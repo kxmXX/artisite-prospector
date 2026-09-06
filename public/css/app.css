@@ -587,7 +587,79 @@ body {
 }
 .editor-section-wrapper.is-active-section .editor-section-toolbar {
   opacity: 1 !important;
+  pointer-events: auto !important;
+  transform: translateY(0) !important;
 }
+
+/* Floating In-Visualizer Section Toolbar (Sleek Linear/Framer Pill) */
+.editor-section-toolbar {
+  position: absolute !important;
+  top: 10px !important;
+  right: 16px !important;
+  z-index: 45 !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  flex-wrap: nowrap !important;
+  white-space: nowrap !important;
+  gap: 3px !important;
+  padding: 4px 8px !important;
+  border-radius: 9999px !important;
+  background: #18181b !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.28), 0 1px 3px rgba(0, 0, 0, 0.15) !important;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-3px);
+  transition: opacity 0.15s ease, transform 0.15s ease !important;
+}
+
+.editor-section-wrapper:hover .editor-section-toolbar {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  transform: translateY(0) !important;
+}
+
+.btn-sec-ctrl {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: transparent;
+  color: #a1a1aa;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+.btn-sec-ctrl:hover {
+  background: #27272a;
+  color: #ffffff;
+  border-color: #3f3f46;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+.btn-sec-ctrl:active {
+  transform: translateY(1.5px);
+}
+.btn-sec-ctrl.btn-sec-del:hover {
+  background: #dc2626;
+  color: #ffffff;
+  border-color: #ef4444;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+}
+
+/* Hide all editor toolbars & chrome in Live Client Preview mode */
+.client-preview-mode .editor-section-toolbar,
+.client-preview-mode .canva-dock,
+.client-preview-mode .cta-context-popover,
+.client-preview-mode .btn-sec-ctrl {
+  display: none !important;
+}
+.client-preview-mode .editor-section-wrapper {
+  outline: none !important;
+}
+
 input, textarea, select, [contenteditable] {
   user-select: text !important;
 }
@@ -835,3 +907,361 @@ input, textarea, select, [contenteditable] {
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
 }
 
+/* Missing utilities for modern responsive components */
+.aspect-\[4\/3\] { aspect-ratio: 4 / 3; }
+.aspect-\[16\/9\] { aspect-ratio: 16 / 9; }
+.aspect-\[1\/1\] { aspect-ratio: 1 / 1; }
+.aspect-\[16\/10\] { aspect-ratio: 16 / 10; }
+.backdrop-blur { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.backdrop-blur-sm { backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+.backdrop-blur-md { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+.backdrop-blur-\[2px\] { backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); }
+.bg-zinc-900\/95 { background-color: rgba(24, 24, 27, 0.95); }
+.bg-zinc-950\/90 { background-color: rgba(9, 9, 11, 0.90); }
+.bg-zinc-950\/60 { background-color: rgba(9, 9, 11, 0.60); }
+.bg-black\/50 { background-color: rgba(0, 0, 0, 0.50); }
+.bg-white\/10 { background-color: rgba(255, 255, 255, 0.10); }
+.bg-white\/15 { background-color: rgba(255, 255, 255, 0.15); }
+.bg-white\/20 { background-color: rgba(255, 255, 255, 0.20); }
+.bg-white\/90 { background-color: rgba(255, 255, 255, 0.90); }
+.bg-white\/95 { background-color: rgba(255, 255, 255, 0.95); }
+.border-white\/10 { border-color: rgba(255, 255, 255, 0.10); }
+.border-white\/20 { border-color: rgba(255, 255, 255, 0.20); }
+.border-white\/30 { border-color: rgba(255, 255, 255, 0.30); }
+.border-black\/5 { border-color: rgba(0, 0, 0, 0.05); }
+.border-black\/10 { border-color: rgba(0, 0, 0, 0.10); }
+
+/* Tactile Mechanical Keycap Buttons (Windows XP / Mechanical Keyboard Switches) */
+.btn-keycap, .keycap-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.12s cubic-bezier(0.2, 0.8, 0.4, 1);
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.08);
+  transform: translateY(0);
+  cursor: pointer;
+  user-select: none;
+}
+
+.btn-keycap-light {
+  background: #f7f1e6;
+  color: #18181b;
+  border: 1px solid #d8cbb8;
+  border-bottom: 3px solid #aa9b87;
+  box-shadow: 0 3px 0 #aa9b87, 0 4px 8px rgba(56, 42, 24, 0.12);
+}
+.btn-keycap-light:hover {
+  background: #fffaf0;
+  border-color: #b9a78f;
+  border-bottom-color: #8e7c67;
+  box-shadow: 0 3px 0 #8e7c67, 0 0 10px rgba(240, 107, 61, 0.22);
+  transform: translateY(-1px);
+}
+.btn-keycap-light:active {
+  transform: translateY(1.5px) !important;
+  box-shadow: 0 0.5px 0 #8e7c67, 0 1px 2px rgba(56, 42, 24, 0.08) !important;
+}
+
+.btn-keycap-dark {
+  background: #18181b;
+  color: #ffffff;
+  border: 1px solid #27272a;
+  border-bottom: 2px solid #09090b;
+  box-shadow: 0 2.5px 0 #09090b, 0 3px 8px rgba(0, 0, 0, 0.25);
+}
+.btn-keycap-dark:hover {
+  background: #27272a;
+  border-color: #3f3f46;
+  border-bottom-color: #000000;
+  box-shadow: 0 2.5px 0 #000000, 0 0 12px rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+.btn-keycap-dark:active {
+  transform: translateY(1.5px) !important;
+  box-shadow: 0 0.5px 0 #000000 !important;
+}
+
+.btn-keycap-danger {
+  background: #dc2626;
+  color: #ffffff;
+  border: 1px solid #b91c1c;
+  border-bottom: 2px solid #991b1b;
+  box-shadow: 0 2.5px 0 #991b1b, 0 3px 8px rgba(220, 38, 38, 0.3);
+}
+.btn-keycap-danger:hover {
+  background: #ef4444;
+  box-shadow: 0 2.5px 0 #7f1d1d, 0 0 14px rgba(239, 68, 68, 0.45);
+  transform: translateY(-1px);
+}
+.btn-keycap-danger:active {
+  transform: translateY(1.5px) !important;
+  box-shadow: 0 0.5px 0 #7f1d1d !important;
+}
+
+/* Accent keycaps echo the orange modifier keys in the physical keyboard reference. */
+.btn-keycap-accent {
+  background: #f06b3d;
+  color: #24130d;
+  border: 1px solid #d9572c;
+  border-bottom: 3px solid #a94123;
+  box-shadow: 0 3px 0 #a94123, 0 4px 10px rgba(169, 65, 35, 0.24);
+}
+.btn-keycap-accent:hover {
+  background: #ff8050;
+  border-color: #e26336;
+  box-shadow: 0 3px 0 #96381f, 0 0 14px rgba(240, 107, 61, 0.42);
+  transform: translateY(-1px);
+}
+.btn-keycap-accent:active {
+  transform: translateY(1.5px) !important;
+  box-shadow: 0 0.5px 0 #96381f !important;
+}
+
+.btn-keycap-success {
+  background: #059669;
+  color: #ffffff;
+  border: 1px solid #047857;
+  border-bottom: 2px solid #065f46;
+  box-shadow: 0 2.5px 0 #065f46, 0 3px 8px rgba(5, 150, 105, 0.3);
+}
+.btn-keycap-success:hover {
+  background: #10b981;
+  box-shadow: 0 2.5px 0 #064e3b, 0 0 14px rgba(16, 185, 129, 0.45);
+  transform: translateY(-1px);
+}
+.btn-keycap-success:active {
+  transform: translateY(1.5px) !important;
+  box-shadow: 0 0.5px 0 #064e3b !important;
+}
+
+/* Inline CTA Contextual Control Popover */
+.cta-button-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cta-context-popover {
+  position: absolute;
+  /* Slight overlap removes the hover dead-zone between CTA and controls. */
+  bottom: calc(100% - 2px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: #18181b;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
+  padding: 4px 8px;
+  display: none;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  z-index: 60;
+  white-space: nowrap;
+  font-size: 11px;
+}
+
+.cta-button-wrapper:hover .cta-context-popover,
+.cta-button-wrapper:focus-within .cta-context-popover,
+.cta-button-wrapper.is-active .cta-context-popover {
+  display: flex !important;
+  transform: translateX(-50%) translateY(0);
+}
+
+.cta-context-btn {
+  padding: 3px 7px;
+  border-radius: 5px;
+  font-size: 10.5px;
+  font-weight: 600;
+  background: #27272a;
+  color: #e4e4e7;
+  border: 1px solid #3f3f46;
+  border-bottom: 2px solid #18181b;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  user-select: none;
+}
+.cta-context-btn:hover {
+  background: #3f3f46;
+  color: #ffffff;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.25);
+}
+.cta-context-btn:active {
+  transform: translateY(1px);
+}
+.cta-context-btn.is-selected {
+  background: #ffffff;
+  color: #09090b;
+  border-color: #ffffff;
+}
+
+/* Pulsing effect toggle for CTA */
+.btn-cta-pulse {
+  animation: ctaPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+@keyframes ctaPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.95; transform: scale(1.02); }
+}
+
+/* True Dark Theme Styling */
+body.dark-theme {
+  background-color: #09090b !important;
+  color: #f4f4f5 !important;
+}
+
+body.dark-theme header,
+body.dark-theme aside,
+body.dark-theme nav {
+  background-color: #121215 !important;
+  color: #f4f4f5 !important;
+  border-color: #27272a !important;
+}
+
+body.dark-theme .section-card {
+  background-color: #18181b !important;
+  border-color: #27272a !important;
+  color: #f4f4f5 !important;
+}
+body.dark-theme .section-card-header {
+  background-color: #18181b !important;
+  color: #f4f4f5 !important;
+}
+body.dark-theme .section-accordion-body {
+  background-color: #121215 !important;
+  border-color: #27272a !important;
+  color: #d4d4d8 !important;
+}
+body.dark-theme .pill-tabs-container {
+  background-color: #18181b !important;
+  border-color: #27272a !important;
+}
+body.dark-theme .pill-tab-btn {
+  color: #a1a1aa !important;
+}
+body.dark-theme .pill-tab-btn.is-active {
+  background-color: #27272a !important;
+  color: #ffffff !important;
+}
+body.dark-theme input,
+body.dark-theme textarea,
+body.dark-theme select {
+  background-color: #18181b !important;
+  color: #ffffff !important;
+  border-color: #3f3f46 !important;
+}
+
+/* Responsive PC / Widescreen Layout Scaling */
+@media (min-width: 1024px) {
+  .pc-header { height: 4rem !important; }
+  .pc-sidebar { width: 22.5rem !important; }
+  .dashboard-card-img { height: 13rem !important; }
+}
+
+@media (min-width: 1440px) {
+  .pc-sidebar { width: 24rem !important; }
+  .dashboard-card-img { height: 14rem !important; }
+  .dashboard-grid { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
+}
+
+/* Explicit utility fallbacks used by the editor shell. */
+.w-84 { width: 21rem; }
+.w-96 { width: 24rem; }
+.max-w-none { max-width: none; }
+@media (min-width: 1536px) {
+  .\32xl\:block { display: block; }
+}
+
+/* Larger mechanical keycaps: clearer icons, reliable PC hit targets and a tactile press. */
+.pc-header .btn-keycap,
+.pc-header .viewport-option,
+.canva-dock-btn,
+.editor-section-toolbar .btn-sec-ctrl { min-height: 40px; }
+.pc-header .btn-keycap svg,
+.pc-header .viewport-option svg { width: 18px; height: 18px; stroke-width: 2.2; }
+.pc-header .btn-keycap,
+.viewport-option,
+.canva-dock-btn,
+.editor-section-toolbar .btn-sec-ctrl {
+  transition: transform 120ms ease, box-shadow 120ms ease, background-color 120ms ease, color 120ms ease;
+}
+.pc-header .btn-keycap:hover,
+.viewport-option:hover,
+.canva-dock-btn:hover,
+.editor-section-toolbar .btn-sec-ctrl:hover { transform: translateY(-1px); }
+.pc-header .btn-keycap:active,
+.viewport-option:active,
+.canva-dock-btn:active,
+.editor-section-toolbar .btn-sec-ctrl:active { transform: translateY(1px); }
+.viewport-switcher { gap: 2px; }
+.viewport-option { display: inline-flex; align-items: center; justify-content: center; gap: 6px; color: #71717a; font-size: 11px; font-weight: 700; }
+.viewport-option.is-active { background: #ffffff; color: #09090b; box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+.viewport-label { white-space: nowrap; }
+.editor-section-toolbar { padding: 6px 8px; gap: 5px; }
+.editor-section-toolbar .btn-sec-ctrl { width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; }
+.editor-section-toolbar .btn-sec-ctrl svg { width: 17px; height: 17px; }
+.section-card-header { min-height: 48px; }
+.section-card-header button { min-width: 34px; min-height: 34px; }
+
+/* Editor night theme is separate from the generated client's day/night theme. */
+body.dark-theme .pc-header,
+body.dark-theme .pc-sidebar,
+body.dark-theme #right-inspector-panel,
+body.dark-theme .pc-sidebar .section-card,
+body.dark-theme .pc-sidebar .section-card-header {
+  background: #111114 !important;
+  color: #f4f4f5 !important;
+  border-color: #2c2c32 !important;
+}
+body.dark-theme .pc-header .text-zinc-900,
+body.dark-theme .pc-sidebar .text-zinc-900,
+body.dark-theme #right-inspector-panel .text-zinc-900 { color: #f4f4f5 !important; }
+body.dark-theme .pc-header .bg-zinc-100,
+body.dark-theme .pc-sidebar .bg-zinc-100,
+body.dark-theme #right-inspector-panel .bg-zinc-100 { background: #202027 !important; }
+body.dark-theme #canvas-container { background: #111114 !important; }
+body.dark-theme .viewport-option.is-active { background: #f4f4f5; color: #09090b; }
+
+/* Generated client day/night switch. Scoped so it never changes the editor chrome. */
+.site-theme-toggle { min-height: 40px; cursor: pointer; }
+.site-theme-icon { display: inline-flex; }
+.artisite-root[data-site-theme="dark"] {
+  --bg: #111318 !important;
+  --bg-sec: #1c222b !important;
+  --text: #f4f4f5 !important;
+  --text-muted: #b4bac7 !important;
+  background: #111318 !important;
+  color: #f4f4f5;
+}
+.artisite-root[data-site-theme="dark"] .bg-white,
+.artisite-root[data-site-theme="dark"] .bg-white\/95 { background-color: #171a20 !important; }
+.artisite-root[data-site-theme="dark"] .bg-gray-50,
+.artisite-root[data-site-theme="dark"] .bg-slate-50 { background-color: #20242c !important; }
+.artisite-root[data-site-theme="dark"] .text-gray-900,
+.artisite-root[data-site-theme="dark"] .text-gray-800,
+.artisite-root[data-site-theme="dark"] .text-gray-700 { color: #f4f4f5 !important; }
+.artisite-root[data-site-theme="dark"] .text-gray-600,
+.artisite-root[data-site-theme="dark"] .text-gray-500,
+.artisite-root[data-site-theme="dark"] .text-gray-400 { color: #b4bac7 !important; }
+.artisite-root[data-site-theme="dark"] .border-gray-100,
+.artisite-root[data-site-theme="dark"] .border-gray-200,
+.artisite-root[data-site-theme="dark"] .border-black\/5 { border-color: #303641 !important; }
+.artisite-root[data-site-theme="dark"] .site-theme-toggle { background: #20242c !important; color: #f4f4f5 !important; border-color: #3b4350 !important; }
+.artisite-root[data-site-theme="dark"] .site-section { color: #f4f4f5; }
+
+@media (max-width: 1250px) {
+  .viewport-label { display: none; }
+  .pc-header { padding-left: 12px; padding-right: 12px; }
+  .pc-header > div { gap: 6px; }
+  .pc-header .btn-keycap { padding-left: 10px; padding-right: 10px; }
+  .pc-header .theme-control-label { display: none; }
+}
+@media (max-width: 980px) {
+  .pc-header { height: auto; min-height: 64px; flex-wrap: wrap; row-gap: 8px; padding-top: 8px; padding-bottom: 8px; }
+  .pc-header > div:nth-child(2) { order: 3; width: 100%; justify-content: center; }
+  .pc-sidebar { width: 18rem !important; }
+}

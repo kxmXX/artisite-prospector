@@ -87,7 +87,33 @@ Intégré directement dans le produit, Michel dispose à chaque instant d'un tir
 
 ---
 
-## 🧪 5. Démarrage Rapide & Tests
+## 📍 5. État actuel & suivi des améliorations
+
+### État actuel
+
+- **MVP fonctionnel :** génération de sites vitrines pour les métiers référencés, éditeur visuel, aperçu client, dashboard prospects et outils commerciaux.
+- **Export autonome :** un fichier HTML unique embarque le rendu, les styles utilitaires et les interactions client (avant/après, FAQ, lightbox et simulateur de devis), sans dépendance JavaScript au runtime.
+- **Thème du site exporté :** le bouton jour/nuit est actif dans le fichier exporté et met à jour son libellé, son icône et l’apparence du site.
+- **Images distantes :** les images disposent d’un fallback SVG client lorsqu’une URL distante échoue ; les images distantes et les polices Google restent toutefois des ressources externes facultatives.
+- **Persistance actuelle :** l’état de travail est conservé côté navigateur via `localStorage`. Il n’y a pas encore de comptes, de base de données multi-utilisateur ni de stockage cloud des médias.
+- **IA image :** l’interface prévoit la génération/remplacement d’images, mais l’intégration d’un fournisseur de génération d’images en production reste à finaliser.
+
+### Suivi des améliorations
+
+| Priorité | Sujet | État | Prochaine étape |
+| --- | --- | --- | --- |
+| P0 | Export autonome et robustesse des images | En place | Ajouter des tests navigateur sur le téléchargement et les erreurs réseau réelles |
+| P0 | Comptes et droits utilisateurs | À faire | Ajouter authentification, sessions et séparation des projets |
+| P1 | Persistance et médias | À faire | Brancher une base de données et un stockage objet pour projets, images et exports |
+| P1 | Génération d’images IA | À finaliser | Connecter un fournisseur avec contrôle des coûts, quotas et modération |
+| P1 | Mise en production | À renforcer | Ajouter validation des entrées, observabilité, CSP et vérifications de déploiement |
+| P2 | Finitions UI/UX desktop | En amélioration | Poursuivre les tests responsive et les contrôles d’accessibilité |
+
+Ce tableau sert de point de repère pour les prochaines interventions : toute nouvelle évolution doit préciser son périmètre, son test de validation et son impact sur l’export autonome.
+
+---
+
+## 🧪 6. Démarrage Rapide & Tests
 
 Le projet est entièrement autonome et s'exécute avec Node.js sans aucune dépendance npm externe requise.
 
@@ -105,7 +131,7 @@ npm test
 
 ---
 
-## 🏛️ 6. Architecture du Code
+## 🏛️ 7. Architecture du Code
 
 ```
 /

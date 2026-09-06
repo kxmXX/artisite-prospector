@@ -13,6 +13,7 @@ import { processCopilotPrompt } from "./engine/copilot.js";
 import { downloadHTML, downloadJSON } from "./engine/exporter.js";
 import { getStylePresetById } from "./data/styles.js";
 import { getTradeById } from "./data/trades.js";
+import { getTradeFallbackDataUrl } from "./data/imageFallbacks.js";
 import { getIcon } from "./components/icons.js";
 
 class App {
@@ -28,10 +29,24 @@ class App {
   init() {
     // Expose app on window for inline handlers
     window.app = this;
+    document.body.classList.toggle("dark-theme", state.themeMode === "dark");
 
     // Subscribe to state changes
     state.subscribe((s, event) => {
       if (event === "live_text_change" || event === "live_color_change" || event === "live_business_change" || event === "sidebar_tab_change") {
+        return;
+      }
+      if (event === "theme_mode_change") {
+        document.body.classList.toggle("dark-theme", s.themeMode === "dark");
+        this.render();
+        return;
+      }
+      if (event === "editor_mode_change") {
+        document.body.classList.toggle("client-preview-mode", s.editorMode === "preview");
+        this.render();
+        if (s.currentView === "editor") {
+          this.initCanvasInteractivity();
+        }
         return;
       }
       if (event === "drawer_change") {
@@ -100,6 +115,8 @@ class App {
 
     // Modals & Drawers overlays
     this.renderModals();
+    this.syncSiteThemeToggle();
+    this.hydrateImageFallbacks();
   }
 
   renderModals() {
@@ -327,6 +344,13 @@ class App {
         mobile: "w-[390px] mx-auto shadow-sm rounded-3xl overflow-hidden border-2 border-zinc-400 my-8 bg-white transition-all duration-300 min-h-full"
       }[vp] || "w-full";
     }
+    document.querySelectorAll(".viewport-option").forEach(button => {
+      const label = button.getAttribute("aria-label") || "";
+      const active = (vp === "desktop" && label.includes("ordinateur")) ||
+        (vp === "tablet" && label.includes("tablette")) ||
+        (vp === "mobile" && label.includes("mobile"));
+      button.classList.toggle("is-active", active);
+    });
   }
 
   setSidebarTab(tab) {
@@ -951,19 +975,143 @@ class App {
   }
 
   switchImageTab(tab) {
-    ["library", "url", "upload"].forEach(t => {
+    ["library", "ai", "url", "upload"].forEach(t => {
       const btn = document.getElementById(`tab-img-${t}`);
       const panel = document.getElementById(`image-panel-${t}`);
       if (btn && panel) {
         if (t === tab) {
-          btn.className = "px-3 py-1.5 rounded-md font-medium text-zinc-900 bg-white shadow-xs border border-zinc-200";
+          btn.className = "px-3 py-1.5 rounded-lg font-semibold text-zinc-900 bg-white shadow-xs border border-zinc-200";
           panel.style.display = "block";
         } else {
-          btn.className = "px-3 py-1.5 rounded-md font-medium text-zinc-600 hover:text-zinc-900 border border-transparent";
+          btn.className = "px-3 py-1.5 rounded-lg font-medium text-zinc-600 hover:text-zinc-900 border border-transparent";
           panel.style.display = "none";
         }
       }
     });
+  }
+
+  setAIImageStyle(style) {
+    this.selectedAIStyle = style;
+    const styles = ['4k', 'archi', 'vector'];
+    styles.forEach(s => {
+      const btn = document.getElementById(`ai-style-${s}`);
+      if (btn) {
+        if (s === style) {
+          btn.classList.add('is-selected');
+        } else {
+          btn.classList.remove('is-selected');
+        }
+      }
+    });
+  }
+
+  async generateAIPhoto() {
+    const promptInput = document.getElementById("ai-image-prompt-input");
+    const prompt = promptInput?.value?.trim() || "Photo artisanale pro";
+    const btn = document.getElementById("btn-generate-ai-photo");
+    const outputContainer = document.getElementById("ai-image-output-container");
+    const previewImg = document.getElementById("ai-generated-preview-img");
+
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = `<span class="animate-spin mr-1.5">⚡</span><span>Génération du visuel par l'IA en cours...</span>`;
+    }
+
+    try {
+      const tradeId = state.currentProject?.business?.tradeId || "paysagiste";
+      const sectionType = state.activeImageMeta?.sectionType || "hero";
+
+      let imageUrl = "";
+      try {
+        const res = await fetch("/api/ai/image", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt, tradeId, sectionType, style: this.selectedAIStyle || "4k" })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.imageUrl) imageUrl = data.imageUrl;
+        }
+      } catch (err) {
+        // Fallback to vector engine
+      }
+
+      if (!imageUrl) {
+        const { getTradeFallbackDataUrl } = await import("./data/imageFallbacks.js");
+        imageUrl = getTradeFallbackDataUrl(tradeId, sectionType, prompt);
+      }
+
+      this.lastGeneratedAIPhotoUrl = imageUrl;
+      if (previewImg) previewImg.src = imageUrl;
+      if (outputContainer) outputContainer.classList.remove("hidden");
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = `<span>⚡ Regénérer une autre variante</span>`;
+      }
+    }
+  }
+
+  applyGeneratedAIPhoto() {
+    if (!this.lastGeneratedAIPhotoUrl || !state.activeImageMeta) return;
+    const { sectionId, fieldPath, itemIndex } = state.activeImageMeta;
+    this.applyImageUpdate(sectionId, fieldPath, this.lastGeneratedAIPhotoUrl, itemIndex);
+    this.closeImageModal();
+  }
+
+  setEditorMode(mode) {
+    state.setEditorMode(mode);
+  }
+
+  setThemeMode(mode) {
+    state.setThemeMode(mode);
+  }
+
+  toggleThemeMode() {
+    state.toggleThemeMode();
+  }
+
+  toggleSiteTheme() {
+    const root = document.querySelector(".artisite-root");
+    if (!root || !state.currentProject) return;
+    const next = root.dataset.siteTheme === "dark" ? "light" : "dark";
+    root.dataset.siteTheme = next;
+    state.currentProject.siteTheme = next;
+    state.saveToStorage();
+    this.syncSiteThemeToggle(root);
+  }
+
+  syncSiteThemeToggle(root = document.querySelector(".artisite-root")) {
+    if (!root) return;
+    const dark = root.dataset.siteTheme === "dark";
+    document.querySelectorAll("[data-site-theme-toggle]").forEach(button => {
+      button.setAttribute("aria-label", dark ? "Activer le mode jour du site" : "Activer le mode nuit du site");
+      const label = button.querySelector(".site-theme-label");
+      if (label) label.textContent = dark ? "Mode jour" : "Mode nuit";
+      button.querySelector(".site-theme-icon-light")?.classList.toggle("hidden", dark);
+      button.querySelector(".site-theme-icon-dark")?.classList.toggle("hidden", !dark);
+    });
+  }
+
+  hydrateImageFallbacks() {
+    window.setTimeout(() => {
+      document.querySelectorAll("img[data-fallback-src]").forEach(img => {
+        if (!img.complete || img.naturalWidth > 0) return;
+        const fallback = img.dataset.fallbackSrc;
+        if (!fallback || img.dataset.fallbackApplied === "true") return;
+        img.dataset.fallbackApplied = "true";
+        img.src = fallback;
+      });
+    }, 700);
+  }
+
+  toggleCTAPulse() {
+    if (state.currentProject?.branding) {
+      state.currentProject.branding.ctaPulse = !state.currentProject.branding.ctaPulse;
+      state.saveToStorage();
+    }
+    const btns = document.querySelectorAll(".btn-cta");
+    btns.forEach(b => b.classList.toggle("btn-cta-pulse"));
   }
 
   selectPhotoFromLibrary(url) {
@@ -1022,7 +1170,8 @@ class App {
 
   deletePhoto(sectionId, fieldPath, itemIndex = null) {
     if (confirm("Mettre cette photo à la poubelle ?")) {
-      const placeholder = "https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=800&q=80";
+      const tradeId = state.currentProject?.business?.tradeId || "paysagiste";
+      const placeholder = getTradeFallbackDataUrl(tradeId, fieldPath, "Visuel à personnaliser");
       this.applyImageUpdate(sectionId, fieldPath, placeholder, itemIndex);
     }
   }
@@ -1475,10 +1624,20 @@ class App {
     `;
 
     this.initCanvasInteractivity();
+    this.syncSiteThemeToggle();
+    this.hydrateImageFallbacks();
   }
 
   // Interactive hooks for the canvas
   initCanvasInteractivity() {
+    document.querySelectorAll("[data-site-theme-toggle]").forEach(button => {
+      button.onclick = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        this.toggleSiteTheme();
+      };
+    });
+
     // 1. Before / After slider
     const container = document.querySelector(".ba-container");
     if (container) {

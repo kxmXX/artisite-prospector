@@ -1,4 +1,18 @@
 import { getFallbackModels, enrichSiteWithAI, callGeminiWithFallback } from "./gemini.js";
+import { getTradeFallbackDataUrl } from "../public/js/data/imageFallbacks.js";
+
+function extractImageUrl(data) {
+  if (typeof data === "string" && /^(data:image\/|https?:\/\/)/i.test(data.trim())) {
+    return data.trim();
+  }
+
+  if (!data || typeof data !== "object") return null;
+
+  const candidate = data.imageUrl || data.image_url || data.url || data.image?.url;
+  return typeof candidate === "string" && /^(data:image\/|https?:\/\/)/i.test(candidate.trim())
+    ? candidate.trim()
+    : null;
+}
 
 export function readBodyJSON(req) {
   if (req.body && typeof req.body === "object") {
@@ -154,6 +168,38 @@ Réponds en JSON avec :
           error: aiResult.error
         });
       }
+      return;
+    }
+
+    // 5. AI Image Generation / Synthesizer
+    if (normalizedPath === "/api/ai/image" && req.method === "POST") {
+      const body = await readBodyJSON(req);
+      const { prompt, tradeId, sectionType, style } = body;
+
+      const requestedPrompt = prompt || "Photo artisanale pro";
+      const fallbackUrl = getTradeFallbackDataUrl(tradeId, sectionType, requestedPrompt);
+      // Attempt Gemini generation for rich SVG art or prompt analysis
+      let generatedUrl = null;
+      if (process.env.GEMINI_API_KEY) {
+        try {
+          const aiResult = await callGeminiWithFallback({
+            prompt: `Génère une description détaillée et un objet visuel pour ce prompt d'image d'artisan: "${requestedPrompt}". Corps de métier: "${tradeId}". Section: "${sectionType}". Style: "${style}". Si une URL ou une data URL d'image est disponible, renvoie-la explicitement.`,
+            jsonOutput: false
+          });
+          if (aiResult.success) {
+            generatedUrl = extractImageUrl(aiResult.data);
+          }
+        } catch (e) {
+          // Fallback gracefully
+        }
+      }
+
+      sendJSON(res, 200, {
+        success: true,
+        source: generatedUrl ? "gemini" : "local_engine",
+        prompt: requestedPrompt,
+        imageUrl: generatedUrl || fallbackUrl
+      });
       return;
     }
 

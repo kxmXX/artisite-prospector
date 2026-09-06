@@ -8,6 +8,8 @@ class AppStateManager {
     this.currentProject = null;
     this.currentView = "dashboard"; // "dashboard", "editor", "preview"
     this.viewport = "desktop"; // "desktop", "tablet", "mobile"
+    this.editorMode = "conception"; // "conception", "preview"
+    this.themeMode = "light"; // "light", "dark"
     this.selectedSectionId = null;
     this.activeInspectorTab = "content"; // "content", "style", "visibility"
     this.activeSidebarTab = "sections"; // "sections", "settings"
@@ -33,9 +35,20 @@ class AppStateManager {
     this.currentProject = this.projects[0];
   }
 
-  subscribe(callback) {
-    this.listeners.add(callback);
-    return () => this.listeners.delete(callback);
+  subscribe(eventOrCallback, callback) {
+    if (typeof eventOrCallback === 'function') {
+      this.listeners.add(eventOrCallback);
+      return () => this.listeners.delete(eventOrCallback);
+    } else if (typeof eventOrCallback === 'string' && typeof callback === 'function') {
+      const filtered = (s, event) => {
+        if (event === eventOrCallback) {
+          callback(s, event);
+        }
+      };
+      this.listeners.add(filtered);
+      return () => this.listeners.delete(filtered);
+    }
+    return () => {};
   }
 
   notify(changeEvent = "state_change") {
@@ -81,6 +94,22 @@ class AppStateManager {
   setViewport(vp) {
     this.viewport = vp;
     this.notify("viewport_change");
+  }
+
+  setEditorMode(mode = "conception") {
+    this.editorMode = mode;
+    this.notify("editor_mode_change");
+  }
+
+  setThemeMode(mode = "light") {
+    this.themeMode = mode;
+    this.notify("theme_mode_change");
+  }
+
+  toggleThemeMode() {
+    this.themeMode = this.themeMode === "dark" ? "light" : "dark";
+    this.notify("theme_mode_change");
+    return this.themeMode;
   }
 
   setDrawer(drawerName) {

@@ -62,6 +62,14 @@ ${UTILITY_CSS}
     img { max-width: 100%; height: auto; display: block; }
     button { font-family: inherit; cursor: pointer; border: none; }
 
+    /* Physical keyboard keycap treatment for exported CTAs. */
+    .btn-keycap { position: relative; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; transition: transform 120ms ease, box-shadow 120ms ease, background-color 120ms ease; }
+    .btn-keycap:hover { transform: translateY(-1px); }
+    .btn-keycap:active { transform: translateY(1.5px); }
+    .btn-keycap-light { background: #f7f1e6; color: #18181b; border: 1px solid #d8cbb8; border-bottom: 3px solid #aa9b87; box-shadow: 0 3px 0 #aa9b87, 0 4px 8px rgba(56,42,24,.12); }
+    .btn-keycap-dark { background: #27282b; color: #fff; border: 1px solid #3f4146; border-bottom: 3px solid #111214; box-shadow: 0 3px 0 #111214, 0 4px 8px rgba(0,0,0,.25); }
+    .btn-keycap-accent { background: #f06b3d; color: #24130d; border: 1px solid #d9572c; border-bottom: 3px solid #a94123; box-shadow: 0 3px 0 #a94123, 0 4px 10px rgba(169,65,35,.24); }
+
     /* Utilities */
     .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 1.25rem; }
     .section-py { padding-top: 5rem; padding-bottom: 5rem; }
@@ -147,6 +155,33 @@ ${UTILITY_CSS}
       font-size: 32px; font-weight: bold; cursor: pointer;
     }
 
+    /* Standalone day/night theme */
+    .artisite-root { transition: background-color 0.2s ease, color 0.2s ease; }
+    .site-theme-toggle { min-height: 40px; cursor: pointer; }
+    .site-theme-icon { display: inline-flex; }
+    .btn-cta-pulse { animation: ctaPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+    @keyframes ctaPulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.95; transform: scale(1.02); } }
+    .artisite-root[data-site-theme="dark"] {
+      --bg: #111318 !important; --bg-sec: #1c222b !important;
+      --text: #f4f4f5 !important; --text-muted: #b4bac7 !important;
+      background: #111318 !important; color: #f4f4f5;
+    }
+    .artisite-root[data-site-theme="dark"] .bg-white,
+    .artisite-root[data-site-theme="dark"] .bg-white\\/95 { background-color: #171a20 !important; }
+    .artisite-root[data-site-theme="dark"] .bg-gray-50,
+    .artisite-root[data-site-theme="dark"] .bg-slate-50 { background-color: #20242c !important; }
+    .artisite-root[data-site-theme="dark"] .text-gray-900,
+    .artisite-root[data-site-theme="dark"] .text-gray-800,
+    .artisite-root[data-site-theme="dark"] .text-gray-700 { color: #f4f4f5 !important; }
+    .artisite-root[data-site-theme="dark"] .text-gray-600,
+    .artisite-root[data-site-theme="dark"] .text-gray-500,
+    .artisite-root[data-site-theme="dark"] .text-gray-400 { color: #b4bac7 !important; }
+    .artisite-root[data-site-theme="dark"] .border-gray-100,
+    .artisite-root[data-site-theme="dark"] .border-gray-200,
+    .artisite-root[data-site-theme="dark"] .border-black\\/5 { border-color: #303641 !important; }
+    .artisite-root[data-site-theme="dark"] .site-theme-toggle { background: #20242c !important; color: #f4f4f5 !important; border-color: #3b4350 !important; }
+    .artisite-root[data-site-theme="dark"] .site-section { color: #f4f4f5; }
+
     @media (max-width: 768px) {
       .section-py { padding-top: 3.5rem; padding-bottom: 3.5rem; }
       .ba-container { height: 340px; }
@@ -158,7 +193,61 @@ ${UTILITY_CSS}
 
   <!-- Interactive Scripts Bundle -->
   <script>
-    // 1. Before-After Comparison Slider
+    // 1. Standalone day/night theme toggle
+    (function initSiteTheme() {
+      const root = document.querySelector('.artisite-root');
+      const toggles = document.querySelectorAll('[data-site-theme-toggle]');
+      if (!root || !toggles.length) return;
+
+      function syncThemeToggle() {
+        const dark = root.dataset.siteTheme === 'dark';
+        toggles.forEach(button => {
+          button.setAttribute('aria-label', dark ? 'Activer le mode jour du site' : 'Activer le mode nuit du site');
+          const label = button.querySelector('.site-theme-label');
+          if (label) label.textContent = dark ? 'Mode jour' : 'Mode nuit';
+          const lightIcon = button.querySelector('.site-theme-icon-light');
+          const darkIcon = button.querySelector('.site-theme-icon-dark');
+          if (lightIcon) lightIcon.classList.toggle('hidden', dark);
+          if (darkIcon) darkIcon.classList.toggle('hidden', !dark);
+        });
+      }
+
+      toggles.forEach(button => {
+        button.addEventListener('click', () => {
+          root.dataset.siteTheme = root.dataset.siteTheme === 'dark' ? 'light' : 'dark';
+          syncThemeToggle();
+        });
+      });
+
+      syncThemeToggle();
+    })();
+
+    // 2. Client-side fallback for failed remote images
+    (function initImageFallbacks() {
+      function applyFallback(img) {
+        if (!img || img.dataset.fallbackApplied === 'true') return;
+        const fallback = img.dataset.fallbackSrc;
+        if (!fallback) return;
+        img.dataset.fallbackApplied = 'true';
+        img.removeAttribute('srcset');
+        img.src = fallback;
+      }
+
+      function hydrateImageFallbacks() {
+        document.querySelectorAll('img[data-fallback-src]').forEach(img => {
+          if (img.dataset.fallbackListenerAttached !== 'true') {
+            img.addEventListener('error', () => applyFallback(img));
+            img.dataset.fallbackListenerAttached = 'true';
+          }
+          if (img.complete && img.naturalWidth === 0) applyFallback(img);
+        });
+      }
+
+      hydrateImageFallbacks();
+      window.setTimeout(hydrateImageFallbacks, 0);
+    })();
+
+    // 3. Before-After Comparison Slider
     (function initBeforeAfter() {
       const container = document.querySelector('.ba-container');
       if (!container) return;
@@ -207,7 +296,7 @@ ${UTILITY_CSS}
       }, 100);
     })();
 
-    // 2. FAQ Accordion Toggle
+    // 4. FAQ Accordion Toggle
     (function initFaq() {
       document.querySelectorAll('.faq-header').forEach(header => {
         header.addEventListener('click', () => {
@@ -220,7 +309,7 @@ ${UTILITY_CSS}
       });
     })();
 
-    // 3. Lightbox functionality
+    // 5. Lightbox functionality
     (function initLightbox() {
       const modal = document.getElementById('lightbox-modal');
       const imgTarget = document.getElementById('lightbox-target');
@@ -242,7 +331,7 @@ ${UTILITY_CSS}
       });
     })();
 
-    // 4. Quote Simulator Calculation
+    // 6. Quote Simulator Calculation
     (function initQuoteSimulator() {
       const form = document.getElementById('quote-calc-form');
       if (!form) return;

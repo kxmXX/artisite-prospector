@@ -45,28 +45,34 @@ export function renderEditor(state) {
   }[state.viewport] || "w-full";
 
   const selectedSecId = state.selectedSectionId || project.sections[0]?.id;
-  const websiteHTML = renderWebsiteHTML(project, { isEditor: true, isStandalone: false, selectedSectionId: selectedSecId });
+  const isLivePreview = state.editorMode === "preview";
+  const websiteHTML = renderWebsiteHTML(project, {
+    isEditor: !isLivePreview,
+    isStandalone: false,
+    selectedSectionId: selectedSecId,
+    tradeId: project.business.tradeId
+  });
   const selectedSec = project.sections.find(s => s.id === selectedSecId) || project.sections[0];
   const inspectorHTML = renderInspector(selectedSec, project, state);
 
   return `
     <div class="h-screen flex flex-col bg-[#F4F5F7] text-zinc-900 overflow-hidden select-none">
-      
-      <!-- TOP MINIMALIST NAVIGATION BAR (Linear / Sendpage style) -->
-      <header class="h-13 bg-white text-zinc-900 px-4 sm:px-5 flex items-center justify-between border-b border-zinc-200 z-40 flex-shrink-0">
-        
+
+      <!-- TOP NAVIGATION BAR (PC-Optimized with 1-Click Modes & Mechanical Keycaps) -->
+      <header class="h-16 bg-white text-zinc-900 px-4 sm:px-6 flex items-center justify-between border-b border-zinc-200 z-40 flex-shrink-0 pc-header">
+
         <!-- Left: Back Button & Project Identification -->
-        <div class="flex items-center gap-3">
-          <button type="button" onclick="window.app.openDashboard()" class="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-600 hover:text-zinc-900 px-2.5 py-1.5 rounded-lg hover:bg-zinc-100 transition-colors">
+        <div class="flex items-center gap-3.5">
+          <button type="button" onclick="window.app.openDashboard()" class="btn-keycap btn-keycap-light inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-700 px-3 py-2 rounded-lg border border-zinc-200">
             ${getIcon("arrowLeft", "w-3.5 h-3.5")}
             <span>Projets</span>
           </button>
 
-          <div class="h-4 w-[1px] bg-zinc-200 hidden sm:block"></div>
+          <div class="h-5 w-[1px] bg-zinc-200 hidden sm:block"></div>
 
-          <div class="flex items-center gap-2">
-            <span class="font-semibold text-sm text-zinc-900 truncate max-w-[160px] sm:max-w-none" id="editor-title-display">${project.name}</span>
-            <span class="text-[10.5px] font-medium px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-600 border border-zinc-200">
+          <div class="flex items-center gap-2.5">
+            <span class="font-bold text-sm sm:text-base text-zinc-900 truncate max-w-[180px] sm:max-w-none" id="editor-title-display">${project.name}</span>
+            <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-md bg-zinc-100 text-zinc-700 border border-zinc-200">
               ${project.business.tradeLabel}
             </span>
             <div class="hidden md:flex items-center gap-1 text-[11px] text-zinc-400 pl-1">
@@ -76,83 +82,103 @@ export function renderEditor(state) {
           </div>
         </div>
 
-        <!-- Middle: Undo/Redo & Segmented Device Switcher -->
-        <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Middle: 1-Click Conception / Preview Switcher + Device Viewport -->
+        <div class="flex items-center gap-2.5 sm:gap-3.5">
+
+          <!-- Mode Switcher: 🛠️ Conception vs 👁️ Vue Client Démo -->
+          <div class="flex items-center bg-zinc-100 rounded-xl p-1 border border-zinc-200 shadow-2xs">
+            <button type="button" onclick="window.app.setEditorMode('conception')" class="btn-keycap ${!isLivePreview ? 'btn-keycap-dark' : 'btn-keycap-light'} px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5">
+              ${getIcon("edit", "w-3.5 h-3.5")}
+              <span class="hidden sm:inline">Mode Conception</span>
+              <span class="sm:hidden">Éditer</span>
+            </button>
+            <button type="button" onclick="window.app.setEditorMode('preview')" class="btn-keycap ${isLivePreview ? 'btn-keycap-dark' : 'btn-keycap-light'} px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 ml-1" title="Voir exactement le rendu final sans barres d'outils">
+              ${getIcon("eye", "w-3.5 h-3.5")}
+              <span class="hidden sm:inline">Vue Client Démo</span>
+              <span class="sm:hidden">Client</span>
+            </button>
+          </div>
+
           <!-- Undo / Redo -->
-          <div class="flex items-center bg-zinc-100/80 rounded-lg p-0.5 border border-zinc-200/80">
-            <button type="button" id="btn-undo-header" onclick="window.app.undo()" class="p-1.5 text-zinc-600 hover:text-zinc-900 hover:bg-white rounded-md transition-colors ${!state.canUndo() ? 'opacity-30 cursor-not-allowed' : ''}" title="Annuler (⌘Z)">
+          <div class="hidden sm:flex items-center bg-zinc-100 rounded-lg p-0.5 border border-zinc-200">
+            <button type="button" id="btn-undo-header" onclick="window.app.undo()" class="btn-keycap btn-keycap-light p-1.5 text-zinc-700 rounded-md ${!state.canUndo() ? 'opacity-30 cursor-not-allowed' : ''}" title="Annuler (⌘Z)">
               ${getIcon("undo", "w-3.5 h-3.5")}
             </button>
-            <button type="button" id="btn-redo-header" onclick="window.app.redo()" class="p-1.5 text-zinc-600 hover:text-zinc-900 hover:bg-white rounded-md transition-colors ${!state.canRedo() ? 'opacity-30 cursor-not-allowed' : ''}" title="Rétablir (⌘⇧Z)">
+            <button type="button" id="btn-redo-header" onclick="window.app.redo()" class="btn-keycap btn-keycap-light p-1.5 text-zinc-700 rounded-md ${!state.canRedo() ? 'opacity-30 cursor-not-allowed' : ''}" title="Rétablir (⌘⇧Z)">
               ${getIcon("redo", "w-3.5 h-3.5")}
             </button>
           </div>
 
           <!-- Device Switcher Segmented Control -->
-          <div class="flex items-center bg-zinc-100/80 rounded-lg p-0.5 border border-zinc-200/80">
-            <button type="button" onclick="window.app.setViewport('desktop')" class="p-1.5 rounded-md transition-all ${state.viewport === 'desktop' ? 'bg-white text-zinc-950 shadow-xs font-semibold' : 'text-zinc-500 hover:text-zinc-800'}" title="Desktop (100%)">
+          <div class="viewport-switcher flex items-center bg-zinc-100 rounded-lg p-1 border border-zinc-200" aria-label="Prévisualisation par appareil">
+            <button type="button" onclick="window.app.setViewport('desktop')" class="viewport-option p-2 rounded-md transition-all ${state.viewport === 'desktop' ? 'is-active' : ''}" title="Desktop (100%)" aria-label="Prévisualiser sur ordinateur">
               ${getIcon("monitor", "w-3.5 h-3.5")}
+              <span class="viewport-label">Ordinateur</span>
             </button>
-            <button type="button" onclick="window.app.setViewport('tablet')" class="p-1.5 rounded-md transition-all ${state.viewport === 'tablet' ? 'bg-white text-zinc-950 shadow-xs font-semibold' : 'text-zinc-500 hover:text-zinc-800'}" title="Tablette (768px)">
+            <button type="button" onclick="window.app.setViewport('tablet')" class="viewport-option p-2 rounded-md transition-all ${state.viewport === 'tablet' ? 'is-active' : ''}" title="Tablette (768px)" aria-label="Prévisualiser sur tablette">
               ${getIcon("tablet", "w-3.5 h-3.5")}
+              <span class="viewport-label">Tablette</span>
             </button>
-            <button type="button" onclick="window.app.setViewport('mobile')" class="p-1.5 rounded-md transition-all ${state.viewport === 'mobile' ? 'bg-white text-zinc-950 shadow-xs font-semibold' : 'text-zinc-500 hover:text-zinc-800'}" title="Mobile (390px)">
+            <button type="button" onclick="window.app.setViewport('mobile')" class="viewport-option p-2 rounded-md transition-all ${state.viewport === 'mobile' ? 'is-active' : ''}" title="Mobile (390px)" aria-label="Prévisualiser sur mobile">
               ${getIcon("smartphone", "w-3.5 h-3.5")}
+              <span class="viewport-label">Mobile</span>
             </button>
           </div>
         </div>
 
-        <!-- Right: Sales Pitch & Presentation & Export Button -->
+        <!-- Right: Theme Mode Toggle, Tools & Exporter -->
         <div class="flex items-center gap-2">
+
+          <!-- True Dark / Light Mode Switcher -->
+          <button type="button" onclick="window.app.toggleThemeMode()" class="btn-keycap btn-keycap-light px-3 py-2 rounded-lg text-xs font-bold text-zinc-800 border border-zinc-200 flex items-center gap-1.5" title="Changer l'ambiance de l'éditeur" aria-label="Changer l'ambiance de l'éditeur">
+            ${getIcon(state.themeMode === 'dark' ? 'sun' : 'moon', 'w-4 h-4')}
+            <span class="theme-control-label">${state.themeMode === 'dark' ? 'Éditeur clair' : 'Éditeur sombre'}</span>
+          </button>
+
           <!-- Command Palette (⌘K) -->
-          <button type="button" onclick="window.app.openCommandPalette()" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-zinc-600 hover:text-zinc-900 bg-zinc-100 hover:bg-zinc-200 border border-zinc-200/80 transition-colors" title="Palette de commande (⌘K)">
+          <button type="button" onclick="window.app.openCommandPalette()" class="btn-keycap btn-keycap-light inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-zinc-700 border border-zinc-200" title="Palette de commande (⌘K)">
             ${getIcon("search", "w-3.5 h-3.5 text-zinc-500")}
-            <kbd class="hidden sm:inline text-[10px] font-mono px-1 py-0.2 bg-white rounded border border-zinc-200 text-zinc-500">⌘K</kbd>
+            <kbd class="hidden xl:inline text-[10px] font-mono px-1 py-0.2 bg-white rounded border border-zinc-200 text-zinc-500">⌘K</kbd>
           </button>
 
           <!-- Share Demo with QR -->
-          <button type="button" onclick="window.app.openShareModal()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-700 hover:text-zinc-900 bg-zinc-100 hover:bg-zinc-200 border border-zinc-200/80 transition-colors" title="Partager démo client avec QR Code">
+          <button type="button" onclick="window.app.openShareModal()" class="btn-keycap btn-keycap-light inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-700 border border-zinc-200" title="Partager démo client avec QR Code">
             ${getIcon("share", "w-3.5 h-3.5 text-zinc-600")}
-            <span class="hidden sm:inline">Partager (QR)</span>
+            <span class="hidden xl:inline">Partager (QR)</span>
           </button>
 
-          <button type="button" onclick="window.app.openCloserModal('${project.id}')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-700 hover:text-zinc-900 bg-zinc-100 hover:bg-zinc-200 border border-zinc-200/80 transition-colors" title="Kit Vente Closer & Argumentaire">
-            ${getIcon("sparkles", "w-3.5 h-3.5 text-zinc-600")}
+          <button type="button" onclick="window.app.openCloserModal('${project.id}')" class="btn-keycap btn-keycap-light inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-700 border border-zinc-200" title="Kit Vente Closer & Argumentaire">
+            ${getIcon("sparkles", "w-3.5 h-3.5 text-amber-500")}
             <span class="hidden md:inline">Kit Closer</span>
           </button>
 
-          <button type="button" onclick="window.app.openPreview('${project.id}')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-700 hover:text-zinc-900 bg-zinc-100 hover:bg-zinc-200 border border-zinc-200/80 transition-colors" title="Aperçu Client Démo">
-            ${getIcon("eye", "w-3.5 h-3.5 text-zinc-600")}
-            <span class="hidden md:inline">Aperçu</span>
-          </button>
-
-          <!-- Export Dropdown -->
+          <!-- Export Dropdown with Tactile Keycap -->
           <div class="relative group">
-            <button type="button" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-medium text-white bg-zinc-900 hover:bg-black shadow-xs transition-colors">
+            <button type="button" class="btn-keycap btn-keycap-accent inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold shadow-xs">
               ${getIcon("download", "w-3.5 h-3.5")}
               <span>Exporter</span>
               ${getIcon("chevronDown", "w-3 h-3 text-zinc-400")}
             </button>
-            <div class="absolute right-0 top-full mt-1 w-60 bg-white rounded-xl shadow-lg border border-zinc-200 p-1.5 text-xs text-zinc-700 hidden group-hover:block z-50 animate-fade-in">
+            <div class="absolute right-0 top-full mt-1.5 w-64 bg-white rounded-xl shadow-xl border border-zinc-200 p-2 text-xs text-zinc-700 hidden group-hover:block z-50 animate-fade-in">
               <button type="button" onclick="window.app.exportHTML()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-zinc-50 flex items-center gap-2.5 transition-colors">
                 ${getIcon("download", "w-4 h-4 text-zinc-700")}
                 <div>
-                  <div class="font-medium text-zinc-900">Site Web Complet (.HTML)</div>
-                  <div class="text-[10px] text-zinc-400">Fichier autonome prêt à héberger</div>
+                  <div class="font-semibold text-zinc-900">Site Web Autonome (.HTML)</div>
+                  <div class="text-[10px] text-zinc-400">Prêt pour hébergement ou envoi direct</div>
                 </div>
               </button>
               <button type="button" onclick="window.app.exportJSON()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-zinc-50 flex items-center gap-2.5 transition-colors">
                 ${getIcon("layers", "w-4 h-4 text-zinc-700")}
                 <div>
-                  <div class="font-medium text-zinc-900">Données Projet (.JSON)</div>
+                  <div class="font-semibold text-zinc-900">Données Projet (.JSON)</div>
                   <div class="text-[10px] text-zinc-400">Sauvegarde et structure complète</div>
                 </div>
               </button>
               <button type="button" onclick="window.app.printCommercialProposal()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-zinc-50 flex items-center gap-2.5 transition-colors">
                 ${getIcon("printer", "w-4 h-4 text-zinc-700")}
                 <div>
-                  <div class="font-medium text-zinc-900">Fiche Devis Commercial (PDF)</div>
-                  <div class="text-[10px] text-zinc-400">Document prêt pour le prospect</div>
+                  <div class="font-semibold text-zinc-900">Fiche Devis Commercial (PDF)</div>
+                  <div class="text-[10px] text-zinc-400">Document imprimable pour le prospect</div>
                 </div>
               </button>
             </div>
@@ -163,10 +189,10 @@ export function renderEditor(state) {
 
       <!-- MAIN WORKSPACE: SIDEBAR + CANVAS + INSPECTOR -->
       <div class="flex-1 flex overflow-hidden">
-        
+
         <!-- LEFT SIDEBAR: SEGMENTED PILL TABS [SECTIONS] / [PARAMÈTRES] -->
-        <aside class="w-80 bg-white border-r border-zinc-200 flex flex-col flex-shrink-0 z-20 overflow-hidden">
-          
+        <aside class="w-84 xl:w-96 bg-white border-r border-zinc-200 flex flex-col flex-shrink-0 z-20 overflow-hidden pc-sidebar ${isLivePreview ? 'hidden' : ''}">
+
           <!-- Segmented Pill-Tabs (Sendpage / Linear style) -->
           <div class="p-3 border-b border-zinc-200/80">
             <div class="pill-tabs-container">
@@ -183,7 +209,7 @@ export function renderEditor(state) {
 
           <!-- TAB 1: SECTIONS MANAGER (COMPACT CARDS + DISCRETE GRIP + EYE TOGGLE + INSTANT ACCORDION) -->
           <div id="sidebar-tab-sections" class="flex-1 overflow-y-auto p-3 space-y-2 ${state.activeSidebarTab === 'settings' ? 'hidden' : ''}">
-            
+
             <div class="flex items-center justify-between pb-1.5 px-0.5">
               <span class="text-[11px] font-medium uppercase tracking-wider text-zinc-400">
                 ${project.sections.filter(s => s.visibility !== false).length}/${project.sections.length} sections actives
@@ -208,9 +234,9 @@ export function renderEditor(state) {
                   <div class="section-card ${isSel ? 'is-selected' : ''} ${!isVis ? 'is-hidden' : ''}"
                        data-sec-id="${s.id}"
                        draggable="true">
-                    
-                    <!-- Compact Header -->
-                    <div class="section-card-header" onclick="window.app.toggleSectionAccordion('${s.id}', event)">
+
+                    <!-- Compact Header with Smooth Scroll to Canvas Section -->
+                    <div class="section-card-header" onclick="window.app.toggleSectionAccordion('${s.id}', event); window.app.scrollToSection('${s.id}');">
                       <div class="flex items-center gap-2 min-w-0 flex-1">
                         <span class="section-card-grip" title="Glisser pour réorganiser">
                           ${getIcon("gripVertical", "w-3.5 h-3.5")}
@@ -220,15 +246,15 @@ export function renderEditor(state) {
                       </div>
 
                       <div class="flex items-center gap-0.5 flex-shrink-0">
-                        <button type="button" 
-                                onclick="event.stopPropagation(); window.app.toggleSectionVisibility('${s.id}')" 
-                                class="p-1 rounded text-zinc-400 hover:text-zinc-800 hover:bg-zinc-100 transition-colors" 
+                        <button type="button"
+                                onclick="event.stopPropagation(); window.app.toggleSectionVisibility('${s.id}')"
+                                class="p-1 rounded text-zinc-400 hover:text-zinc-800 hover:bg-zinc-100 transition-colors"
                                 title="${isVis ? 'Masquer la section' : 'Afficher la section'}">
                           ${getIcon(isVis ? "eye" : "eyeOff", "w-3.5 h-3.5")}
                         </button>
-                        <button type="button" 
+                        <button type="button"
                                 onclick="event.stopPropagation(); window.app.toggleSectionAccordion('${s.id}', event)"
-                                class="accordion-chevron p-1 rounded text-zinc-400 hover:text-zinc-800 hover:bg-zinc-100 transition-transform ${isOpen ? 'rotate-180' : ''}" 
+                                class="accordion-chevron p-1 rounded text-zinc-400 hover:text-zinc-800 hover:bg-zinc-100 transition-transform ${isOpen ? 'rotate-180' : ''}"
                                 title="${isOpen ? 'Fermer l\'accordéon' : 'Ouvrir l\'accordéon'}">
                           ${getIcon("chevronDown", "w-3.5 h-3.5")}
                         </button>
@@ -254,34 +280,49 @@ export function renderEditor(state) {
 
         <!-- CENTRAL CANVAS: WEBPAGE PREVIEW / LIVE EDIT WITH CANVA DOCK -->
         <main class="flex-1 bg-[#F4F5F7] overflow-y-auto relative flex flex-col items-center">
-          
-          <!-- Canva-like Quick Element Adder Dock -->
-          <div class="canva-dock" id="canva-floating-dock">
-            <span class="text-[11px] font-bold text-zinc-500 px-1.5 flex items-center gap-1">
-              ${getIcon("plus", "w-3 h-3 text-zinc-400")}
-              <span>Ajouter un bloc :</span>
-            </span>
-            <button type="button" onclick="window.app.addCanvaElement('urgentBanner')" class="canva-dock-btn" title="Ajouter un bandeau promo ou urgence">
-              <span>📢 Bandeau promo</span>
-            </button>
-            <button type="button" onclick="window.app.addCanvaElement('floatingBadge')" class="canva-dock-btn" title="Ajouter un badge de réassurance agréé">
-              <span>🛡️ Badge réassurance</span>
-            </button>
-            <button type="button" onclick="window.app.addCanvaElement('customCard')" class="canva-dock-btn" title="Ajouter un encadré d'information">
-              <span>📦 Encadré sur-mesure</span>
-            </button>
-            <button type="button" onclick="window.app.openAddSectionModal()" class="canva-dock-btn" title="Ouvrir le catalogue des sections">
-              <span>⊞ Catalogue...</span>
-            </button>
-          </div>
 
-          <div class="transition-all duration-300 ${viewportWidthClass} bg-white min-h-full mt-3" id="canvas-container">
+          <!-- In-situ Live Preview Client Floating Pill -->
+          ${isLivePreview ? `
+            <div class="fixed top-3.5 left-1/2 transform -translate-x-1/2 z-50 bg-zinc-950/95 text-white px-5 py-2.5 rounded-full shadow-2xl border border-zinc-700 flex items-center gap-4 text-xs backdrop-blur animate-fade-in">
+              <span class="flex items-center gap-2 font-bold text-zinc-200">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Aperçu Client Démo en direct</span>
+              </span>
+              <div class="h-4 w-[1px] bg-zinc-700"></div>
+              <button type="button" onclick="window.app.setEditorMode('conception')" class="btn-keycap btn-keycap-light px-3 py-1 rounded-full text-xs font-bold text-zinc-950 flex items-center gap-1.5 shadow-sm">
+                ${getIcon("edit", "w-3.5 h-3.5")}
+                <span>Retour Conception</span>
+              </button>
+            </div>
+          ` : `
+            <!-- Canva-like Quick Element Adder Dock -->
+            <div class="canva-dock" id="canva-floating-dock">
+              <span class="text-[11px] font-bold text-zinc-500 px-1.5 flex items-center gap-1">
+                ${getIcon("plus", "w-3 h-3 text-zinc-400")}
+                <span>Ajouter un bloc :</span>
+              </span>
+              <button type="button" onclick="window.app.addCanvaElement('urgentBanner')" class="canva-dock-btn" title="Ajouter un bandeau promo ou urgence">
+                <span>📢 Bandeau promo</span>
+              </button>
+              <button type="button" onclick="window.app.addCanvaElement('floatingBadge')" class="canva-dock-btn" title="Ajouter un badge de réassurance agréé">
+                <span>🛡️ Badge réassurance</span>
+              </button>
+              <button type="button" onclick="window.app.addCanvaElement('customCard')" class="canva-dock-btn" title="Ajouter un encadré d'information">
+                <span>📦 Encadré sur-mesure</span>
+              </button>
+              <button type="button" onclick="window.app.openAddSectionModal()" class="canva-dock-btn" title="Ouvrir le catalogue des sections">
+                <span>⊞ Catalogue...</span>
+              </button>
+            </div>
+          `}
+
+          <div class="transition-all duration-300 ${viewportWidthClass} ${isLivePreview ? 'client-preview-mode' : ''} bg-white min-h-full mt-3" id="canvas-container">
             ${websiteHTML}
           </div>
         </main>
 
         <!-- RIGHT INSPECTOR: DETAILED SECTION PROPS (OPTIONAL ON LARGE SCREENS) -->
-        <aside class="w-72 bg-white border-l border-zinc-200 flex-shrink-0 z-20 overflow-y-auto hidden lg:block" id="right-inspector-panel">
+        <aside class="w-72 bg-white border-l border-zinc-200 flex-shrink-0 z-20 overflow-y-auto ${isLivePreview ? 'hidden' : 'hidden 2xl:block'}" id="right-inspector-panel">
           ${inspectorHTML}
         </aside>
 
@@ -299,7 +340,7 @@ function renderSectionAccordionContent(sec, project, variants) {
 
   return `
     <div class="space-y-3">
-      
+
       <!-- Variant Selector if available -->
       ${variants.length > 1 ? `
         <div>
@@ -316,7 +357,7 @@ function renderSectionAccordionContent(sec, project, variants) {
       ${c.badge !== undefined ? `
         <div>
           <label class="block text-[10px] font-medium text-zinc-500 mb-1">Surtitre / Badge :</label>
-          <input type="text" value="${escapeHtml(c.badge)}" 
+          <input type="text" value="${escapeHtml(c.badge)}"
                  data-field="badge"
                  oninput="window.app.liveUpdateField('${sectionId}', 'badge', this.value)"
                  onchange="window.app.commitFieldUpdate('${sectionId}', 'badge', this.value)"
@@ -328,7 +369,7 @@ function renderSectionAccordionContent(sec, project, variants) {
       ${c.title !== undefined ? `
         <div>
           <label class="block text-[10px] font-medium text-zinc-500 mb-1">Titre principal :</label>
-          <textarea rows="2" 
+          <textarea rows="2"
                     data-field="title"
                     oninput="window.app.liveUpdateField('${sectionId}', 'title', this.value)"
                     onchange="window.app.commitFieldUpdate('${sectionId}', 'title', this.value)"
@@ -340,7 +381,7 @@ function renderSectionAccordionContent(sec, project, variants) {
       ${c.subtitle !== undefined ? `
         <div>
           <label class="block text-[10px] font-medium text-zinc-500 mb-1">Sous-titre :</label>
-          <textarea rows="2" 
+          <textarea rows="2"
                     data-field="subtitle"
                     oninput="window.app.liveUpdateField('${sectionId}', 'subtitle', this.value)"
                     onchange="window.app.commitFieldUpdate('${sectionId}', 'subtitle', this.value)"
@@ -355,13 +396,13 @@ function renderSectionAccordionContent(sec, project, variants) {
           ${(c.badges || []).map((b, bIdx) => `
             <div class="p-2 rounded-lg bg-zinc-50 border border-zinc-200 space-y-1.5">
               <div class="text-[10px] text-zinc-400 font-semibold uppercase">Badge 0${bIdx + 1}</div>
-              <input type="text" value="${escapeHtml(b.title)}" 
+              <input type="text" value="${escapeHtml(b.title)}"
                      placeholder="Titre du badge"
                      data-field="badges.${bIdx}.title"
                      oninput="window.app.liveUpdateField('${sectionId}', 'badges.${bIdx}.title', this.value)"
                      onchange="window.app.commitFieldUpdate('${sectionId}', 'badges.${bIdx}.title', this.value)"
                      class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-xs text-zinc-900 focus:border-zinc-900 focus:outline-none">
-              <input type="text" value="${escapeHtml(b.desc)}" 
+              <input type="text" value="${escapeHtml(b.desc)}"
                      placeholder="Description du badge"
                      data-field="badges.${bIdx}.desc"
                      oninput="window.app.liveUpdateField('${sectionId}', 'badges.${bIdx}.desc', this.value)"
@@ -385,26 +426,26 @@ function renderSectionAccordionContent(sec, project, variants) {
                 <span class="text-[10.5px] font-bold text-zinc-800 truncate">#${sIdx + 1} ${escapeHtml(srv.title)}</span>
                 <button type="button" onclick="window.app.deleteServiceItem('${sectionId}', ${sIdx})" class="text-red-500 hover:text-red-700 text-[10px] p-0.5" title="Supprimer ce service">🗑️</button>
               </div>
-              <input type="text" value="${escapeHtml(srv.title)}" 
+              <input type="text" value="${escapeHtml(srv.title)}"
                      placeholder="Titre de la prestation"
                      data-field="services.${sIdx}.title"
                      oninput="window.app.liveUpdateField('${sectionId}', 'services.${sIdx}.title', this.value)"
                      onchange="window.app.commitFieldUpdate('${sectionId}', 'services.${sIdx}.title', this.value)"
                      class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-xs text-zinc-900 focus:border-zinc-900 focus:outline-none">
-              <textarea rows="2" 
+              <textarea rows="2"
                         placeholder="Description concrète"
                         data-field="services.${sIdx}.desc"
                         oninput="window.app.liveUpdateField('${sectionId}', 'services.${sIdx}.desc', this.value)"
                         onchange="window.app.commitFieldUpdate('${sectionId}', 'services.${sIdx}.desc', this.value)"
                         class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-[11px] text-zinc-600 focus:border-zinc-900 focus:outline-none leading-snug">${escapeHtml(srv.desc)}</textarea>
               <div class="grid grid-cols-2 gap-1.5">
-                <input type="text" value="${escapeHtml(srv.price || '')}" 
+                <input type="text" value="${escapeHtml(srv.price || '')}"
                        placeholder="Tarif (ex: Sur devis)"
                        data-field="services.${sIdx}.price"
                        oninput="window.app.liveUpdateField('${sectionId}', 'services.${sIdx}.price', this.value)"
                        onchange="window.app.commitFieldUpdate('${sectionId}', 'services.${sIdx}.price', this.value)"
                        class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-[11px] text-zinc-800">
-                <input type="text" value="${escapeHtml(srv.tag || '')}" 
+                <input type="text" value="${escapeHtml(srv.tag || '')}"
                        placeholder="Tag (ex: Spécialité)"
                        data-field="services.${sIdx}.tag"
                        oninput="window.app.liveUpdateField('${sectionId}', 'services.${sIdx}.tag', this.value)"
@@ -437,7 +478,7 @@ function renderSectionAccordionContent(sec, project, variants) {
         <div class="grid grid-cols-2 gap-2 pt-1 border-t border-zinc-200/60">
           <div>
             <label class="block text-[10px] text-zinc-500 mb-1">Bouton 1 :</label>
-            <input type="text" value="${escapeHtml(c.ctaPrimary)}" 
+            <input type="text" value="${escapeHtml(c.ctaPrimary)}"
                    data-field="ctaPrimary"
                    oninput="window.app.liveUpdateField('${sectionId}', 'ctaPrimary', this.value)"
                    onchange="window.app.commitFieldUpdate('${sectionId}', 'ctaPrimary', this.value)"
@@ -446,7 +487,7 @@ function renderSectionAccordionContent(sec, project, variants) {
           ${c.ctaSecondary !== undefined ? `
             <div>
               <label class="block text-[10px] text-zinc-500 mb-1">Bouton 2 :</label>
-              <input type="text" value="${escapeHtml(c.ctaSecondary)}" 
+              <input type="text" value="${escapeHtml(c.ctaSecondary)}"
                      data-field="ctaSecondary"
                      oninput="window.app.liveUpdateField('${sectionId}', 'ctaSecondary', this.value)"
                      onchange="window.app.commitFieldUpdate('${sectionId}', 'ctaSecondary', this.value)"
@@ -494,7 +535,7 @@ function renderSectionAccordionContent(sec, project, variants) {
 function renderSettingsAccordions(project) {
   return `
     <div class="space-y-2" id="settings-accordion-group">
-      
+
       <!-- 1. Business Information -->
       <div class="section-card">
         <div class="section-card-header" onclick="window.app.toggleSettingsItem('business')">
@@ -507,7 +548,7 @@ function renderSettingsAccordions(project) {
         <div class="section-accordion-body space-y-2.5" id="settings-body-business">
           <div>
             <label class="block text-[10px] text-zinc-500 mb-1">Nom entreprise :</label>
-            <input type="text" value="${escapeHtml(project.business.name)}" 
+            <input type="text" value="${escapeHtml(project.business.name)}"
                    oninput="window.app.liveUpdateBusiness('name', this.value)"
                    onchange="window.app.commitBusiness('name', this.value)"
                    class="w-full bg-white border border-zinc-200 rounded-md px-2.5 py-1 text-xs text-zinc-900 focus:border-zinc-900 focus:outline-none">
@@ -515,14 +556,14 @@ function renderSettingsAccordions(project) {
           <div class="grid grid-cols-2 gap-2">
             <div>
               <label class="block text-[10px] text-zinc-500 mb-1">Ville :</label>
-              <input type="text" value="${escapeHtml(project.business.city)}" 
+              <input type="text" value="${escapeHtml(project.business.city)}"
                      oninput="window.app.liveUpdateBusiness('city', this.value)"
                      onchange="window.app.commitBusiness('city', this.value)"
                      class="w-full bg-white border border-zinc-200 rounded-md px-2 py-1 text-xs text-zinc-900 focus:border-zinc-900 focus:outline-none">
             </div>
             <div>
               <label class="block text-[10px] text-zinc-500 mb-1">Région :</label>
-              <input type="text" value="${escapeHtml(project.business.region || 'Occitanie')}" 
+              <input type="text" value="${escapeHtml(project.business.region || 'Occitanie')}"
                      oninput="window.app.liveUpdateBusiness('region', this.value)"
                      onchange="window.app.commitBusiness('region', this.value)"
                      class="w-full bg-white border border-zinc-200 rounded-md px-2 py-1 text-xs text-zinc-900 focus:border-zinc-900 focus:outline-none">
@@ -531,14 +572,14 @@ function renderSettingsAccordions(project) {
           <div class="grid grid-cols-2 gap-2">
             <div>
               <label class="block text-[10px] text-zinc-500 mb-1">Téléphone :</label>
-              <input type="text" value="${escapeHtml(project.business.phone)}" 
+              <input type="text" value="${escapeHtml(project.business.phone)}"
                      oninput="window.app.liveUpdateBusiness('phone', this.value)"
                      onchange="window.app.commitBusiness('phone', this.value)"
                      class="w-full bg-white border border-zinc-200 rounded-md px-2 py-1 text-xs text-zinc-900 focus:border-zinc-900 focus:outline-none">
             </div>
             <div>
               <label class="block text-[10px] text-zinc-500 mb-1">Email :</label>
-              <input type="text" value="${escapeHtml(project.business.email || 'contact@artisan.fr')}" 
+              <input type="text" value="${escapeHtml(project.business.email || 'contact@artisan.fr')}"
                      oninput="window.app.liveUpdateBusiness('email', this.value)"
                      onchange="window.app.commitBusiness('email', this.value)"
                      class="w-full bg-white border border-zinc-200 rounded-md px-2 py-1 text-xs text-zinc-900 focus:border-zinc-900 focus:outline-none">
@@ -620,23 +661,23 @@ function renderSettingsAccordions(project) {
             <label class="block text-[10px] font-medium text-zinc-400 uppercase tracking-wider">Palette Personnalisée</label>
             <div class="flex items-center justify-between p-2 rounded-lg border border-zinc-200 bg-white">
               <span class="text-xs font-medium text-zinc-800">Primaire</span>
-              <input type="color" value="${project.branding.primaryColor}" 
-                     oninput="window.app.liveUpdateColor('primaryColor', this.value)" 
-                     onchange="window.app.commitColorUpdate('primaryColor', this.value)" 
+              <input type="color" value="${project.branding.primaryColor}"
+                     oninput="window.app.liveUpdateColor('primaryColor', this.value)"
+                     onchange="window.app.commitColorUpdate('primaryColor', this.value)"
                      class="w-6 h-6 rounded cursor-pointer border border-zinc-200 bg-transparent">
             </div>
             <div class="flex items-center justify-between p-2 rounded-lg border border-zinc-200 bg-white">
               <span class="text-xs font-medium text-zinc-800">Secondaire</span>
-              <input type="color" value="${project.branding.secondaryColor}" 
-                     oninput="window.app.liveUpdateColor('secondaryColor', this.value)" 
-                     onchange="window.app.commitColorUpdate('secondaryColor', this.value)" 
+              <input type="color" value="${project.branding.secondaryColor}"
+                     oninput="window.app.liveUpdateColor('secondaryColor', this.value)"
+                     onchange="window.app.commitColorUpdate('secondaryColor', this.value)"
                      class="w-6 h-6 rounded cursor-pointer border border-zinc-200 bg-transparent">
             </div>
             <div class="flex items-center justify-between p-2 rounded-lg border border-zinc-200 bg-white">
               <span class="text-xs font-medium text-zinc-800">Accentuation</span>
-              <input type="color" value="${project.branding.accentColor}" 
-                     oninput="window.app.liveUpdateColor('accentColor', this.value)" 
-                     onchange="window.app.commitColorUpdate('accentColor', this.value)" 
+              <input type="color" value="${project.branding.accentColor}"
+                     oninput="window.app.liveUpdateColor('accentColor', this.value)"
+                     onchange="window.app.commitColorUpdate('accentColor', this.value)"
                      class="w-6 h-6 rounded cursor-pointer border border-zinc-200 bg-transparent">
             </div>
           </div>
@@ -707,7 +748,7 @@ function renderSettingsAccordions(project) {
                 <p class="text-[10px] text-zinc-500">Pillule d'appel & WhatsApp persistante au bas de l'écran</p>
               </div>
               <label class="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" ${project.settings?.stickyBarEnabled !== false ? 'checked' : ''} 
+                <input type="checkbox" ${project.settings?.stickyBarEnabled !== false ? 'checked' : ''}
                        onchange="window.app.toggleStickyBar(this.checked)" class="sr-only peer">
                 <div class="w-8 h-4 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3 after:w-3.5 after:transition-all peer-checked:bg-zinc-900"></div>
               </label>
@@ -715,7 +756,7 @@ function renderSettingsAccordions(project) {
 
             <div>
               <label class="block text-[10px] text-zinc-500 mb-1">Numéro WhatsApp direct :</label>
-              <input type="text" value="${escapeHtml(project.settings?.whatsappNumber || project.business.phone || '')}" 
+              <input type="text" value="${escapeHtml(project.settings?.whatsappNumber || project.business.phone || '')}"
                      placeholder="Ex: 06 12 34 56 78"
                      onchange="window.app.updateWhatsAppNumber(this.value)"
                      class="w-full bg-white border border-zinc-200 rounded-md px-2.5 py-1 text-xs text-zinc-900 focus:border-zinc-900 focus:outline-none">

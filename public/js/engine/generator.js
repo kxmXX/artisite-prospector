@@ -415,6 +415,7 @@ export function generateSite(input = {}) {
     pipelineStatus: input.pipelineStatus || "generated", // prospect, generated, contacted, demo_sent, won
     business,
     branding,
+    siteTheme: input.siteTheme || ((preset.bgColor || "#ffffff").toLowerCase() === "#0f0f11" ? "dark" : "light"),
     closerTips: trade.closerTips || {},
     sections
   };
@@ -699,4 +700,3 @@ export function createSectionData(type, variant, trade, business = {}) {
       };
   }
 }
-

@@ -30,6 +30,11 @@ test("exportStandaloneHTML produces complete, self-contained offline production 
   assert.ok(html.includes("initFaq"), "Must include FAQ accordion script");
   assert.ok(html.includes("initLightbox"), "Must include Lightbox modal script");
   assert.ok(html.includes("initQuoteSimulator"), "Must include quote calculator script");
+  assert.ok(html.includes("initSiteTheme"), "Must include standalone day/night theme script");
+  assert.ok(html.includes("data-site-theme-toggle"), "Must include the client theme toggle");
+  assert.ok(html.includes("initImageFallbacks"), "Must include client image fallback hydration");
+  assert.ok(html.includes("ctaPulse"), "Must include the optional CTA pulse animation");
+  assert.ok(html.includes("Physical keyboard keycap treatment"), "Must embed keycap styling in standalone export");
 
   // Must not have broken template variables
   assert.ok(!html.includes("undefined"), "Must not contain undefined");

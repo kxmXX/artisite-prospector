@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { getFallbackModels, callGeminiWithFallback, DEFAULT_FALLBACK_MODELS } from "../server/gemini.js";
+import { handleApiRequest } from "../server/apiHandler.js";
 
 test("getFallbackModels returns default models in correct order", () => {
   const models = getFallbackModels();
@@ -44,4 +45,43 @@ test("callGeminiWithFallback falls back through all models when key is invalid",
   assert.equal(res.success, false);
   assert.equal(res.error, "ALL_MODELS_FAILED");
   assert.ok(res.lastError);
+});
+
+test("/api/ai/image returns the local vector fallback without a Gemini key", async () => {
+  const originalKey = process.env.GEMINI_API_KEY;
+  delete process.env.GEMINI_API_KEY;
+
+  let statusCode;
+  let responseBody;
+  const response = {
+    writeHead(code) {
+      statusCode = code;
+    },
+    end(body) {
+      responseBody = JSON.parse(body);
+    }
+  };
+
+  try {
+    await handleApiRequest({
+      method: "POST",
+      url: "/api/ai/image",
+      body: {
+        prompt: "Jardin contemporain",
+        tradeId: "paysagiste",
+        sectionType: "hero",
+        style: "4k"
+      }
+    }, response);
+  } finally {
+    if (originalKey === undefined) delete process.env.GEMINI_API_KEY;
+    else process.env.GEMINI_API_KEY = originalKey;
+  }
+
+  assert.equal(statusCode, 200);
+  assert.equal(responseBody.success, true);
+  assert.equal(responseBody.source, "local_engine");
+  assert.equal(responseBody.prompt, "Jardin contemporain");
+  assert.match(responseBody.imageUrl, /^data:image\/svg\+xml/);
+  assert.match(decodeURIComponent(responseBody.imageUrl), /Jardin contemporain/);
 });

@@ -1,15 +1,27 @@
 import { getIcon } from "./icons.js";
+import { getTradeFallbackDataUrl } from "../data/imageFallbacks.js";
+
+function getInitialSiteTheme(project) {
+  const color = project?.branding?.bgColor || "#ffffff";
+  const hex = color.replace("#", "");
+  if (!/^[0-9a-f]{6}$/i.test(hex)) return "light";
+  const [r, g, b] = [0, 2, 4].map(i => parseInt(hex.slice(i, i + 2), 16));
+  return (0.299 * r + 0.587 * g + 0.114 * b) < 132 ? "dark" : "light";
+}
 
 /**
  * Image renderer with optional Editor Controls (Replace, Trash, Drag & Drop).
+ * Includes automatic trade fallback SVG if URL fails or returns 403.
  */
-export function renderEditableImage(url, { sectionId = "", fieldPath = "", alt = "", className = "", options = {}, itemIndex = null } = {}) {
+export function renderEditableImage(url, { sectionId = "", fieldPath = "", alt = "", className = "", options = {}, itemIndex = null, tradeId = "paysagiste" } = {}) {
   const isEditor = options?.isEditor;
-  const placeholder = "https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=800&q=80";
-  const displayUrl = url || placeholder;
+  const activeTrade = tradeId || options?.tradeId || "paysagiste";
+  const fallbackSvg = getTradeFallbackDataUrl(activeTrade, fieldPath, alt);
+  const displayUrl = url || fallbackSvg;
+  const onErrorAttr = `onerror="if(!this.dataset.fallbackApplied){this.dataset.fallbackApplied='true';this.src='${fallbackSvg}';}"`;
 
   if (!isEditor) {
-    return `<img src="${displayUrl}" alt="${alt}" class="${className}">`;
+    return `<img src="${displayUrl}" data-fallback-src="${fallbackSvg}" alt="${alt}" class="${className}" ${onErrorAttr}>`;
   }
 
   const indexParam = itemIndex !== null && itemIndex !== undefined ? itemIndex : 'null';
@@ -19,19 +31,19 @@ export function renderEditableImage(url, { sectionId = "", fieldPath = "", alt =
          ondragover="event.preventDefault(); this.classList.add('ring-2', 'ring-zinc-900');"
          ondragleave="this.classList.remove('ring-2', 'ring-zinc-900');"
          ondrop="event.preventDefault(); this.classList.remove('ring-2', 'ring-zinc-900'); window.app.handleImageElementDrop(event, '${sectionId}', '${fieldPath}', ${indexParam});">
-      <img src="${displayUrl}" alt="${alt}" class="${className}">
-      
+      <img src="${displayUrl}" data-fallback-src="${fallbackSvg}" alt="${alt}" class="${className}" ${onErrorAttr}>
+
       <div class="absolute inset-0 bg-zinc-950/60 backdrop-blur-[2px] opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center gap-2 z-20 pointer-events-auto p-2">
-        <button type="button" 
-                onclick="event.stopPropagation(); window.app.openImagePicker('${sectionId}', '${fieldPath}', ${indexParam})" 
-                class="px-2.5 py-1.5 bg-white hover:bg-zinc-100 text-zinc-900 rounded-lg text-xs font-medium shadow-xs border border-zinc-200 flex items-center gap-1.5 transition-colors"
+        <button type="button"
+                onclick="event.stopPropagation(); window.app.openImagePicker('${sectionId}', '${fieldPath}', ${indexParam})"
+                class="btn-keycap btn-keycap-light px-2.5 py-1.5 text-zinc-900 rounded-lg text-xs font-medium shadow-xs flex items-center gap-1.5 transition-all"
                 title="Modifier / Remplacer cette image">
           ${getIcon("eye", "w-3.5 h-3.5 text-zinc-700")}
           <span>Remplacer</span>
         </button>
-        <button type="button" 
-                onclick="event.stopPropagation(); window.app.deletePhoto('${sectionId}', '${fieldPath}', ${indexParam})" 
-                class="p-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-medium shadow-xs flex items-center justify-center transition-colors" 
+        <button type="button"
+                onclick="event.stopPropagation(); window.app.deletePhoto('${sectionId}', '${fieldPath}', ${indexParam})"
+                class="btn-keycap btn-keycap-danger p-1.5 text-white rounded-lg text-xs font-medium shadow-xs flex items-center justify-center transition-all"
                 title="Supprimer la photo (Poubelle 🗑️)">
           ${getIcon("trash", "w-4 h-4")}
         </button>
@@ -77,9 +89,10 @@ export function renderWebsiteHTML(project, options = { isEditor: false, isStanda
   };
 
   const stickyBarHTML = renderStickyCallBar(project, options);
+  const initialSiteTheme = project.siteTheme || getInitialSiteTheme(project);
 
   return `
-    <div class="artisite-root font-body text-main bg-site min-h-screen" style="
+    <div class="artisite-root font-body text-main bg-site min-h-screen" data-site-theme="${initialSiteTheme}" style="
       --primary: ${project.branding.primaryColor};
       --secondary: ${project.branding.secondaryColor};
       --accent: ${project.branding.accentColor};
@@ -192,30 +205,30 @@ function renderSection(sec, project, options) {
 
   return `
     <div id="section-${sec.id}"
-         class="editor-section-wrapper relative group ${bgTheme} ${isSelected ? 'is-active-section' : ''} ${isHidden ? 'opacity-40 grayscale' : ''}" 
-         data-section-id="${sec.id}" 
+         class="editor-section-wrapper relative group ${bgTheme} ${isSelected ? 'is-active-section' : ''} ${isHidden ? 'opacity-40 grayscale' : ''}"
+         data-section-id="${sec.id}"
          data-section-type="${sec.type}">
-      
-      <!-- Sleek In-Visualizer Action Bar (Linear / Sendpage style) -->
-      <div class="editor-section-toolbar absolute top-2 right-4 z-40 flex items-center gap-1 bg-zinc-900/95 backdrop-blur text-white px-2 py-1 rounded-lg text-xs shadow-md border border-zinc-800 transition-all opacity-0 group-hover:opacity-100">
-        <span class="font-medium text-zinc-300 mr-1.5 text-[10.5px] uppercase tracking-wider">${SECTION_TITLES[sec.type] || sec.type}</span>
-        
-        <button type="button" class="btn-sec-up p-1 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded transition-colors" title="Monter cette section (↑)" data-action="move-up" data-id="${sec.id}">
+
+      <!-- Sleek Floating Action Bar (Linear / Framer style) -->
+      <div class="editor-section-toolbar">
+        <span class="font-semibold text-zinc-300 px-2 py-0.5 rounded-full bg-zinc-800/80 text-[10px] uppercase tracking-wider mr-1">${SECTION_TITLES[sec.type] || sec.type}</span>
+
+        <button type="button" class="btn-sec-ctrl btn-sec-up" title="Monter cette section (↑)" data-action="move-up" data-id="${sec.id}">
           ${getIcon("chevronUp", "w-3.5 h-3.5")}
         </button>
-        <button type="button" class="btn-sec-down p-1 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded transition-colors" title="Descendre cette section (↓)" data-action="move-down" data-id="${sec.id}">
+        <button type="button" class="btn-sec-ctrl btn-sec-down" title="Descendre cette section (↓)" data-action="move-down" data-id="${sec.id}">
           ${getIcon("chevronDown", "w-3.5 h-3.5")}
         </button>
-        <button type="button" class="btn-sec-bg p-1 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded transition-colors" title="Changer le style de fond" data-action="toggle-bg" data-id="${sec.id}">
+        <button type="button" class="btn-sec-ctrl btn-sec-bg" title="Changer le style de fond" data-action="toggle-bg" data-id="${sec.id}">
           ${getIcon("palette", "w-3.5 h-3.5")}
         </button>
-        <button type="button" class="btn-sec-insert p-1 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded transition-colors" title="Insérer une section après" data-action="insert-after" data-id="${sec.id}">
+        <button type="button" class="btn-sec-ctrl btn-sec-insert" title="Insérer une section après" data-action="insert-after" data-id="${sec.id}">
           ${getIcon("plus", "w-3.5 h-3.5")}
         </button>
-        <button type="button" class="btn-sec-vis p-1 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded transition-colors" title="${isHidden ? 'Afficher' : 'Masquer'}" data-action="toggle-vis" data-id="${sec.id}">
+        <button type="button" class="btn-sec-ctrl btn-sec-vis" title="${isHidden ? 'Afficher' : 'Masquer'}" data-action="toggle-vis" data-id="${sec.id}">
           ${getIcon(isHidden ? "eyeOff" : "eye", "w-3.5 h-3.5")}
         </button>
-        <button type="button" class="btn-sec-del p-1 text-zinc-400 hover:text-red-400 hover:bg-zinc-800 rounded transition-colors" title="Supprimer la section" data-action="delete" data-id="${sec.id}">
+        <button type="button" class="btn-sec-ctrl btn-sec-del" title="Supprimer la section" data-action="delete" data-id="${sec.id}">
           ${getIcon("trash", "w-3.5 h-3.5")}
         </button>
       </div>
@@ -229,7 +242,7 @@ function renderSection(sec, project, options) {
 
 
 // 1. Header
-function renderHeader(sec, project) {
+function renderHeader(sec, project, options = {}) {
   const c = sec.content;
   return `
     <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-black/5 transition-all">
@@ -238,7 +251,7 @@ function renderHeader(sec, project) {
           <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-md transition-transform group-hover:scale-105" style="background-color: var(--primary);">
             ${c.brandName ? c.brandName.charAt(0).toUpperCase() : 'A'}
           </div>
-          <div>
+          <div class="header-project-meta">
             <span class="font-heading text-xl font-bold tracking-tight text-gray-900 block leading-tight" data-editable="brandName">${c.brandName}</span>
             <span class="text-[11px] font-medium text-gray-500 uppercase tracking-wider block">${project.business.tradeLabel} • ${project.business.city}</span>
           </div>
@@ -253,6 +266,11 @@ function renderHeader(sec, project) {
             ${getIcon("phone", "w-4 h-4 text-emerald-600")}
             <span data-editable="phone">${c.phone}</span>
           </a>
+          <button type="button" class="site-theme-toggle inline-flex items-center gap-2 px-3.5 py-2.5 rounded-full text-sm font-semibold text-gray-800 border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all" data-site-theme-toggle aria-label="Activer le mode sombre du site">
+            <span class="site-theme-icon site-theme-icon-light">${getIcon("moon", "w-4 h-4")}</span>
+            <span class="site-theme-icon site-theme-icon-dark hidden">${getIcon("sun", "w-4 h-4")}</span>
+            <span class="site-theme-label">Mode nuit</span>
+          </button>
           <a href="#simulateur" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5" style="background-color: var(--primary);">
             ${getIcon("sparkles", "w-4 h-4")}
             <span data-editable="ctaText">${c.ctaText || "Demander un devis"}</span>
@@ -267,6 +285,7 @@ function renderHeader(sec, project) {
 function renderHero(sec, project, options = {}) {
   const c = sec.content;
   const variant = sec.variant || "split-image";
+  const ctaPulseClass = project?.branding?.ctaPulse ? " btn-cta-pulse" : "";
 
   // Variant A: Fullscreen Image
   if (variant === "fullscreen-image") {
@@ -281,7 +300,7 @@ function renderHero(sec, project, options = {}) {
 
     return `
       <div class="relative overflow-hidden py-24 lg:py-36 text-white" style="
-        background: linear-gradient(rgba(15, 23, 42, 0.72), rgba(15, 23, 42, 0.85)), url('${c.heroImage}') center/cover no-repeat;
+                background: linear-gradient(rgba(15, 23, 42, 0.72), rgba(15, 23, 42, 0.85)), url('${c.heroImage || getTradeFallbackDataUrl(project.business.tradeId, 'hero', c.title)}') center/cover no-repeat;
       ">
         ${bgEditBtn}
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-7">
@@ -329,7 +348,7 @@ function renderHero(sec, project, options = {}) {
       <div class="relative overflow-hidden py-20 lg:py-28 bg-slate-950 text-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="grid lg:grid-cols-12 gap-12 items-center">
-            
+
             <div class="lg:col-span-7 space-y-6">
               <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-slate-900 border border-slate-700 text-amber-400">
                 <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
@@ -420,7 +439,7 @@ function renderHero(sec, project, options = {}) {
     <div class="relative overflow-hidden py-16 lg:py-24" style="background: linear-gradient(180deg, var(--bg-sec) 0%, var(--bg) 100%);">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid lg:grid-cols-12 gap-12 lg:gap-8 items-center">
-          
+
           <div class="lg:col-span-7 space-y-6">
             <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-white shadow-sm border border-black/5 text-gray-800" style="color: var(--primary);">
               <span class="w-2 h-2 rounded-full animate-pulse" style="background-color: var(--accent);"></span>
@@ -435,16 +454,38 @@ function renderHero(sec, project, options = {}) {
               ${c.subtitle}
             </p>
 
-            <div class="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-              <a href="#simulateur" class="inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-full text-base font-bold text-white shadow-xl hover:shadow-2xl transition-all transform hover:-translate-y-0.5" style="background-color: var(--primary);">
+            <div class="cta-button-wrapper group/cta">
+              <a href="#simulateur" class="btn-cta btn-keycap${ctaPulseClass} inline-flex items-center justify-center gap-2.5 shadow-xl transition-all" style="background-color: var(--primary); color: #ffffff;">
                 ${getIcon("sparkles", "w-5 h-5")}
                 <span data-editable="ctaPrimary">${c.ctaPrimary}</span>
               </a>
+              ${options.isEditor ? `
+                <div class="cta-context-popover" onclick="event.stopPropagation();">
+                  <span class="text-[9.5px] uppercase font-bold text-zinc-400 mr-0.5">Taille:</span>
+                  <button type="button" data-cta-size="sm" onclick="event.preventDefault(); window.app.setCTASize('sm')" class="cta-context-btn">S</button>
+                  <button type="button" data-cta-size="md" onclick="event.preventDefault(); window.app.setCTASize('md')" class="cta-context-btn">M</button>
+                  <button type="button" data-cta-size="lg" onclick="event.preventDefault(); window.app.setCTASize('lg')" class="cta-context-btn">L</button>
+                  <button type="button" data-cta-size="xl" onclick="event.preventDefault(); window.app.setCTASize('xl')" class="cta-context-btn">XL</button>
+                  <button type="button" data-action="pulse" onclick="event.preventDefault(); window.app.toggleCTAPulse()" class="cta-context-btn" title="Pulsation lumineuse">✨ Pulse</button>
+                </div>
+              ` : ''}
+            </div>
 
-              <a href="tel:${c.phone}" class="inline-flex items-center justify-center gap-2.5 px-6 py-4 rounded-full text-base font-semibold text-gray-800 bg-white border border-gray-200 shadow-sm hover:bg-gray-50 transition-colors">
+            <div class="cta-button-wrapper group/cta">
+              <a href="tel:${c.phone}" class="btn-cta btn-keycap${ctaPulseClass} inline-flex items-center justify-center gap-2.5 shadow-sm transition-all" style="background-color: #ffffff; color: #18181b; border: 1px solid #e4e4e7;">
                 ${getIcon("phone", "w-5 h-5 text-emerald-600")}
                 <span data-editable="ctaSecondary">${c.ctaSecondary}</span>
               </a>
+              ${options.isEditor ? `
+                <div class="cta-context-popover" onclick="event.stopPropagation();">
+                  <span class="text-[9.5px] uppercase font-bold text-zinc-400 mr-0.5">Taille:</span>
+                  <button type="button" data-cta-size="sm" onclick="event.preventDefault(); window.app.setCTASize('sm')" class="cta-context-btn">S</button>
+                  <button type="button" data-cta-size="md" onclick="event.preventDefault(); window.app.setCTASize('md')" class="cta-context-btn">M</button>
+                  <button type="button" data-cta-size="lg" onclick="event.preventDefault(); window.app.setCTASize('lg')" class="cta-context-btn">L</button>
+                  <button type="button" data-cta-size="xl" onclick="event.preventDefault(); window.app.setCTASize('xl')" class="cta-context-btn">XL</button>
+                  <button type="button" data-action="pulse" onclick="event.preventDefault(); window.app.toggleCTAPulse()" class="cta-context-btn" title="Pulsation lumineuse">${getIcon("sparkles", "w-3 h-3")} Pulse</button>
+                </div>
+              ` : ''}
             </div>
 
             <div class="pt-3 flex items-center gap-3 text-xs font-medium text-gray-500">
@@ -462,7 +503,7 @@ function renderHero(sec, project, options = {}) {
               <div class="aspect-[4/3] sm:aspect-[1/1] rounded-2xl overflow-hidden shadow-2xl border-4 border-white bg-slate-100">
                 ${renderEditableImage(c.heroImage, { sectionId: sec.id, fieldPath: 'heroImage', alt: c.title, className: 'w-full h-full object-cover transform hover:scale-105 transition-transform duration-700', options })}
               </div>
-              
+
               <!-- Floating Trust Card -->
               <div class="absolute -bottom-6 -left-6 bg-white/95 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-black/5 flex items-center gap-3.5 max-w-xs">
                 <div class="w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold" style="background-color: var(--secondary);">
@@ -595,7 +636,7 @@ function renderAbout(sec, project, options = {}) {
     <div id="about" class="py-20 lg:py-28" style="background-color: var(--bg);">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-          
+
           <div class="lg:col-span-5 order-2 lg:order-1">
             <div class="relative">
               <div class="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl border-4 border-white bg-slate-100">
@@ -897,10 +938,10 @@ function renderBeforeAfter(sec, project, options = {}) {
         </div>
 
         <div class="ba-container shadow-2xl border-4 border-white">
-          <img src="${c.afterImage}" alt="Après intervention" class="ba-img-after">
-          
+          <img src="${c.afterImage}" data-fallback-src="${getTradeFallbackDataUrl(project?.business?.tradeId || 'paysagiste', 'beforeAfter', 'Chantier Réalisé')}" alt="Après intervention" class="ba-img-after" onerror="if(!this.dataset.fallbackApplied){this.dataset.fallbackApplied='true';this.src=this.dataset.fallbackSrc;}">
+
           <div class="ba-img-before-wrapper" style="width: 50%;">
-            <img src="${c.beforeImage}" alt="Avant intervention" class="ba-img-before">
+          <img src="${c.beforeImage}" data-fallback-src="${getTradeFallbackDataUrl(project?.business?.tradeId || 'paysagiste', 'beforeAfter', 'Avant Travaux')}" alt="Avant intervention" class="ba-img-before" onerror="if(!this.dataset.fallbackApplied){this.dataset.fallbackApplied='true';this.src=this.dataset.fallbackSrc;}">
           </div>
 
           <div class="ba-handle" style="left: 50%;">
@@ -1084,7 +1125,7 @@ function renderReviews(sec, project) {
     <div id="avis" class="py-20 lg:py-28 bg-white border-t border-black/5">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid lg:grid-cols-12 gap-12 items-start">
-          
+
           <div class="lg:col-span-4 bg-gray-50 p-8 rounded-3xl border border-black/5 space-y-4">
             <div class="inline-flex items-center gap-2 text-amber-500">
               ${[...Array(5)].map(() => getIcon("star", "w-5 h-5 fill-current")).join('')}
@@ -1232,7 +1273,7 @@ function renderLocation(sec, project) {
     <div id="contact" class="py-20" style="background-color: var(--bg-sec);">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid lg:grid-cols-12 gap-12 items-center">
-          
+
           <div class="lg:col-span-5 space-y-6">
             <span class="text-xs font-bold uppercase tracking-wider text-emerald-700" data-editable="badge">${c.badge}</span>
             <h2 class="font-heading text-3xl font-extrabold text-gray-900 leading-tight" data-editable="title">${c.title}</h2>
@@ -1457,7 +1498,7 @@ export function renderStickyCallBar(project, options = {}) {
   return `
     <div class="sticky-call-bar fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-[92%] max-w-md transition-all duration-300 pointer-events-auto">
       <div class="bg-zinc-950/85 text-white backdrop-blur-md px-3 py-2 rounded-full shadow-2xl border border-white/10 flex items-center justify-between gap-2 text-xs">
-        
+
         <!-- Direct Call -->
         <a href="tel:${cleanPhone || phone}" class="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-full bg-white text-zinc-950 hover:bg-zinc-100 font-semibold transition-colors shadow-xs">
           <span>📞</span>
@@ -1518,4 +1559,3 @@ export function generateLocalBusinessSchema(project) {
   };
   return JSON.stringify(schema, null, 2);
 }
-
