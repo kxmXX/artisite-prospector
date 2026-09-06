@@ -1,4 +1,4 @@
-import { state } from "./state.js";
+import { state, getDeepValue, setDeepValue } from "./state.js";
 import { renderDashboard } from "./components/dashboard.js";
 import { renderEditor } from "./components/editor.js";
 import { renderWizardModal } from "./components/wizard.js";
@@ -29,6 +29,25 @@ class App {
 
     // Subscribe to state changes
     state.subscribe((s, event) => {
+      if (event === "live_text_change" || event === "live_color_change" || event === "live_business_change" || event === "sidebar_tab_change") {
+        return;
+      }
+      if (event === "drawer_change") {
+        this.renderModals();
+        return;
+      }
+      if (event === "history_change") {
+        this.updateUndoRedoUI();
+        return;
+      }
+      if (event === "section_selected") {
+        this.updateSelectedSectionUI();
+        return;
+      }
+      if (event === "viewport_change") {
+        this.updateViewportUI();
+        return;
+      }
       this.render();
       if (s.currentView === "editor") {
         this.initCanvasInteractivity();
@@ -149,10 +168,38 @@ class App {
     state.setViewport(vp);
   }
 
+  updateViewportUI() {
+    const vp = state.viewport;
+    const canvasContainer = document.getElementById("canvas-container");
+    if (canvasContainer) {
+      canvasContainer.className = {
+        desktop: "w-full max-w-none shadow-none transition-all duration-300 bg-white min-h-full",
+        tablet: "w-[768px] mx-auto shadow-sm rounded-2xl overflow-hidden border border-zinc-300 my-8 bg-white transition-all duration-300 min-h-full",
+        mobile: "w-[390px] mx-auto shadow-sm rounded-3xl overflow-hidden border-2 border-zinc-400 my-8 bg-white transition-all duration-300 min-h-full"
+      }[vp] || "w-full";
+    }
+  }
+
   setSidebarTab(tab) {
     this.activeSidebarTab = tab;
     state.activeSidebarTab = tab;
-    state.notify("sidebar_tab_change");
+    
+    const tabSections = document.getElementById("sidebar-tab-sections");
+    const tabSettings = document.getElementById("sidebar-tab-settings");
+    const btnSections = document.getElementById("tab-btn-sections");
+    const btnSettings = document.getElementById("tab-btn-settings");
+    
+    if (tab === "settings") {
+      tabSections?.classList.add("hidden");
+      tabSettings?.classList.remove("hidden");
+      btnSections?.classList.remove("is-active");
+      btnSettings?.classList.add("is-active");
+    } else {
+      tabSections?.classList.remove("hidden");
+      tabSettings?.classList.add("hidden");
+      btnSections?.classList.add("is-active");
+      btnSettings?.classList.remove("is-active");
+    }
   }
 
   switchWizardMode(mode) {
@@ -162,12 +209,12 @@ class App {
     const advFields = document.getElementById("wiz-advanced-fields");
     
     if (mode === "fast") {
-      fastTab.className = "pb-3 border-b-2 border-orange-600 text-orange-600 flex items-center gap-1.5";
-      advTab.className = "pb-3 border-b-2 border-transparent text-slate-500 hover:text-slate-900 flex items-center gap-1.5";
+      fastTab?.classList.add("is-active");
+      advTab?.classList.remove("is-active");
       if (advFields) advFields.style.display = "none";
     } else {
-      advTab.className = "pb-3 border-b-2 border-orange-600 text-orange-600 flex items-center gap-1.5";
-      fastTab.className = "pb-3 border-b-2 border-transparent text-slate-500 hover:text-slate-900 flex items-center gap-1.5";
+      advTab?.classList.add("is-active");
+      fastTab?.classList.remove("is-active");
       if (advFields) advFields.style.display = "block";
     }
   }
@@ -179,10 +226,10 @@ class App {
       const panel = document.getElementById(`closer-panel-${t}`);
       if (btn && panel) {
         if (t === tab) {
-          btn.className = "pb-3 border-b-2 border-orange-600 text-orange-600";
+          btn.className = "px-3 py-1.5 rounded-md font-medium text-zinc-900 bg-white shadow-xs border border-zinc-200";
           panel.classList.remove("hidden");
         } else {
-          btn.className = "pb-3 border-b-2 border-transparent text-slate-500 hover:text-slate-900";
+          btn.className = "px-3 py-1.5 rounded-md font-medium text-zinc-600 hover:text-zinc-900 border border-transparent";
           panel.classList.add("hidden");
         }
       }
@@ -309,6 +356,323 @@ class App {
   // Actions on Sections
   selectSection(sectionId) {
     state.setSelectedSection(sectionId);
+    this.updateSelectedSectionUI();
+  }
+
+  updateSelectedSectionUI() {
+    const sectionId = state.selectedSectionId;
+    if (!state.currentProject) return;
+
+    // 1. Highlight in canvas with the sleek 1.5px solid #18181b border from app.css
+    document.querySelectorAll(".editor-section-wrapper").forEach(wrap => {
+      if (wrap.getAttribute("data-section-id") === sectionId) {
+        wrap.classList.add("is-active-section");
+      } else {
+        wrap.classList.remove("is-active-section");
+      }
+    });
+
+    // 2. Synchronize sidebar tabs: if we're on settings, switch back to sections
+    const tabSections = document.getElementById("sidebar-tab-sections");
+    const tabSettings = document.getElementById("sidebar-tab-settings");
+    const btnSections = document.getElementById("tab-btn-sections");
+    const btnSettings = document.getElementById("tab-btn-settings");
+    if (tabSettings && !tabSettings.classList.contains("hidden")) {
+      tabSections?.classList.remove("hidden");
+      tabSettings?.classList.add("hidden");
+      btnSections?.classList.add("is-active");
+      btnSettings?.classList.remove("is-active");
+      this.activeSidebarTab = "sections";
+      state.activeSidebarTab = "sections";
+    }
+
+    // 3. Highlight and open accordion in sidebar cards
+    document.querySelectorAll(".section-card").forEach(card => {
+      const cardSecId = card.getAttribute("data-sec-id");
+      const acc = document.getElementById(`accordion-${cardSecId}`);
+      const chevron = card.querySelector(".accordion-chevron");
+
+      if (cardSecId === sectionId) {
+        card.classList.add("is-selected");
+        if (acc) acc.classList.remove("hidden");
+        if (chevron) chevron.classList.add("rotate-180");
+        card.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      } else {
+        card.classList.remove("is-selected");
+        if (acc) acc.classList.add("hidden");
+        if (chevron) chevron.classList.remove("rotate-180");
+      }
+    });
+
+    // 4. Update Right Inspector panel directly without wiping canvas
+    const rightInspector = document.getElementById("right-inspector-panel");
+    if (rightInspector) {
+      const selectedSec = state.currentProject.sections.find(s => s.id === sectionId) || state.currentProject.sections[0];
+      rightInspector.innerHTML = renderInspector(selectedSec, state.currentProject, state);
+    }
+  }
+
+  scrollToSection(sectionId) {
+    const canvasSec = document.getElementById(`section-${sectionId}`) || document.querySelector(`.editor-section-wrapper[data-section-id="${sectionId}"]`);
+    if (canvasSec) {
+      canvasSec.scrollIntoView({ behavior: "smooth", block: "center" });
+      canvasSec.classList.remove("section-focus-glow");
+      void canvasSec.offsetWidth; // Trigger reflow
+      canvasSec.classList.add("section-focus-glow");
+      setTimeout(() => {
+        canvasSec.classList.remove("section-focus-glow");
+      }, 1600);
+    }
+  }
+
+  toggleSectionAccordion(sectionId, event) {
+    const card = document.querySelector(`.section-card[data-sec-id="${sectionId}"]`);
+    const accordion = document.getElementById(`accordion-${sectionId}`);
+    const chevron = card?.querySelector(".accordion-chevron");
+    
+    if (!accordion || !card) {
+      this.scrollToSection(sectionId);
+      return;
+    }
+    
+    const isClosed = accordion.classList.contains("hidden");
+    
+    if (isClosed) {
+      // Close other accordions for focused clarity
+      document.querySelectorAll(".section-accordion-body").forEach(body => {
+        if (body.id !== `accordion-${sectionId}`) {
+          body.classList.add("hidden");
+        }
+      });
+      document.querySelectorAll(".section-card").forEach(c => {
+        if (c.getAttribute("data-sec-id") !== sectionId) {
+          c.classList.remove("is-selected");
+          c.querySelector(".accordion-chevron")?.classList.remove("rotate-180");
+        }
+      });
+
+      // Open this accordion
+      accordion.classList.remove("hidden");
+      card.classList.add("is-selected");
+      chevron?.classList.add("rotate-180");
+      this.selectSection(sectionId);
+      this.scrollToSection(sectionId);
+    } else {
+      accordion.classList.add("hidden");
+      card.classList.remove("is-selected");
+      chevron?.classList.remove("rotate-180");
+    }
+  }
+
+  liveUpdateField(sectionId, path, value) {
+    if (!state.currentProject) return;
+    const sec = state.currentProject.sections.find(s => s.id === sectionId);
+    if (!sec || !sec.content) return;
+
+    // 1. Update in-memory state data directly using setDeepValue
+    setDeepValue(sec.content, path, value);
+
+    // 2. Direct canvas DOM update: find the matching element with data-editable="path"
+    const canvasSec = document.getElementById(`section-${sectionId}`) || document.querySelector(`.editor-section-wrapper[data-section-id="${sectionId}"]`);
+    if (canvasSec) {
+      const targetEl = canvasSec.querySelector(`[data-editable="${path}"]`);
+      if (targetEl && targetEl !== document.activeElement) {
+        targetEl.textContent = value;
+      }
+    }
+
+    // 3. Synchronize any twin input in the sidebar accordion
+    const accordionInput = document.querySelector(`#accordion-${sectionId} [data-field="${path}"]`);
+    if (accordionInput && document.activeElement !== accordionInput) {
+      accordionInput.value = value;
+    }
+
+    // 4. Update save status indicator
+    const saveStatus = document.getElementById("save-status-text");
+    if (saveStatus) {
+      saveStatus.textContent = "Modification en cours...";
+      saveStatus.className = "text-[11px] font-medium text-amber-600";
+    }
+  }
+
+  commitFieldUpdate(sectionId, path, value) {
+    if (!state.currentProject) return;
+    const sec = state.currentProject.sections.find(s => s.id === sectionId);
+    if (!sec || !sec.content) return;
+
+    setDeepValue(sec.content, path, value);
+    state.pushHistory(`Modification ${path}`);
+    state.saveToStorage();
+    this.updateUndoRedoUI();
+
+    const saveStatus = document.getElementById("save-status-text");
+    if (saveStatus) {
+      saveStatus.textContent = "✓ Enregistré";
+      saveStatus.className = "text-[11px] font-medium text-zinc-500";
+    }
+  }
+
+  liveUpdateText(sectionId, field, value) {
+    this.liveUpdateField(sectionId, field, value);
+  }
+
+  commitTextUpdate(sectionId, field, value) {
+    this.commitFieldUpdate(sectionId, field, value);
+  }
+
+  toggleSettingsItem(itemId) {
+    const body = document.getElementById(`settings-body-${itemId}`);
+    if (!body) return;
+    const isHidden = body.classList.contains("hidden");
+    const parentCard = body.closest(".section-card");
+    const chevron = parentCard?.querySelector(".section-card-header .text-zinc-400 svg");
+
+    if (isHidden) {
+      body.classList.remove("hidden");
+      chevron?.classList.add("rotate-180");
+    } else {
+      body.classList.add("hidden");
+      chevron?.classList.remove("rotate-180");
+    }
+  }
+
+  cycleSectionBg(sectionId) {
+    if (!state.currentProject) return;
+    const sec = state.currentProject.sections.find(s => s.id === sectionId);
+    if (!sec) return;
+    if (!sec.settings) sec.settings = {};
+    const themes = ["white", "mineral", "dark"];
+    const current = sec.settings.bgTheme || "white";
+    const nextIdx = (themes.indexOf(current) + 1) % themes.length;
+    this.setSectionBg(sectionId, themes[nextIdx]);
+  }
+
+  setSectionBg(sectionId, theme) {
+    if (!state.currentProject) return;
+    const sec = state.currentProject.sections.find(s => s.id === sectionId);
+    if (!sec) return;
+    if (!sec.settings) sec.settings = {};
+    sec.settings.bgTheme = theme;
+
+    // Apply directly to canvas element classes
+    const canvasSec = document.getElementById(`section-${sectionId}`) || document.querySelector(`.editor-section-wrapper[data-section-id="${sectionId}"]`);
+    if (canvasSec) {
+      canvasSec.classList.remove("bg-sec-white", "bg-sec-mineral", "bg-sec-dark");
+      canvasSec.classList.add(`bg-sec-${theme}`);
+    }
+
+    state.pushHistory(`Changement fond (${theme})`);
+    state.saveToStorage();
+    this.updateUndoRedoUI();
+
+    // Update active button state in sidebar if open
+    const accordion = document.getElementById(`accordion-${sectionId}`);
+    if (accordion) {
+      const btns = accordion.querySelectorAll(".grid-cols-3 button");
+      const map = ["white", "mineral", "dark"];
+      btns.forEach((b, i) => {
+        if (map[i] === theme) {
+          b.className = "py-1 text-[11px] font-medium border rounded text-center transition-colors border-zinc-900 bg-white font-semibold shadow-xs";
+        } else {
+          b.className = "py-1 text-[11px] font-medium border rounded text-center transition-colors border-zinc-200 bg-zinc-50 text-zinc-600 hover:bg-white";
+        }
+      });
+    }
+  }
+
+  setCTASize(size) {
+    if (!state.currentProject) return;
+    state.currentProject.branding.ctaSize = size;
+
+    const ctaPaddingMap = {
+      sm: '0.5rem 1rem',
+      md: '0.75rem 1.5rem',
+      lg: '1rem 2rem',
+      xl: '1.25rem 2.5rem'
+    };
+    const ctaFontMap = {
+      sm: '0.875rem',
+      md: '0.95rem',
+      lg: '1.125rem',
+      xl: '1.25rem'
+    };
+
+    const root = document.querySelector(".artisite-root");
+    if (root) {
+      root.style.setProperty("--cta-padding", ctaPaddingMap[size] || "0.75rem 1.5rem");
+      root.style.setProperty("--cta-font-size", ctaFontMap[size] || "0.95rem");
+    }
+
+    // Update buttons in settings tab
+    const tabSettings = document.getElementById("sidebar-tab-settings");
+    if (tabSettings) {
+      const sizeBtns = tabSettings.querySelectorAll(".grid-cols-4 button");
+      const sizes = ['sm', 'md', 'lg', 'xl'];
+      sizeBtns.forEach((btn, idx) => {
+        const isAct = sizes[idx] === size;
+        btn.className = `py-1 border rounded text-center text-[11px] font-medium ${isAct ? 'border-zinc-900 bg-white font-semibold shadow-xs text-zinc-950' : 'border-zinc-200 bg-white text-zinc-600'}`;
+      });
+    }
+
+    state.pushHistory(`Taille CTA : ${size}`);
+    state.saveToStorage();
+    this.updateUndoRedoUI();
+  }
+
+  addCanvaElement(blockType) {
+    if (!state.currentProject) return;
+    const project = state.currentProject;
+
+    let content = {};
+    if (blockType === "urgentBanner") {
+      content = {
+        blockType: "urgentBanner",
+        badge: "⚡ INTERVENTION PRIORITAIRE",
+        title: "Disponibilité immédiate 7j/7 sur votre secteur",
+        text: "Contactez notre standard d'intervention pour un déplacement rapide et un diagnostic clair sans frais cachés.",
+        ctaText: "Appeler maintenant",
+        ctaLink: `tel:${project.business.phone || '0600000000'}`
+      };
+    } else if (blockType === "floatingBadge") {
+      content = {
+        blockType: "floatingBadge",
+        badge: "🛡️ CHARTE DE CONFIANCE LOCALE",
+        title: "Professionnel Agréé & Artisans Référencés",
+        text: "Toutes nos interventions sont couvertes par notre garantie décennale et assurance responsabilité civile professionnelle.",
+        ctaText: "Consulter nos garanties",
+        ctaLink: "#contact"
+      };
+    } else {
+      content = {
+        blockType: "customCard",
+        badge: "✨ SERVICE SUR-MESURE",
+        title: "Un projet spécifique ou un besoin particulier ?",
+        text: "Nos spécialistes étudient votre demande et vous accompagnent de la conception jusqu'aux finitions.",
+        ctaText: "Demander une étude",
+        ctaLink: "#contact"
+      };
+    }
+
+    const newSection = {
+      id: `sec-custom-${Date.now()}`,
+      type: "customBlock",
+      variant: blockType,
+      visibility: true,
+      content,
+      settings: { bgTheme: "mineral" }
+    };
+
+    // Insert after hero section (index 1) or at end
+    const heroIdx = project.sections.findIndex(s => s.type === "hero");
+    const insertIdx = heroIdx !== -1 ? heroIdx + 1 : project.sections.length;
+    project.sections.splice(insertIdx, 0, newSection);
+
+    state.pushHistory(`Ajout élément Canva (${blockType})`);
+    state.saveToStorage();
+    this.render();
+    setTimeout(() => {
+      this.scrollToSection(newSection.id);
+    }, 100);
   }
 
   moveSection(sectionId, direction) {
@@ -369,6 +733,10 @@ class App {
     if (!sec || !sec.content || !Array.isArray(sec.content.services)) return;
     const services = sec.content.services.filter((_, i) => i !== idx);
     state.updateSectionContent(sectionId, "services", services);
+  }
+
+  deleteServiceItem(sectionId, idx) {
+    this.removeServiceItem(sectionId, idx);
   }
 
   addFaqItem(sectionId) {
@@ -439,10 +807,10 @@ class App {
       const panel = document.getElementById(`image-panel-${t}`);
       if (btn && panel) {
         if (t === tab) {
-          btn.className = "pb-2.5 border-b-2 border-orange-600 text-orange-600";
+          btn.className = "px-3 py-1.5 rounded-md font-medium text-zinc-900 bg-white shadow-xs border border-zinc-200";
           panel.style.display = "block";
         } else {
-          btn.className = "pb-2.5 border-b-2 border-transparent text-slate-500 hover:text-slate-900";
+          btn.className = "px-3 py-1.5 rounded-md font-medium text-zinc-600 hover:text-zinc-900 border border-transparent";
           panel.style.display = "none";
         }
       }
@@ -574,17 +942,140 @@ class App {
     state.updateProject(proj, true, `Application du preset ${preset.name}`);
   }
 
+  liveUpdateColor(colorKey, value) {
+    if (!state.currentProject) return;
+    state.currentProject.branding[colorKey] = value;
+
+    // Direct CSS custom property update on canvas root (60 FPS smooth)
+    const root = document.querySelector(".artisite-root");
+    if (root) {
+      const map = {
+        primaryColor: "--primary",
+        secondaryColor: "--secondary",
+        accentColor: "--accent",
+        bgColor: "--bg",
+        textColor: "--text"
+      };
+      if (map[colorKey]) {
+        root.style.setProperty(map[colorKey], value);
+      }
+    }
+
+    const hexMap = {
+      primaryColor: "hex-primary",
+      secondaryColor: "hex-secondary",
+      accentColor: "hex-accent"
+    };
+    const hexEl = document.getElementById(hexMap[colorKey]);
+    if (hexEl) hexEl.textContent = value;
+  }
+
+  commitColorUpdate(colorKey, value) {
+    if (!state.currentProject) return;
+    state.pushHistory(`Modification couleur ${colorKey}`);
+    state.currentProject.branding[colorKey] = value;
+    state.saveToStorage();
+    this.updateUndoRedoUI();
+  }
+
   updateBrandingColor(colorKey, value) {
-    const proj = JSON.parse(JSON.stringify(state.currentProject));
-    proj.branding[colorKey] = value;
-    state.updateProject(proj, true, `Mise à jour couleur ${colorKey}`);
+    this.liveUpdateColor(colorKey, value);
+    this.commitColorUpdate(colorKey, value);
+  }
+
+  liveUpdateBorderRadius(radius, btnRadius) {
+    if (!state.currentProject) return;
+    state.currentProject.branding.borderRadius = radius;
+    state.currentProject.branding.buttonRadius = btnRadius;
+
+    const root = document.querySelector(".artisite-root");
+    if (root) {
+      root.style.setProperty("--radius", radius);
+      root.style.setProperty("--btn-radius", btnRadius);
+    }
+    state.pushHistory("Modification arrondi");
+    state.saveToStorage();
+    this.updateUndoRedoUI();
+
+    // Update border radius button active states in sidebar settings
+    const tabSettings = document.getElementById("sidebar-tab-settings");
+    if (tabSettings) {
+      const btns = tabSettings.querySelectorAll(".grid-cols-3 button");
+      btns.forEach((btn, idx) => {
+        const radMap = ['0.25rem', '0.75rem', '1.5rem'];
+        const isAct = radMap[idx] === radius;
+        btn.className = `py-1.5 border text-center font-medium transition-all ${isAct ? 'border-zinc-900 bg-white font-semibold shadow-xs text-zinc-950' : 'border-zinc-200 text-zinc-600 hover:bg-zinc-50'} ${idx === 0 ? 'rounded-md' : idx === 1 ? 'rounded-lg' : 'rounded-full'}`;
+      });
+    }
   }
 
   updateBorderRadius(radius, btnRadius) {
-    const proj = JSON.parse(JSON.stringify(state.currentProject));
-    proj.branding.borderRadius = radius;
-    proj.branding.buttonRadius = btnRadius;
-    state.updateProject(proj, true, "Mise à jour arrondi");
+    this.liveUpdateBorderRadius(radius, btnRadius);
+  }
+
+  updateTypography(headingFont, bodyFont) {
+    if (!state.currentProject) return;
+    state.currentProject.branding.headingFont = headingFont;
+    state.currentProject.branding.bodyFont = bodyFont;
+
+    const root = document.querySelector(".artisite-root");
+    if (root) {
+      root.style.setProperty("--font-heading", `'${headingFont}', -apple-system, BlinkMacSystemFont, sans-serif`);
+      root.style.setProperty("--font-body", `'${bodyFont}', -apple-system, BlinkMacSystemFont, sans-serif`);
+    }
+
+    state.pushHistory(`Typographie : ${headingFont}`);
+    state.saveToStorage();
+    this.updateUndoRedoUI();
+  }
+
+  liveUpdateBusiness(field, value) {
+    if (!state.currentProject) return;
+    state.currentProject.business[field] = value;
+    if (field === "name") {
+      state.currentProject.name = value;
+      const titleDisplay = document.getElementById("editor-title-display");
+      if (titleDisplay) titleDisplay.textContent = value;
+      document.querySelectorAll('[data-editable="brandName"]').forEach(el => el.textContent = value);
+    }
+    if (field === "phone") {
+      document.querySelectorAll('[data-editable="phone"]').forEach(el => el.textContent = value);
+    }
+  }
+
+  commitBusiness(field, value) {
+    if (!state.currentProject) return;
+    state.pushHistory(`Modification coordonnées prospect (${field})`);
+    state.saveToStorage();
+    this.updateUndoRedoUI();
+  }
+
+  updateUndoRedoUI() {
+    const btnUndo = document.getElementById("btn-undo-header");
+    const btnRedo = document.getElementById("btn-redo-header");
+    if (btnUndo) {
+      if (state.canUndo()) {
+        btnUndo.classList.remove("opacity-30", "cursor-not-allowed");
+      } else {
+        btnUndo.classList.add("opacity-30", "cursor-not-allowed");
+      }
+    }
+    if (btnRedo) {
+      if (state.canRedo()) {
+        btnRedo.classList.remove("opacity-30", "cursor-not-allowed");
+      } else {
+        btnRedo.classList.add("opacity-30", "cursor-not-allowed");
+      }
+    }
+  }
+
+  applyCopilotChip(prompt) {
+    const input = document.getElementById("copilot-prompt-input");
+    if (input) {
+      input.value = prompt;
+      const fakeEvent = { preventDefault: () => {} };
+      this.submitCopilotPrompt(fakeEvent);
+    }
   }
 
   // Copilot AI Submit with API call & local fallback
@@ -730,17 +1221,17 @@ class App {
       <head>
         <title>Proposition Commerciale — ${b.name}</title>
         <style>
-          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 40px; color: #1e293b; }
-          .header { border-bottom: 2px solid #ea580c; padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end; }
-          h1 { margin: 0; font-size: 24px; color: #0f172a; }
-          .sub { color: #ea580c; font-weight: bold; margin-top: 5px; }
-          .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; }
-          .card { border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; background: #f8fafc; }
-          .card h3 { margin-top: 0; font-size: 16px; border-bottom: 1px solid #cbd5e1; padding-bottom: 8px; }
-          ul { padding-left: 20px; font-size: 14px; line-height: 1.8; }
-          .pricing { background: #fff7ed; border: 2px solid #fdba74; border-radius: 12px; padding: 25px; margin-top: 30px; }
-          .price-val { font-size: 32px; font-weight: bold; color: #ea580c; }
-          .footer { margin-top: 50px; text-align: center; font-size: 12px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 20px; }
+          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 40px; color: #18181b; background: #ffffff; }
+          .header { border-bottom: 1.5px solid #18181b; padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end; }
+          h1 { margin: 0; font-size: 22px; font-weight: 700; color: #09090b; }
+          .sub { color: #52525b; font-weight: 500; font-size: 13px; margin-top: 5px; }
+          .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+          .card { border: 1px solid #e4e4e7; border-radius: 8px; padding: 20px; background: #fafafa; }
+          .card h3 { margin-top: 0; font-size: 14px; font-weight: 600; color: #18181b; border-bottom: 1px solid #e4e4e7; padding-bottom: 8px; }
+          ul { padding-left: 18px; font-size: 13px; line-height: 1.8; color: #3f3f46; }
+          .pricing { background: #fafafa; border: 1.5px solid #18181b; border-radius: 8px; padding: 24px; margin-top: 24px; }
+          .price-val { font-size: 28px; font-weight: 800; color: #18181b; }
+          .footer { margin-top: 40px; text-align: center; font-size: 11.5px; color: #a1a1aa; border-top: 1px solid #e4e4e7; padding-top: 16px; }
         </style>
       </head>
       <body>
@@ -749,7 +1240,7 @@ class App {
             <h1>Proposition de Site Vitrine Professionnel</h1>
             <div class="sub">Destinée à : ${b.name} (${b.city})</div>
           </div>
-          <div style="text-align: right; font-size: 13px;">
+          <div style="text-align: right; font-size: 13px; color: #71717a;">
             Date : ${new Date().toLocaleDateString('fr-FR')}<br>
             Conseiller : Michel
           </div>
@@ -780,15 +1271,15 @@ class App {
         </div>
 
         <div class="pricing">
-          <h3 style="margin-top:0;">Offre Spéciale Clé en Main</h3>
-          <div class="price-val">990 € H.T. <span style="font-size:16px; color:#475569; font-weight:normal;">(ou 89 € / mois hébergement & nom de domaine inclus)</span></div>
-          <p style="font-size:14px; margin-top:10px; color:#475569;">
+          <h3 style="margin-top:0; font-size: 15px; font-weight: 600;">Offre Spéciale Clé en Main</h3>
+          <div class="price-val">990 € H.T. <span style="font-size:15px; color:#71717a; font-weight:normal;">(ou 89 € / mois hébergement & nom de domaine inclus)</span></div>
+          <p style="font-size:13.5px; margin-top:8px; color:#52525b; line-height: 1.6;">
             Site déjà développé, configuré et prêt à être branché sur votre nom de domaine officiel sous 48 heures.
           </p>
         </div>
 
         <div class="footer">
-          Document commercial non contractuel • Édité avec Artisite Prospector v4.0
+          Document commercial non contractuel • Artisite Prospector v4.0
         </div>
       </body>
       </html>
@@ -804,23 +1295,23 @@ class App {
     const siteHTML = renderWebsiteHTML(project, { isEditor: false, isStandalone: false });
 
     this.rootEl.innerHTML = `
-      <div class="relative min-h-screen bg-slate-900">
+      <div class="relative min-h-screen bg-zinc-950">
         
         <!-- Floating Commercial Pitch Ribbon for Michel -->
-        <div class="fixed top-3 left-1/2 transform -translate-x-1/2 z-50 bg-slate-900/95 text-white px-5 py-2.5 rounded-full shadow-2xl backdrop-blur-md border border-slate-700 flex items-center gap-4 text-xs">
-          <div class="flex items-center gap-2 font-semibold">
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
-            <span>Proposition pour <strong>${project.business.name}</strong></span>
+        <div class="fixed top-3 left-1/2 transform -translate-x-1/2 z-50 bg-zinc-950/90 text-white px-4 py-2 rounded-full shadow-lg backdrop-blur-md border border-zinc-800 flex items-center gap-3.5 text-xs">
+          <div class="flex items-center gap-2 font-medium text-zinc-300">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span>Proposition : <strong class="text-white">${project.business.name}</strong></span>
           </div>
 
-          <div class="h-4 w-[1px] bg-slate-700"></div>
+          <div class="h-3.5 w-[1px] bg-zinc-800"></div>
 
-          <button type="button" onclick="window.app.openEditor()" class="text-slate-300 hover:text-white font-medium flex items-center gap-1">
+          <button type="button" onclick="window.app.openEditor()" class="text-zinc-400 hover:text-white font-medium flex items-center gap-1 transition-colors">
             ${getIcon("edit", "w-3.5 h-3.5")}
             <span>Retour Éditeur</span>
           </button>
 
-          <button type="button" onclick="window.app.openCloserModal()" class="text-amber-400 hover:text-amber-300 font-bold flex items-center gap-1">
+          <button type="button" onclick="window.app.openCloserModal()" class="px-2.5 py-1 rounded-full bg-white text-zinc-950 hover:bg-zinc-100 font-medium flex items-center gap-1 shadow-xs transition-colors">
             ${getIcon("sparkles", "w-3.5 h-3.5")}
             <span>Script Appel</span>
           </button>
@@ -942,7 +1433,7 @@ class App {
       };
     });
 
-    // Toolbar buttons click
+    // Canvas section hover toolbar buttons click
     document.querySelectorAll(".editor-section-toolbar button").forEach(btn => {
       btn.onclick = (e) => {
         e.stopPropagation();
@@ -950,6 +1441,8 @@ class App {
         const secId = btn.getAttribute("data-id");
         if (action === "move-up") this.moveSection(secId, "up");
         else if (action === "move-down") this.moveSection(secId, "down");
+        else if (action === "toggle-bg") this.cycleSectionBg(secId);
+        else if (action === "insert-after") this.openAddSectionModal();
         else if (action === "toggle-vis") this.toggleSectionVisibility(secId);
         else if (action === "duplicate") this.duplicateSection(secId);
         else if (action === "delete") this.deleteSection(secId);
@@ -959,11 +1452,33 @@ class App {
     // Direct contenteditable on text elements
     document.querySelectorAll("[data-editable]").forEach(el => {
       el.setAttribute("contenteditable", "true");
-      el.classList.add("hover:outline", "hover:outline-2", "hover:outline-orange-400", "rounded", "transition-all", "cursor-text");
+      el.classList.add("hover:outline", "hover:outline-1", "hover:outline-dashed", "hover:outline-zinc-400", "rounded", "transition-all", "cursor-text");
 
       el.addEventListener("click", (e) => {
         e.stopPropagation();
       });
+
+      el.oninput = () => {
+        const field = el.getAttribute("data-editable");
+        const value = el.innerText;
+        const secWrapper = el.closest(".editor-section-wrapper");
+        const secId = secWrapper?.getAttribute("data-section-id");
+        if (secId && field && state.currentProject) {
+          const sec = state.currentProject.sections.find(s => s.id === secId);
+          if (sec && sec.content) {
+            setDeepValue(sec.content, field, value);
+          }
+          const mirrorInputs = document.querySelectorAll(`#accordion-${secId} [data-field="${field}"], #inspector-panel-content [data-field="${field}"]`);
+          mirrorInputs.forEach(inp => {
+            if (document.activeElement !== inp) inp.value = value;
+          });
+          const saveStatus = document.getElementById("save-status-text");
+          if (saveStatus) {
+            saveStatus.textContent = "Modification en cours...";
+            saveStatus.className = "text-[11px] font-medium text-amber-600";
+          }
+        }
+      };
 
       el.onblur = () => {
         const field = el.getAttribute("data-editable");
@@ -971,7 +1486,7 @@ class App {
         const secWrapper = el.closest(".editor-section-wrapper");
         const secId = secWrapper?.getAttribute("data-section-id");
         if (secId && field) {
-          this.updateSectionContent(secId, field, value);
+          this.commitFieldUpdate(secId, field, value);
         }
       };
 
@@ -984,8 +1499,12 @@ class App {
     });
 
     // Sidebar Section Reordering via HTML5 Drag & Drop
-    document.querySelectorAll(".section-item-drag").forEach(item => {
+    document.querySelectorAll(".section-card[draggable='true'], .section-item-drag").forEach(item => {
       item.addEventListener("dragstart", (e) => {
+        if (e.target.closest("input, textarea, select, button, .section-accordion-body")) {
+          e.preventDefault();
+          return;
+        }
         const secId = item.getAttribute("data-sec-id");
         e.dataTransfer.setData("text/plain", secId);
         e.dataTransfer.effectAllowed = "move";
@@ -994,7 +1513,7 @@ class App {
 
       item.addEventListener("dragend", () => {
         item.classList.remove("is-dragging");
-        document.querySelectorAll(".section-item-drag").forEach(el => {
+        document.querySelectorAll(".section-card, .section-item-drag").forEach(el => {
           el.classList.remove("drop-above", "drop-below");
         });
       });
@@ -1013,7 +1532,8 @@ class App {
         }
       });
 
-      item.addEventListener("dragleave", () => {
+      item.addEventListener("dragleave", (e) => {
+        if (e.relatedTarget && item.contains(e.relatedTarget)) return;
         item.classList.remove("drop-above", "drop-below");
       });
 

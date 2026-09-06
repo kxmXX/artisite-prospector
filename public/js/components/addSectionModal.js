@@ -135,45 +135,45 @@ export const SECTION_DEFINITIONS = [
 
 export function renderAddSectionModal(project) {
   return `
-    <div id="add-section-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-sm animate-fade-in">
-      <div class="bg-white rounded-3xl shadow-2xl max-w-3xl w-full border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+    <div id="add-section-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
+      <div class="bg-white rounded-2xl shadow-xl max-w-2xl w-full border border-zinc-200 overflow-hidden flex flex-col max-h-[90vh]">
         
         <!-- Header -->
-        <div class="px-8 py-5 border-b border-slate-100 flex items-center justify-between flex-shrink-0 bg-slate-50">
+        <div class="px-6 py-4 border-b border-zinc-200 flex items-center justify-between flex-shrink-0 bg-white">
           <div>
-            <div class="text-[10px] font-bold uppercase tracking-wider text-orange-600">Bibliothèque de Composants v4</div>
-            <h2 class="font-heading text-xl font-black text-slate-900 mt-0.5">Ajouter une Section au Site</h2>
+            <div class="text-[10px] font-medium uppercase tracking-wider text-zinc-400">Bibliothèque de Sections</div>
+            <h2 class="font-semibold text-base text-zinc-900 mt-0.5">Ajouter une Section au Site</h2>
           </div>
-          <button type="button" onclick="window.app.closeAddSectionModal()" class="p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-200/60 transition-colors">
-            ${getIcon("x", "w-5 h-5")}
+          <button type="button" onclick="window.app.closeAddSectionModal()" class="p-1.5 text-zinc-400 hover:text-zinc-800 rounded-lg hover:bg-zinc-100 transition-colors">
+            ${getIcon("x", "w-4 h-4")}
           </button>
         </div>
 
         <!-- Section List & Variant Picker -->
-        <div class="p-6 overflow-y-auto space-y-4 flex-1">
-          <p class="text-xs text-slate-500 mb-2">
-            Sélectionnez le type de section et son style de disposition. La section sera générée avec des contenus adaptés au métier <strong>${project?.business?.tradeLabel || 'de votre prospect'}</strong>.
+        <div class="p-6 overflow-y-auto space-y-3.5 flex-1 text-xs">
+          <p class="text-xs text-zinc-500 mb-1">
+            Sélectionnez une section à ajouter. Elle sera automatiquement calibrée pour l'activité <strong>${project?.business?.tradeLabel || 'de votre prospect'}</strong>.
           </p>
 
-          <div class="grid md:grid-cols-2 gap-4">
+          <div class="grid md:grid-cols-2 gap-3">
             ${SECTION_DEFINITIONS.map(secDef => {
               return `
-                <div class="bg-slate-50 hover:bg-white border border-slate-200/80 hover:border-orange-300 rounded-2xl p-4.5 transition-all space-y-3 flex flex-col justify-between shadow-sm hover:shadow-md">
+                <div class="bg-zinc-50 hover:bg-white border border-zinc-200 hover:border-zinc-300 rounded-xl p-3.5 transition-all space-y-3 flex flex-col justify-between shadow-xs">
                   <div>
                     <div class="flex items-center gap-2.5">
-                      <div class="w-8 h-8 rounded-xl bg-orange-100/80 text-orange-600 flex items-center justify-center flex-shrink-0">
-                        ${getIcon(secDef.icon, "w-4 h-4")}
+                      <div class="w-7 h-7 rounded-lg bg-zinc-200/70 text-zinc-700 flex items-center justify-center flex-shrink-0">
+                        ${getIcon(secDef.icon, "w-3.5 h-3.5")}
                       </div>
                       <div class="truncate">
-                        <h4 class="font-heading font-bold text-xs text-slate-900 truncate">${secDef.title}</h4>
-                        <div class="text-[10px] text-slate-400 truncate">${secDef.description}</div>
+                        <h4 class="font-semibold text-xs text-zinc-900 truncate">${secDef.title}</h4>
+                        <div class="text-[10.5px] text-zinc-400 truncate">${secDef.description}</div>
                       </div>
                     </div>
 
                     <!-- Variant Selection Dropdown -->
-                    <div class="mt-3">
-                      <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Variante visuelle :</label>
-                      <select id="variant-select-${secDef.type}" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 font-medium focus:ring-1 focus:ring-orange-500">
+                    <div class="mt-2.5">
+                      <label class="block text-[10px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Variante :</label>
+                      <select id="variant-select-${secDef.type}" class="w-full bg-white border border-zinc-200 rounded-md px-2 py-1 text-xs text-zinc-800 font-medium focus:border-zinc-900 focus:outline-none">
                         ${secDef.variants.map(v => `
                           <option value="${v.id}">${v.label}</option>
                         `).join('')}
@@ -181,8 +181,8 @@ export function renderAddSectionModal(project) {
                     </div>
                   </div>
 
-                  <button type="button" onclick="window.app.handleAddSection('${secDef.type}', document.getElementById('variant-select-${secDef.type}').value)" class="w-full py-2 rounded-xl text-xs font-bold text-white bg-slate-900 hover:bg-orange-600 transition-colors flex items-center justify-center gap-1.5 shadow-sm">
-                    ${getIcon("plus", "w-3.5 h-3.5")}
+                  <button type="button" onclick="window.app.handleAddSection('${secDef.type}', document.getElementById('variant-select-${secDef.type}').value)" class="w-full py-1.5 rounded-lg text-xs font-medium text-white bg-zinc-900 hover:bg-black transition-colors flex items-center justify-center gap-1.5 shadow-xs">
+                    ${getIcon("plus", "w-3 h-3")}
                     <span>Insérer cette section</span>
                   </button>
                 </div>
@@ -192,9 +192,9 @@ export function renderAddSectionModal(project) {
         </div>
 
         <!-- Footer -->
-        <div class="px-8 py-3.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between flex-shrink-0 text-xs text-slate-500">
-          <span>Toutes les sections restent modifiables, déplaçables et masquables à tout moment.</span>
-          <button type="button" onclick="window.app.closeAddSectionModal()" class="px-4 py-1.5 rounded-lg border border-slate-200 font-semibold hover:bg-slate-100">
+        <div class="px-6 py-3 bg-zinc-50 border-t border-zinc-200 flex items-center justify-between flex-shrink-0 text-xs text-zinc-500">
+          <span>Sections déplaçables et masquables à tout moment.</span>
+          <button type="button" onclick="window.app.closeAddSectionModal()" class="px-3 py-1.5 rounded-lg border border-zinc-200 font-medium text-zinc-700 hover:bg-zinc-100 transition-colors">
             Fermer
           </button>
         </div>

@@ -10,6 +10,7 @@ class AppStateManager {
     this.viewport = "desktop"; // "desktop", "tablet", "mobile"
     this.selectedSectionId = null;
     this.activeInspectorTab = "content"; // "content", "style", "visibility"
+    this.activeSidebarTab = "sections"; // "sections", "settings"
     this.activeDrawer = null; // null, "closer", "new_project", "add_section"
 
     // History for Undo/Redo
@@ -49,9 +50,11 @@ class AppStateManager {
 
   loadFromStorage() {
     try {
-      const data = localStorage.getItem(STORAGE_KEY);
-      if (data) {
-        this.projects = JSON.parse(data);
+      if (typeof localStorage !== "undefined") {
+        const data = localStorage.getItem(STORAGE_KEY);
+        if (data) {
+          this.projects = JSON.parse(data);
+        }
       }
     } catch (e) {
       console.warn("Could not read from localStorage, using in-memory:", e);
@@ -61,7 +64,9 @@ class AppStateManager {
 
   saveToStorage() {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(this.projects));
+      if (typeof localStorage !== "undefined") {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(this.projects));
+      }
     } catch (e) {
       console.warn("Could not save to localStorage:", e);
     }
@@ -350,7 +355,7 @@ class AppStateManager {
   }
 }
 
-function getDeepValue(obj, path) {
+export function getDeepValue(obj, path) {
   if (!obj || !path) return undefined;
   const parts = path.split(".");
   let current = obj;
@@ -361,7 +366,7 @@ function getDeepValue(obj, path) {
   return current;
 }
 
-function setDeepValue(obj, path, value) {
+export function setDeepValue(obj, path, value) {
   const parts = path.split(".");
   let current = obj;
   for (let i = 0; i < parts.length - 1; i++) {
@@ -377,3 +382,4 @@ function setDeepValue(obj, path, value) {
 }
 
 export const state = new AppStateManager();
+

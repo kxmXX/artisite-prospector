@@ -16,22 +16,22 @@ export function renderEditableImage(url, { sectionId = "", fieldPath = "", alt =
 
   return `
     <div class="relative group/img w-full h-full"
-         ondragover="event.preventDefault(); this.classList.add('ring-4', 'ring-orange-500');"
-         ondragleave="this.classList.remove('ring-4', 'ring-orange-500');"
-         ondrop="event.preventDefault(); this.classList.remove('ring-4', 'ring-orange-500'); window.app.handleImageElementDrop(event, '${sectionId}', '${fieldPath}', ${indexParam});">
+         ondragover="event.preventDefault(); this.classList.add('ring-2', 'ring-zinc-900');"
+         ondragleave="this.classList.remove('ring-2', 'ring-zinc-900');"
+         ondrop="event.preventDefault(); this.classList.remove('ring-2', 'ring-zinc-900'); window.app.handleImageElementDrop(event, '${sectionId}', '${fieldPath}', ${indexParam});">
       <img src="${displayUrl}" alt="${alt}" class="${className}">
       
-      <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-[2px] opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center gap-2 z-20 pointer-events-auto p-2">
+      <div class="absolute inset-0 bg-zinc-950/60 backdrop-blur-[2px] opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center gap-2 z-20 pointer-events-auto p-2">
         <button type="button" 
                 onclick="event.stopPropagation(); window.app.openImagePicker('${sectionId}', '${fieldPath}', ${indexParam})" 
-                class="px-2.5 py-1.5 bg-white hover:bg-orange-50 text-slate-900 rounded-lg text-xs font-bold shadow-lg flex items-center gap-1.5 transition-transform hover:scale-105"
+                class="px-2.5 py-1.5 bg-white hover:bg-zinc-100 text-zinc-900 rounded-lg text-xs font-medium shadow-xs border border-zinc-200 flex items-center gap-1.5 transition-colors"
                 title="Modifier / Remplacer cette image">
-          ${getIcon("eye", "w-3.5 h-3.5 text-orange-600")}
+          ${getIcon("eye", "w-3.5 h-3.5 text-zinc-700")}
           <span>Remplacer</span>
         </button>
         <button type="button" 
                 onclick="event.stopPropagation(); window.app.deletePhoto('${sectionId}', '${fieldPath}', ${indexParam})" 
-                class="p-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold shadow-lg flex items-center justify-center transition-transform hover:scale-105" 
+                class="p-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-medium shadow-xs flex items-center justify-center transition-colors" 
                 title="Supprimer la photo (Poubelle 🗑️)">
           ${getIcon("trash", "w-4 h-4")}
         </button>
@@ -62,6 +62,20 @@ export function renderWebsiteHTML(project, options = { isEditor: false, isStanda
     </div>
   `;
 
+  const ctaSize = project.branding.ctaSize || 'md';
+  const ctaPaddingMap = {
+    sm: '0.5rem 1rem',
+    md: '0.75rem 1.5rem',
+    lg: '1rem 2rem',
+    xl: '1.25rem 2.5rem'
+  };
+  const ctaFontMap = {
+    sm: '0.875rem',
+    md: '0.95rem',
+    lg: '1.125rem',
+    xl: '1.25rem'
+  };
+
   return `
     <div class="artisite-root font-body text-main bg-site min-h-screen" style="
       --primary: ${project.branding.primaryColor};
@@ -75,6 +89,8 @@ export function renderWebsiteHTML(project, options = { isEditor: false, isStanda
       --font-body: '${project.branding.bodyFont}', -apple-system, BlinkMacSystemFont, sans-serif;
       --radius: ${project.branding.borderRadius};
       --btn-radius: ${project.branding.buttonRadius};
+      --cta-padding: ${ctaPaddingMap[ctaSize] || '0.75rem 1.5rem'};
+      --cta-font-size: ${ctaFontMap[ctaSize] || '0.95rem'};
     ">
       ${sectionsHTML}
       ${lightboxHTML}
@@ -136,36 +152,67 @@ function renderSection(sec, project, options) {
     case "footer":
       innerHTML = renderFooter(sec, project, options);
       break;
+    case "customBlock":
+      innerHTML = renderCustomBlock(sec, project, options);
+      break;
     default:
       innerHTML = `<div class="p-8 text-center text-gray-400">Section ${sec.type}</div>`;
   }
 
+  const bgTheme = sec.settings?.bgTheme ? `bg-sec-${sec.settings.bgTheme}` : "";
+
   if (!isEditor) {
-    return `<section id="${sec.type}" class="site-section ${isHidden ? 'hidden' : ''}">${innerHTML}</section>`;
+    return `<section id="${sec.type}" class="site-section ${bgTheme} ${isHidden ? 'hidden' : ''}">${innerHTML}</section>`;
   }
 
   // Editor Wrapper with Controls
+  const isSelected = isEditor && options?.selectedSectionId === sec.id;
+  const SECTION_TITLES = {
+    header: "En-tête",
+    hero: "Hero",
+    trust: "Garanties",
+    about: "Présentation",
+    stats: "Chiffres",
+    services: "Services",
+    beforeAfter: "Avant / Après",
+    realisations: "Réalisations",
+    gallery: "Galerie",
+    reviews: "Avis Clients",
+    quoteSimulator: "Devis",
+    hours: "Horaires",
+    location: "Zone",
+    faq: "FAQ",
+    cta: "Appel Action",
+    footer: "Pied de page",
+    customBlock: "Bloc Canva"
+  };
+
   return `
-    <div class="editor-section-wrapper relative group ${isHidden ? 'opacity-40 grayscale' : ''}" 
+    <div id="section-${sec.id}"
+         class="editor-section-wrapper relative group ${bgTheme} ${isSelected ? 'is-active-section' : ''} ${isHidden ? 'opacity-40 grayscale' : ''}" 
          data-section-id="${sec.id}" 
          data-section-type="${sec.type}">
       
-      <!-- Editor Action Bar on Hover / Active -->
-      <div class="editor-section-toolbar absolute top-2 right-4 z-40 flex items-center gap-1 bg-gray-900/90 backdrop-blur text-white px-2 py-1 rounded-lg text-xs shadow-lg transition-all opacity-0 group-hover:opacity-100">
-        <span class="font-medium text-gray-300 mr-1.5 uppercase tracking-wider text-[10px]">${sec.type}</span>
-        <button type="button" class="btn-sec-up p-1 hover:text-amber-400" title="Monter la section" data-action="move-up" data-id="${sec.id}">
+      <!-- Sleek In-Visualizer Action Bar (Linear / Sendpage style) -->
+      <div class="editor-section-toolbar absolute top-2 right-4 z-40 flex items-center gap-1 bg-zinc-900/95 backdrop-blur text-white px-2 py-1 rounded-lg text-xs shadow-md border border-zinc-800 transition-all opacity-0 group-hover:opacity-100">
+        <span class="font-medium text-zinc-300 mr-1.5 text-[10.5px] uppercase tracking-wider">${SECTION_TITLES[sec.type] || sec.type}</span>
+        
+        <button type="button" class="btn-sec-up p-1 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded transition-colors" title="Monter cette section (↑)" data-action="move-up" data-id="${sec.id}">
           ${getIcon("chevronUp", "w-3.5 h-3.5")}
         </button>
-        <button type="button" class="btn-sec-down p-1 hover:text-amber-400" title="Descendre la section" data-action="move-down" data-id="${sec.id}">
+        <button type="button" class="btn-sec-down p-1 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded transition-colors" title="Descendre cette section (↓)" data-action="move-down" data-id="${sec.id}">
           ${getIcon("chevronDown", "w-3.5 h-3.5")}
         </button>
-        <button type="button" class="btn-sec-vis p-1 hover:text-amber-400" title="${isHidden ? 'Afficher' : 'Masquer'}" data-action="toggle-vis" data-id="${sec.id}">
+        <button type="button" class="btn-sec-bg p-1 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded transition-colors" title="Changer le style de fond" data-action="toggle-bg" data-id="${sec.id}">
+          ${getIcon("palette", "w-3.5 h-3.5")}
+        </button>
+        <button type="button" class="btn-sec-insert p-1 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded transition-colors" title="Insérer une section après" data-action="insert-after" data-id="${sec.id}">
+          ${getIcon("plus", "w-3.5 h-3.5")}
+        </button>
+        <button type="button" class="btn-sec-vis p-1 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded transition-colors" title="${isHidden ? 'Afficher' : 'Masquer'}" data-action="toggle-vis" data-id="${sec.id}">
           ${getIcon(isHidden ? "eyeOff" : "eye", "w-3.5 h-3.5")}
         </button>
-        <button type="button" class="btn-sec-dup p-1 hover:text-amber-400" title="Dupliquer" data-action="duplicate" data-id="${sec.id}">
-          ${getIcon("copy", "w-3.5 h-3.5")}
-        </button>
-        <button type="button" class="btn-sec-del p-1 hover:text-red-400" title="Supprimer" data-action="delete" data-id="${sec.id}">
+        <button type="button" class="btn-sec-del p-1 text-zinc-400 hover:text-red-400 hover:bg-zinc-800 rounded transition-colors" title="Supprimer la section" data-action="delete" data-id="${sec.id}">
           ${getIcon("trash", "w-3.5 h-3.5")}
         </button>
       </div>
@@ -176,6 +223,7 @@ function renderSection(sec, project, options) {
     </div>
   `;
 }
+
 
 // 1. Header
 function renderHeader(sec, project) {
@@ -435,18 +483,19 @@ function renderHero(sec, project, options = {}) {
 // 3. Trust Badges
 function renderTrust(sec, project) {
   const c = sec.content;
+  const bgClass = sec.settings?.bgTheme === "mineral" ? "bg-sec-mineral" : (sec.settings?.bgTheme === "dark" ? "bg-sec-dark" : "bg-white");
   return `
-    <div class="py-12 bg-white border-y border-black/5">
+    <div class="py-12 ${bgClass} border-y border-black/5">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           ${(c.badges || []).map((b, idx) => `
-            <div class="flex items-start gap-3.5 p-4 rounded-xl hover:bg-gray-50/80 transition-colors">
-              <div class="w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center text-white" style="background-color: var(--primary);">
+            <div class="flex items-start gap-3.5 p-4 rounded-xl hover:bg-black/5 transition-colors">
+              <div class="w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center text-white shadow-xs" style="background-color: var(--primary);">
                 ${getIcon(idx === 0 ? "clock" : idx === 1 ? "shield" : idx === 2 ? "badgeCheck" : "checkCircle", "w-5 h-5")}
               </div>
-              <div>
-                <h4 class="font-bold text-gray-900 text-sm leading-tight">${b.title}</h4>
-                <p class="text-xs text-gray-500 mt-1 leading-normal">${b.desc}</p>
+              <div class="flex-1 min-w-0">
+                <h4 class="font-bold text-gray-900 text-sm leading-tight" data-editable="badges.${idx}.title">${b.title}</h4>
+                <p class="text-xs text-gray-500 mt-1 leading-normal" data-editable="badges.${idx}.desc">${b.desc}</p>
               </div>
             </div>
           `).join('')}
@@ -455,6 +504,7 @@ function renderTrust(sec, project) {
     </div>
   `;
 }
+
 
 // 4. About
 function renderAbout(sec, project, options = {}) {
@@ -604,11 +654,11 @@ function renderStats(sec, project) {
     <div class="py-14 text-white" style="background-color: var(--primary);">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center divide-y sm:divide-y-0 sm:divide-x divide-white/15">
-          ${(c.items || []).map(item => `
+          ${(c.items || []).map((item, idx) => `
             <div class="p-4">
-              <div class="font-heading text-4xl sm:text-5xl font-extrabold text-white tracking-tight">${item.value}</div>
-              <div class="font-bold text-white/90 text-sm mt-2">${item.label}</div>
-              <div class="text-xs text-white/70 mt-1">${item.sub}</div>
+              <div class="font-heading text-4xl sm:text-5xl font-extrabold text-white tracking-tight" data-editable="items.${idx}.value">${item.value}</div>
+              <div class="font-bold text-white/90 text-sm mt-2" data-editable="items.${idx}.label">${item.label}</div>
+              <div class="text-xs text-white/70 mt-1" data-editable="items.${idx}.sub">${item.sub}</div>
             </div>
           `).join('')}
         </div>
@@ -644,18 +694,18 @@ function renderServices(sec, project, options = {}) {
               <div class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all border border-black/5 flex flex-col group">
                 <div class="aspect-[16/9] overflow-hidden relative bg-slate-100">
                   ${renderEditableImage(srv.image, { sectionId: sec.id, fieldPath: 'image', itemIndex: idx, alt: srv.title, className: 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-500', options })}
-                  <span class="absolute top-4 right-4 z-10 bg-black/75 backdrop-blur text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                  <span class="absolute top-4 right-4 z-10 bg-black/75 backdrop-blur text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider" data-editable="services.${idx}.tag">
                     ${srv.tag}
                   </span>
                 </div>
                 <div class="p-8 flex-1 flex flex-col justify-between space-y-5">
                   <div class="space-y-2.5">
-                    <h3 class="font-heading text-2xl font-bold text-gray-900">${srv.title}</h3>
-                    <p class="text-gray-600 text-sm leading-relaxed">${srv.desc}</p>
+                    <h3 class="font-heading text-2xl font-bold text-gray-900" data-editable="services.${idx}.title">${srv.title}</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed" data-editable="services.${idx}.desc">${srv.desc}</p>
                   </div>
                   <div class="pt-4 border-t border-gray-100 flex items-center justify-between">
-                    <span class="text-xs font-bold text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-lg">${srv.price}</span>
-                    <a href="#simulateur" class="inline-flex items-center gap-1 text-xs font-bold text-white px-4 py-2 rounded-full shadow hover:opacity-90" style="background-color: var(--primary);">
+                    <span class="text-xs font-bold text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-lg" data-editable="services.${idx}.price">${srv.price}</span>
+                    <a href="#simulateur" class="btn-cta text-xs font-bold text-white" style="background-color: var(--primary);">
                       <span>Demander un devis</span>
                       ${getIcon("arrowRight", "w-3.5 h-3.5")}
                     </a>
@@ -697,12 +747,12 @@ function renderServices(sec, project, options = {}) {
                     </div>
                   </div>
                   <div class="lg:col-span-6 ${isEven ? 'lg:order-1' : 'lg:order-2'} space-y-4">
-                    <span class="inline-block text-xs font-bold uppercase tracking-wider text-orange-600 bg-orange-50 px-2.5 py-0.5 rounded-full">${srv.tag}</span>
-                    <h3 class="font-heading text-2xl sm:text-3xl font-extrabold text-gray-900">${srv.title}</h3>
-                    <p class="text-gray-600 text-base leading-relaxed">${srv.desc}</p>
+                    <span class="inline-block text-xs font-bold uppercase tracking-wider text-orange-600 bg-orange-50 px-2.5 py-0.5 rounded-full" data-editable="services.${idx}.tag">${srv.tag}</span>
+                    <h3 class="font-heading text-2xl sm:text-3xl font-extrabold text-gray-900" data-editable="services.${idx}.title">${srv.title}</h3>
+                    <p class="text-gray-600 text-base leading-relaxed" data-editable="services.${idx}.desc">${srv.desc}</p>
                     <div class="pt-2 flex items-center gap-4">
-                      <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-lg">${srv.price}</span>
-                      <a href="#simulateur" class="inline-flex items-center gap-1.5 text-xs font-bold hover:underline" style="color: var(--primary);">
+                      <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-lg" data-editable="services.${idx}.price">${srv.price}</span>
+                      <a href="#simulateur" class="btn-cta text-xs font-bold text-white" style="background-color: var(--primary);">
                         <span>Calculer le coût</span>
                         ${getIcon("arrowRight", "w-3.5 h-3.5")}
                       </a>
@@ -729,15 +779,15 @@ function renderServices(sec, project, options = {}) {
           </div>
 
           <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            ${(c.services || []).map(srv => `
+            ${(c.services || []).map((srv, idx) => `
               <div class="p-6 rounded-2xl bg-gray-50/80 border border-gray-200/80 hover:bg-white hover:border-orange-300 hover:shadow-lg transition-all space-y-3 flex flex-col justify-between">
                 <div class="space-y-2">
                   <div class="flex items-center justify-between text-xs">
-                    <span class="font-bold uppercase tracking-wider text-orange-600">${srv.tag}</span>
-                    <span class="text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded">${srv.price}</span>
+                    <span class="font-bold uppercase tracking-wider text-orange-600" data-editable="services.${idx}.tag">${srv.tag}</span>
+                    <span class="text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded" data-editable="services.${idx}.price">${srv.price}</span>
                   </div>
-                  <h3 class="font-heading text-lg font-bold text-gray-900">${srv.title}</h3>
-                  <p class="text-gray-600 text-xs leading-relaxed">${srv.desc}</p>
+                  <h3 class="font-heading text-lg font-bold text-gray-900" data-editable="services.${idx}.title">${srv.title}</h3>
+                  <p class="text-gray-600 text-xs leading-relaxed" data-editable="services.${idx}.desc">${srv.desc}</p>
                 </div>
                 <div class="pt-3 border-t border-gray-200/60 flex items-center justify-end">
                   <a href="#simulateur" class="text-xs font-bold flex items-center gap-1 text-gray-700 hover:text-orange-600">
@@ -774,18 +824,18 @@ function renderServices(sec, project, options = {}) {
             <div class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-black/5 flex flex-col group transform hover:-translate-y-1">
               <div class="aspect-[16/10] overflow-hidden relative bg-slate-100">
                 ${renderEditableImage(srv.image, { sectionId: sec.id, fieldPath: 'image', itemIndex: idx, alt: srv.title, className: 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-500', options })}
-                <span class="absolute top-3 right-3 z-10 bg-black/70 backdrop-blur text-white text-[11px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
+                <span class="absolute top-3 right-3 z-10 bg-black/70 backdrop-blur text-white text-[11px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider" data-editable="services.${idx}.tag">
                   ${srv.tag}
                 </span>
               </div>
               <div class="p-6 flex-1 flex flex-col justify-between space-y-4">
                 <div>
-                  <h3 class="font-heading text-xl font-bold text-gray-900 leading-snug">${srv.title}</h3>
-                  <p class="text-gray-600 text-sm mt-2.5 leading-relaxed">${srv.desc}</p>
+                  <h3 class="font-heading text-xl font-bold text-gray-900 leading-snug" data-editable="services.${idx}.title">${srv.title}</h3>
+                  <p class="text-gray-600 text-sm mt-2.5 leading-relaxed" data-editable="services.${idx}.desc">${srv.desc}</p>
                 </div>
                 <div class="pt-4 border-t border-gray-100 flex items-center justify-between">
-                  <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md">${srv.price}</span>
-                  <a href="#simulateur" class="text-xs font-bold flex items-center gap-1 hover:underline" style="color: var(--primary);">
+                  <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md" data-editable="services.${idx}.price">${srv.price}</span>
+                  <a href="#simulateur" class="btn-cta text-xs font-bold text-white" style="background-color: var(--primary);">
                     <span>Chiffrer</span>
                     ${getIcon("arrowRight", "w-3.5 h-3.5")}
                   </a>
@@ -797,6 +847,7 @@ function renderServices(sec, project, options = {}) {
       </div>
     </div>
   `;
+
 }
 
 // 7. Before / After Interactive Slider
@@ -804,25 +855,25 @@ function renderBeforeAfter(sec, project, options = {}) {
   const c = sec.content;
 
   const beforeBadge = options.isEditor ? `
-    <div class="absolute top-4 left-4 z-30 flex items-center gap-1.5 bg-slate-900/90 backdrop-blur px-2 py-1 rounded-xl shadow-lg">
-      <span class="text-[10px] text-white font-bold uppercase mr-1">${c.beforeLabel}</span>
-      <button type="button" onclick="event.stopPropagation(); window.app.openImagePicker('${sec.id}', 'beforeImage')" class="px-2 py-0.5 bg-white hover:bg-orange-50 text-slate-900 rounded-lg text-[10px] font-bold">Remplacer</button>
-      <button type="button" onclick="event.stopPropagation(); window.app.deletePhoto('${sec.id}', 'beforeImage')" class="p-1 bg-red-600 hover:bg-red-700 text-white rounded-lg text-[10px]" title="Poubelle">🗑️</button>
+    <div class="absolute top-4 left-4 z-30 flex items-center gap-1.5 bg-zinc-900/90 backdrop-blur px-2.5 py-1 rounded-lg shadow-sm border border-zinc-800">
+      <span class="text-[10px] text-white font-medium uppercase mr-1" data-editable="beforeLabel">${c.beforeLabel}</span>
+      <button type="button" onclick="event.stopPropagation(); window.app.openImagePicker('${sec.id}', 'beforeImage')" class="px-2 py-0.5 bg-white hover:bg-zinc-100 text-zinc-900 rounded text-[10px] font-medium border border-zinc-200 transition-colors">Remplacer</button>
+      <button type="button" onclick="event.stopPropagation(); window.app.deletePhoto('${sec.id}', 'beforeImage')" class="p-1 bg-red-600 hover:bg-red-700 text-white rounded text-[10px] transition-colors" title="Poubelle">🗑️</button>
     </div>
   ` : `
-    <div class="absolute top-4 left-4 z-30 bg-black/75 backdrop-blur text-white text-xs font-bold px-3 py-1.5 rounded-md uppercase tracking-wider shadow">
+    <div class="absolute top-4 left-4 z-30 bg-zinc-900/80 backdrop-blur text-white text-xs font-medium px-3 py-1 rounded-md uppercase tracking-wider shadow-xs border border-zinc-800/60">
       ${c.beforeLabel}
     </div>
   `;
 
   const afterBadge = options.isEditor ? `
-    <div class="absolute top-4 right-4 z-30 flex items-center gap-1.5 bg-slate-900/90 backdrop-blur px-2 py-1 rounded-xl shadow-lg">
-      <span class="text-[10px] text-white font-bold uppercase mr-1">${c.afterLabel}</span>
-      <button type="button" onclick="event.stopPropagation(); window.app.openImagePicker('${sec.id}', 'afterImage')" class="px-2 py-0.5 bg-white hover:bg-orange-50 text-slate-900 rounded-lg text-[10px] font-bold">Remplacer</button>
-      <button type="button" onclick="event.stopPropagation(); window.app.deletePhoto('${sec.id}', 'afterImage')" class="p-1 bg-red-600 hover:bg-red-700 text-white rounded-lg text-[10px]" title="Poubelle">🗑️</button>
+    <div class="absolute top-4 right-4 z-30 flex items-center gap-1.5 bg-zinc-900/90 backdrop-blur px-2.5 py-1 rounded-lg shadow-sm border border-zinc-800">
+      <span class="text-[10px] text-white font-medium uppercase mr-1" data-editable="afterLabel">${c.afterLabel}</span>
+      <button type="button" onclick="event.stopPropagation(); window.app.openImagePicker('${sec.id}', 'afterImage')" class="px-2 py-0.5 bg-white hover:bg-zinc-100 text-zinc-900 rounded text-[10px] font-medium border border-zinc-200 transition-colors">Remplacer</button>
+      <button type="button" onclick="event.stopPropagation(); window.app.deletePhoto('${sec.id}', 'afterImage')" class="p-1 bg-red-600 hover:bg-red-700 text-white rounded text-[10px] transition-colors" title="Poubelle">🗑️</button>
     </div>
   ` : `
-    <div class="absolute top-4 right-4 z-30 bg-white/90 backdrop-blur text-gray-900 text-xs font-bold px-3 py-1.5 rounded-md uppercase tracking-wider shadow">
+    <div class="absolute top-4 right-4 z-30 bg-white/90 backdrop-blur text-zinc-900 text-xs font-medium px-3 py-1 rounded-md uppercase tracking-wider shadow-xs border border-zinc-200">
       ${c.afterLabel}
     </div>
   `;
@@ -897,11 +948,11 @@ function renderRealisations(sec, project, options = {}) {
               </div>
               <div class="p-5 space-y-2">
                 <div class="flex items-center justify-between text-xs">
-                  <span class="font-semibold text-gray-500 uppercase">${r.category}</span>
-                  <span class="text-emerald-700 font-medium">${r.city}</span>
+                  <span class="font-semibold text-gray-500 uppercase" data-editable="items.${idx}.category">${r.category}</span>
+                  <span class="text-emerald-700 font-medium" data-editable="items.${idx}.city">${r.city}</span>
                 </div>
-                <h3 class="font-bold text-gray-900 text-base leading-snug">${r.title}</h3>
-                <p class="text-gray-600 text-xs leading-relaxed">${r.desc}</p>
+                <h3 class="font-bold text-gray-900 text-base leading-snug" data-editable="items.${idx}.title">${r.title}</h3>
+                <p class="text-gray-600 text-xs leading-relaxed" data-editable="items.${idx}.desc">${r.desc}</p>
               </div>
             </div>
           `).join('')}
@@ -995,25 +1046,25 @@ function renderReviews(sec, project) {
           <div class="text-center max-w-2xl mx-auto space-y-3 mb-14">
             <div class="inline-flex items-center gap-1.5 text-amber-500 text-sm font-bold">
               ${[...Array(5)].map(() => getIcon("star", "w-4 h-4 fill-current")).join('')}
-              <span class="text-gray-700 ml-1.5">${c.overallRating || '4.9'}/5 — Avis vérifiés</span>
+              <span class="text-gray-700 ml-1.5" data-editable="overallRating">${c.overallRating || '4.9'}/5 — Avis vérifiés</span>
             </div>
             <h2 class="font-heading text-3xl font-extrabold text-gray-900" data-editable="title">${c.title}</h2>
             <p class="text-gray-600 text-sm" data-editable="subtitle">${c.subtitle}</p>
           </div>
 
           <div class="grid md:grid-cols-3 gap-8">
-            ${(c.reviews || []).map(r => `
+            ${(c.reviews || []).map((r, idx) => `
               <div class="bg-gray-50/80 p-8 rounded-3xl border border-gray-100 shadow-sm flex flex-col justify-between space-y-6">
                 <div class="space-y-4">
                   <div class="flex text-amber-400">
                     ${[...Array(r.rating || 5)].map(() => getIcon("star", "w-4 h-4 fill-current")).join('')}
                   </div>
-                  <p class="text-gray-700 text-sm leading-relaxed italic">« ${r.text} »</p>
+                  <p class="text-gray-700 text-sm leading-relaxed italic" data-editable="reviews.${idx}.text">« ${r.text} »</p>
                 </div>
                 <div class="pt-4 border-t border-gray-200/60 flex items-center justify-between text-xs">
                   <div>
-                    <span class="font-bold text-gray-900 block">${r.author}</span>
-                    <span class="text-gray-500 text-[11px]">${r.city}</span>
+                    <span class="font-bold text-gray-900 block" data-editable="reviews.${idx}.author">${r.author}</span>
+                    <span class="text-gray-500 text-[11px]" data-editable="reviews.${idx}.city">${r.city}</span>
                   </div>
                   <span class="text-[10px] text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded">Vérifié ✓</span>
                 </div>
@@ -1035,8 +1086,8 @@ function renderReviews(sec, project) {
             <div class="inline-flex items-center gap-2 text-amber-500">
               ${[...Array(5)].map(() => getIcon("star", "w-5 h-5 fill-current")).join('')}
             </div>
-            <div class="font-heading text-5xl font-extrabold text-gray-900">${c.overallRating || '4.9'} <span class="text-xl font-semibold text-gray-400">/ 5</span></div>
-            <div class="text-sm font-bold text-gray-800">${c.totalReviews || '48 avis vérifiés'}</div>
+            <div class="font-heading text-5xl font-extrabold text-gray-900" data-editable="overallRating">${c.overallRating || '4.9'} <span class="text-xl font-semibold text-gray-400">/ 5</span></div>
+            <div class="text-sm font-bold text-gray-800" data-editable="totalReviews">${c.totalReviews || '48 avis vérifiés'}</div>
             <p class="text-xs text-gray-500 leading-relaxed">Retours d'expérience collectés après réalisation de chantiers à ${project.business.city} et ses alentours.</p>
             <div class="pt-2">
               <span class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-emerald-100/80 px-3 py-1.5 rounded-full">
@@ -1047,20 +1098,20 @@ function renderReviews(sec, project) {
           </div>
 
           <div class="lg:col-span-8 grid sm:grid-cols-2 gap-6">
-            ${(c.reviews || []).map(r => `
+            ${(c.reviews || []).map((r, idx) => `
               <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm space-y-3 flex flex-col justify-between">
                 <div class="space-y-2">
                   <div class="flex items-center justify-between">
-                    <div class="font-bold text-gray-900 text-sm">${r.author}</div>
+                    <div class="font-bold text-gray-900 text-sm" data-editable="reviews.${idx}.author">${r.author}</div>
                     <div class="flex text-amber-400">
                       ${[...Array(r.rating || 5)].map(() => getIcon("star", "w-3.5 h-3.5 fill-current")).join('')}
                     </div>
                   </div>
-                  <p class="text-xs text-gray-600 leading-relaxed italic">« ${r.text} »</p>
+                  <p class="text-xs text-gray-600 leading-relaxed italic" data-editable="reviews.${idx}.text">« ${r.text} »</p>
                 </div>
                 <div class="flex items-center justify-between text-[11px] text-gray-400 pt-2 border-t border-gray-50">
-                  <span>${r.city}</span>
-                  <span>${r.date}</span>
+                  <span data-editable="reviews.${idx}.city">${r.city}</span>
+                  <span>${r.date || 'Récemment'}</span>
                 </div>
               </div>
             `).join('')}
@@ -1070,6 +1121,7 @@ function renderReviews(sec, project) {
       </div>
     </div>
   `;
+
 }
 
 // 11. Quote Simulator
@@ -1089,13 +1141,13 @@ function renderQuoteSimulator(sec, project) {
             <div class="grid sm:grid-cols-2 gap-6">
               <div>
                 <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-2">${c.typeLabel || 'Type de besoin'}</label>
-                <select class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                <select class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 focus:outline-none focus:border-zinc-900 focus:bg-white">
                   ${(c.types || []).map(t => `<option value="${t}">${t}</option>`).join('')}
                 </select>
               </div>
               <div>
                 <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-2">${c.sizeLabel || 'Envergure du projet'}</label>
-                <select class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                <select class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 focus:outline-none focus:border-zinc-900 focus:bg-white">
                   ${(c.sizes || []).map(s => `<option value="${s}">${s}</option>`).join('')}
                 </select>
               </div>
@@ -1104,17 +1156,17 @@ function renderQuoteSimulator(sec, project) {
             <div class="grid sm:grid-cols-2 gap-6">
               <div>
                 <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-2">Votre Nom ou Entreprise</label>
-                <input type="text" required placeholder="Ex: M. Dupont" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                <input type="text" required placeholder="Ex: M. Dupont" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 focus:outline-none focus:border-zinc-900 focus:bg-white">
               </div>
               <div>
                 <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-2">Votre Téléphone (pour devis)</label>
-                <input type="tel" required placeholder="06 XX XX XX XX" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                <input type="tel" required placeholder="06 XX XX XX XX" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 focus:outline-none focus:border-zinc-900 focus:bg-white">
               </div>
             </div>
 
             <div>
               <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-2">Précisions sur votre demande (optionnel)</label>
-              <textarea rows="3" placeholder="Décrivez succinctement votre besoin ou contraintes..." class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-amber-500"></textarea>
+              <textarea rows="3" placeholder="Décrivez succinctement votre besoin ou contraintes..." class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 focus:outline-none focus:border-zinc-900 focus:bg-white"></textarea>
             </div>
 
             <div class="text-center pt-2">
@@ -1246,11 +1298,11 @@ function renderFaq(sec, project) {
           ${(c.items || []).map((faq, idx) => `
             <div class="faq-item ${idx === 0 ? 'active' : ''}">
               <div class="faq-header">
-                <span class="text-sm font-bold text-gray-900">${faq.q}</span>
+                <span class="text-sm font-bold text-gray-900" data-editable="items.${idx}.q">${faq.q}</span>
                 <span class="faq-icon text-gray-400 text-xs transition-transform">${getIcon("chevronDown", "w-4 h-4")}</span>
               </div>
               <div class="faq-content">
-                <p class="text-sm text-gray-600 leading-relaxed">${faq.a}</p>
+                <p class="text-sm text-gray-600 leading-relaxed" data-editable="items.${idx}.a">${faq.a}</p>
               </div>
             </div>
           `).join('')}
@@ -1270,11 +1322,11 @@ function renderCta(sec, project) {
         <h2 class="font-heading text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight" data-editable="title">${c.title}</h2>
         <p class="text-white/80 text-base sm:text-lg max-w-2xl mx-auto" data-editable="subtitle">${c.subtitle}</p>
         <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a href="#simulateur" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full text-base font-bold bg-white text-gray-900 shadow-xl hover:bg-gray-50 transition-all transform hover:-translate-y-0.5">
+          <a href="#simulateur" class="btn-cta bg-white text-gray-900 shadow-xl hover:bg-gray-50">
             ${getIcon("sparkles", "w-5 h-5 text-amber-500")}
             <span data-editable="ctaPrimary">${c.ctaPrimary}</span>
           </a>
-          <a href="tel:${c.phone}" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full text-base font-semibold border border-white/30 text-white hover:bg-white/10 transition-colors">
+          <a href="tel:${c.phone}" class="btn-cta border border-white/30 text-white hover:bg-white/10">
             ${getIcon("phone", "w-5 h-5")}
             <span data-editable="ctaSecondary">${c.ctaSecondary}</span>
           </a>
@@ -1326,3 +1378,63 @@ function renderFooter(sec, project) {
     </footer>
   `;
 }
+
+// 17. Canva-like Custom Block
+function renderCustomBlock(sec, project, options = {}) {
+  const c = sec.content || {};
+  const blockType = c.blockType || sec.variant || "urgentBanner";
+
+  if (blockType === "urgentBanner") {
+    return `
+      <div class="urgent-banner bg-amber-500 text-zinc-950 px-4 py-3 shadow-xs">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-center gap-2 sm:gap-3.5 text-xs sm:text-sm font-semibold text-center">
+          ${c.badge ? `<span class="px-2 py-0.5 rounded bg-black text-white text-[11px] font-bold uppercase tracking-wider" data-editable="badge">${c.badge}</span>` : '<span class="text-base">📢</span>'}
+          ${c.title ? `<strong data-editable="title" class="font-bold">${c.title} :</strong>` : ''}
+          <span data-editable="text">${c.text || "Offre spéciale de saison : Devis et déplacement offerts sous 24h !"}</span>
+          ${c.ctaText ? `
+            <a href="${c.ctaLink || '#contact'}" class="ml-2 px-3 py-1 bg-zinc-950 text-white rounded-full text-xs font-semibold hover:bg-zinc-800 transition-colors" data-editable="ctaText">
+              ${c.ctaText}
+            </a>
+          ` : ''}
+        </div>
+      </div>
+    `;
+  }
+
+  if (blockType === "floatingBadge") {
+    return `
+      <div class="py-6 bg-white border-b border-zinc-100 text-center">
+        <div class="inline-flex items-center gap-3 px-4 py-2 rounded-full border border-emerald-200 bg-emerald-50/70 text-emerald-900 text-xs font-semibold shadow-xs">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          ${c.badge ? `<span data-editable="badge" class="font-bold">${c.badge}</span><span class="text-emerald-400">•</span>` : ''}
+          <span data-editable="title">${c.title || "Artisan Vérifié & Agréé 2026"}</span>
+          <span class="text-emerald-400">•</span>
+          <span data-editable="text">${c.text || c.subtitle || "Garantie Décennale & Responsabilité Civile Professionnelle"}</span>
+          ${c.ctaText ? `
+            <a href="${c.ctaLink || '#contact'}" class="ml-2 text-emerald-700 underline font-medium hover:text-emerald-900" data-editable="ctaText">${c.ctaText}</a>
+          ` : ''}
+        </div>
+      </div>
+    `;
+  }
+
+  // Custom Card Box
+  return `
+    <div class="py-12 bg-white">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6">
+        <div class="p-8 sm:p-10 rounded-2xl border border-zinc-200 bg-zinc-50 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div class="space-y-2 text-center sm:text-left">
+            <span class="text-xs font-bold uppercase tracking-wider text-zinc-400" data-editable="badge">${c.badge || c.tag || "Information importante"}</span>
+            <h3 class="text-xl font-bold text-zinc-900" data-editable="title">${c.title || "Vous avez un chantier urgent ou sur-mesure ?"}</h3>
+            <p class="text-sm text-zinc-600 max-w-xl" data-editable="text">${c.text || c.desc || "Notre équipe se déplace directement chez vous pour évaluer vos travaux et vous remettre un devis ferme et gratuit sous 24h."}</p>
+          </div>
+          <a href="${c.ctaLink || `tel:${project.business.phone}`}" class="btn-cta text-white whitespace-nowrap" style="background-color: var(--primary);">
+            <span>${getIcon("phone", "w-4 h-4")}</span>
+            <span data-editable="ctaText">${c.ctaText || c.cta || "Appeler l'artisan"}</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
