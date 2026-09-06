@@ -5,7 +5,7 @@
  * 3. Commercial Proposal Print Document
  */
 
-import { renderWebsiteHTML } from "../components/renderer.js";
+import { renderWebsiteHTML, generateLocalBusinessSchema } from "../components/renderer.js";
 import { UTILITY_CSS } from "./exportStyles.js";
 
 export function exportStandaloneHTML(project) {
@@ -20,6 +20,11 @@ export function exportStandaloneHTML(project) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${bus.name} — ${bus.tradeLabel} à ${bus.city}</title>
   <meta name="description" content="${bus.name}, votre artisan ${bus.tradeLabel.toLowerCase()} professionnel à ${bus.city} et alentours. Devis gratuit sous 24h.">
+  
+  <!-- LocalBusiness Structured Data (Schema.org JSON-LD) for Local Google SEO -->
+  <script type="application/ld+json">
+${generateLocalBusinessSchema(project)}
+  </script>
   
   <!-- Modern Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">

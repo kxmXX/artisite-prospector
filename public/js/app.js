@@ -3,9 +3,11 @@ import { renderDashboard } from "./components/dashboard.js";
 import { renderEditor } from "./components/editor.js";
 import { renderWizardModal } from "./components/wizard.js";
 import { renderCloserModal } from "./components/closerModal.js";
+import { renderShareModal } from "./components/shareModal.js";
+import { renderCommandPalette } from "./components/commandPalette.js";
 import { renderAddSectionModal } from "./components/addSectionModal.js";
 import { renderImageModal } from "./components/imageModal.js";
-import { renderWebsiteHTML } from "./components/renderer.js";
+import { renderWebsiteHTML, generateLocalBusinessSchema } from "./components/renderer.js";
 import { generateSite, createSectionData } from "./engine/generator.js";
 import { processCopilotPrompt } from "./engine/copilot.js";
 import { downloadHTML, downloadJSON } from "./engine/exporter.js";
@@ -62,6 +64,9 @@ class App {
       } else if ((e.metaKey || e.ctrlKey) && (e.shiftKey && e.key.toLowerCase() === "z" || e.key.toLowerCase() === "y")) {
         e.preventDefault();
         this.redo();
+      } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        this.openCommandPalette();
       } else if (e.key === "Escape") {
         this.closeModals();
       }
@@ -109,6 +114,13 @@ class App {
       modalContainer.innerHTML = renderWizardModal();
     } else if (state.activeDrawer === "closer") {
       modalContainer.innerHTML = renderCloserModal(state.currentProject);
+    } else if (state.activeDrawer === "share_modal") {
+      modalContainer.innerHTML = renderShareModal(state.currentProject);
+    } else if (state.activeDrawer === "command_palette") {
+      modalContainer.innerHTML = renderCommandPalette(state.currentProject);
+      setTimeout(() => {
+        document.getElementById("cmd-palette-input")?.focus();
+      }, 50);
     } else if (state.activeDrawer === "add_section") {
       modalContainer.innerHTML = renderAddSectionModal(state.currentProject);
     } else if (state.activeDrawer === "image_modal") {
@@ -148,6 +160,139 @@ class App {
 
   closeCloserModal() {
     state.closeDrawer();
+  }
+
+  openShareModal() {
+    state.setDrawer("share_modal");
+  }
+
+  closeShareModal() {
+    state.closeDrawer();
+  }
+
+  copyShareUrl() {
+    const input = document.getElementById("share-modal-url-input");
+    if (input) {
+      input.select();
+      navigator.clipboard?.writeText(input.value);
+      const label = document.getElementById("btn-copy-share-label");
+      if (label) {
+        label.textContent = "✓ Copié !";
+        setTimeout(() => { label.textContent = "Copier"; }, 2000);
+      }
+    }
+  }
+
+  openCommandPalette() {
+    state.setDrawer("command_palette");
+  }
+
+  closeCommandPalette() {
+    state.closeDrawer();
+  }
+
+  filterCommandPalette(query) {
+    const q = (query || "").toLowerCase().trim();
+    const items = document.querySelectorAll("#cmd-palette-results .cmd-item");
+    items.forEach(item => {
+      const title = (item.getAttribute("data-title") || item.textContent).toLowerCase();
+      const match = !q || title.includes(q);
+      item.style.display = match ? "flex" : "none";
+    });
+  }
+
+  handleCommandPaletteKey(e) {
+    if (e.key === "Escape") {
+      this.closeCommandPalette();
+    } else if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      const visibleItems = Array.from(document.querySelectorAll("#cmd-palette-results .cmd-item")).filter(el => el.style.display !== "none");
+      if (!visibleItems.length) return;
+      let idx = visibleItems.findIndex(el => el.classList.contains("bg-zinc-100"));
+      visibleItems.forEach(el => el.classList.remove("bg-zinc-100"));
+      if (e.key === "ArrowDown") {
+        idx = (idx + 1) % visibleItems.length;
+      } else {
+        idx = (idx - 1 + visibleItems.length) % visibleItems.length;
+      }
+      visibleItems[idx].classList.add("bg-zinc-100");
+      visibleItems[idx].scrollIntoView({ block: "nearest" });
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      const selected = document.querySelector("#cmd-palette-results .cmd-item.bg-zinc-100") || 
+                       Array.from(document.querySelectorAll("#cmd-palette-results .cmd-item")).find(el => el.style.display !== "none");
+      if (selected) {
+        selected.click();
+      }
+    }
+  }
+
+  executeCommand(type, arg) {
+    this.closeCommandPalette();
+    if (type === "goto-section") {
+      this.scrollToSection(arg);
+    } else if (type === "share-modal") {
+      this.openShareModal();
+    } else if (type === "closer-modal") {
+      this.openCloserModal(state.currentProject?.id);
+    } else if (type === "print-proposal") {
+      this.printCommercialProposal();
+    } else if (type === "export-html") {
+      this.exportHTML();
+    } else if (type === "set-vp") {
+      this.setViewport(arg);
+    } else if (type === "switch-theme") {
+      this.switchGlobalTheme(arg);
+    }
+  }
+
+  toggleStickyBar(enabled) {
+    if (!state.currentProject) return;
+    if (!state.currentProject.settings) state.currentProject.settings = {};
+    state.currentProject.settings.stickyBarEnabled = enabled;
+    state.pushHistory(enabled ? "Activation bandeau flottant" : "Désactivation bandeau flottant");
+    state.saveToStorage();
+    this.render();
+  }
+
+  updateWhatsAppNumber(number) {
+    if (!state.currentProject) return;
+    if (!state.currentProject.settings) state.currentProject.settings = {};
+    state.currentProject.settings.whatsappNumber = number;
+    state.pushHistory("Modification WhatsApp");
+    state.saveToStorage();
+    this.render();
+  }
+
+  switchGlobalTheme(theme) {
+    if (!state.currentProject) return;
+    const b = state.currentProject.branding;
+    if (theme === "white") {
+      b.bgColor = "#ffffff";
+      b.bgSecondary = "#fafafa";
+      b.textColor = "#18181b";
+      b.textMuted = "#71717a";
+    } else if (theme === "mineral") {
+      b.bgColor = "#f4f4f5";
+      b.bgSecondary = "#ffffff";
+      b.textColor = "#18181b";
+      b.textMuted = "#71717a";
+    } else if (theme === "dark") {
+      b.bgColor = "#09090b";
+      b.bgSecondary = "#18181b";
+      b.textColor = "#f4f4f5";
+      b.textMuted = "#a1a1aa";
+    }
+    state.pushHistory(`Ambiance : ${theme}`);
+    state.saveToStorage();
+    this.render();
+  }
+
+  copyJsonLdSchema() {
+    if (!state.currentProject) return;
+    const schema = generateLocalBusinessSchema(state.currentProject);
+    navigator.clipboard?.writeText(schema);
+    alert("✓ Schema.org (LocalBusiness JSON-LD) copié dans le presse-papier !");
   }
 
   openAddSectionModal() {

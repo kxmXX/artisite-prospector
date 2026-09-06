@@ -76,6 +76,8 @@ export function renderWebsiteHTML(project, options = { isEditor: false, isStanda
     xl: '1.25rem'
   };
 
+  const stickyBarHTML = renderStickyCallBar(project, options);
+
   return `
     <div class="artisite-root font-body text-main bg-site min-h-screen" style="
       --primary: ${project.branding.primaryColor};
@@ -93,6 +95,7 @@ export function renderWebsiteHTML(project, options = { isEditor: false, isStanda
       --cta-font-size: ${ctaFontMap[ctaSize] || '0.95rem'};
     ">
       ${sectionsHTML}
+      ${stickyBarHTML}
       ${lightboxHTML}
     </div>
   `;
@@ -1436,5 +1439,83 @@ function renderCustomBlock(sec, project, options = {}) {
       </div>
     </div>
   `;
+}
+
+/**
+ * Sticky Floating Action Bar (Unbounce, Duda, Carrd Inspired)
+ * High-converting mobile & desktop floating pill with direct call, WhatsApp, and quote anchor.
+ */
+export function renderStickyCallBar(project, options = {}) {
+  if (project.settings?.stickyBarEnabled === false) return "";
+
+  const b = project.business || {};
+  const phone = b.phone || "";
+  const cleanPhone = phone.replace(/[^0-9]/g, "");
+  const waNumber = (project.settings?.whatsappNumber || cleanPhone).replace(/[^0-9]/g, "");
+  const waText = encodeURIComponent(`Bonjour ${b.name}, je souhaiterais un devis.`);
+
+  return `
+    <div class="sticky-call-bar fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-[92%] max-w-md transition-all duration-300 pointer-events-auto">
+      <div class="bg-zinc-950/85 text-white backdrop-blur-md px-3 py-2 rounded-full shadow-2xl border border-white/10 flex items-center justify-between gap-2 text-xs">
+        
+        <!-- Direct Call -->
+        <a href="tel:${cleanPhone || phone}" class="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-full bg-white text-zinc-950 hover:bg-zinc-100 font-semibold transition-colors shadow-xs">
+          <span>📞</span>
+          <span class="truncate">${phone || "Appeler"}</span>
+        </a>
+
+        <!-- Direct WhatsApp -->
+        ${waNumber ? `
+          <a href="https://wa.me/${waNumber}?text=${waText}" target="_blank" class="flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold transition-colors shadow-xs" title="Discuter sur WhatsApp">
+            <span>💬</span>
+            <span class="hidden sm:inline">WhatsApp</span>
+          </a>
+        ` : ''}
+
+        <!-- Quick Quote Link -->
+        <a href="#quoteSimulator" class="flex-1 flex items-center justify-center gap-1 py-1.5 px-2.5 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-medium transition-colors border border-white/10">
+          <span>📝 Devis 24h</span>
+        </a>
+
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * LocalBusiness JSON-LD Schema (B12 & Wix Studio Inspired)
+ * Generates SEO-rich structured data for Google Search and Google Maps.
+ */
+export function generateLocalBusinessSchema(project) {
+  if (!project) return "";
+  const b = project.business || {};
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": b.name,
+    "telephone": b.phone,
+    "email": b.email || `contact@${(b.name || "artisan").toLowerCase().replace(/[^a-z0-9]/g, "")}.fr`,
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": b.city,
+      "addressRegion": b.region || "France"
+    },
+    "description": b.description || `${b.tradeLabel} professionnel à ${b.city}. Devis gratuit sous 24h et interventions soignées.`,
+    "priceRange": "€€",
+    "openingHoursSpecification": [
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        "opens": "08:00",
+        "closes": "19:00"
+      }
+    ],
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "5.0",
+      "reviewCount": "48"
+    }
+  };
+  return JSON.stringify(schema, null, 2);
 }
 

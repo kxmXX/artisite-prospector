@@ -811,3 +811,27 @@ input, textarea, select, [contenteditable] {
   .canva-dock { max-width: 95%; overflow-x: auto; border-radius: 12px; }
 }
 
+/* Sticky Action Bar (Unbounce & Duda Inspired) */
+.sticky-call-bar {
+  animation: slideUpPill 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes slideUpPill {
+  from {
+    transform: translate(-50%, 20px);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}
+
+/* Command Palette Item Active State */
+.cmd-item:hover, .cmd-item.bg-zinc-100 {
+  background-color: #f4f4f5 !important;
+}
+
+.shadow-2xs {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+}
+

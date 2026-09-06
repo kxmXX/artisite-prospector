@@ -104,9 +104,21 @@ export function renderEditor(state) {
 
         <!-- Right: Sales Pitch & Presentation & Export Button -->
         <div class="flex items-center gap-2">
+          <!-- Command Palette (⌘K) -->
+          <button type="button" onclick="window.app.openCommandPalette()" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-zinc-600 hover:text-zinc-900 bg-zinc-100 hover:bg-zinc-200 border border-zinc-200/80 transition-colors" title="Palette de commande (⌘K)">
+            ${getIcon("search", "w-3.5 h-3.5 text-zinc-500")}
+            <kbd class="hidden sm:inline text-[10px] font-mono px-1 py-0.2 bg-white rounded border border-zinc-200 text-zinc-500">⌘K</kbd>
+          </button>
+
+          <!-- Share Demo with QR -->
+          <button type="button" onclick="window.app.openShareModal()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-700 hover:text-zinc-900 bg-zinc-100 hover:bg-zinc-200 border border-zinc-200/80 transition-colors" title="Partager démo client avec QR Code">
+            ${getIcon("share", "w-3.5 h-3.5 text-zinc-600")}
+            <span class="hidden sm:inline">Partager (QR)</span>
+          </button>
+
           <button type="button" onclick="window.app.openCloserModal('${project.id}')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-700 hover:text-zinc-900 bg-zinc-100 hover:bg-zinc-200 border border-zinc-200/80 transition-colors" title="Kit Vente Closer & Argumentaire">
             ${getIcon("sparkles", "w-3.5 h-3.5 text-zinc-600")}
-            <span class="hidden sm:inline">Kit Closer</span>
+            <span class="hidden md:inline">Kit Closer</span>
           </button>
 
           <button type="button" onclick="window.app.openPreview('${project.id}')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-700 hover:text-zinc-900 bg-zinc-100 hover:bg-zinc-200 border border-zinc-200/80 transition-colors" title="Aperçu Client Démo">
@@ -570,6 +582,22 @@ function renderSettingsAccordions(project) {
           <span class="text-zinc-400">${getIcon("chevronDown", "w-3.5 h-3.5")}</span>
         </div>
         <div class="section-accordion-body space-y-3" id="settings-body-colors">
+          <!-- Ambiance Globale 1-Clic (Typedream & Framer Inspired) -->
+          <div>
+            <label class="block text-[10px] font-medium text-zinc-400 uppercase tracking-wider mb-1.5">Ambiance Globale 1-Clic</label>
+            <div class="grid grid-cols-3 gap-1.5 text-xs">
+              <button type="button" onclick="window.app.switchGlobalTheme('white')" class="py-1.5 border rounded-lg text-center text-[11px] font-medium border-zinc-200 bg-white hover:border-zinc-300 text-zinc-800 shadow-2xs">
+                ☀️ Blanche
+              </button>
+              <button type="button" onclick="window.app.switchGlobalTheme('mineral')" class="py-1.5 border rounded-lg text-center text-[11px] font-medium border-zinc-200 bg-zinc-100 hover:border-zinc-300 text-zinc-800 shadow-2xs">
+                🪨 Minérale
+              </button>
+              <button type="button" onclick="window.app.switchGlobalTheme('dark')" class="py-1.5 border rounded-lg text-center text-[11px] font-medium border-zinc-800 bg-zinc-900 text-white shadow-2xs">
+                🌙 Sombre
+              </button>
+            </div>
+          </div>
+
           <div>
             <label class="block text-[10px] font-medium text-zinc-400 uppercase tracking-wider mb-1.5">Presets 1-Clic</label>
             <div class="space-y-1.5">
@@ -670,6 +698,29 @@ function renderSettingsAccordions(project) {
               <button type="button" onclick="window.app.liveUpdateBorderRadius('1.5rem', '9999px')" class="py-1.5 border rounded-full text-center text-[11px] font-medium ${project.branding.borderRadius === '1.5rem' ? 'border-zinc-900 bg-white font-semibold shadow-xs' : 'border-zinc-200 bg-white text-zinc-600'}">Pilule</button>
             </div>
           </div>
+
+          <!-- Bandeau Flottant Fixe (Unbounce & Duda Inspired) -->
+          <div class="pt-3 border-t border-zinc-200/80 space-y-2">
+            <div class="flex items-center justify-between">
+              <div>
+                <label class="block text-[11px] font-semibold text-zinc-900">Bandeau de Contact Flottant</label>
+                <p class="text-[10px] text-zinc-500">Pillule d'appel & WhatsApp persistante au bas de l'écran</p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" ${project.settings?.stickyBarEnabled !== false ? 'checked' : ''} 
+                       onchange="window.app.toggleStickyBar(this.checked)" class="sr-only peer">
+                <div class="w-8 h-4 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3 after:w-3.5 after:transition-all peer-checked:bg-zinc-900"></div>
+              </label>
+            </div>
+
+            <div>
+              <label class="block text-[10px] text-zinc-500 mb-1">Numéro WhatsApp direct :</label>
+              <input type="text" value="${escapeHtml(project.settings?.whatsappNumber || project.business.phone || '')}" 
+                     placeholder="Ex: 06 12 34 56 78"
+                     onchange="window.app.updateWhatsAppNumber(this.value)"
+                     class="w-full bg-white border border-zinc-200 rounded-md px-2.5 py-1 text-xs text-zinc-900 focus:border-zinc-900 focus:outline-none">
+            </div>
+          </div>
         </div>
       </div>
 
@@ -706,11 +757,37 @@ function renderSettingsAccordions(project) {
         <div class="section-accordion-body hidden space-y-2" id="settings-body-seo">
           <div>
             <label class="block text-[10px] text-zinc-500 mb-1">Titre SEO (Balise Title) :</label>
-            <input type="text" value="${project.business.name} — ${project.business.tradeLabel} à ${project.business.city}" class="w-full bg-white border border-zinc-200 rounded px-2.5 py-1 text-xs text-zinc-900">
+            <input type="text" value="${escapeHtml(project.business.name)} — ${escapeHtml(project.business.tradeLabel)} à ${escapeHtml(project.business.city)}" class="w-full bg-white border border-zinc-200 rounded px-2.5 py-1 text-xs text-zinc-900">
           </div>
           <div>
             <label class="block text-[10px] text-zinc-500 mb-1">Meta Description locale :</label>
-            <textarea rows="2" class="w-full bg-white border border-zinc-200 rounded px-2.5 py-1 text-xs text-zinc-900 leading-snug">Besoin d'un ${project.business.tradeLabel.toLowerCase()} qualifié à ${project.business.city} ? Intervention rapide, travail soigné et devis gratuit sous 24h.</textarea>
+            <textarea rows="2" class="w-full bg-white border border-zinc-200 rounded px-2.5 py-1 text-xs text-zinc-900 leading-snug">Besoin d'un ${escapeHtml(project.business.tradeLabel.toLowerCase())} qualifié à ${escapeHtml(project.business.city)} ? Intervention rapide, travail soigné et devis gratuit sous 24h.</textarea>
+          </div>
+
+          <!-- Google Search Live Snippet Card (Wix & B12 Inspired) -->
+          <div class="mt-2.5 p-3 rounded-xl bg-white border border-zinc-200 space-y-1 shadow-2xs">
+            <div class="flex items-center gap-1.5 text-[10.5px] text-zinc-500">
+              <span class="w-3.5 h-3.5 rounded-full bg-zinc-100 flex items-center justify-center font-bold text-[9px] text-zinc-700">G</span>
+              <span class="truncate">https://www.${(project.business.name || "artisan").toLowerCase().replace(/[^a-z0-9]/g, '')}.fr</span>
+            </div>
+            <div class="text-xs font-semibold text-blue-700 hover:underline cursor-pointer line-clamp-1">
+              ${escapeHtml(project.business.name)} — ${escapeHtml(project.business.tradeLabel)} à ${escapeHtml(project.business.city)}
+            </div>
+            <div class="flex items-center gap-1.5 text-[10.5px]">
+              <span class="text-amber-500 font-bold">★★★★★</span>
+              <span class="font-semibold text-zinc-700">5.0</span>
+              <span class="text-zinc-400">(48 avis Google vérifiés)</span>
+            </div>
+            <p class="text-[11px] text-zinc-600 leading-snug line-clamp-2">
+              Artisan ${escapeHtml(project.business.tradeLabel.toLowerCase())} qualifié à ${escapeHtml(project.business.city)}. Travaux soignés, réactivité, intervention rapide et devis gratuit sous 24h.
+            </p>
+          </div>
+
+          <div class="pt-1">
+            <button type="button" onclick="window.app.copyJsonLdSchema()" class="w-full py-1.5 px-2.5 rounded-lg border border-zinc-200 hover:bg-zinc-50 flex items-center justify-between text-[11px] font-medium text-zinc-800 transition-colors">
+              <span>📋 Copier Schema.org (LocalBusiness JSON-LD)</span>
+              ${getIcon("copy", "w-3 h-3 text-zinc-400")}
+            </button>
           </div>
         </div>
       </div>
