@@ -117,7 +117,7 @@ class App {
     } else if (state.activeDrawer === "share_modal") {
       modalContainer.innerHTML = renderShareModal(state.currentProject);
     } else if (state.activeDrawer === "command_palette") {
-      modalContainer.innerHTML = renderCommandPalette(state.currentProject);
+      modalContainer.innerHTML = renderCommandPalette(state.currentProject, state.projects);
       setTimeout(() => {
         document.getElementById("cmd-palette-input")?.focus();
       }, 50);
@@ -231,6 +231,10 @@ class App {
     this.closeCommandPalette();
     if (type === "goto-section") {
       this.scrollToSection(arg);
+    } else if (type === "open-project") {
+      this.openEditor(arg);
+    } else if (type === "new-project") {
+      this.openWizard();
     } else if (type === "share-modal") {
       this.openShareModal();
     } else if (type === "closer-modal") {

@@ -39,13 +39,20 @@ test("Leader MVP Feature 2: Share Modal generates live demo URL, QR code and pre
 
 test("Leader MVP Feature 3: Command Palette (⌘K) renders quick navigation for sections, actions & themes", () => {
   const project = generateSite({ name: "Élec Énergie", tradeId: "electricien" });
-  const html = renderCommandPalette(project);
+  const html = renderCommandPalette(project, [project]);
 
   assert.ok(html.includes("cmd-palette-input"), "Should render search input");
   assert.ok(html.includes("Sections du site"), "Should include sections group");
+  assert.ok(html.includes("Mes Projets"), "Should include projects group");
+  assert.ok(html.includes("Élec Énergie"), "Should list project name");
   assert.ok(html.includes("Outils & Actions Vente"), "Should include sales tools group");
   assert.ok(html.includes("Affichage Responsive"), "Should include viewports group");
   assert.ok(html.includes("Ambiance Globale"), "Should include global themes group");
+
+  // Fallback when no project selected
+  const nullProjectHtml = renderCommandPalette(null, [project]);
+  assert.ok(nullProjectHtml.includes("cmd-palette-input"), "Should render search input even without active project");
+  assert.ok(nullProjectHtml.includes("Mes Projets"), "Should list projects when project is null");
 });
 
 test("Leader MVP Feature 4: Sticky Floating Action Bar renders conversion pill with Call, WhatsApp and Quote", () => {

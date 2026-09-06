@@ -4,10 +4,8 @@ import { getIcon } from "./icons.js";
  * Command Palette (Linear & Raycast Inspired)
  * Instant fuzzy keyboard search (⌘K / Ctrl+K) to jump to sections, change themes, switch viewports, or trigger sales tools.
  */
-export function renderCommandPalette(project) {
-  if (!project) return "";
-
-  const sections = project.sections || [];
+export function renderCommandPalette(project, allProjects = []) {
+  const sections = project?.sections || [];
 
   return `
     <div id="cmd-palette-backdrop" class="fixed inset-0 z-50 flex items-start justify-center pt-20 p-4 bg-zinc-950/60 backdrop-blur-xs animate-fade-in" onclick="if(event.target === this) window.app.closeCommandPalette()">
@@ -27,6 +25,7 @@ export function renderCommandPalette(project) {
         <!-- Results List -->
         <div id="cmd-palette-results" class="max-h-80 overflow-y-auto p-2 space-y-1">
           
+          ${sections.length > 0 ? `
           <!-- Sections Group -->
           <div class="cmd-group" data-group="sections">
             <div class="px-2.5 py-1 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Sections du site</div>
@@ -41,6 +40,25 @@ export function renderCommandPalette(project) {
               </div>
             `).join('')}
           </div>
+          ` : ''}
+
+          ${allProjects.length > 0 ? `
+          <!-- Projects Group -->
+          <div class="cmd-group pt-2 border-t border-zinc-100" data-group="projects">
+            <div class="px-2.5 py-1 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Mes Projets</div>
+            ${allProjects.map(p => `
+              <div class="cmd-item flex items-center justify-between px-3 py-2 rounded-lg text-xs text-zinc-800 hover:bg-zinc-100 cursor-pointer transition-colors"
+                   onclick="window.app.executeCommand('open-project', '${p.id}')" data-title="${escapeHtml(p.name + ' ' + (p.business?.city || ''))}">
+                <div class="flex items-center gap-2.5">
+                  <span class="text-xs">📂</span>
+                  <span class="font-medium text-zinc-900">${escapeHtml(p.name)}</span>
+                  <span class="text-[10.5px] text-zinc-400">${escapeHtml(p.business?.city || '')}</span>
+                </div>
+                <span class="text-[10px] text-zinc-400">Ouvrir ↵</span>
+              </div>
+            `).join('')}
+          </div>
+          ` : ''}
 
           <!-- Actions Group -->
           <div class="cmd-group pt-2 border-t border-zinc-100" data-group="actions">
