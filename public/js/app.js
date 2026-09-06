@@ -7,13 +7,15 @@ import { renderShareModal } from "./components/shareModal.js";
 import { renderCommandPalette } from "./components/commandPalette.js";
 import { renderAddSectionModal } from "./components/addSectionModal.js";
 import { renderImageModal } from "./components/imageModal.js";
+import { renderInspector } from "./components/inspector.js";
 import { renderWebsiteHTML, generateLocalBusinessSchema } from "./components/renderer.js";
 import { generateSite, createSectionData } from "./engine/generator.js";
-import { processCopilotPrompt } from "./engine/copilot.js";
+import { processCopilotPrompt, applyCopilotOperations } from "./engine/copilot.js";
 import { downloadHTML, downloadJSON } from "./engine/exporter.js";
 import { getStylePresetById } from "./data/styles.js";
 import { getTradeById } from "./data/trades.js";
 import { getTradeFallbackDataUrl } from "./data/imageFallbacks.js";
+import { ensureFontCatalog } from "./data/fonts.js";
 import { getIcon } from "./components/icons.js";
 
 class App {
@@ -29,6 +31,7 @@ class App {
   init() {
     // Expose app on window for inline handlers
     window.app = this;
+    ensureFontCatalog();
     document.body.classList.toggle("dark-theme", state.themeMode === "dark");
 
     // Subscribe to state changes
@@ -51,6 +54,10 @@ class App {
       }
       if (event === "drawer_change") {
         this.renderModals();
+        return;
+      }
+      if (event === "copilot_visibility_change") {
+        this.render();
         return;
       }
       if (event === "history_change") {
@@ -528,8 +535,9 @@ class App {
 
   // Actions on Sections
   selectSection(sectionId) {
+    const alreadySelected = state.selectedSectionId === sectionId;
     state.setSelectedSection(sectionId);
-    this.updateSelectedSectionUI();
+    if (alreadySelected) this.updateSelectedSectionUI();
   }
 
   updateSelectedSectionUI() {
@@ -569,7 +577,7 @@ class App {
         card.classList.add("is-selected");
         if (acc) acc.classList.remove("hidden");
         if (chevron) chevron.classList.add("rotate-180");
-        card.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        this.scrollSidebarCardIntoView(card);
       } else {
         card.classList.remove("is-selected");
         if (acc) acc.classList.add("hidden");
@@ -585,26 +593,84 @@ class App {
     }
   }
 
-  scrollToSection(sectionId) {
-    const canvasSec = document.getElementById(`section-${sectionId}`) || document.querySelector(`.editor-section-wrapper[data-section-id="${sectionId}"]`);
-    if (canvasSec) {
-      canvasSec.scrollIntoView({ behavior: "smooth", block: "center" });
-      canvasSec.classList.remove("section-focus-glow");
-      void canvasSec.offsetWidth; // Trigger reflow
-      canvasSec.classList.add("section-focus-glow");
-      setTimeout(() => {
-        canvasSec.classList.remove("section-focus-glow");
-      }, 1600);
+  scrollSidebarCardIntoView(card) {
+    const sidebar = document.getElementById("sidebar-tab-sections");
+    if (!sidebar || !card) return;
+
+    const cardRect = card.getBoundingClientRect();
+    const sidebarRect = sidebar.getBoundingClientRect();
+    const isOutside = cardRect.top < sidebarRect.top || cardRect.bottom > sidebarRect.bottom;
+
+    if (isOutside && typeof sidebar.scrollTo === "function") {
+      sidebar.scrollTo({
+        top: Math.max(
+          0,
+          sidebar.scrollTop +
+            cardRect.top -
+            sidebarRect.top -
+            sidebar.clientHeight / 2 +
+            card.offsetHeight / 2
+        ),
+        behavior: "smooth"
+      });
     }
   }
 
-  toggleSectionAccordion(sectionId, event) {
+  scrollToSection(sectionId) {
+    const canvas = document.getElementById("canvas-container");
+    const canvasSec = canvas?.querySelector(`[data-section-id="${sectionId}"]`) ||
+      document.getElementById(`section-${sectionId}`) ||
+      document.querySelector(`.editor-section-wrapper[data-section-id="${sectionId}"]`);
+
+    if (!canvasSec) return false;
+
+    const scrollHost = canvas?.closest("main") || canvas?.parentElement;
+    if (scrollHost && typeof scrollHost.scrollTo === "function") {
+      const hostRect = scrollHost.getBoundingClientRect();
+      const targetRect = canvasSec.getBoundingClientRect();
+      const targetTop = scrollHost.scrollTop + targetRect.top - hostRect.top -
+        (scrollHost.clientHeight - canvasSec.offsetHeight) / 2;
+
+      scrollHost.scrollTo({
+        top: Math.max(0, targetTop),
+        behavior: "smooth"
+      });
+    } else {
+      canvasSec.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    canvasSec.classList.remove("section-focus-glow");
+    void canvasSec.offsetWidth;
+    canvasSec.classList.add("section-focus-glow");
+    setTimeout(() => canvasSec.classList.remove("section-focus-glow"), 1600);
+    return true;
+  }
+
+  handleSectionNavigation(sectionId, event) {
+    event?.preventDefault?.();
+
+    const accordion = document.getElementById(`accordion-${sectionId}`);
+    const card = document.querySelector(`.section-card[data-sec-id="${sectionId}"]`);
+    if (accordion && card) {
+      this.toggleSectionAccordion(sectionId, event, { skipScroll: true });
+    }
+
+    this.selectSection(sectionId);
+    const run = () => this.scrollToSection(sectionId);
+    if (typeof window !== "undefined" && typeof window.requestAnimationFrame === "function") {
+      window.requestAnimationFrame(run);
+    } else {
+      setTimeout(run, 0);
+    }
+  }
+
+  toggleSectionAccordion(sectionId, event, options = {}) {
     const card = document.querySelector(`.section-card[data-sec-id="${sectionId}"]`);
     const accordion = document.getElementById(`accordion-${sectionId}`);
     const chevron = card?.querySelector(".accordion-chevron");
     
     if (!accordion || !card) {
-      this.scrollToSection(sectionId);
+      if (!options.skipScroll) this.scrollToSection(sectionId);
       return;
     }
     
@@ -629,7 +695,14 @@ class App {
       card.classList.add("is-selected");
       chevron?.classList.add("rotate-180");
       this.selectSection(sectionId);
-      this.scrollToSection(sectionId);
+      if (!options.skipScroll) {
+        const run = () => this.scrollToSection(sectionId);
+        if (typeof window !== "undefined" && typeof window.requestAnimationFrame === "function") {
+          window.requestAnimationFrame(run);
+        } else {
+          setTimeout(run, 0);
+        }
+      }
     } else {
       accordion.classList.add("hidden");
       card.classList.remove("is-selected");
@@ -1060,7 +1133,11 @@ class App {
   }
 
   setEditorMode(mode) {
-    state.setEditorMode(mode);
+    state.setEditorMode(mode === "preview" ? "preview" : "conception");
+  }
+
+  toggleCopilotPanel(force) {
+    state.setCopilotOpen(typeof force === "boolean" ? force : !state.copilotOpen);
   }
 
   setThemeMode(mode) {
@@ -1266,6 +1343,8 @@ class App {
     };
     const hexEl = document.getElementById(hexMap[colorKey]);
     if (hexEl) hexEl.textContent = value;
+    const textInput = document.getElementById(`color-text-${colorKey}`);
+    if (textInput && document.activeElement !== textInput) textInput.value = value;
   }
 
   commitColorUpdate(colorKey, value) {
@@ -1279,6 +1358,34 @@ class App {
   updateBrandingColor(colorKey, value) {
     this.liveUpdateColor(colorKey, value);
     this.commitColorUpdate(colorKey, value);
+  }
+
+  updateColorFromText(colorKey, value) {
+    const normalized = String(value || "").trim();
+    if (!/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(normalized)) return;
+    this.liveUpdateColor(colorKey, normalized);
+    const picker = document.querySelector(`[data-color-picker="${colorKey}"]`);
+    if (picker) picker.value = normalized;
+  }
+
+  commitColorFromText(colorKey, value) {
+    const normalized = String(value || "").trim();
+    if (!/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(normalized)) return;
+    this.updateBrandingColor(colorKey, normalized);
+  }
+
+  async pickColorWithEyedropper(colorKey) {
+    if (typeof window === "undefined" || !window.EyeDropper) return;
+    try {
+      const result = await new window.EyeDropper().open();
+      if (result?.sRGBHex) this.updateBrandingColor(colorKey, result.sRGBHex);
+    } catch (error) {
+      if (error?.name !== "AbortError") console.warn("EyeDropper unavailable", error);
+    }
+  }
+
+  applyHarmonyColor(colorKey, value) {
+    this.updateBrandingColor(colorKey, value);
   }
 
   liveUpdateBorderRadius(radius, btnRadius) {
@@ -1298,17 +1405,30 @@ class App {
     // Update border radius button active states in sidebar settings
     const tabSettings = document.getElementById("sidebar-tab-settings");
     if (tabSettings) {
-      const btns = tabSettings.querySelectorAll(".grid-cols-3 button");
+      const btns = tabSettings.querySelectorAll("[data-radius-option]");
       btns.forEach((btn, idx) => {
-        const radMap = ['0.25rem', '0.75rem', '1.5rem'];
-        const isAct = radMap[idx] === radius;
-        btn.className = `py-1.5 border text-center font-medium transition-all ${isAct ? 'border-zinc-900 bg-white font-semibold shadow-xs text-zinc-950' : 'border-zinc-200 text-zinc-600 hover:bg-zinc-50'} ${idx === 0 ? 'rounded-md' : idx === 1 ? 'rounded-lg' : 'rounded-full'}`;
+        const isAct = btn.dataset.radius === radius;
+        btn.classList.toggle('border-zinc-900', isAct);
+        btn.classList.toggle('bg-white', isAct);
+        btn.classList.toggle('font-semibold', isAct);
+        btn.classList.toggle('text-zinc-950', isAct);
+        btn.classList.toggle('border-zinc-200', !isAct);
+        btn.classList.toggle('text-zinc-600', !isAct);
       });
     }
   }
 
   updateBorderRadius(radius, btnRadius) {
     this.liveUpdateBorderRadius(radius, btnRadius);
+  }
+
+  setMotionPreset(preset) {
+    if (!state.currentProject) return;
+    const allowed = new Set(['none', 'fade-in', 'slide-up', 'slide-in', 'spring', 'progress-fill']);
+    if (!allowed.has(preset)) return;
+    const updated = JSON.parse(JSON.stringify(state.currentProject));
+    updated.branding.motionPreset = preset;
+    state.updateProject(updated, true, `Animation : ${preset}`);
   }
 
   updateTypography(headingFont, bodyFont) {
@@ -1383,6 +1503,9 @@ class App {
     const promptText = input ? input.value : "";
     if (!promptText.trim()) return;
 
+    const targetId = promptText.match(/#([a-z][a-z0-9-]*)/i)?.[1] || null;
+    const targetNode = targetId ? document.querySelector(`[data-ui-id="${targetId}"]`) : null;
+
     const feedback = document.getElementById("copilot-feedback");
     if (feedback) {
       feedback.textContent = "⏳ Analyse de la demande en cours...";
@@ -1393,13 +1516,33 @@ class App {
       const apiRes = await fetch("/api/ai/copilot", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ instruction: promptText, project: state.currentProject })
+        body: JSON.stringify({
+          instruction: promptText,
+          project: state.currentProject,
+          targetId,
+          selectionContext: targetNode ? {
+            sectionId: targetNode.closest("[data-section-id]")?.dataset.sectionId || null,
+            componentType: targetNode.dataset.uiType || null
+          } : null
+        })
       });
       if (apiRes.ok) {
         const json = await apiRes.json();
         if (json.success && json.data) {
           const d = json.data;
           const updated = JSON.parse(JSON.stringify(state.currentProject));
+          if (Array.isArray(d.operations)) {
+            const targeted = applyCopilotOperations(updated, d.operations);
+            if (!targeted.applied.length) {
+              if (feedback) feedback.textContent = `⚠️ ${d.summary || "Aucune opération valide n’a été appliquée."}`;
+              return;
+            }
+            state.updateProject(targeted.project, true, `Copilot ciblé: ${promptText}`);
+            if (feedback) feedback.textContent = `✨ ${d.summary || "Modification ciblée appliquée."}`;
+            if (input) input.value = "";
+            state.setCopilotOpen(false);
+            return;
+          }
           if (d.suggestedPreset) {
             const p = getStylePresetById(d.suggestedPreset);
             if (p) {
@@ -1437,6 +1580,7 @@ class App {
       feedback.textContent = `✓ ${res.message}`;
     }
     if (input) input.value = "";
+    state.setCopilotOpen(false);
   }
 
   // Project Level Actions
@@ -1724,6 +1868,40 @@ class App {
           quoteForm.style.display = "none";
         }
       };
+    }
+
+    // Accessible CTA popovers: hover remains a shortcut, while click/focus/Escape
+    // make the controls reliable for keyboard and pointer users.
+    document.querySelectorAll("[data-cta-popover-wrapper]").forEach(wrapper => {
+      const setOpen = (open) => wrapper.setAttribute("aria-expanded", String(open));
+      wrapper.addEventListener("mouseenter", () => setOpen(true));
+      wrapper.addEventListener("mouseleave", () => {
+        if (!wrapper.matches(":focus-within")) {
+          wrapper.classList.remove("is-active");
+          setOpen(false);
+        }
+      });
+      wrapper.addEventListener("focusin", () => setOpen(true));
+      wrapper.addEventListener("focusout", () => {
+        requestAnimationFrame(() => {
+          if (!wrapper.matches(":focus-within")) setOpen(false);
+        });
+      });
+      wrapper.addEventListener("click", event => {
+        if (event.target.closest(".cta-context-popover") || event.target.closest("a")) return;
+        const open = wrapper.classList.toggle("is-active");
+        setOpen(open);
+      });
+    });
+    if (!this._popoverEscapeBound) {
+      document.addEventListener("keydown", event => {
+        if (event.key !== "Escape") return;
+        document.querySelectorAll("[data-cta-popover-wrapper].is-active").forEach(wrapper => {
+          wrapper.classList.remove("is-active");
+          wrapper.setAttribute("aria-expanded", "false");
+        });
+      });
+      this._popoverEscapeBound = true;
     }
   }
 

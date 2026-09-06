@@ -1,7 +1,8 @@
 import { getIcon } from "./icons.js";
-import { renderWebsiteHTML } from "./renderer.js";
+import { renderWebsiteHTML, renderStickyCallBar } from "./renderer.js";
 import { renderInspector } from "./inspector.js";
 import { STYLE_PRESETS } from "../data/styles.js";
+import { FONT_CATALOG, ensureFontCatalog } from "../data/fonts.js";
 import { SECTION_DEFINITIONS } from "./addSectionModal.js";
 
 /**
@@ -35,6 +36,7 @@ export function getSectionFriendlyTitle(sec) {
 }
 
 export function renderEditor(state) {
+  ensureFontCatalog();
   const project = state.currentProject;
   if (!project) return `<div class="p-12 text-center text-zinc-400">Aucun projet sélectionné.</div>`;
 
@@ -49,6 +51,7 @@ export function renderEditor(state) {
   const websiteHTML = renderWebsiteHTML(project, {
     isEditor: !isLivePreview,
     isStandalone: false,
+    includeStickyBar: false,
     selectedSectionId: selectedSecId,
     tradeId: project.business.tradeId
   });
@@ -87,12 +90,12 @@ export function renderEditor(state) {
 
           <!-- Mode Switcher: 🛠️ Conception vs 👁️ Vue Client Démo -->
           <div class="flex items-center bg-zinc-100 rounded-xl p-1 border border-zinc-200 shadow-2xs">
-            <button type="button" onclick="window.app.setEditorMode('conception')" class="btn-keycap ${!isLivePreview ? 'btn-keycap-dark' : 'btn-keycap-light'} px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5">
+            <button type="button" aria-pressed="${!isLivePreview}" onclick="window.app.setEditorMode('conception')" class="btn-keycap ${!isLivePreview ? 'btn-keycap-dark' : 'btn-keycap-light'} px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5">
               ${getIcon("edit", "w-3.5 h-3.5")}
               <span class="hidden sm:inline">Mode Conception</span>
               <span class="sm:hidden">Éditer</span>
             </button>
-            <button type="button" onclick="window.app.setEditorMode('preview')" class="btn-keycap ${isLivePreview ? 'btn-keycap-dark' : 'btn-keycap-light'} px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 ml-1" title="Voir exactement le rendu final sans barres d'outils">
+            <button type="button" aria-pressed="${isLivePreview}" onclick="window.app.setEditorMode('preview')" class="btn-keycap ${isLivePreview ? 'btn-keycap-dark' : 'btn-keycap-light'} px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 ml-1" title="Voir exactement le rendu final sans barres d'outils">
               ${getIcon("eye", "w-3.5 h-3.5")}
               <span class="hidden sm:inline">Vue Client Démo</span>
               <span class="sm:hidden">Client</span>
@@ -236,7 +239,7 @@ export function renderEditor(state) {
                        draggable="true">
 
                     <!-- Compact Header with Smooth Scroll to Canvas Section -->
-                    <div class="section-card-header" onclick="window.app.toggleSectionAccordion('${s.id}', event); window.app.scrollToSection('${s.id}');">
+                    <div class="section-card-header" role="button" tabindex="0" aria-controls="accordion-${s.id}" aria-expanded="${isOpen}" onclick="window.app.handleSectionNavigation('${s.id}', event)" onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); window.app.handleSectionNavigation('${s.id}', event); }">
                       <div class="flex items-center gap-2 min-w-0 flex-1">
                         <span class="section-card-grip" title="Glisser pour réorganiser">
                           ${getIcon("gripVertical", "w-3.5 h-3.5")}
@@ -253,7 +256,7 @@ export function renderEditor(state) {
                           ${getIcon(isVis ? "eye" : "eyeOff", "w-3.5 h-3.5")}
                         </button>
                         <button type="button"
-                                onclick="event.stopPropagation(); window.app.toggleSectionAccordion('${s.id}', event)"
+                                onclick="event.stopPropagation(); window.app.handleSectionNavigation('${s.id}', event)"
                                 class="accordion-chevron p-1 rounded text-zinc-400 hover:text-zinc-800 hover:bg-zinc-100 transition-transform ${isOpen ? 'rotate-180' : ''}"
                                 title="${isOpen ? 'Fermer l\'accordéon' : 'Ouvrir l\'accordéon'}">
                           ${getIcon("chevronDown", "w-3.5 h-3.5")}
@@ -289,7 +292,7 @@ export function renderEditor(state) {
                 <span>Aperçu Client Démo en direct</span>
               </span>
               <div class="h-4 w-[1px] bg-zinc-700"></div>
-              <button type="button" onclick="window.app.setEditorMode('conception')" class="btn-keycap btn-keycap-light px-3 py-1 rounded-full text-xs font-bold text-zinc-950 flex items-center gap-1.5 shadow-sm">
+          <button type="button" aria-pressed="true" onclick="window.app.setEditorMode('conception')" class="btn-keycap btn-keycap-light px-3 py-1 rounded-full text-xs font-bold text-zinc-950 flex items-center gap-1.5 shadow-sm">
                 ${getIcon("edit", "w-3.5 h-3.5")}
                 <span>Retour Conception</span>
               </button>
@@ -327,6 +330,43 @@ export function renderEditor(state) {
         </aside>
 
       </div>
+
+      ${renderStickyCallBar(project, { isEditor: !isLivePreview })}
+
+      ${!isLivePreview && state.copilotOpen ? `
+        <div class="copilot-floating-panel" role="dialog" aria-label="Assistant Copilot IA">
+          <div class="copilot-floating-header">
+            <div class="flex items-center gap-2">
+              ${getIcon("sparkles", "w-4 h-4 text-amber-400")}
+              <div>
+                <div class="text-xs font-bold text-white">Copilot IA</div>
+                <div class="text-[10px] text-zinc-400">Modifications ciblées avec Undo</div>
+              </div>
+            </div>
+            <button type="button" aria-label="Fermer Copilot" onclick="window.app.toggleCopilotPanel(false)" class="copilot-close-btn">
+              ${getIcon("x", "w-4 h-4")}
+            </button>
+          </div>
+          <form onsubmit="window.app.submitCopilotPrompt(event)" class="space-y-2.5">
+            <textarea id="copilot-prompt-input" rows="3" placeholder="Ex : Change la couleur de #section-2 ou supprime #btn-33" class="copilot-prompt-input"></textarea>
+            <div class="copilot-suggestion-row">
+              <button type="button" onclick="window.app.applyCopilotChip('Rends le bouton #btn-1 plus visible')">#btn-1</button>
+              <button type="button" onclick="window.app.applyCopilotChip('Améliore la section #section-2')">#section-2</button>
+            </div>
+            <button type="submit" class="btn-keycap btn-keycap-dark w-full py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5">
+              ${getIcon("sparkles", "w-3.5 h-3.5 text-amber-400")}
+              <span>Exécuter la consigne</span>
+            </button>
+          </form>
+          <div id="copilot-feedback" class="copilot-feedback hidden"></div>
+        </div>
+      ` : `
+        <button type="button" aria-label="Ouvrir Copilot IA" onclick="window.app.toggleCopilotPanel(true)" class="copilot-launcher">
+          ${getIcon("sparkles", "w-4 h-4 text-amber-400")}
+          <span>Copilot</span>
+        </button>
+      `}
+
     </div>
   `;
 }
@@ -659,27 +699,39 @@ function renderSettingsAccordions(project) {
 
           <div class="pt-2 border-t border-zinc-200/60 space-y-2">
             <label class="block text-[10px] font-medium text-zinc-400 uppercase tracking-wider">Palette Personnalisée</label>
-            <div class="flex items-center justify-between p-2 rounded-lg border border-zinc-200 bg-white">
-              <span class="text-xs font-medium text-zinc-800">Primaire</span>
-              <input type="color" value="${project.branding.primaryColor}"
-                     oninput="window.app.liveUpdateColor('primaryColor', this.value)"
-                     onchange="window.app.commitColorUpdate('primaryColor', this.value)"
-                     class="w-6 h-6 rounded cursor-pointer border border-zinc-200 bg-transparent">
-            </div>
-            <div class="flex items-center justify-between p-2 rounded-lg border border-zinc-200 bg-white">
-              <span class="text-xs font-medium text-zinc-800">Secondaire</span>
-              <input type="color" value="${project.branding.secondaryColor}"
-                     oninput="window.app.liveUpdateColor('secondaryColor', this.value)"
-                     onchange="window.app.commitColorUpdate('secondaryColor', this.value)"
-                     class="w-6 h-6 rounded cursor-pointer border border-zinc-200 bg-transparent">
-            </div>
-            <div class="flex items-center justify-between p-2 rounded-lg border border-zinc-200 bg-white">
-              <span class="text-xs font-medium text-zinc-800">Accentuation</span>
-              <input type="color" value="${project.branding.accentColor}"
-                     oninput="window.app.liveUpdateColor('accentColor', this.value)"
-                     onchange="window.app.commitColorUpdate('accentColor', this.value)"
-                     class="w-6 h-6 rounded cursor-pointer border border-zinc-200 bg-transparent">
-            </div>
+            ${[
+              ['primaryColor', 'Primaire'],
+              ['secondaryColor', 'Secondaire'],
+              ['accentColor', 'Accentuation']
+            ].map(([key, label]) => {
+              const color = project.branding[key] || '#18181b';
+              const harmony = getHarmonyColors(color);
+              return `
+                <div class="color-field" data-color-field="${key}">
+                  <div class="flex items-center justify-between gap-2">
+                    <label class="text-xs font-medium text-zinc-800" for="color-text-${key}">${label}</label>
+                    <div class="flex items-center gap-1.5">
+                      <input type="color" data-color-picker="${key}" value="${color}"
+                             oninput="window.app.liveUpdateColor('${key}', this.value)"
+                             onchange="window.app.commitColorUpdate('${key}', this.value)"
+                             aria-label="Choisir la couleur ${label}"
+                             class="color-swatch">
+                      <button type="button" class="color-eyedropper" onclick="window.app.pickColorWithEyedropper('${key}')" title="Pipette" aria-label="Utiliser la pipette">
+                        ${getIcon("pipette", "w-3.5 h-3.5")}
+                      </button>
+                    </div>
+                  </div>
+                  <input id="color-text-${key}" class="color-hex-input" value="${color}" inputmode="text" maxlength="7"
+                         oninput="window.app.updateColorFromText('${key}', this.value)"
+                         onchange="window.app.commitColorFromText('${key}', this.value)" aria-label="Valeur HEX ${label}">
+                  <div class="color-harmony-row" aria-label="Harmonies de couleur">
+                    <button type="button" style="--harmony-color: ${harmony[0]}" onclick="window.app.applyHarmonyColor('${key}', '${harmony[0]}')" title="Couleur actuelle"></button>
+                    <button type="button" style="--harmony-color: ${harmony[1]}" onclick="window.app.applyHarmonyColor('${key}', '${harmony[1]}')" title="Couleur complémentaire"></button>
+                    <button type="button" style="--harmony-color: ${harmony[2]}" onclick="window.app.applyHarmonyColor('${key}', '${harmony[2]}')" title="Couleur analogue"></button>
+                  </div>
+                </div>
+              `;
+            }).join('')}
           </div>
         </div>
       </div>
@@ -694,19 +746,13 @@ function renderSettingsAccordions(project) {
           <span class="text-zinc-400">${getIcon("chevronDown", "w-3.5 h-3.5")}</span>
         </div>
         <div class="section-accordion-body hidden space-y-2.5" id="settings-body-typography">
-          <div class="space-y-1.5">
-            <button type="button" onclick="window.app.updateTypography('Plus Jakarta Sans', 'Inter')" class="w-full text-left p-2 rounded-lg border bg-white hover:border-zinc-400 text-xs">
-              <div class="font-bold text-zinc-900">Plus Jakarta Sans</div>
-              <div class="text-[10px] text-zinc-400">Moderne, percutant et lisible</div>
-            </button>
-            <button type="button" onclick="window.app.updateTypography('Inter', 'Inter')" class="w-full text-left p-2 rounded-lg border bg-white hover:border-zinc-400 text-xs">
-              <div class="font-bold text-zinc-900">Inter Clean</div>
-              <div class="text-[10px] text-zinc-400">Minimaliste, sobre et précis</div>
-            </button>
-            <button type="button" onclick="window.app.updateTypography('Outfit', 'Inter')" class="w-full text-left p-2 rounded-lg border bg-white hover:border-zinc-400 text-xs">
-              <div class="font-bold text-zinc-900">Outfit Editorial</div>
-              <div class="text-[10px] text-zinc-400">Chaleureux, local et soigné</div>
-            </button>
+          <div class="space-y-1.5 max-h-72 overflow-y-auto pr-1">
+            ${FONT_CATALOG.map(font => `
+              <button type="button" aria-label="Utiliser ${font.name}" onclick="window.app.updateTypography('${font.name}', '${project.branding.bodyFont || 'Inter'}')" class="font-option w-full text-left p-2 rounded-lg border bg-white hover:border-zinc-400 text-xs ${project.branding.headingFont === font.name ? 'is-active' : ''}" style="font-family: '${font.name}', sans-serif">
+                <div class="font-bold text-zinc-900">${font.name}</div>
+                <div class="text-[10px] text-zinc-400">${font.category} · ${font.description}</div>
+              </button>
+            `).join('')}
           </div>
         </div>
       </div>
@@ -734,10 +780,34 @@ function renderSettingsAccordions(project) {
           <div>
             <label class="block text-[10px] font-medium text-zinc-400 uppercase tracking-wider mb-1.5">Rayon d'Arrondi des Boutons</label>
             <div class="grid grid-cols-3 gap-1.5 text-xs">
-              <button type="button" onclick="window.app.liveUpdateBorderRadius('0.25rem', '0.25rem')" class="py-1.5 border rounded-md text-center text-[11px] font-medium ${project.branding.borderRadius === '0.25rem' ? 'border-zinc-900 bg-white font-semibold shadow-xs' : 'border-zinc-200 bg-white text-zinc-600'}">Droit (4px)</button>
-              <button type="button" onclick="window.app.liveUpdateBorderRadius('0.75rem', '0.5rem')" class="py-1.5 border rounded-lg text-center text-[11px] font-medium ${project.branding.borderRadius === '0.75rem' ? 'border-zinc-900 bg-white font-semibold shadow-xs' : 'border-zinc-200 bg-white text-zinc-600'}">Doux (8px)</button>
-              <button type="button" onclick="window.app.liveUpdateBorderRadius('1.5rem', '9999px')" class="py-1.5 border rounded-full text-center text-[11px] font-medium ${project.branding.borderRadius === '1.5rem' ? 'border-zinc-900 bg-white font-semibold shadow-xs' : 'border-zinc-200 bg-white text-zinc-600'}">Pilule</button>
+              ${[
+                ['0px', '0px', 'Carré'],
+                ['0.25rem', '0.25rem', '4px'],
+                ['0.5rem', '0.5rem', '8px'],
+                ['0.75rem', '0.75rem', '12px'],
+                ['1.5rem', '1.5rem', '24px'],
+                ['9999px', '9999px', 'Pilule']
+              ].map(([radius, btnRadius, label]) => `
+                <button type="button" data-radius-option data-radius="${radius}" onclick="window.app.liveUpdateBorderRadius('${radius}', '${btnRadius}')" class="py-1.5 border text-center text-[11px] font-medium ${project.branding.borderRadius === radius ? 'border-zinc-900 bg-white font-semibold text-zinc-950' : 'border-zinc-200 bg-white text-zinc-600'}" style="border-radius:${radius}">${label}</button>
+              `).join('')}
             </div>
+          </div>
+
+          <div class="pt-3 border-t border-zinc-200/80 space-y-2">
+            <label class="block text-[10px] font-medium text-zinc-400 uppercase tracking-wider">Micro-interactions</label>
+            <div class="grid grid-cols-3 gap-1.5 text-xs">
+              ${[
+                ['none', 'Aucune'],
+                ['fade-in', 'Fade'],
+                ['slide-up', 'Slide'],
+                ['slide-in', 'Entrée'],
+                ['spring', 'Spring'],
+                ['progress-fill', 'Remplissage']
+              ].map(([preset, label]) => `
+                <button type="button" onclick="window.app.setMotionPreset('${preset}')" class="py-1.5 border rounded-md text-center text-[11px] font-medium ${((project.branding.motionPreset || 'none') === preset) ? 'border-zinc-900 bg-white font-semibold text-zinc-950' : 'border-zinc-200 bg-white text-zinc-600'}">${label}</button>
+              `).join('')}
+            </div>
+            <p class="text-[10px] text-zinc-500">Les animations respectent automatiquement le réglage système « réduire les mouvements ».</p>
           </div>
 
           <!-- Bandeau Flottant Fixe (Unbounce & Duda Inspired) -->
@@ -835,23 +905,16 @@ function renderSettingsAccordions(project) {
 
       <!-- 8. Assistant Copilot IA -->
       <div class="section-card">
-        <div class="section-card-header" onclick="window.app.toggleSettingsItem('copilot')">
+        <div class="section-card-header" onclick="window.app.toggleCopilotPanel(true)">
           <div class="flex items-center gap-2 text-xs font-medium text-zinc-900">
             ${getIcon("sparkles", "w-4 h-4 text-amber-500")}
             <span>Assistant Copilot IA (Gemini)</span>
           </div>
-          <span class="text-zinc-400">${getIcon("chevronDown", "w-3.5 h-3.5")}</span>
+          <span class="text-zinc-400">${getIcon("panelBottom", "w-3.5 h-3.5")}</span>
         </div>
-        <div class="section-accordion-body space-y-2.5" id="settings-body-copilot">
-          <form onsubmit="window.app.submitCopilotPrompt(event)" class="space-y-2">
-            <textarea id="copilot-prompt-input" rows="2" placeholder="Ex: Rends les boutons plus percutants et accentue l'urgence 24h/24..." class="w-full bg-white border border-zinc-200 rounded-lg p-2.5 text-xs text-zinc-900 focus:border-zinc-900 focus:outline-none"></textarea>
-            <button type="submit" class="w-full py-1.5 rounded-lg text-xs font-medium text-white bg-zinc-900 hover:bg-black shadow-xs flex items-center justify-center gap-1.5 transition-colors">
-              ${getIcon("sparkles", "w-3 h-3 text-amber-400")}
-              <span>Exécuter la consigne IA</span>
-            </button>
-          </form>
-          <div id="copilot-feedback" class="text-xs p-2 rounded-lg bg-zinc-100 text-zinc-700 hidden"></div>
-        </div>
+        <button type="button" onclick="window.app.toggleCopilotPanel(true)" class="w-full px-3 pb-3 text-left text-[11px] text-zinc-500 hover:text-zinc-900">
+          Ouvrir le panneau flottant et cibler un élément par son ID.
+        </button>
       </div>
 
     </div>
@@ -866,4 +929,31 @@ function escapeHtml(str) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
+}
+
+function getHarmonyColors(hex) {
+  const value = String(hex || '').replace('#', '');
+  if (!/^[0-9a-f]{6}$/i.test(value)) return ['#18181b', '#52525b', '#a1a1aa'];
+  const rgb = [0, 2, 4].map(index => parseInt(value.slice(index, index + 2), 16) / 255);
+  const max = Math.max(...rgb);
+  const min = Math.min(...rgb);
+  const delta = max - min;
+  let h = 0;
+  const l = (max + min) / 2;
+  const s = delta === 0 ? 0 : delta / (1 - Math.abs(2 * l - 1));
+  if (delta !== 0) {
+    if (max === rgb[0]) h = 60 * (((rgb[1] - rgb[2]) / delta) % 6);
+    else if (max === rgb[1]) h = 60 * ((rgb[2] - rgb[0]) / delta + 2);
+    else h = 60 * ((rgb[0] - rgb[1]) / delta + 4);
+  }
+  if (h < 0) h += 360;
+  const toHex = hue => {
+    const sat = s;
+    const chroma = (1 - Math.abs(2 * l - 1)) * sat;
+    const x = chroma * (1 - Math.abs((hue / 60) % 2 - 1));
+    const m = l - chroma / 2;
+    const parts = hue < 60 ? [chroma, x, 0] : hue < 120 ? [x, chroma, 0] : hue < 180 ? [0, chroma, x] : hue < 240 ? [0, x, chroma] : hue < 300 ? [x, 0, chroma] : [chroma, 0, x];
+    return `#${parts.map(channel => Math.round((channel + m) * 255).toString(16).padStart(2, '0')).join('')}`;
+  };
+  return [hex, toHex((h + 180) % 360), toHex((h + 30) % 360)];
 }

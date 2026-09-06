@@ -1,5 +1,6 @@
 import { getIcon } from "./icons.js";
 import { getTradeFallbackDataUrl } from "../data/imageFallbacks.js";
+import { getUiId, getSectionUiId } from "../data/uiIds.js";
 
 function getInitialSiteTheme(project) {
   const color = project?.branding?.bgColor || "#ffffff";
@@ -88,7 +89,7 @@ export function renderWebsiteHTML(project, options = { isEditor: false, isStanda
     xl: '1.25rem'
   };
 
-  const stickyBarHTML = renderStickyCallBar(project, options);
+  const stickyBarHTML = options.includeStickyBar === false ? "" : renderStickyCallBar(project, options);
   const initialSiteTheme = project.siteTheme || getInitialSiteTheme(project);
 
   return `
@@ -176,9 +177,15 @@ function renderSection(sec, project, options) {
   }
 
   const bgTheme = sec.settings?.bgTheme ? `bg-sec-${sec.settings.bgTheme}` : "";
+  const motionPreset = project.branding?.motionPreset && project.branding.motionPreset !== "none"
+    ? project.branding.motionPreset
+    : "";
+  const customBackground = /^#[0-9a-f]{3,8}$/i.test(sec.settings?.customBackground || "")
+    ? `background-color: ${sec.settings.customBackground} !important;`
+    : "";
 
   if (!isEditor) {
-    return `<section id="${sec.type}" class="site-section ${bgTheme} ${isHidden ? 'hidden' : ''}">${innerHTML}</section>`;
+    return `<section id="${sec.type}" class="site-section ${bgTheme} ${isHidden ? 'hidden' : ''}" style="${customBackground}" data-ui-id="${getSectionUiId(sec)}" data-ui-type="section"${motionPreset ? ` data-motion="${motionPreset}"` : ''}>${innerHTML}</section>`;
   }
 
   // Editor Wrapper with Controls
@@ -207,7 +214,12 @@ function renderSection(sec, project, options) {
     <div id="section-${sec.id}"
          class="editor-section-wrapper relative group ${bgTheme} ${isSelected ? 'is-active-section' : ''} ${isHidden ? 'opacity-40 grayscale' : ''}"
          data-section-id="${sec.id}"
-         data-section-type="${sec.type}">
+         data-section-type="${sec.type}"
+         data-ui-id="section-${sec.id}"
+         data-ui-type="section"
+         ${motionPreset ? `data-motion="${motionPreset}"` : ''}
+         style="${customBackground}"
+         tabindex="-1">
 
       <!-- Sleek Floating Action Bar (Linear / Framer style) -->
       <div class="editor-section-toolbar">
@@ -286,6 +298,8 @@ function renderHero(sec, project, options = {}) {
   const c = sec.content;
   const variant = sec.variant || "split-image";
   const ctaPulseClass = project?.branding?.ctaPulse ? " btn-cta-pulse" : "";
+  const heroButtonId = getUiId(project, sec, "btn");
+  const heroButtonVisibility = sec.settings?.[`${heroButtonId}-visible`] === false ? " hidden" : "";
 
   // Variant A: Fullscreen Image
   if (variant === "fullscreen-image") {
@@ -454,13 +468,13 @@ function renderHero(sec, project, options = {}) {
               ${c.subtitle}
             </p>
 
-            <div class="cta-button-wrapper group/cta">
-              <a href="#simulateur" class="btn-cta btn-keycap${ctaPulseClass} inline-flex items-center justify-center gap-2.5 shadow-xl transition-all" style="background-color: var(--primary); color: #ffffff;">
+              <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-primary" data-cta-popover-wrapper data-ui-id="${getUiId(project, sec, 'cta')}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
+              <a href="#simulateur" class="btn-cta btn-keycap${ctaPulseClass}${heroButtonVisibility} inline-flex items-center justify-center gap-2.5 shadow-xl transition-all" data-ui-id="${heroButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}" style="background-color: var(--primary); color: #ffffff;">
                 ${getIcon("sparkles", "w-5 h-5")}
                 <span data-editable="ctaPrimary">${c.ctaPrimary}</span>
               </a>
               ${options.isEditor ? `
-                <div class="cta-context-popover" onclick="event.stopPropagation();">
+                <div id="cta-popover-${sec.id}-primary" class="cta-context-popover" role="dialog" aria-label="Réglages du bouton principal" onclick="event.stopPropagation();">
                   <span class="text-[9.5px] uppercase font-bold text-zinc-400 mr-0.5">Taille:</span>
                   <button type="button" data-cta-size="sm" onclick="event.preventDefault(); window.app.setCTASize('sm')" class="cta-context-btn">S</button>
                   <button type="button" data-cta-size="md" onclick="event.preventDefault(); window.app.setCTASize('md')" class="cta-context-btn">M</button>
@@ -471,13 +485,13 @@ function renderHero(sec, project, options = {}) {
               ` : ''}
             </div>
 
-            <div class="cta-button-wrapper group/cta">
+            <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-phone" data-cta-popover-wrapper>
               <a href="tel:${c.phone}" class="btn-cta btn-keycap${ctaPulseClass} inline-flex items-center justify-center gap-2.5 shadow-sm transition-all" style="background-color: #ffffff; color: #18181b; border: 1px solid #e4e4e7;">
                 ${getIcon("phone", "w-5 h-5 text-emerald-600")}
                 <span data-editable="ctaSecondary">${c.ctaSecondary}</span>
               </a>
               ${options.isEditor ? `
-                <div class="cta-context-popover" onclick="event.stopPropagation();">
+                <div id="cta-popover-${sec.id}-phone" class="cta-context-popover" role="dialog" aria-label="Réglages du bouton téléphone" onclick="event.stopPropagation();">
                   <span class="text-[9.5px] uppercase font-bold text-zinc-400 mr-0.5">Taille:</span>
                   <button type="button" data-cta-size="sm" onclick="event.preventDefault(); window.app.setCTASize('sm')" class="cta-context-btn">S</button>
                   <button type="button" data-cta-size="md" onclick="event.preventDefault(); window.app.setCTASize('md')" class="cta-context-btn">M</button>
@@ -1357,8 +1371,10 @@ function renderFaq(sec, project) {
 }
 
 // 15. Final CTA
-function renderCta(sec, project) {
+function renderCta(sec, project, options = {}) {
   const c = sec.content;
+  const primaryButtonId = getUiId(project, sec, "btn-primary");
+  const primaryButtonVisibility = sec.settings?.[`${primaryButtonId}-visible`] === false ? " hidden" : "";
   return `
     <div class="py-20 text-white relative overflow-hidden" style="background-color: var(--primary);">
       <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6 relative z-10">
@@ -1366,11 +1382,11 @@ function renderCta(sec, project) {
         <h2 class="font-heading text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight" data-editable="title">${c.title}</h2>
         <p class="text-white/80 text-base sm:text-lg max-w-2xl mx-auto" data-editable="subtitle">${c.subtitle}</p>
         <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a href="#simulateur" class="btn-cta bg-white text-gray-900 shadow-xl hover:bg-gray-50">
+          <a href="#simulateur" class="btn-cta${primaryButtonVisibility} bg-white text-gray-900 shadow-xl hover:bg-gray-50" data-ui-id="${primaryButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
             ${getIcon("sparkles", "w-5 h-5 text-amber-500")}
             <span data-editable="ctaPrimary">${c.ctaPrimary}</span>
           </a>
-          <a href="tel:${c.phone}" class="btn-cta border border-white/30 text-white hover:bg-white/10">
+          <a href="tel:${c.phone}" class="btn-cta border border-white/30 text-white hover:bg-white/10" data-ui-id="${getUiId(project, sec, 'btn-phone')}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
             ${getIcon("phone", "w-5 h-5")}
             <span data-editable="ctaSecondary">${c.ctaSecondary}</span>
           </a>
@@ -1500,22 +1516,23 @@ export function renderStickyCallBar(project, options = {}) {
       <div class="bg-zinc-950/85 text-white backdrop-blur-md px-3 py-2 rounded-full shadow-2xl border border-white/10 flex items-center justify-between gap-2 text-xs">
 
         <!-- Direct Call -->
-        <a href="tel:${cleanPhone || phone}" class="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-full bg-white text-zinc-950 hover:bg-zinc-100 font-semibold transition-colors shadow-xs">
-          <span>📞</span>
+        <a href="tel:${cleanPhone || phone}" class="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-full bg-white text-zinc-950 hover:bg-zinc-100 font-semibold transition-colors shadow-xs" aria-label="Appeler ${phone || 'l’entreprise'}">
+          ${getIcon("phone", "w-3.5 h-3.5")}
           <span class="truncate">${phone || "Appeler"}</span>
         </a>
 
         <!-- Direct WhatsApp -->
         ${waNumber ? `
-          <a href="https://wa.me/${waNumber}?text=${waText}" target="_blank" class="flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold transition-colors shadow-xs" title="Discuter sur WhatsApp">
-            <span>💬</span>
+          <a href="https://wa.me/${waNumber}?text=${waText}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold transition-colors shadow-xs" title="Discuter sur WhatsApp" aria-label="Discuter sur WhatsApp">
+            ${getIcon("message", "w-3.5 h-3.5")}
             <span class="hidden sm:inline">WhatsApp</span>
           </a>
         ` : ''}
 
         <!-- Quick Quote Link -->
-        <a href="#quoteSimulator" class="flex-1 flex items-center justify-center gap-1 py-1.5 px-2.5 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-medium transition-colors border border-white/10">
-          <span>📝 Devis 24h</span>
+        <a href="#quoteSimulator" class="flex-1 flex items-center justify-center gap-1 py-1.5 px-2.5 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-medium transition-colors border border-white/10" aria-label="Demander un devis sous 24 heures">
+          ${getIcon("clipboard", "w-3.5 h-3.5")}
+          <span>Devis 24h</span>
         </a>
 
       </div>

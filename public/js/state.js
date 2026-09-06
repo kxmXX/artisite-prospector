@@ -14,6 +14,7 @@ class AppStateManager {
     this.activeInspectorTab = "content"; // "content", "style", "visibility"
     this.activeSidebarTab = "sections"; // "sections", "settings"
     this.activeDrawer = null; // null, "closer", "new_project", "add_section"
+    this.copilotOpen = false;
 
     // History for Undo/Redo
     this.undoStack = [];
@@ -120,6 +121,11 @@ class AppStateManager {
   closeDrawer() {
     this.activeDrawer = null;
     this.notify("drawer_change");
+  }
+
+  setCopilotOpen(open = true) {
+    this.copilotOpen = Boolean(open);
+    this.notify("copilot_visibility_change");
   }
 
   // Project selection & CRUD
@@ -411,4 +417,3 @@ export function setDeepValue(obj, path, value) {
 }
 
 export const state = new AppStateManager();
-

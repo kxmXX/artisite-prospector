@@ -131,7 +131,7 @@ export async function handleApiRequest(req, res) {
     // 4. AI Copilot Natural Language with fallback
     if (normalizedPath === "/api/ai/copilot" && req.method === "POST") {
       const body = await readBodyJSON(req);
-      const { instruction, project } = body;
+      const { instruction, project, targetId, selectionContext } = body;
       if (!instruction) {
         sendJSON(res, 400, { error: "Instruction manquante" });
         return;
@@ -140,6 +140,8 @@ export async function handleApiRequest(req, res) {
       const prompt = `
 En tant qu'assistant de personnalisation web, analyse cette instruction utilisateur pour un site d'artisan :
 Instruction: "${instruction}"
+Target UI éventuelle: "${targetId || "aucune"}"
+Contexte de sélection: ${JSON.stringify(selectionContext || {})}
 Entreprise: "${project?.business?.name}" (${project?.business?.tradeLabel} à ${project?.business?.city})
 
 Réponds en JSON avec :
@@ -150,8 +152,17 @@ Réponds en JSON avec :
   "updatedSubtitle": null | "Nouveau sous-titre",
   "updatedBadge": null | "Nouveau badge",
   "borderRadius": null | "1.5rem" | "0.25rem",
-  "buttonRadius": null | "9999px" | "0.25rem"
+  "buttonRadius": null | "9999px" | "0.25rem",
+  "operations": [
+    {
+      "op": "set" | "delete",
+      "targetId": "section-..." | "btn-...",
+      "path": "visibility" | "backgroundColor" | "content",
+      "value": true | false | "#RRGGBB" | "texte"
+    }
+  ]
 }
+Si aucune cible # explicite n'est présente, retourne "operations": []. Si une cible est présente, ne modifie qu'elle et ne réécris jamais le projet entier.
 `;
       const aiResult = await callGeminiWithFallback({ prompt, jsonOutput: true });
       if (aiResult.success) {

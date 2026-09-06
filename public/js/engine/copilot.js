@@ -1,4 +1,93 @@
 import { getStylePresetById } from "../data/styles.js";
+import { getUiId, getSectionUiId } from "../data/uiIds.js";
+
+export function getProjectUiTargets(project) {
+  const targets = new Map();
+  (project?.sections || []).forEach(section => {
+    targets.set(getSectionUiId(section), {
+      targetId: getSectionUiId(section),
+      sectionId: section.id,
+      type: "section",
+      path: null
+    });
+
+    if (section.type === "hero" || section.type === "cta") {
+      const primaryId = getUiId(project, section, section.type === "hero" ? "btn" : "btn-primary");
+      targets.set(primaryId, {
+        targetId: primaryId,
+        sectionId: section.id,
+        type: "button",
+        path: "content.ctaPrimary"
+      });
+    }
+  });
+  return targets;
+}
+
+function readHex(text) {
+  const match = text.match(/#[0-9a-f]{3,8}\b/i);
+  return match ? match[0] : null;
+}
+
+function setDeepValue(target, path, value) {
+  const parts = String(path || "").split(".").filter(Boolean);
+  if (!parts.length) return;
+  let cursor = target;
+  parts.slice(0, -1).forEach(part => {
+    if (!cursor[part] || typeof cursor[part] !== "object") cursor[part] = {};
+    cursor = cursor[part];
+  });
+  cursor[parts[parts.length - 1]] = value;
+}
+
+export function applyCopilotOperations(project, operations = []) {
+  const updated = JSON.parse(JSON.stringify(project));
+  const targets = getProjectUiTargets(updated);
+  const applied = [];
+  const rejected = [];
+
+  operations.forEach(operation => {
+    const target = targets.get(operation.targetId);
+    if (!target || !operation.op) {
+      rejected.push(operation);
+      return;
+    }
+
+    const section = updated.sections.find(item => item.id === target.sectionId);
+    if (!section) {
+      rejected.push(operation);
+      return;
+    }
+
+    if (operation.op === "set") {
+      if (target.type === "section" && operation.path === "visibility") {
+        section.visibility = Boolean(operation.value);
+      } else if (target.type === "section" && operation.path === "backgroundColor") {
+        section.settings = { ...(section.settings || {}), customBackground: operation.value };
+      } else if (target.path && target.type === "button" && operation.path === "visibility") {
+        section.settings = { ...(section.settings || {}), [`${target.targetId}-visible`]: Boolean(operation.value) };
+      } else if (target.path && operation.path === "content") {
+        setDeepValue(section, target.path, operation.value);
+      } else {
+        rejected.push(operation);
+        return;
+      }
+      applied.push(operation);
+      return;
+    }
+
+    if (operation.op === "delete" && target.type === "section") {
+      section.visibility = false;
+      applied.push({ ...operation, op: "set", path: "visibility", value: false });
+      return;
+    }
+
+    rejected.push(operation);
+  });
+
+  updated.updatedAt = new Date().toISOString();
+  return { project: updated, applied, rejected };
+}
 
 /**
  * Intelligent AI Copilot for Michel to tweak the site using natural language requests.
@@ -7,6 +96,48 @@ export function processCopilotPrompt(project, promptText) {
   if (!promptText || !promptText.trim()) return { project, message: "Aucune instruction reçue." };
   
   const text = promptText.toLowerCase().trim();
+
+  const targetMatch = promptText.match(/#([a-z][a-z0-9-]*)/i);
+  if (targetMatch) {
+    const targetId = targetMatch[1];
+    const target = getProjectUiTargets(project).get(targetId);
+    if (!target) {
+      return {
+        project,
+        message: `La cible #${targetId} est introuvable.`,
+        targetId,
+        operations: [],
+        error: "TARGET_NOT_FOUND"
+      };
+    }
+
+    const hex = readHex(promptText);
+    const operations = [];
+    if (/supprime|supprimer|masque|masquer|retire|retirer|enlève|enlever/.test(text)) {
+      operations.push({ op: "set", targetId, path: "visibility", value: false });
+    } else if (/affiche|afficher|active|activer|montre|montrer/.test(text)) {
+      operations.push({ op: "set", targetId, path: "visibility", value: true });
+    } else if (hex && /couleur|color|fond|background/.test(text) && target.type === "section") {
+      operations.push({ op: "set", targetId, path: "backgroundColor", value: hex });
+    } else {
+      return {
+        project,
+        message: `J’ai trouvé #${targetId}, mais l’action demandée n’est pas encore supportée.`,
+        targetId,
+        operations: [],
+        error: "UNSUPPORTED_OPERATION"
+      };
+    }
+
+    const result = applyCopilotOperations(project, operations);
+    return {
+      project: result.project,
+      message: result.applied.length ? `Modification appliquée à #${targetId}.` : `Aucune modification appliquée à #${targetId}.`,
+      targetId,
+      operations: result.applied,
+      rejected: result.rejected
+    };
+  }
   // Deep clone project
   const updated = JSON.parse(JSON.stringify(project));
   const logs = [];

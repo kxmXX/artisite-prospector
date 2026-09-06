@@ -7,6 +7,11 @@
 
 import { renderWebsiteHTML, generateLocalBusinessSchema } from "../components/renderer.js";
 import { UTILITY_CSS } from "./exportStyles.js";
+import { FONT_CATALOG } from "../data/fonts.js";
+
+const EXPORT_FONT_QUERY = FONT_CATALOG
+  .map(font => `family=${encodeURIComponent(font.name).replace(/%20/g, '+')}:wght@400;500;600;700;800`)
+  .join('&');
 
 export function exportStandaloneHTML(project) {
   const htmlBody = renderWebsiteHTML(project, { isEditor: false, isStandalone: true });
@@ -29,7 +34,7 @@ ${generateLocalBusinessSchema(project)}
   <!-- Modern Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?${EXPORT_FONT_QUERY}&display=swap" rel="stylesheet">
   
   <style>
 ${UTILITY_CSS}
@@ -69,6 +74,10 @@ ${UTILITY_CSS}
     .btn-keycap-light { background: #f7f1e6; color: #18181b; border: 1px solid #d8cbb8; border-bottom: 3px solid #aa9b87; box-shadow: 0 3px 0 #aa9b87, 0 4px 8px rgba(56,42,24,.12); }
     .btn-keycap-dark { background: #27282b; color: #fff; border: 1px solid #3f4146; border-bottom: 3px solid #111214; box-shadow: 0 3px 0 #111214, 0 4px 8px rgba(0,0,0,.25); }
     .btn-keycap-accent { background: #f06b3d; color: #24130d; border: 1px solid #d9572c; border-bottom: 3px solid #a94123; box-shadow: 0 3px 0 #a94123, 0 4px 10px rgba(169,65,35,.24); }
+
+    .sticky-call-bar { position: fixed; left: 50%; bottom: max(1rem, env(safe-area-inset-bottom)); transform: translateX(-50%); width: min(92vw, 28rem); z-index: 120; }
+    [data-ui-target="false"]::after { display: none !important; }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; scroll-behavior: auto !important; } }
 
     /* Utilities */
     .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 1.25rem; }
