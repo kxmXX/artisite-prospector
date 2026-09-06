@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { handleApiRequest } from "../server/apiHandler.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -51,4 +52,44 @@ test("server static file resolution handles SPA fallback and accurate MIME types
   const fallback = resolveFile("/unknown-prospect-route");
   assert.ok(fallback.contentType.includes("text/html"));
   assert.ok(fallback.content.includes("Artisite Prospector v4"));
+});
+
+test("handleApiRequest handles /api/health, /api/ai/status and CORS preflight", async () => {
+  let statusCode = null;
+  let headers = {};
+  let body = "";
+
+  function createMockRes() {
+    return {
+      writeHead(code, h) {
+        statusCode = code;
+        headers = h;
+      },
+      end(data) {
+        body = data || "";
+      }
+    };
+  }
+
+  // 1. Health check
+  await handleApiRequest({ method: "GET", url: "/api/health" }, createMockRes());
+  assert.equal(statusCode, 200);
+  const healthData = JSON.parse(body);
+  assert.equal(healthData.status, "ok");
+
+  // 2. AI Status
+  await handleApiRequest({ method: "GET", url: "/api/ai/status" }, createMockRes());
+  assert.equal(statusCode, 200);
+  const aiStatus = JSON.parse(body);
+  assert.equal(typeof aiStatus.configured, "boolean");
+  assert.ok(Array.isArray(aiStatus.models));
+
+  // 3. OPTIONS preflight
+  await handleApiRequest({ method: "OPTIONS", url: "/api/ai/generate" }, createMockRes());
+  assert.equal(statusCode, 204);
+  assert.equal(headers["Access-Control-Allow-Origin"], "*");
+
+  // 4. Unknown endpoint
+  await handleApiRequest({ method: "GET", url: "/api/unknown" }, createMockRes());
+  assert.equal(statusCode, 404);
 });
