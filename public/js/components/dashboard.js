@@ -111,7 +111,7 @@ export function renderDashboard(state) {
             <div>
               <div class="font-bold text-sm sm:text-base text-zinc-950 tracking-tight flex items-center gap-2">
                 <span>ARTISITE PROSPECTOR</span>
-                <span class="text-[10.5px] text-zinc-600 font-semibold px-2 py-0.5 rounded-md bg-zinc-100 border border-zinc-200">v4.0</span>
+                <span class="text-[10.5px] text-zinc-600 font-semibold px-2 py-0.5 rounded-md bg-zinc-100 border border-zinc-200">v4.1</span>
               </div>
               <div class="text-[11.5px] text-zinc-500 hidden sm:block">Générateur de sites vitrines & prospection locale</div>
             </div>

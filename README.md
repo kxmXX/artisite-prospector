@@ -1,4 +1,4 @@
-# ⚡ ARTISITE PROSPECTOR — VERSION 4
+# ⚡ ARTISITE PROSPECTOR — VERSION 4.1.0
 ### SAS & Sandbox de Création Ultra-Rapide de Sites Vitrines Premium pour Prospection Commerciale Locale
 
 ---
@@ -89,6 +89,15 @@ Intégré directement dans le produit, Michel dispose à chaque instant d'un tir
 
 ## 📍 5. État actuel & suivi des améliorations
 
+### Version 4.1.0 — Canvas d’édition fiable
+
+- Contrôles de canvas ciblés par identifiants numériques lisibles.
+- Édition des boutons, textes, animations, couleurs, radius et visibilité avec historique Undo/Redo.
+- Bibliothèque de patterns UI/UX documentée et traduite en primitives vanilla JS.
+- Navigation, export HTML/JSON, thèmes et typographies couverts par des tests automatisés.
+
+Le détail des décisions techniques et du plan de validation se trouve dans [`document.md`](document.md). Les changements versionnés sont listés dans [`CHANGELOG.md`](CHANGELOG.md).
+
 ### État actuel
 
 - **MVP fonctionnel :** génération de sites vitrines pour les métiers référencés, éditeur visuel, aperçu client, dashboard prospects et outils commerciaux.
@@ -165,4 +174,4 @@ npm test
 ```
 
 ---
-*Artisite Prospector v4.0 — Fait pour closer les artisans locaux avec excellence.*
+*Artisite Prospector v4.1.0 — Fait pour closer les artisans locaux avec excellence.*

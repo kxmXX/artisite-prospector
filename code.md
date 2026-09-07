@@ -1,6 +1,8 @@
-# Artisite Prospector — état technique
+# Artisite Prospector — état technique v4.1.0
 
 ## Parcours principal
+
+La version courante est `4.1.0`. Les modifications de cette itération sont décrites dans `CHANGELOG.md` et validées par `npm test`.
 
 1. `public/js/engine/generator.js` crée un projet métier avec ses 16 sections.
 2. `public/js/components/renderer.js` produit le site en mode conception, aperçu client ou export.
@@ -14,7 +16,7 @@
 - Mode Conception séparé du mode Aperçu Client final.
 - Thème de l’éditeur séparé du thème jour/nuit du site généré et de l’export.
 - Fallback SVG local pour les images distantes défaillantes, y compris dans l’API image.
-- CTA éditables avec tailles S/M/L/XL et animation Pulse ; sections réordonnables et catalogue navigable.
+- CTA éditables avec réglage continu de taille, radius et animations ; sections réordonnables par glisser-déposer et catalogue de patterns navigable.
 - Documentation de suivi complète dans `README.md`.
 
 ## Vérification
