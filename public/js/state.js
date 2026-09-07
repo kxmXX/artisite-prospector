@@ -412,10 +412,37 @@ class AppStateManager {
     this.updateProject(project, false);
   }
 
-  setButtonScale(scalePercent) {
+  setButtonMotion(sectionId, buttonType, motionPreset) {
+    if (!this.currentProject) return;
+    this.pushHistory(`Animation bouton ${buttonType} : ${motionPreset}`);
+    const project = JSON.parse(JSON.stringify(this.currentProject));
+    const sec = project.sections.find(s => s.id === sectionId);
+    if (sec) {
+      sec.settings = sec.settings || {};
+      const heroId = `hero-${buttonType}`;
+      const ctaId = `cta-${buttonType}`;
+      sec.settings[`${buttonType}-motion`] = motionPreset;
+      sec.settings[`btn-${buttonType}-motion`] = motionPreset;
+      sec.settings[`${heroId}-motion`] = motionPreset;
+      sec.settings[`${ctaId}-motion`] = motionPreset;
+      this.updateProject(project, false);
+    }
+  }
+
+  setButtonScale(scalePercent, isLive = false) {
     if (!this.currentProject) return;
     const val = Number(scalePercent) || 100;
+    this.currentProject.branding = this.currentProject.branding || {};
     this.currentProject.branding.ctaScale = val;
+    if (isLive) {
+      if (typeof document !== "undefined") {
+        const factor = val / 100;
+        document.documentElement.style.setProperty("--cta-scale", String(factor));
+        const canvas = document.getElementById("canvas-container") || document.getElementById("site-canvas");
+        if (canvas) canvas.style.setProperty("--cta-scale", String(factor));
+      }
+      return;
+    }
     this.saveToStorage();
     this.notify("project_updated");
   }

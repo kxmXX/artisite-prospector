@@ -325,26 +325,20 @@ export function renderEditor(state) {
             </div>
           `}
 
-          <!-- In-Canvas Floating Text Toolbar ("Monter / Descendre les textes & Tailles") -->
+          <!-- In-Canvas Floating Text Toolbar (Taille, Gras, Italique, Souligné) -->
           <div id="floating-text-toolbar" class="floating-text-toolbar" style="display: none;" role="toolbar" aria-label="Formatage du texte" onclick="event.stopPropagation();">
             <div class="flex items-center gap-1">
-              <button type="button" id="ftb-move-up" class="ftb-btn" title="Monter cette section (↑)">
-                ${getIcon("chevronUp", "w-3 h-3")}
-                <span>Monter</span>
-              </button>
-              <button type="button" id="ftb-move-down" class="ftb-btn" title="Descendre cette section (↓)">
-                ${getIcon("chevronDown", "w-3 h-3")}
-                <span>Descendre</span>
-              </button>
-            </div>
-            <div class="h-3.5 w-[1px] bg-zinc-700 mx-0.5"></div>
-            <div class="flex items-center gap-1">
-              <span class="text-[9px] uppercase font-bold text-zinc-400 mr-0.5">Texte:</span>
+              <span class="text-[9px] uppercase font-bold text-zinc-400 mr-0.5">Taille:</span>
               <button type="button" id="ftb-font-down" class="ftb-btn font-bold" title="Réduire taille texte">A-</button>
               <button type="button" id="ftb-font-up" class="ftb-btn font-bold" title="Agrandir taille texte">A+</button>
-              <button type="button" id="ftb-bold" class="ftb-btn font-bold" title="Gras / Normal">B</button>
             </div>
-            <div class="h-3.5 w-[1px] bg-zinc-700 mx-0.5"></div>
+            <div class="h-3.5 w-[1px] bg-zinc-700 mx-1"></div>
+            <div class="flex items-center gap-1">
+              <button type="button" id="ftb-bold" class="ftb-btn font-bold" title="Mettre en gras (B)">B</button>
+              <button type="button" id="ftb-italic" class="ftb-btn italic font-serif" title="Mettre en italique (I)">I</button>
+              <button type="button" id="ftb-underline" class="ftb-btn underline" title="Souligner le texte (U)">U</button>
+            </div>
+            <div class="h-3.5 w-[1px] bg-zinc-700 mx-1"></div>
             <button type="button" id="ftb-close" class="ftb-btn text-zinc-400 hover:text-white px-1.5" title="Fermer">✕</button>
           </div>
 
@@ -844,13 +838,13 @@ function renderSettingsAccordions(project) {
           <div>
             <label class="block text-[10px] font-medium text-zinc-400 uppercase tracking-wider mb-1.5">Ambiance Globale 1-Clic</label>
             <div class="grid grid-cols-3 gap-1.5 text-xs">
-              <button type="button" onclick="window.app.switchGlobalTheme('white')" class="py-1.5 border rounded-lg text-center text-[11px] font-medium border-zinc-200 bg-white hover:border-zinc-300 text-zinc-800 shadow-2xs">
+              <button type="button" onclick="window.app.switchGlobalTheme('white')" class="py-2 border rounded-lg text-center text-[11px] font-medium transition-all ${project.branding?.globalTheme === 'white' || project.branding?.bgColor === '#ffffff' ? 'border-zinc-950 bg-white ring-2 ring-zinc-950 font-bold text-zinc-950 shadow-sm' : 'border-zinc-200 bg-white hover:border-zinc-300 text-zinc-700 shadow-2xs'}">
                 ☀️ Blanche
               </button>
-              <button type="button" onclick="window.app.switchGlobalTheme('mineral')" class="py-1.5 border rounded-lg text-center text-[11px] font-medium border-zinc-200 bg-zinc-100 hover:border-zinc-300 text-zinc-800 shadow-2xs">
+              <button type="button" onclick="window.app.switchGlobalTheme('mineral')" class="py-2 border rounded-lg text-center text-[11px] font-medium transition-all ${project.branding?.globalTheme === 'mineral' || (!project.branding?.globalTheme && project.branding?.bgColor !== '#ffffff' && project.branding?.bgColor !== '#09090b') ? 'border-zinc-950 bg-zinc-100 ring-2 ring-zinc-950 font-bold text-zinc-950 shadow-sm' : 'border-zinc-200 bg-zinc-100 hover:border-zinc-300 text-zinc-700 shadow-2xs'}">
                 🪨 Minérale
               </button>
-              <button type="button" onclick="window.app.switchGlobalTheme('dark')" class="py-1.5 border rounded-lg text-center text-[11px] font-medium border-zinc-800 bg-zinc-900 text-white shadow-2xs">
+              <button type="button" onclick="window.app.switchGlobalTheme('dark')" class="py-2 border rounded-lg text-center text-[11px] font-medium transition-all ${project.branding?.globalTheme === 'dark' || project.branding?.bgColor === '#09090b' ? 'border-amber-400 bg-zinc-900 ring-2 ring-amber-400 font-bold text-amber-300 shadow-sm' : 'border-zinc-800 bg-zinc-900 text-zinc-300 hover:text-white shadow-2xs'}">
                 🌙 Sombre
               </button>
             </div>
@@ -957,7 +951,9 @@ function renderSettingsAccordions(project) {
               <span class="text-[10px] font-mono font-bold text-zinc-700" id="cta-scale-display">${project.branding.ctaScale || 100}%</span>
             </div>
             <input type="range" min="80" max="140" step="5" value="${project.branding.ctaScale || 100}"
-                   oninput="window.app.setButtonScale(this.value); const el = document.getElementById('cta-scale-display'); if (el) el.textContent = this.value + '%';"
+                   data-cta-scale-slider
+                   oninput="window.app.setButtonScale(this.value, true); const el = document.getElementById('cta-scale-display'); if (el) el.textContent = this.value + '%';"
+                   onchange="window.app.setButtonScale(this.value, false)"
                    class="w-full accent-zinc-900 cursor-pointer h-1.5 bg-zinc-200 rounded-lg">
           </div>
 

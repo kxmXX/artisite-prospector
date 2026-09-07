@@ -1072,13 +1072,25 @@ input, textarea, select, [contenteditable] {
 /* Accent keycaps echo the orange modifier keys in the physical keyboard reference. */
 .btn-keycap-accent {
   background: #f06b3d;
-  color: #24130d;
+  color: #ffffff !important;
   border: 1px solid #d9572c;
   border-bottom: 3px solid #a94123;
   box-shadow: 0 3px 0 #a94123, 0 4px 10px rgba(169, 65, 35, 0.24);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding-top: 6px;
+  padding-bottom: 7px;
+  line-height: 1;
+}
+.btn-keycap-accent svg {
+  color: #ffffff !important;
+  flex-shrink: 0;
 }
 .btn-keycap-accent:hover {
   background: #ff8050;
+  color: #ffffff !important;
   border-color: #e26336;
   box-shadow: 0 3px 0 #96381f, 0 0 14px rgba(240, 107, 61, 0.42);
   transform: translateY(-1px);
@@ -1332,13 +1344,92 @@ input, textarea, select, [contenteditable] {
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-/* Pulsing effect toggle for CTA */
-.btn-cta-pulse {
-  animation: ctaPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+/* Pulsing effect toggle for CTA & Specific Button Animations */
+.btn-cta-pulse,
+.btn-motion-pulse,
+[data-btn-motion="pulse"] {
+  animation: ctaPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite !important;
 }
 @keyframes ctaPulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.95; transform: scale(1.02); }
+  0%, 100% { opacity: 1; transform: scale(var(--cta-scale, 1)); }
+  50% { opacity: 0.95; transform: scale(calc(var(--cta-scale, 1) * 1.03)); }
+}
+
+.btn-motion-shimmer,
+[data-btn-motion="shimmer"] {
+  position: relative !important;
+  overflow: hidden !important;
+}
+.btn-motion-shimmer::after,
+[data-btn-motion="shimmer"]::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 50%;
+  height: 200%;
+  background: linear-gradient(60deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  transform: rotate(25deg);
+  animation: btnShimmer 3s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes btnShimmer {
+  0% { transform: translateX(-150%) rotate(25deg); }
+  35%, 100% { transform: translateX(350%) rotate(25deg); }
+}
+
+.btn-motion-bounce,
+[data-btn-motion="bounce"] {
+  animation: btnBounce 2.4s ease-in-out infinite !important;
+}
+@keyframes btnBounce {
+  0%, 100% { transform: scale(var(--cta-scale, 1)) translateY(0); }
+  50% { transform: scale(var(--cta-scale, 1)) translateY(-3.5px); }
+}
+
+.btn-motion-glow,
+[data-btn-motion="glow"] {
+  animation: btnGlow 2s ease-in-out infinite alternate !important;
+}
+@keyframes btnGlow {
+  0% { box-shadow: 0 0 6px rgba(240, 107, 61, 0.25), 0 2px 4px rgba(0,0,0,0.1); }
+  100% { box-shadow: 0 0 20px rgba(240, 107, 61, 0.65), 0 4px 12px rgba(240, 107, 61, 0.3); }
+}
+
+.btn-motion-magnetic,
+[data-btn-motion="magnetic"] {
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+/* Button ID tag in direct toolbar for AI Copilot reference */
+.cta-direct-id {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 9px;
+  font-weight: 700;
+  color: #fbbf24;
+  background: #18181b;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  padding: 1px 4.5px;
+  border-radius: 4px;
+  margin-right: 2px;
+  letter-spacing: -0.01em;
+}
+
+/* Final CTA Contrast overrides for light / white / mineral backgrounds */
+.editor-section-wrapper[data-section-bg="white"] #cta,
+.editor-section-wrapper[data-section-bg="mineral"] #cta,
+.editor-section-wrapper[data-section-bg="warm"] #cta {
+  background-color: transparent !important;
+}
+.editor-section-wrapper[data-section-bg="white"] #cta .font-heading,
+.editor-section-wrapper[data-section-bg="mineral"] #cta .font-heading,
+.editor-section-wrapper[data-section-bg="warm"] #cta .font-heading {
+  color: #09090b !important;
+}
+.editor-section-wrapper[data-section-bg="white"] #cta p,
+.editor-section-wrapper[data-section-bg="mineral"] #cta p,
+.editor-section-wrapper[data-section-bg="warm"] #cta p {
+  color: #52525b !important;
 }
 
 /* True Dark Theme Styling */
@@ -1435,8 +1526,8 @@ body.dark-theme select {
 .viewport-option.is-active { background: #ffffff; color: #09090b; box-shadow: 0 1px 3px rgba(0,0,0,.12); }
 .viewport-label { white-space: nowrap; }
 .editor-section-toolbar { padding: 6px 8px; gap: 5px; }
-.editor-section-toolbar .btn-sec-ctrl { width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; }
-.editor-section-toolbar .btn-sec-ctrl svg { width: 17px; height: 17px; }
+.editor-section-toolbar .btn-sec-ctrl { min-width: 34px; width: auto; padding: 0 8px; height: 34px; display: inline-flex; align-items: center; justify-content: center; gap: 4px; white-space: nowrap; }
+.editor-section-toolbar .btn-sec-ctrl svg { width: 17px; height: 17px; flex-shrink: 0; }
 .section-card-header { min-height: 48px; }
 .section-card-header button { min-width: 34px; min-height: 34px; }
 

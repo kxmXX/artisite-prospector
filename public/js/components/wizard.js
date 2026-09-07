@@ -89,13 +89,50 @@ export function renderWizardModal() {
 
           <!-- Advanced Fields (Hidden by default in Mode Rapide) -->
           <div id="wiz-advanced-fields" class="space-y-3 pt-2 border-t border-zinc-100" style="display: none;">
-            <div>
-              <label class="block text-[11px] font-medium text-zinc-600 mb-1">
-                Preset de Style Graphique
-              </label>
-              <select id="wiz-preset" class="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-2 text-xs text-zinc-900 font-medium focus:bg-white focus:border-zinc-900 focus:outline-none">
-                ${presetOptions}
-              </select>
+            <div class="grid sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[11px] font-medium text-zinc-600 mb-1">
+                  Preset de Style Graphique
+                </label>
+                <select id="wiz-preset" class="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-2 text-xs text-zinc-900 font-medium focus:bg-white focus:border-zinc-900 focus:outline-none">
+                  ${presetOptions}
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-[11px] font-medium text-zinc-600 mb-1">
+                  Ambiance Globale 1-Clic
+                </label>
+                <select id="wiz-ambiance" class="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-2 text-xs text-zinc-900 font-medium focus:bg-white focus:border-zinc-900 focus:outline-none">
+                  <option value="mineral" selected>🪨 Minérale (Épurée & Moderne)</option>
+                  <option value="white">☀️ Blanche (Lumineuse & Minimale)</option>
+                  <option value="dark">🌙 Sombre (Obsidienne & Contraste Fort)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[11px] font-medium text-zinc-600 mb-1">
+                  Tonalité Rédactionnelle IA
+                </label>
+                <select id="wiz-tone" class="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-2 text-xs text-zinc-900 font-medium focus:bg-white focus:border-zinc-900 focus:outline-none">
+                  <option value="artisan" selected>Authentique & Chaleureux (Recommandé)</option>
+                  <option value="expert">Expert & Précis / Technique</option>
+                  <option value="luxe">Haut de Gamme & Prestigieux</option>
+                  <option value="direct">Direct & Orienté Devis Rapide</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-[11px] font-medium text-zinc-600 mb-1">
+                  Couleur Primaire (Optionnel)
+                </label>
+                <div class="flex items-center gap-2">
+                  <input type="color" id="wiz-color-picker" value="#f06b3d" oninput="document.getElementById('wiz-color').value = this.value" class="w-8 h-8 rounded-lg border border-zinc-200 cursor-pointer p-0.5 bg-white">
+                  <input type="text" id="wiz-color" placeholder="#f06b3d" value="" oninput="if(/^#[0-9a-f]{6}$/i.test(this.value)) document.getElementById('wiz-color-picker').value = this.value" class="flex-1 bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-2 text-xs text-zinc-900 font-mono focus:bg-white focus:border-zinc-900 focus:outline-none">
+                </div>
+              </div>
             </div>
 
             <div>

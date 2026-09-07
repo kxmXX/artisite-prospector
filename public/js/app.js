@@ -334,16 +334,19 @@ class App {
       b.bgSecondary = "#fafafa";
       b.textColor = "#18181b";
       b.textMuted = "#71717a";
+      b.globalTheme = "white";
     } else if (theme === "mineral") {
       b.bgColor = "#f4f4f5";
       b.bgSecondary = "#ffffff";
       b.textColor = "#18181b";
       b.textMuted = "#71717a";
+      b.globalTheme = "mineral";
     } else if (theme === "dark") {
       b.bgColor = "#09090b";
       b.bgSecondary = "#18181b";
       b.textColor = "#f4f4f5";
       b.textMuted = "#a1a1aa";
+      b.globalTheme = "dark";
     }
     state.currentProject.siteTheme = theme === "dark" ? "dark" : "light";
     state.pushHistory(`Ambiance : ${theme}`);
@@ -460,6 +463,9 @@ class App {
     const phone = document.getElementById("wiz-phone")?.value || "07 82 14 39 50";
     const region = document.getElementById("wiz-region")?.value || "Occitanie";
     const presetId = document.getElementById("wiz-preset")?.value || null;
+    const ambiance = document.getElementById("wiz-ambiance")?.value || "mineral";
+    const tone = document.getElementById("wiz-tone")?.value || "artisan";
+    const customColor = document.getElementById("wiz-color")?.value?.trim() || document.getElementById("wiz-color-picker")?.value || null;
     const email = document.getElementById("wiz-email")?.value || null;
 
     // Show AI Generation Terminal Overlay
@@ -472,7 +478,7 @@ class App {
     const aiPromise = fetch("/api/ai/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, trade: tradeId, city, phone, region })
+      body: JSON.stringify({ name, trade: tradeId, city, phone, region, tone, ambiance })
     }).then(r => r.ok ? r.json() : null).catch(() => null);
 
     const steps = [
@@ -499,6 +505,7 @@ class App {
     const aiRes = await aiPromise;
 
     setTimeout(() => {
+      const validColor = customColor && /^#[0-9a-f]{6}$/i.test(customColor) ? customColor : undefined;
       const newProject = generateSite({
         name,
         tradeId,
@@ -506,8 +513,35 @@ class App {
         phone,
         region,
         presetId,
-        email
+        email,
+        primaryColor: validColor
       });
+
+      if (ambiance === "white") {
+        newProject.branding.bgColor = "#ffffff";
+        newProject.branding.bgSecondary = "#fafafa";
+        newProject.branding.textColor = "#18181b";
+        newProject.branding.textMuted = "#71717a";
+        newProject.branding.globalTheme = "white";
+        newProject.siteTheme = "light";
+      } else if (ambiance === "dark") {
+        newProject.branding.bgColor = "#09090b";
+        newProject.branding.bgSecondary = "#18181b";
+        newProject.branding.textColor = "#f4f4f5";
+        newProject.branding.textMuted = "#a1a1aa";
+        newProject.branding.globalTheme = "dark";
+        newProject.siteTheme = "dark";
+      } else {
+        newProject.branding.bgColor = "#f4f4f5";
+        newProject.branding.bgSecondary = "#ffffff";
+        newProject.branding.textColor = "#18181b";
+        newProject.branding.textMuted = "#71717a";
+        newProject.branding.globalTheme = "mineral";
+        newProject.siteTheme = "light";
+      }
+      if (tone) {
+        newProject.tone = tone;
+      }
 
       // Enrich with Gemini AI output if successful
       if (aiRes && aiRes.success && aiRes.data) {
@@ -980,12 +1014,29 @@ class App {
     }, 4000);
   }
 
-  setButtonScale(scalePercent) {
-    state.setButtonScale(scalePercent);
+  setButtonScale(scalePercent, isLive = false) {
+    state.setButtonScale(scalePercent, isLive);
+    const factor = (Number(scalePercent) / 100).toString();
     const root = document.querySelector(".artisite-root");
     if (root) {
-      root.style.setProperty("--cta-scale", (Number(scalePercent) / 100).toString());
+      root.style.setProperty("--cta-scale", factor);
     }
+    const canvas = document.getElementById("canvas-container") || document.getElementById("site-canvas");
+    if (canvas) {
+      canvas.style.setProperty("--cta-scale", factor);
+    }
+    document.documentElement.style.setProperty("--cta-scale", factor);
+    const displays = document.querySelectorAll("#cta-scale-display, [data-cta-scale-display]");
+    displays.forEach(el => { el.textContent = `${scalePercent}%`; });
+    if (!isLive) {
+      this.updateUndoRedoUI();
+    }
+  }
+
+  setButtonMotion(sectionId, buttonType, motionPreset) {
+    state.setButtonMotion(sectionId, buttonType, motionPreset);
+    this.showToast(`Animation appliquée : ${motionPreset === 'none' ? 'Aucune' : motionPreset}`, "info");
+    this.updateUndoRedoUI();
   }
 
   setButtonRadius(radius) {
@@ -1038,6 +1089,7 @@ class App {
   }
 
   toggleButtonPopover(sectionId, buttonType) {
+    this.hideFloatingTextToolbar();
     const popover = document.getElementById(`cta-popover-${sectionId}-${buttonType}`);
     const wrapper = popover?.closest("[data-cta-popover-wrapper]");
     if (wrapper) {
@@ -1108,7 +1160,61 @@ class App {
     }
   }
 
+  toggleActiveTextItalic() {
+    if (!this._activeEditableEl) return;
+    const el = this._activeEditableEl;
+    const secWrapper = el.closest(".editor-section-wrapper");
+    const secId = secWrapper?.getAttribute("data-section-id");
+    const field = el.getAttribute("data-editable");
+    if (secId && field && state.currentProject) {
+      const sec = state.currentProject.sections.find(s => s.id === secId);
+      if (sec) {
+        sec.settings = sec.settings || {};
+        const key = `italic_${field}`;
+        const isCurrentlyItalic = sec.settings[key] === true || window.getComputedStyle(el).fontStyle === "italic";
+        sec.settings[key] = !isCurrentlyItalic;
+        el.style.fontStyle = isCurrentlyItalic ? "normal" : "italic";
+        state.pushHistory(`Style italique ${field}`);
+        state.saveToStorage();
+        this.updateUndoRedoUI();
+        this.showToast(isCurrentlyItalic ? "Texte normal" : "Texte en italique", "info");
+      }
+    } else {
+      const isItalic = window.getComputedStyle(el).fontStyle === "italic";
+      el.style.fontStyle = isItalic ? "normal" : "italic";
+    }
+  }
+
+  toggleActiveTextUnderline() {
+    if (!this._activeEditableEl) return;
+    const el = this._activeEditableEl;
+    const secWrapper = el.closest(".editor-section-wrapper");
+    const secId = secWrapper?.getAttribute("data-section-id");
+    const field = el.getAttribute("data-editable");
+    if (secId && field && state.currentProject) {
+      const sec = state.currentProject.sections.find(s => s.id === secId);
+      if (sec) {
+        sec.settings = sec.settings || {};
+        const key = `underline_${field}`;
+        const isCurrentlyUnderline = sec.settings[key] === true || window.getComputedStyle(el).textDecorationLine?.includes("underline");
+        sec.settings[key] = !isCurrentlyUnderline;
+        el.style.textDecoration = isCurrentlyUnderline ? "none" : "underline";
+        state.pushHistory(`Style souligné ${field}`);
+        state.saveToStorage();
+        this.updateUndoRedoUI();
+        this.showToast(isCurrentlyUnderline ? "Texte normal" : "Texte souligné", "info");
+      }
+    } else {
+      const isUnderline = window.getComputedStyle(el).textDecorationLine?.includes("underline");
+      el.style.textDecoration = isUnderline ? "none" : "underline";
+    }
+  }
+
   showFloatingTextToolbar(el, secId) {
+    if (!el || el.closest("[data-cta-popover-wrapper]")) {
+      this.hideFloatingTextToolbar();
+      return;
+    }
     this._activeEditableEl = el;
     const toolbar = document.getElementById("floating-text-toolbar");
     if (!toolbar) return;
@@ -1125,18 +1231,18 @@ class App {
     toolbar.style.left = `${leftPos}px`;
     toolbar.style.display = "flex";
 
-    const btnUp = document.getElementById("ftb-move-up");
-    const btnDown = document.getElementById("ftb-move-down");
     const btnFontDown = document.getElementById("ftb-font-down");
     const btnFontUp = document.getElementById("ftb-font-up");
     const btnBold = document.getElementById("ftb-bold");
+    const btnItalic = document.getElementById("ftb-italic");
+    const btnUnderline = document.getElementById("ftb-underline");
     const btnClose = document.getElementById("ftb-close");
 
-    if (btnUp) btnUp.onclick = (e) => { e.preventDefault(); e.stopPropagation(); this.moveSection(secId, "up"); };
-    if (btnDown) btnDown.onclick = (e) => { e.preventDefault(); e.stopPropagation(); this.moveSection(secId, "down"); };
     if (btnFontDown) btnFontDown.onclick = (e) => { e.preventDefault(); e.stopPropagation(); this.adjustActiveTextFontSize(-1); };
     if (btnFontUp) btnFontUp.onclick = (e) => { e.preventDefault(); e.stopPropagation(); this.adjustActiveTextFontSize(1); };
     if (btnBold) btnBold.onclick = (e) => { e.preventDefault(); e.stopPropagation(); this.toggleActiveTextBold(); };
+    if (btnItalic) btnItalic.onclick = (e) => { e.preventDefault(); e.stopPropagation(); this.toggleActiveTextItalic(); };
+    if (btnUnderline) btnUnderline.onclick = (e) => { e.preventDefault(); e.stopPropagation(); this.toggleActiveTextUnderline(); };
     if (btnClose) btnClose.onclick = (e) => { e.preventDefault(); e.stopPropagation(); toolbar.style.display = "none"; };
   }
 
@@ -1864,16 +1970,19 @@ class App {
   }
 
   initScrollObserver() {
+    const motionElements = document.querySelectorAll("[data-motion]:not([data-motion='none'])");
+    if (!motionElements.length) return;
+
     if (typeof IntersectionObserver === "undefined") {
-      document.querySelectorAll("[data-motion]:not([data-motion='none'])").forEach(el => {
-        el.classList.add("is-revealed");
-      });
+      motionElements.forEach(el => el.classList.add("is-revealed"));
       return;
     }
 
     if (this._scrollObserver) {
       this._scrollObserver.disconnect();
     }
+
+    const scrollContainer = document.querySelector("main.overflow-y-auto") || document.querySelector("main") || null;
 
     this._scrollObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -1882,13 +1991,27 @@ class App {
         }
       });
     }, {
+      root: scrollContainer,
       threshold: 0.05,
-      rootMargin: "0px 0px -30px 0px"
+      rootMargin: "0px 0px -20px 0px"
     });
 
-    document.querySelectorAll("[data-motion]:not([data-motion='none'])").forEach(el => {
+    motionElements.forEach(el => {
       this._scrollObserver.observe(el);
     });
+
+    if (scrollContainer && !this._mainScrollBound) {
+      scrollContainer.addEventListener("scroll", () => {
+        const containerRect = scrollContainer.getBoundingClientRect();
+        document.querySelectorAll("[data-motion]:not([data-motion='none']):not(.is-revealed)").forEach(el => {
+          const r = el.getBoundingClientRect();
+          if (r.top < containerRect.bottom + 60 && r.bottom > containerRect.top - 60) {
+            el.classList.add("is-revealed");
+          }
+        });
+      }, { passive: true });
+      this._mainScrollBound = true;
+    }
   }
 
   updateTypography(headingFont, bodyFont) {
@@ -2531,6 +2654,14 @@ class App {
           return;
         }
 
+        this.hideFloatingTextToolbar();
+        document.querySelectorAll("[data-cta-popover-wrapper].is-active").forEach(w => {
+          if (w !== wrapper) {
+            w.classList.remove("is-active");
+            w.setAttribute("aria-expanded", "false");
+          }
+        });
+
         const open = wrapper.classList.toggle("is-active");
         setOpen(open);
       });
@@ -2555,6 +2686,18 @@ class App {
         this.hideFloatingTextToolbar();
       });
       this._popoverEscapeBound = true;
+    }
+
+    if (!this._popoverOutsideClickBound) {
+      document.addEventListener("click", (e) => {
+        if (!e.target.closest("[data-cta-popover-wrapper]")) {
+          document.querySelectorAll("[data-cta-popover-wrapper].is-active").forEach(w => {
+            w.classList.remove("is-active");
+            w.setAttribute("aria-expanded", "false");
+          });
+        }
+      });
+      this._popoverOutsideClickBound = true;
     }
 
     if (!this._floatingTextDocClickBound) {
@@ -2604,6 +2747,10 @@ class App {
       el.classList.add("hover:outline", "hover:outline-1", "hover:outline-dashed", "hover:outline-zinc-400", "rounded", "transition-all", "cursor-text");
 
       el.addEventListener("click", (e) => {
+        if (el.closest("[data-cta-popover-wrapper]")) {
+          this.hideFloatingTextToolbar();
+          return;
+        }
         const secWrapper = el.closest(".editor-section-wrapper");
         const secId = secWrapper?.getAttribute("data-section-id");
         if (secId && state.selectedSectionId !== secId) {
@@ -2614,6 +2761,10 @@ class App {
 
       el.addEventListener("focus", () => {
         el.dataset.initialValue = el.innerText.trim();
+        if (el.closest("[data-cta-popover-wrapper]")) {
+          this.hideFloatingTextToolbar();
+          return;
+        }
         const secWrapper = el.closest(".editor-section-wrapper");
         const secId = secWrapper?.getAttribute("data-section-id");
         if (secId) {

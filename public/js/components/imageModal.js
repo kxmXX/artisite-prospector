@@ -74,12 +74,12 @@ export function renderImageModal(state) {
         <div class="p-6 overflow-y-auto space-y-4 flex-1 text-xs">
 
           <!-- Current Image Preview with Keycaps -->
-          <div class="bg-zinc-50 rounded-xl p-3 border border-zinc-200 flex items-center gap-4">
-            <div class="w-18 h-18 rounded-lg overflow-hidden bg-zinc-900 flex-shrink-0 border border-zinc-200 relative">
+          <div class="bg-zinc-50 rounded-xl p-3 border border-zinc-200 flex items-center gap-4 overflow-hidden">
+            <div class="w-16 h-16 sm:w-20 sm:h-20 max-w-[5rem] max-h-[5rem] rounded-xl overflow-hidden bg-zinc-900 flex-shrink-0 border border-zinc-200 relative shadow-2xs">
               <img id="image-modal-preview"
                    src="${currentUrl || fallbackCurrent}"
                    alt="Aperçu actuel"
-                   class="w-full h-full object-cover"
+                   class="w-full h-full object-cover max-w-full max-h-full block"
                    onerror="if(!this.dataset.fallbackApplied){this.dataset.fallbackApplied='true';this.src='${fallbackCurrent}';}">
             </div>
             <div class="flex-1 min-w-0">
@@ -140,8 +140,8 @@ export function renderImageModal(state) {
 
             <div id="ai-image-output-container" class="hidden pt-2 space-y-2 border-t border-zinc-200">
               <div class="text-[11px] font-semibold text-zinc-700">Aperçu du visuel généré :</div>
-              <div class="aspect-[16/9] rounded-xl overflow-hidden border border-zinc-200 bg-zinc-950">
-                <img id="ai-generated-preview-img" src="" alt="Visuel IA" class="w-full h-full object-cover">
+              <div class="aspect-[16/9] max-h-56 rounded-xl overflow-hidden border border-zinc-200 bg-zinc-950">
+                <img id="ai-generated-preview-img" src="" alt="Visuel IA" class="w-full h-full object-cover max-w-full">
               </div>
               <button type="button" onclick="window.app.applyGeneratedAIPhoto()" class="w-full btn-keycap btn-keycap-success py-2 rounded-xl text-xs font-semibold text-white shadow-sm flex items-center justify-center gap-1.5">
                 ${getIcon("checkCircle", "w-4 h-4")}
