@@ -726,20 +726,23 @@ class App {
 
     if (!canvasSec) return false;
 
-    // Ensure scrollHost (main) scrolls smoothly to section offset without fighting user gestures
-    const scrollHost = canvas?.closest("main") || canvas?.parentElement || document.querySelector("main");
-    if (scrollHost && typeof scrollHost.scrollTo === "function") {
-      const hostRect = scrollHost.getBoundingClientRect();
-      const targetRect = canvasSec.getBoundingClientRect();
-      
-      // If the section is already comfortably in view, do not jerk the scroll position
-      const isComfortablyVisible = targetRect.top >= hostRect.top + 20 && targetRect.top <= hostRect.bottom - 120;
-      if (!isComfortablyVisible) {
-        const targetTop = scrollHost.scrollTop + (targetRect.top - hostRect.top) - 16;
+    // Ensure scrollHost (main / canvas parent) scrolls smoothly to section offset
+    const scrollHost = canvas?.closest("main") || canvas?.parentElement || document.querySelector("main") || window;
+    if (scrollHost) {
+      if (typeof scrollHost.scrollTo === "function") {
+        const hostRect = scrollHost.getBoundingClientRect ? scrollHost.getBoundingClientRect() : { top: 0, height: window.innerHeight };
+        const targetRect = canvasSec.getBoundingClientRect();
+        
+        // Precise scroll computation with clean 24px clearance from top
+        const currentScroll = scrollHost.scrollTop !== undefined ? scrollHost.scrollTop : window.scrollY;
+        const targetTop = currentScroll + (targetRect.top - hostRect.top) - 24;
+        
         scrollHost.scrollTo({
           top: Math.max(0, targetTop),
           behavior: "smooth"
         });
+      } else if (typeof canvasSec.scrollIntoView === "function") {
+        canvasSec.scrollIntoView({ behavior: "smooth", block: "start" });
       }
     }
 
@@ -1378,11 +1381,13 @@ class App {
     project.sections.splice(insertIdx, 0, newSection);
 
     state.pushHistory(`Ajout élément Canva (${blockType})`);
+    state.setSelectedSection(newSection.id);
     state.saveToStorage();
     this.render();
     setTimeout(() => {
-      this.scrollToSection(newSection.id);
-    }, 100);
+      this.selectSection(newSection.id, { scroll: true });
+      this.updateSelectedSectionUI();
+    }, 50);
   }
 
   moveSection(sectionId, direction) {

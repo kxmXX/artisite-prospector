@@ -2779,3 +2779,43 @@ body.dark-theme #right-inspector-panel select { background: #202027 !important; 
   }
 }
 
+/* ============================================================
+   COMPONENT GALLERY 2026 SPECIFICATION STYLES
+   quoteBlock, videoBlock, stepperBlock, tableBlock, sliderBlock, tabsBlock
+   ============================================================ */
+
+.component-quote {
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.component-video-player {
+  position: relative;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.component-video-player:hover {
+  transform: translateY(-2px);
+}
+
+.component-stepper .step-item {
+  position: relative;
+}
+
+.component-table table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.component-slider input[type="range"] {
+  accent-color: var(--primary, #059669);
+  cursor: pointer;
+}
+
+.component-tabs .tab-btn {
+  transition: all 0.2s ease;
+}
+
+

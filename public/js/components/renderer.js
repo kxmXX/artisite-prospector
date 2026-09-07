@@ -278,6 +278,24 @@ function renderSection(sec, project, options) {
     case "pricing":
       innerHTML = renderPricing(sec, project, options);
       break;
+    case "quoteBlock":
+      innerHTML = renderQuoteBlock(sec, project, options);
+      break;
+    case "videoBlock":
+      innerHTML = renderVideoBlock(sec, project, options);
+      break;
+    case "stepperBlock":
+      innerHTML = renderStepperBlock(sec, project, options);
+      break;
+    case "tableBlock":
+      innerHTML = renderTableBlock(sec, project, options);
+      break;
+    case "sliderBlock":
+      innerHTML = renderSliderBlock(sec, project, options);
+      break;
+    case "tabsBlock":
+      innerHTML = renderTabsBlock(sec, project, options);
+      break;
     default:
       innerHTML = `<div class="p-8 text-center text-gray-400">Section ${sec.type}</div>`;
   }
@@ -320,7 +338,13 @@ function renderSection(sec, project, options) {
     customBlock: "Bloc Canva",
     process: "Processus",
     certifications: "Certifications",
-    pricing: "Tarifs & Forfaits"
+    pricing: "Tarifs & Forfaits",
+    quoteBlock: "Citation Éditoriale",
+    videoBlock: "Vidéo Immersion",
+    stepperBlock: "Étapes de Chantier",
+    tableBlock: "Tableau Comparatif",
+    sliderBlock: "Curseur Surface",
+    tabsBlock: "Onglets Prestations"
   };
 
   const hasCustomBg = !!sec?.settings?.customBackground;
@@ -2108,6 +2132,251 @@ function renderPricing(sec, project, options = {}) {
               </div>
             </div>
           `).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// 21. Editorial Quote (Component Gallery: Quote / Pull Quote)
+function renderQuoteBlock(sec, project, options = {}) {
+  const c = sec.content || {};
+  return `
+    <div class="py-16 sm:py-24 bg-white">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6">
+        <div class="component-quote relative p-8 sm:p-12 rounded-3xl bg-zinc-50 border border-zinc-200/80 shadow-xs text-center space-y-6">
+          <div class="text-4xl sm:text-5xl text-amber-500/40 font-serif leading-none select-none">“</div>
+          <blockquote class="font-heading text-xl sm:text-2xl lg:text-3xl font-bold text-zinc-900 leading-snug tracking-tight max-w-2xl mx-auto" data-editable="quote">
+            ${c.quote || "« Notre priorité absolue n'est pas seulement de réaliser un chantier, c'est de bâtir une relation de confiance durable avec chaque famille. »"}
+          </blockquote>
+          <div class="pt-4 border-t border-zinc-200/60 flex items-center justify-center gap-3">
+            <div class="w-12 h-12 rounded-full overflow-hidden border border-zinc-300 bg-zinc-200 flex-shrink-0">
+              <img src="${c.authorPhoto || 'https://images.unsplash.com/photo-1540569014015-19a7be504e3a?auto=format&fit=crop&w=200&q=80'}" alt="${c.authorName || 'Fondateur'}" class="w-full h-full object-cover">
+            </div>
+            <div class="text-left">
+              <div class="font-bold text-sm text-zinc-900" data-editable="authorName">${c.authorName || project.business?.name || "Dirigeant Fondateur"}</div>
+              <div class="text-xs text-zinc-500" data-editable="authorRole">${c.authorRole || `Artisan Référencé • ${project.business?.city || 'Local'}`}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// 22. Immersive Video Player (Component Gallery: Video / Media Embed)
+function renderVideoBlock(sec, project, options = {}) {
+  const c = sec.content || {};
+  return `
+    <div class="py-16 sm:py-20 bg-zinc-950 text-white">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6">
+        <div class="text-center space-y-3 mb-8">
+          <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-white/10 text-amber-300 border border-white/15" data-editable="badge">
+            ${c.badge || "🎬 Immersion Chantier"}
+          </span>
+          <h2 class="font-heading text-2xl sm:text-3xl font-extrabold" data-editable="title">
+            ${c.title || "Découvrez nos chantiers en action"}
+          </h2>
+          <p class="text-zinc-400 text-sm max-w-xl mx-auto" data-editable="subtitle">
+            ${c.subtitle || "Chaque geste compte. Regardez nos artisans en situation réelle sur nos réalisations locales."}
+          </p>
+        </div>
+
+        <div class="component-video-player relative aspect-video rounded-2xl overflow-hidden border border-white/20 shadow-2xl bg-zinc-900 group">
+          <img src="${c.poster || 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=80'}" alt="Vidéo de présentation" class="w-full h-full object-cover opacity-80 group-hover:scale-102 transition-transform duration-500">
+          <div class="absolute inset-0 bg-black/40 flex flex-col items-center justify-center p-6 text-center">
+            <button type="button" onclick="alert('Lecture vidéo de présentation artisan')" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/95 text-zinc-950 flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all group-hover:bg-amber-400">
+              <span class="text-2xl ml-1">▶</span>
+            </button>
+            <span class="mt-4 text-xs font-semibold tracking-wider uppercase text-zinc-300 bg-black/60 px-3 py-1 rounded-full border border-white/20">
+              Vidéo 4K • 1 min 45
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// 23. Stepper / Processus Chantier (Component Gallery: Stepper)
+function renderStepperBlock(sec, project, options = {}) {
+  const c = sec.content || {};
+  const steps = Array.isArray(c.steps) ? c.steps : [
+    { step: "1", title: "Diagnostic & Devis Gratuit", desc: "Visite technique offerte à domicile sous 24h avec chiffrage sans engagement." },
+    { step: "2", title: "Planification & Préparation", desc: "Validation des matériaux, calendrier d'intervention et protection des lieux." },
+    { step: "3", title: "Exécution des Travaux", desc: "Réalisation rigoureuse dans les règles de l'art par nos artisans qualifiés." },
+    { step: "4", title: "Réception & Nettoyage", desc: "Contrôle qualité contradictoire, remise de garantie et chantier rendu impeccable." }
+  ];
+
+  return `
+    <div class="py-16 sm:py-24 bg-zinc-50 border-y border-zinc-200/60">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <div class="text-center max-w-2xl mx-auto mb-14 space-y-2.5">
+          <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-black/5 text-zinc-700" data-editable="badge">
+            ${c.badge || "Étapes de Chantier"}
+          </span>
+          <h2 class="font-heading text-2xl sm:text-3xl font-extrabold text-zinc-900" data-editable="title">
+            ${c.title || "Un parcours limpide du devis à la livraison"}
+          </h2>
+        </div>
+
+        <div class="component-stepper grid sm:grid-cols-2 lg:grid-cols-4 gap-6 relative">
+          ${steps.map((st, idx) => `
+            <div class="bg-white p-6 rounded-2xl border border-zinc-200/80 shadow-xs flex flex-col justify-between space-y-4 relative">
+              <div class="flex items-center justify-between">
+                <span class="w-9 h-9 rounded-full bg-zinc-900 text-white font-mono text-sm font-bold flex items-center justify-center">
+                  ${st.step || idx + 1}
+                </span>
+                <span class="text-[10px] uppercase tracking-wider text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded">Étape 0${idx + 1}</span>
+              </div>
+              <div class="space-y-1.5 flex-1">
+                <h4 class="font-bold text-zinc-900 text-base" data-editable="steps.${idx}.title">${st.title}</h4>
+                <p class="text-xs text-zinc-600 leading-relaxed" data-editable="steps.${idx}.desc">${st.desc}</p>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// 24. Comparison Table (Component Gallery: Table)
+function renderTableBlock(sec, project, options = {}) {
+  const c = sec.content || {};
+  const rows = Array.isArray(c.rows) ? c.rows : [
+    { label: "Déplacement & Diagnostic", standard: "0 € (Offert)", premium: "0 € (Prioritaire 24h)" },
+    { label: "Assurance & Garantie", standard: "RC Pro standard", premium: "Garantie Décennale 10 ans" },
+    { label: "Délai moyen d'intervention", standard: "7 à 10 jours", premium: "Sous 48h garanti" },
+    { label: "Nettoyage fin de chantier", standard: "Inclus", premium: "Remise à neuf totale" },
+    { label: "Interlocuteur dédié", standard: "Standard", premium: "Chef d'équipe direct" }
+  ];
+
+  return `
+    <div class="py-16 sm:py-24 bg-white">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6">
+        <div class="text-center max-w-2xl mx-auto mb-10 space-y-2">
+          <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-black/5 text-zinc-700" data-editable="badge">
+            ${c.badge || "Tableau Comparatif"}
+          </span>
+          <h2 class="font-heading text-2xl sm:text-3xl font-extrabold text-zinc-900" data-editable="title">
+            ${c.title || "Comparateur transparent des prestations"}
+          </h2>
+        </div>
+
+        <div class="component-table rounded-2xl border border-zinc-200 overflow-hidden shadow-xs">
+          <table class="w-full text-left text-xs sm:text-sm">
+            <thead class="bg-zinc-900 text-white font-semibold">
+              <tr>
+                <th class="p-4 sm:p-5">Critère & Service</th>
+                <th class="p-4 sm:p-5 text-center">Prestation Standard</th>
+                <th class="p-4 sm:p-5 text-center text-amber-300">Formule Sérénité Pro ★</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-zinc-200">
+              ${rows.map((r, idx) => `
+                <tr class="${idx % 2 === 0 ? 'bg-white' : 'bg-zinc-50/70'}">
+                  <td class="p-3.5 sm:p-4 font-medium text-zinc-800" data-editable="rows.${idx}.label">${r.label}</td>
+                  <td class="p-3.5 sm:p-4 text-center text-zinc-600" data-editable="rows.${idx}.standard">${r.standard}</td>
+                  <td class="p-3.5 sm:p-4 text-center font-bold text-emerald-700 bg-emerald-50/40" data-editable="rows.${idx}.premium">${r.premium}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// 25. Interactive Surface Slider (Component Gallery: Slider)
+function renderSliderBlock(sec, project, options = {}) {
+  const c = sec.content || {};
+  return `
+    <div class="component-slider py-16 sm:py-20 bg-zinc-50 border-y border-zinc-200/80">
+      <div class="max-w-3xl mx-auto px-4 sm:px-6">
+        <div class="p-8 sm:p-10 rounded-3xl bg-white border border-zinc-200 shadow-sm text-center space-y-6">
+          <div class="space-y-2">
+            <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200" data-editable="badge">
+              ${c.badge || "Curseur Interactif"}
+            </span>
+            <h3 class="font-heading text-xl sm:text-2xl font-extrabold text-zinc-900" data-editable="title">
+              ${c.title || "Estimez le dimensionnement de votre surface"}
+            </h3>
+            <p class="text-xs text-zinc-500" data-editable="subtitle">
+              ${c.subtitle || "Faites glisser le curseur pour visualiser l'envergure approximative de votre projet."}
+            </p>
+          </div>
+
+          <div class="space-y-4 max-w-md mx-auto pt-2">
+            <div class="flex items-center justify-between font-bold text-sm text-zinc-700">
+              <span>Surface estimée :</span>
+              <span id="slider-block-val-${sec.id}" class="text-xl font-mono text-emerald-700 font-extrabold">50 m²</span>
+            </div>
+            <input type="range" min="10" max="250" step="5" value="50"
+                   oninput="const el = document.getElementById('slider-block-val-${sec.id}'); if (el) el.textContent = this.value + ' m²';"
+                   class="w-full h-2 bg-zinc-200 rounded-lg appearance-none cursor-pointer accent-emerald-600">
+            <div class="flex justify-between text-[11px] text-zinc-400 font-mono">
+              <span>10 m²</span>
+              <span>100 m²</span>
+              <span>250 m²</span>
+            </div>
+          </div>
+
+          <div class="pt-4 border-t border-zinc-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="text-left text-xs text-zinc-600">
+              <span class="font-bold text-zinc-900">Devis ferme sous 24h</span> • Déplacement offert à ${project.business?.city || 'domicile'}
+            </div>
+            <a href="#simulateur" class="btn-cta text-white px-5 py-2.5 rounded-xl text-xs font-bold shadow-xs whitespace-nowrap" style="background-color: var(--primary);">
+              Demander mon chiffrage
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// 26. Category Tabs (Component Gallery: Tabs)
+function renderTabsBlock(sec, project, options = {}) {
+  const c = sec.content || {};
+  const tabs = Array.isArray(c.tabs) ? c.tabs : [
+    { title: "Entretien Régulier", text: "Tonte, taille de haies, désherbage écologique et remise en état saisonnière.", tag: "Formule Abonnement" },
+    { title: "Création & Aménagement", text: "Conception paysagère sur-mesure, allées pavées, clôtures et plantations durables.", tag: "Projet Clé en main" },
+    { title: "Élagage & Soins", text: "Élagage raisonné grande hauteur, abattage sécurisé et rognage de souches.", tag: "Intervention Sécurisée" }
+  ];
+
+  return `
+    <div class="py-16 sm:py-24 bg-white">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6">
+        <div class="text-center max-w-2xl mx-auto mb-10 space-y-2">
+          <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-black/5 text-zinc-700" data-editable="badge">
+            ${c.badge || "Nos Spécialités"}
+          </span>
+          <h2 class="font-heading text-2xl sm:text-3xl font-extrabold text-zinc-900" data-editable="title">
+            ${c.title || "Explorez nos prestations par domaine"}
+          </h2>
+        </div>
+
+        <div class="component-tabs space-y-6">
+          <div class="flex flex-wrap items-center justify-center gap-2 p-1.5 rounded-2xl bg-zinc-100 max-w-xl mx-auto border border-zinc-200">
+            ${tabs.map((tb, idx) => `
+              <button type="button" class="px-4 py-2 rounded-xl text-xs font-bold transition-all ${idx === 0 ? 'bg-white text-zinc-900 shadow-xs' : 'text-zinc-600 hover:text-zinc-900'}">
+                ${tb.title}
+              </button>
+            `).join('')}
+          </div>
+
+          <div class="p-8 sm:p-10 rounded-3xl bg-zinc-50 border border-zinc-200/80 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div class="space-y-2 text-center sm:text-left">
+              <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full uppercase tracking-wider">${tabs[0]?.tag || 'Spécialité'}</span>
+              <h3 class="text-xl font-bold text-zinc-900">${tabs[0]?.title || 'Prestation'}</h3>
+              <p class="text-sm text-zinc-600 max-w-lg leading-relaxed">${tabs[0]?.text || 'Descriptif détaillé de la prestation artisanale.'}</p>
+            </div>
+            <a href="#simulateur" class="btn-cta text-white px-6 py-3 rounded-xl text-xs font-bold shadow-xs whitespace-nowrap" style="background-color: var(--primary);">
+              Consulter nos disponibilités
+            </a>
+          </div>
         </div>
       </div>
     </div>

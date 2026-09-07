@@ -37,7 +37,16 @@ export function getSectionFriendlyTitle(sec) {
     faq: "Questions Fréquentes",
     cta: "Appel à l'Action Final",
     footer: "Pied de Page",
-    customBlock: "Bloc Personnalisé"
+    customBlock: "Bloc Personnalisé",
+    process: "Processus 3 Étapes",
+    certifications: "Certifications & Garanties",
+    pricing: "Grille Tarifaire",
+    quoteBlock: "Citation Éditoriale",
+    videoBlock: "Vidéo Immersion",
+    stepperBlock: "Étapes de Chantier",
+    tableBlock: "Tableau Comparatif",
+    sliderBlock: "Curseur de Surface",
+    tabsBlock: "Onglets Prestations"
   };
   return titles[sec.type] || sec.type;
 }
@@ -71,7 +80,7 @@ export function renderEditor(state) {
       <!-- TOP NAVIGATION BAR (PC-Optimized with 1-Click Modes & Mechanical Keycaps) -->
       <header class="h-16 bg-white text-zinc-900 px-4 sm:px-6 flex items-center justify-between border-b border-zinc-200 z-40 flex-shrink-0 pc-header">
 
-        <!-- Left: Back Button & Project Identification -->
+        <!-- Left: Back Button & Project Identification + Interactive Breadcrumb -->
         <div class="flex items-center gap-3.5">
           <button type="button" onclick="window.app.openDashboard()" class="btn-keycap btn-keycap-light inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-700 px-3 py-2 rounded-lg border border-zinc-200">
             ${getIcon("arrowLeft", "w-3.5 h-3.5")}
@@ -80,16 +89,32 @@ export function renderEditor(state) {
 
           <div class="h-5 w-[1px] bg-zinc-200 hidden sm:block"></div>
 
-          <div class="flex items-center gap-2.5">
-            <span class="font-bold text-sm sm:text-base text-zinc-900 truncate max-w-[180px] sm:max-w-none" id="editor-title-display">${project.name}</span>
-            <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-md bg-zinc-100 text-zinc-700 border border-zinc-200">
+          <!-- Interactive Breadcrumb Navigation -->
+          <nav aria-label="Fil d'Ariane de navigation" class="flex items-center gap-2 text-xs">
+            <button type="button" onclick="window.app.scrollToSection('${project.sections[0]?.id || ''}')" class="font-bold text-sm text-zinc-900 truncate max-w-[140px] sm:max-w-[180px] hover:text-emerald-700 transition-colors" id="editor-title-display" title="Défiler tout en haut">
+              ${project.name}
+            </button>
+            <span class="text-zinc-300 font-bold hidden sm:inline">/</span>
+            <div class="relative inline-flex items-center">
+              <select onchange="window.app.handleSectionNavigation(this.value, event)" 
+                      class="bg-zinc-100 hover:bg-zinc-200 border border-zinc-200 text-zinc-800 text-[11px] font-semibold rounded-lg px-2.5 py-1 pr-6 cursor-pointer appearance-none transition-colors max-w-[160px] sm:max-w-[200px] truncate"
+                      title="Changer de section et défiler directement">
+                ${project.sections.map((s, idx) => `
+                  <option value="${s.id}" ${s.id === selectedSecId ? 'selected' : ''}>
+                    ${idx < 9 ? '0' + (idx + 1) : (idx + 1)}. ${getSectionFriendlyTitle(s)}
+                  </option>
+                `).join('')}
+              </select>
+              <div class="pointer-events-none absolute right-2 text-zinc-500 text-[10px]">▼</div>
+            </div>
+            <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-700 border border-zinc-200 hidden lg:inline">
               ${project.business.tradeLabel}
             </span>
-            <div class="hidden md:flex items-center gap-1 text-[11px] text-zinc-400 pl-1">
+            <div class="hidden xl:flex items-center gap-1 text-[11px] text-zinc-400 pl-1">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
               <span id="save-status-text">Enregistré</span>
             </div>
-          </div>
+          </nav>
         </div>
 
         <!-- Middle: 1-Click Conception / Preview Switcher + Device Viewport -->
@@ -527,6 +552,56 @@ function renderSectionAccordionContent(sec, project, variants) {
                     oninput="window.app.liveUpdateField('${sectionId}', 'subtitle', this.value)"
                     onchange="window.app.commitFieldUpdate('${sectionId}', 'subtitle', this.value)"
                     class="w-full bg-white border border-zinc-200 rounded-md px-2.5 py-1 text-xs text-zinc-900 focus:border-zinc-900 focus:outline-none leading-snug">${escapeHtml(c.subtitle)}</textarea>
+        </div>
+      ` : ''}
+
+      <!-- Texte / Description générale (ex: customBlock, quoteBlock, etc.) -->
+      ${c.text !== undefined ? `
+        <div class="space-y-1">
+          <div class="flex items-center justify-between">
+            <label class="block text-[10px] font-medium text-zinc-500">Texte / Argumentaire :</label>
+            <div class="flex items-center gap-1.5">
+              <span class="text-[9.5px] text-zinc-400 font-bold uppercase">Taille:</span>
+              <input type="range" min="-10" max="24" step="1" value="${sec.settings?.[`fontSize_text`] || 0}"
+                     data-field-font-slider="text"
+                     oninput="window.app.adjustFieldFontSizeSlider('${sectionId}', 'text', this.value); const valEl = document.getElementById('text-size-val-${sectionId}'); if (valEl) valEl.textContent = (this.value >= 0 ? '+' : '') + this.value + 'px';"
+                     class="w-20 h-1.5 bg-zinc-200 rounded-lg appearance-none cursor-pointer accent-amber-500"
+                     title="Glisser pour modifier la taille du texte">
+              <span id="text-size-val-${sectionId}" class="text-[9px] font-mono text-zinc-500 min-w-[28px] text-right">${(sec.settings?.[`fontSize_text`] || 0) >= 0 ? '+' : ''}${sec.settings?.[`fontSize_text`] || 0}px</span>
+            </div>
+          </div>
+          <textarea rows="3"
+                    data-field="text"
+                    oninput="window.app.liveUpdateField('${sectionId}', 'text', this.value)"
+                    onchange="window.app.commitFieldUpdate('${sectionId}', 'text', this.value)"
+                    class="w-full bg-white border border-zinc-200 rounded-md px-2.5 py-1 text-xs text-zinc-900 focus:border-zinc-900 focus:outline-none leading-relaxed">${escapeHtml(c.text)}</textarea>
+        </div>
+      ` : ''}
+
+      ${c.ctaText !== undefined ? `
+        <div>
+          <label class="block text-[10px] font-medium text-zinc-500 mb-1">Bouton d'Appel / Action :</label>
+          <input type="text" value="${escapeHtml(c.ctaText)}"
+                 data-field="ctaText"
+                 oninput="window.app.liveUpdateField('${sectionId}', 'ctaText', this.value)"
+                 onchange="window.app.commitFieldUpdate('${sectionId}', 'ctaText', this.value)"
+                 class="w-full bg-white border border-zinc-200 rounded-md px-2.5 py-1 text-xs text-zinc-900 focus:border-zinc-900 focus:outline-none">
+        </div>
+      ` : ''}
+
+      <!-- Quote text if quoteBlock -->
+      ${c.quote !== undefined ? `
+        <div class="space-y-1">
+          <label class="block text-[10px] font-medium text-zinc-500">Citation Dirigeant :</label>
+          <textarea rows="3"
+                    data-field="quote"
+                    oninput="window.app.liveUpdateField('${sectionId}', 'quote', this.value)"
+                    onchange="window.app.commitFieldUpdate('${sectionId}', 'quote', this.value)"
+                    class="w-full bg-white border border-zinc-200 rounded-md px-2.5 py-1 text-xs text-zinc-900 focus:border-zinc-900 focus:outline-none leading-relaxed">${escapeHtml(c.quote)}</textarea>
+          <div class="grid grid-cols-2 gap-1.5 pt-1">
+            <input type="text" value="${escapeHtml(c.authorName || '')}" data-field="authorName" placeholder="Nom auteur" onchange="window.app.commitFieldUpdate('${sectionId}', 'authorName', this.value)" class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-xs">
+            <input type="text" value="${escapeHtml(c.authorRole || '')}" data-field="authorRole" placeholder="Rôle" onchange="window.app.commitFieldUpdate('${sectionId}', 'authorRole', this.value)" class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-xs">
+          </div>
         </div>
       ` : ''}
 

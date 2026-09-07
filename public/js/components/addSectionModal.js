@@ -180,6 +180,60 @@ export const SECTION_DEFINITIONS = [
       { id: "floatingBadge", label: "Macaron Flottant Réassurance", desc: "Pastille verte lumineuse avec statut vérifié 2026." },
       { id: "customCard", label: "Boîte Carte Personnalisée", desc: "Encadré avec titre, argument fort et bouton d'appel direct." }
     ]
+  },
+  {
+    type: "quoteBlock",
+    title: "Citation Éditoriale du Dirigeant",
+    description: "Mise en avant typographique haute confiance d'une citation forte avec portrait.",
+    icon: "checkCircle",
+    variants: [
+      { id: "editorial-quote", label: "Citation Éditoriale Centrée", desc: "Guillemets stylisés, phrase d'engagement forte et photo de l'artisan." }
+    ]
+  },
+  {
+    type: "videoBlock",
+    title: "Vidéo Immersion Chantier 4K",
+    description: "Lecteur vidéo immersif avec affiche personnalisée et bouton lecture haute conversion.",
+    icon: "eye",
+    variants: [
+      { id: "immersive-player", label: "Lecteur Vidéo Pleine Largeur", desc: "Poster de chantier 4K avec badge HD et bouton lecture centré." }
+    ]
+  },
+  {
+    type: "stepperBlock",
+    title: "Indicateur d'Étapes de Chantier (Stepper)",
+    description: "Parcours 1-2-3-4 illustré de l'estimation initiale à la livraison finale.",
+    icon: "layers",
+    variants: [
+      { id: "numbered-stepper", label: "Étapes Numérotées 1-2-3-4", desc: "Cartes séquentielles numérotées avec badges d'avancement." }
+    ]
+  },
+  {
+    type: "tableBlock",
+    title: "Tableau Comparatif des Formules",
+    description: "Grille comparative transparente des forfaits et garanties de l'artisan.",
+    icon: "dollarSign",
+    variants: [
+      { id: "comparison-table", label: "Tableau Comparatif Standard / Pro", desc: "Tableau clair avec en-têtes contrastés et mise en avant de la formule phare." }
+    ]
+  },
+  {
+    type: "sliderBlock",
+    title: "Curseur Interactif de Surface (Slider)",
+    description: "Curseur tactile glissant permettant au prospect d'estimer son dimensionnement en m².",
+    icon: "sliders",
+    variants: [
+      { id: "surface-slider", label: "Curseur de Surface m² Dynamique", desc: "Curseur avec affichage instantané de la superficie en temps réel." }
+    ]
+  },
+  {
+    type: "tabsBlock",
+    title: "Sélecteur d'Onglets de Prestations (Tabs)",
+    description: "Navigation fluide par onglets pour explorer les différents savoir-faire sans allonger la page.",
+    icon: "layers",
+    variants: [
+      { id: "segmented-tabs", label: "Onglets Segmentés de Spécialités", desc: "Boutons d'onglets épurés avec carte active correspondante." }
+    ]
   }
 ];
 
@@ -345,6 +399,84 @@ export const COMPONENT_CATALOG_ITEMS = [
     icon: "dollarSign",
     targetSectionType: "quoteSimulator",
     variant: "interactive-calculator"
+  },
+  // 9. Component Gallery Additions
+  {
+    id: "gallery-quote-pull",
+    family: "content",
+    familyName: "📄 Contenus & Preuves",
+    name: "Citation / Pull Quote Éditoriale",
+    description: "Citation grand format avec guillemets géants, photo du dirigeant et signature.",
+    badge: "Gallery • Confiance",
+    icon: "checkCircle",
+    targetSectionType: "quoteBlock",
+    variant: "editorial-quote"
+  },
+  {
+    id: "gallery-video-player",
+    family: "media",
+    familyName: "🖼️ Médias & Vidéos",
+    name: "Lecteur Vidéo Immersion 4K",
+    description: "Composant vidéo immersif avec affiche de chantier et bouton de lecture centré.",
+    badge: "Gallery • Visuel",
+    icon: "eye",
+    targetSectionType: "videoBlock",
+    variant: "immersive-player"
+  },
+  {
+    id: "gallery-stepper-progress",
+    family: "content",
+    familyName: "📄 Contenus & Preuves",
+    name: "Indicateur d'Étapes de Chantier (Stepper)",
+    description: "Composant de processus 1-2-3-4 séquencé guidant le client pas à pas.",
+    badge: "Gallery • Pédagogique",
+    icon: "layers",
+    targetSectionType: "stepperBlock",
+    variant: "numbered-stepper"
+  },
+  {
+    id: "gallery-comparison-table",
+    family: "content",
+    familyName: "📄 Contenus & Preuves",
+    name: "Tableau Comparatif des Prestations",
+    description: "Tableau structuré confrontant la prestation standard et la formule sérénité pro.",
+    badge: "Gallery • Transparence",
+    icon: "dollarSign",
+    targetSectionType: "tableBlock",
+    variant: "comparison-table"
+  },
+  {
+    id: "gallery-surface-slider",
+    family: "input",
+    familyName: "📝 Devis & Formulaires",
+    name: "Curseur Interactif de Surface (Slider)",
+    description: "Curseur glissant de 10 à 250 m² pour chiffrer l'envergure du projet.",
+    badge: "Gallery • Interactif",
+    icon: "sliders",
+    targetSectionType: "sliderBlock",
+    variant: "surface-slider"
+  },
+  {
+    id: "gallery-category-tabs",
+    family: "navigation",
+    familyName: "🗺️ Navigation & Flottant",
+    name: "Sélecteur d'Onglets de Prestations (Tabs)",
+    description: "Navigation par onglets filtrant instantanément les spécialités de l'artisan.",
+    badge: "Gallery • Ergonomie",
+    icon: "layers",
+    targetSectionType: "tabsBlock",
+    variant: "segmented-tabs"
+  },
+  {
+    id: "gallery-custom-card-block",
+    family: "content",
+    familyName: "📄 Contenus & Preuves",
+    name: "Boîte Carte Personnalisée Sur-Mesure",
+    description: "Encadré avec argument fort, badge vérifié et bouton d'appel direct.",
+    badge: "Canva • Sur-mesure",
+    icon: "sparkles",
+    targetSectionType: "customBlock",
+    variant: "customCard"
   }
 ];
 

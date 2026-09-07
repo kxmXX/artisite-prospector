@@ -213,6 +213,28 @@ export function renderInspector(section, project, state) {
           </div>
         ` : ''}
 
+        ${c.text !== undefined ? `
+          <div>
+            <label class="block text-[10.5px] font-medium text-zinc-500 mb-1">Texte / Argumentaire :</label>
+            <textarea rows="3" 
+                      data-field="text"
+                      oninput="window.app.liveUpdateText('${sectionId}', 'text', this.value)"
+                      onchange="window.app.commitTextUpdate('${sectionId}', 'text', this.value)"
+                      class="w-full bg-white border border-zinc-200 rounded-md px-3 py-1.5 text-zinc-900 focus:border-zinc-900 focus:outline-none transition-colors leading-relaxed">${escapeHtml(c.text)}</textarea>
+          </div>
+        ` : ''}
+
+        ${c.ctaText !== undefined ? `
+          <div>
+            <label class="block text-[10.5px] font-medium text-zinc-500 mb-1">Bouton d'Appel / Action :</label>
+            <input type="text" value="${escapeHtml(c.ctaText)}" 
+                   data-field="ctaText"
+                   oninput="window.app.liveUpdateText('${sectionId}', 'ctaText', this.value)"
+                   onchange="window.app.commitTextUpdate('${sectionId}', 'ctaText', this.value)"
+                   class="w-full bg-white border border-zinc-200 rounded-md px-3 py-1.5 text-zinc-900 focus:border-zinc-900 focus:outline-none">
+          </div>
+        ` : ''}
+
         ${c.phone !== undefined ? `
           <div>
             <label class="block text-[10.5px] font-medium text-zinc-500 mb-1">Téléphone Direct :</label>
@@ -434,6 +456,38 @@ export function renderInspector(section, project, state) {
                      oninput="window.app.liveUpdateText('${sectionId}', 'radius', this.value)"
                      onchange="window.app.commitTextUpdate('${sectionId}', 'radius', this.value)" 
                      class="w-full bg-white border border-zinc-200 rounded-md px-2.5 py-1 text-xs">
+            </div>
+          </div>
+        ` : ''}
+
+        <!-- Quote Block specific fields -->
+        ${section.type === 'quoteBlock' ? `
+          <div class="space-y-2 pt-2 border-t border-zinc-100">
+            <div class="font-medium text-zinc-700 text-xs">Citation & Dirigeant</div>
+            <div>
+              <label class="block text-[10px] text-zinc-500 mb-1">Texte de la citation :</label>
+              <textarea rows="3" data-field="quote" oninput="window.app.liveUpdateText('${sectionId}', 'quote', this.value)" onchange="window.app.commitTextUpdate('${sectionId}', 'quote', this.value)" class="w-full bg-white border border-zinc-200 rounded-md px-2.5 py-1.5 text-xs">${escapeHtml(c.quote || '')}</textarea>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-[10px] text-zinc-500 mb-1">Nom Auteur :</label>
+                <input type="text" value="${escapeHtml(c.authorName || '')}" data-field="authorName" oninput="window.app.liveUpdateText('${sectionId}', 'authorName', this.value)" onchange="window.app.commitTextUpdate('${sectionId}', 'authorName', this.value)" class="w-full bg-white border border-zinc-200 rounded-md px-2.5 py-1 text-xs">
+              </div>
+              <div>
+                <label class="block text-[10px] text-zinc-500 mb-1">Rôle / Titre :</label>
+                <input type="text" value="${escapeHtml(c.authorRole || '')}" data-field="authorRole" oninput="window.app.liveUpdateText('${sectionId}', 'authorRole', this.value)" onchange="window.app.commitTextUpdate('${sectionId}', 'authorRole', this.value)" class="w-full bg-white border border-zinc-200 rounded-md px-2.5 py-1 text-xs">
+              </div>
+            </div>
+          </div>
+        ` : ''}
+
+        <!-- Video Block specific fields -->
+        ${section.type === 'videoBlock' ? `
+          <div class="space-y-2 pt-2 border-t border-zinc-100">
+            <div class="font-medium text-zinc-700 text-xs">Lecteur Vidéo Immersif</div>
+            <div>
+              <label class="block text-[10px] text-zinc-500 mb-1">Image de couverture (Poster) :</label>
+              <input type="text" value="${escapeHtml(c.poster || '')}" data-field="poster" oninput="window.app.liveUpdateText('${sectionId}', 'poster', this.value)" onchange="window.app.commitTextUpdate('${sectionId}', 'poster', this.value)" class="w-full bg-white border border-zinc-200 rounded-md px-2.5 py-1 text-xs">
             </div>
           </div>
         ` : ''}

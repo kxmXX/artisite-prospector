@@ -19,7 +19,8 @@ import {
   validateExportableComponents
 } from "../public/js/engine/componentIntelligence.js";
 import { renderInspector } from "../public/js/components/inspector.js";
-import { generateSite } from "../public/js/engine/generator.js";
+import { generateSite, createSectionData } from "../public/js/engine/generator.js";
+import { renderWebsiteHTML } from "../public/js/components/renderer.js";
 import { renderAddSectionModal, COMPONENT_CATALOG_ITEMS } from "../public/js/components/addSectionModal.js";
 import { renderEditor } from "../public/js/components/editor.js";
 import { state } from "../public/js/state.js";
@@ -412,5 +413,58 @@ test("Component Intelligence: Editor Floating Text Toolbar and Canva Dock", () =
   assert.ok(editorHtml.includes("Composants Add-on..."));
   assert.ok(editorHtml.includes("Sections..."));
 });
+
+test("Component Gallery: quoteBlock, videoBlock, stepperBlock, tableBlock, sliderBlock, tabsBlock generation and rendering", () => {
+  const project = generateSite({ name: "Artisite Gallery Demo", tradeId: "paysagiste" });
+  
+  const newTypes = ["quoteBlock", "videoBlock", "stepperBlock", "tableBlock", "sliderBlock", "tabsBlock"];
+  newTypes.forEach(type => {
+    const sec = createSectionData(type, project.business);
+    assert.equal(sec.type, type);
+    assert.ok(sec.content);
+    project.sections.push(sec);
+  });
+
+  const html = renderWebsiteHTML(project, { isEditor: true });
+  
+  assert.ok(html.includes("component-quote"));
+  assert.ok(html.includes("component-video-player"));
+  assert.ok(html.includes("component-stepper"));
+  assert.ok(html.includes("component-table"));
+  assert.ok(html.includes("component-slider"));
+  assert.ok(html.includes("component-tabs"));
+});
+
+test("Component Intelligence: customBlock and customCard rendering and inspector support", () => {
+  const project = generateSite({ name: "Artisite Custom Demo", tradeId: "electricien" });
+  const customSec = {
+    id: "sec-custom-test",
+    type: "customBlock",
+    variant: "customCard",
+    visibility: true,
+    content: {
+      blockType: "customCard",
+      badge: "✨ SERVICE SUR-MESURE",
+      title: "Un projet spécifique ou un besoin particulier ?",
+      text: "Nos spécialistes étudient votre demande.",
+      ctaText: "Demander une étude",
+      ctaLink: "#contact"
+    },
+    settings: { bgTheme: "mineral" }
+  };
+  project.sections.push(customSec);
+  state.currentProject = project;
+  state.selectedSectionId = customSec.id;
+
+  const html = renderWebsiteHTML(project, { isEditor: true });
+  assert.ok(html.includes("SERVICE SUR-MESURE"));
+  assert.ok(html.includes("Un projet spécifique ou un besoin particulier ?"));
+
+  const inspectorHtml = renderInspector(customSec, project, state);
+  assert.ok(inspectorHtml.includes("Texte / Argumentaire"));
+  assert.ok(inspectorHtml.includes("Bouton d&#39;Appel / Action") || inspectorHtml.includes("Bouton d'Appel / Action"));
+  assert.ok(inspectorHtml.includes("Demander une étude"));
+});
+
 
 

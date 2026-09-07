@@ -971,6 +971,101 @@ export function createSectionData(type, variant, trade, business = {}) {
       };
     }
 
+    case "quoteBlock":
+      return {
+        type: "quoteBlock",
+        variant: variant || "editorial-quote",
+        content: {
+          badge: "Parole de Fondateur",
+          quote: `« Notre priorité absolue à ${city} n'est pas seulement de réaliser un chantier, c'est de bâtir une relation de confiance durable avec chaque client. »`,
+          authorName: name,
+          authorRole: `Artisan Référencé • ${city}`,
+          authorPhoto: "https://images.unsplash.com/photo-1540569014015-19a7be504e3a?auto=format&fit=crop&w=200&q=80"
+        },
+        settings: {}
+      };
+
+    case "videoBlock":
+      return {
+        type: "videoBlock",
+        variant: variant || "immersive-player",
+        content: {
+          badge: "🎬 Immersion Chantier",
+          title: `Découvrez nos chantiers en action à ${city}`,
+          subtitle: "Chaque geste compte. Regardez nos artisans en situation réelle sur nos réalisations locales.",
+          poster: trade?.heroImage || "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=80",
+          videoUrl: "#"
+        },
+        settings: { bgTheme: "dark" }
+      };
+
+    case "stepperBlock":
+      return {
+        type: "stepperBlock",
+        variant: variant || "numbered-stepper",
+        content: {
+          badge: "Étapes de Chantier",
+          title: "Un parcours limpide du devis à la livraison",
+          steps: [
+            { step: "1", title: "Diagnostic & Devis Gratuit", desc: `Visite technique offerte à ${city} sous 24h avec chiffrage sans engagement.` },
+            { step: "2", title: "Planification & Préparation", desc: "Validation des matériaux, calendrier d'intervention et protection des lieux." },
+            { step: "3", title: "Exécution des Travaux", desc: "Réalisation soignée dans les règles de l'art par nos artisans qualifiés." },
+            { step: "4", title: "Réception & Nettoyage", desc: "Contrôle qualité contradictoire, remise de garantie et chantier rendu impeccable." }
+          ]
+        },
+        settings: {}
+      };
+
+    case "tableBlock":
+      return {
+        type: "tableBlock",
+        variant: variant || "comparison-table",
+        content: {
+          badge: "Tableau Comparatif",
+          title: "Comparateur transparent des prestations",
+          rows: [
+            { label: "Déplacement & Diagnostic", standard: "0 € (Offert)", premium: "0 € (Prioritaire 24h)" },
+            { label: "Assurance & Garantie", standard: "RC Pro standard", premium: "Garantie Décennale 10 ans" },
+            { label: "Délai moyen d'intervention", standard: "7 à 10 jours", premium: "Sous 48h garanti" },
+            { label: "Nettoyage fin de chantier", standard: "Inclus", premium: "Remise à neuf totale" },
+            { label: "Interlocuteur dédié", standard: "Standard", premium: "Chef d'équipe direct" }
+          ]
+        },
+        settings: {}
+      };
+
+    case "sliderBlock":
+      return {
+        type: "sliderBlock",
+        variant: variant || "surface-slider",
+        content: {
+          badge: "Curseur Interactif",
+          title: "Estimez le dimensionnement de votre surface",
+          subtitle: `Faites glisser le curseur pour visualiser l'envergure approximative de votre projet à ${city}.`,
+          min: 10,
+          max: 250,
+          default: 50,
+          unit: "m²"
+        },
+        settings: {}
+      };
+
+    case "tabsBlock":
+      return {
+        type: "tabsBlock",
+        variant: variant || "segmented-tabs",
+        content: {
+          badge: "Nos Spécialités",
+          title: "Explorez nos prestations par domaine",
+          tabs: [
+            { title: "Intervention Standard", text: `Prestation courante d'entretien et de rénovation pour particuliers à ${city}.`, tag: "Essentiel" },
+            { title: "Rénovation Complète", text: "Projet clé en main de A à Z avec matériaux haut de gamme et garantie décennale.", tag: "Sérénité Pro" },
+            { title: "Urgences & Dépannages", text: `Astreinte rapide sous 30 minutes sur ${city} et ses environs.`, tag: "Express 24/7" }
+          ]
+        },
+        settings: {}
+      };
+
     default:
       return {
         type,
