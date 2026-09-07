@@ -1534,6 +1534,20 @@ class App {
     }
   }
 
+  setSectionSplitDirection(secId, direction) {
+    if (!state.currentProject) return;
+    const updated = JSON.parse(JSON.stringify(state.currentProject));
+    const sec = updated.sections.find(s => s.id === secId);
+    if (!sec) return;
+    sec.variant = direction === "vertical" ? "vertical" : "interactive-slider";
+    sec.content = sec.content || {};
+    sec.content.direction = direction;
+    sec.settings = sec.settings || {};
+    sec.settings.direction = direction;
+    state.updateProject(updated, true, `Direction SplitReveal (${direction})`);
+    this.showToast(`Orientation SplitReveal : ${direction === 'vertical' ? 'Verticale' : 'Horizontale'}`);
+  }
+
   syncSiteThemeToggle(root = document.querySelector(".artisite-root")) {
     if (!root) return;
     const dark = root.dataset.siteTheme === "dark";
@@ -1963,9 +1977,61 @@ class App {
 
     const feedback = document.getElementById("copilot-feedback");
     if (feedback) {
-      feedback.textContent = "⏳ Analyse de la demande en cours...";
+      feedback.innerHTML = `
+        <div class="ai-state-indicator flex items-center gap-2 p-2 bg-amber-50 rounded-lg text-amber-900 border border-amber-200">
+          <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-ping"></span>
+          <span class="text-xs font-semibold">Analyse & Raisonnement en cours...</span>
+        </div>
+      `;
       feedback.classList.remove("hidden");
     }
+
+    const renderApprovalCard = (summary, onApply) => {
+      if (!feedback) {
+        onApply();
+        return;
+      }
+      feedback.innerHTML = `
+        <div class="ai-approval-card border border-zinc-200 bg-white p-3.5 rounded-xl shadow-md space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-zinc-900 flex items-center gap-1.5">
+              <span>✨</span> Proposition Studio IA
+            </span>
+            <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
+              Confiance 96%
+            </span>
+          </div>
+          <div class="ai-confidence-bar h-1.5 bg-zinc-100 rounded-full overflow-hidden">
+            <div class="ai-confidence-fill h-full bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full" style="width: 96%;"></div>
+          </div>
+          <p class="text-xs text-zinc-600 font-medium">${summary}</p>
+          <div class="ai-approval-actions flex gap-2 pt-1">
+            <button type="button" id="btn-approve-ai" class="btn-keycap btn-keycap-dark flex-1 py-1.5 text-xs font-bold text-white bg-zinc-900 rounded-lg shadow-xs">
+              ✓ Appliquer
+            </button>
+            <button type="button" id="btn-reject-ai" class="btn-keycap btn-keycap-light px-3 py-1.5 text-xs text-zinc-600 rounded-lg">
+              ✕ Ignorer
+            </button>
+          </div>
+        </div>
+      `;
+      const btnApprove = document.getElementById("btn-approve-ai");
+      const btnReject = document.getElementById("btn-reject-ai");
+      if (btnApprove) {
+        btnApprove.onclick = () => {
+          onApply();
+          feedback.innerHTML = `<div class="text-xs font-semibold text-emerald-700 p-2 bg-emerald-50 rounded-lg border border-emerald-200">✅ Modification appliquée avec succès (Annulation ⌘Z possible)</div>`;
+          if (input) input.value = "";
+          setTimeout(() => state.setCopilotOpen(false), 900);
+        };
+      }
+      if (btnReject) {
+        btnReject.onclick = () => {
+          feedback.classList.add("hidden");
+          feedback.innerHTML = "";
+        };
+      }
+    };
 
     try {
       const apiRes = await fetch("/api/ai/copilot", {
@@ -1992,10 +2058,9 @@ class App {
               if (feedback) feedback.textContent = `⚠️ ${d.summary || "Aucune opération valide n’a été appliquée."}`;
               return;
             }
-            state.updateProject(targeted.project, true, `Copilot ciblé: ${promptText}`);
-            if (feedback) feedback.textContent = `✨ ${d.summary || "Modification ciblée appliquée."}`;
-            if (input) input.value = "";
-            state.setCopilotOpen(false);
+            renderApprovalCard(d.summary || "Modification ciblée prête à être appliquée.", () => {
+              state.updateProject(targeted.project, true, `Copilot ciblé: ${promptText}`);
+            });
             return;
           }
           if (d.suggestedPreset) {
@@ -2016,11 +2081,9 @@ class App {
             if (d.updatedSubtitle) hero.content.subtitle = d.updatedSubtitle;
             if (d.updatedBadge) hero.content.badge = d.updatedBadge;
           }
-          state.updateProject(updated, true, `Copilot AI: ${promptText}`);
-          if (feedback) {
-            feedback.textContent = `✨ ${d.summary || 'Modifications appliquées par Gemini !'}`;
-          }
-          if (input) input.value = "";
+          renderApprovalCard(d.summary || "Modifications prêtes à être appliquées par Gemini !", () => {
+            state.updateProject(updated, true, `Copilot AI: ${promptText}`);
+          });
           return;
         }
       }
@@ -2030,12 +2093,9 @@ class App {
 
     // Local fallback
     const res = processCopilotPrompt(state.currentProject, promptText);
-    state.updateProject(res.project, true, `Copilot: ${promptText}`);
-    if (feedback) {
-      feedback.textContent = `✓ ${res.message}`;
-    }
-    if (input) input.value = "";
-    state.setCopilotOpen(false);
+    renderApprovalCard(res.message, () => {
+      state.updateProject(res.project, true, `Copilot: ${promptText}`);
+    });
   }
 
   // Project Level Actions
@@ -2241,49 +2301,102 @@ class App {
 
     this.initScrollObserver();
 
-    // 1. Before / After slider
-    const container = document.querySelector(".ba-container");
-    if (container) {
-      const beforeWrapper = container.querySelector(".ba-img-before-wrapper");
-      const beforeImg = container.querySelector(".ba-img-before");
-      const handle = container.querySelector(".ba-handle");
+    // 1. Before / After SplitReveal slider (Multi-instances, Horizontal & Vertical, Keyboard Accessible)
+    document.querySelectorAll(".ba-container, .split-reveal-container").forEach(container => {
+      if (container.dataset.srReady) return;
+      container.dataset.srReady = "true";
+
+      const beforeWrapper = container.querySelector(".ba-img-before-wrapper, .sr-clipper");
+      const beforeImg = container.querySelector(".ba-img-before, .sr-img-before");
+      const handle = container.querySelector(".ba-handle, .sr-handle");
+      const badge = container.querySelector(".sr-percent-badge");
+      const isVertical = container.dataset.splitDirection === "vertical";
 
       if (beforeWrapper && handle) {
-        const updateSlider = (x) => {
+        const updateSlider = (coord) => {
           const rect = container.getBoundingClientRect();
-          let posX = x - rect.left;
-          if (posX < 0) posX = 0;
-          if (posX > rect.width) posX = rect.width;
-          const percentage = (posX / rect.width) * 100;
-          beforeWrapper.style.width = percentage + "%";
-          handle.style.left = percentage + "%";
-          if (beforeImg) beforeImg.style.width = rect.width + "px";
+          let percentage = 50;
+          if (isVertical) {
+            let posY = coord - rect.top;
+            if (posY < 0) posY = 0;
+            if (posY > rect.height) posY = rect.height;
+            percentage = Math.round((posY / rect.height) * 100);
+            beforeWrapper.style.clipPath = `polygon(0 0, 100% 0, 100% ${percentage}%, 0 ${percentage}%)`;
+            beforeWrapper.style.width = "100%";
+            handle.style.top = percentage + "%";
+          } else {
+            let posX = coord - rect.left;
+            if (posX < 0) posX = 0;
+            if (posX > rect.width) posX = rect.width;
+            percentage = Math.round((posX / rect.width) * 100);
+            beforeWrapper.style.width = percentage + "%";
+            beforeWrapper.style.clipPath = "none";
+            handle.style.left = percentage + "%";
+            if (beforeImg) beforeImg.style.width = rect.width + "px";
+          }
+          container.dataset.splitPos = percentage;
+          container.setAttribute("aria-valuenow", percentage);
+          if (badge) badge.textContent = `${percentage}%`;
         };
 
         window.addEventListener("resize", () => {
-          const rect = container.getBoundingClientRect();
-          if (beforeImg) beforeImg.style.width = rect.width + "px";
+          if (!isVertical && beforeImg) {
+            const rect = container.getBoundingClientRect();
+            beforeImg.style.width = rect.width + "px";
+          }
         });
 
         let isDragging = false;
-        handle.onmousedown = () => { isDragging = true; };
-        window.onmouseup = () => { isDragging = false; };
-        window.onmousemove = (e) => {
-          if (isDragging) updateSlider(e.clientX);
-        };
+        handle.onmousedown = (e) => { e.preventDefault(); isDragging = true; };
+        window.addEventListener("mouseup", () => { isDragging = false; });
+        window.addEventListener("mousemove", (e) => {
+          if (isDragging) updateSlider(isVertical ? e.clientY : e.clientX);
+        });
 
         handle.ontouchstart = () => { isDragging = true; };
-        window.ontouchend = () => { isDragging = false; };
-        window.ontouchmove = (e) => {
-          if (isDragging && e.touches[0]) updateSlider(e.touches[0].clientX);
-        };
+        window.addEventListener("touchend", () => { isDragging = false; });
+        window.addEventListener("touchmove", (e) => {
+          if (isDragging && e.touches[0]) updateSlider(isVertical ? e.touches[0].clientY : e.touches[0].clientX);
+        }, { passive: true });
+
+        container.addEventListener("click", (e) => {
+          if (e.target.closest("button") || e.target.closest(".sr-handle")) return;
+          updateSlider(isVertical ? e.clientY : e.clientX);
+        });
+
+        // Keyboard WCAG support
+        container.addEventListener("keydown", (e) => {
+          let cur = Number(container.dataset.splitPos) || 50;
+          const step = e.shiftKey ? 10 : 2;
+          if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+            e.preventDefault();
+            const next = Math.max(0, cur - step);
+            const rect = container.getBoundingClientRect();
+            updateSlider(isVertical ? rect.top + (next / 100) * rect.height : rect.left + (next / 100) * rect.width);
+          } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+            e.preventDefault();
+            const next = Math.min(100, cur + step);
+            const rect = container.getBoundingClientRect();
+            updateSlider(isVertical ? rect.top + (next / 100) * rect.height : rect.left + (next / 100) * rect.width);
+          } else if (e.key === "Home") {
+            e.preventDefault();
+            const rect = container.getBoundingClientRect();
+            updateSlider(isVertical ? rect.top : rect.left);
+          } else if (e.key === "End") {
+            e.preventDefault();
+            const rect = container.getBoundingClientRect();
+            updateSlider(isVertical ? rect.bottom : rect.right);
+          }
+        });
 
         setTimeout(() => {
-          const rect = container.getBoundingClientRect();
-          if (beforeImg) beforeImg.style.width = rect.width + "px";
+          if (!isVertical && beforeImg) {
+            const rect = container.getBoundingClientRect();
+            beforeImg.style.width = rect.width + "px";
+          }
         }, 100);
       }
-    }
+    });
 
     // 2. FAQ accordions
     document.querySelectorAll(".faq-header").forEach(header => {

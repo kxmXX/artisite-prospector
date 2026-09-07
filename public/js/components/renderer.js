@@ -153,25 +153,26 @@ export function renderWebsiteHTML(project, options = { isEditor: false, isStanda
 
   const stickyBarHTML = options.includeStickyBar === false ? "" : renderStickyCallBar(project, options);
   const initialSiteTheme = project.siteTheme || getInitialSiteTheme(project);
+  const isPaperGrain = !!(project.branding?.paperGrain || project.branding?.stylePreset === 'editorial-terroir' || project.branding?.stylePreset === 'papercraft-mineral');
 
   return `
-    <div class="artisite-root font-body text-main bg-site min-h-screen" data-site-theme="${initialSiteTheme}" style="
-      --primary: ${project.branding.primaryColor};
-      --secondary: ${project.branding.secondaryColor};
-      --accent: ${project.branding.accentColor};
-      --bg: ${project.branding.bgColor};
-      --bg-sec: ${project.branding.bgSecondary};
-      --text: ${project.branding.textColor};
-      --text-muted: ${project.branding.textMuted};
-      --font-heading: '${project.branding.headingFont}', -apple-system, BlinkMacSystemFont, sans-serif;
-      --font-body: '${project.branding.bodyFont}', -apple-system, BlinkMacSystemFont, sans-serif;
-      --radius: ${project.branding.borderRadius};
-      --btn-radius: ${project.branding.buttonRadius};
-      --cta-radius: ${project.branding.buttonRadius || '9999px'};
+    <div class="artisite-root font-body text-main bg-site min-h-screen ${isPaperGrain ? 'texture-paper-grain' : ''}" data-site-theme="${initialSiteTheme}" data-paper-grain="${isPaperGrain ? 'true' : 'false'}" style="
+      --primary: ${project.branding?.primaryColor || '#059669'};
+      --secondary: ${project.branding?.secondaryColor || '#065f46'};
+      --accent: ${project.branding?.accentColor || '#f59e0b'};
+      --bg: ${project.branding?.bgColor || '#ffffff'};
+      --bg-sec: ${project.branding?.bgSecondary || '#f8fafc'};
+      --text: ${project.branding?.textColor || '#0f172a'};
+      --text-muted: ${project.branding?.textMuted || '#64748b'};
+      --font-heading: '${project.branding?.headingFont || 'Plus Jakarta Sans'}', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-body: '${project.branding?.bodyFont || 'Inter'}', -apple-system, BlinkMacSystemFont, sans-serif;
+      --radius: ${project.branding?.borderRadius || '0.75rem'};
+      --btn-radius: ${project.branding?.buttonRadius || '9999px'};
+      --cta-radius: ${project.branding?.buttonRadius || '9999px'};
       --cta-padding: ${ctaPaddingMap[ctaSize] || '0.75rem 1.5rem'};
-      --cta-font-size: ${project.branding.ctaFontSize || ctaFontMap[ctaSize] || '0.95rem'};
-      --cta-scale: ${project.branding.ctaScale ? (project.branding.ctaScale / 100) : 1};
-      --cta-transform: ${project.branding.ctaTransform || 'none'};
+      --cta-font-size: ${project.branding?.ctaFontSize || ctaFontMap[ctaSize] || '0.95rem'};
+      --cta-scale: ${project.branding?.ctaScale ? (project.branding.ctaScale / 100) : 1};
+      --cta-transform: ${project.branding?.ctaTransform || 'none'};
     ">
       ${sectionsHTML}
       ${stickyBarHTML}
@@ -354,6 +355,9 @@ function renderSection(sec, project, options) {
         <button type="button" class="btn-sec-ctrl btn-sec-insert" title="Insérer une section après" data-action="insert-after" data-id="${sec.id}">
           ${getIcon("plus", "w-3.5 h-3.5")}
         </button>
+        <button type="button" class="btn-sec-ctrl btn-sec-dup" title="Dupliquer la section" data-action="duplicate" data-id="${sec.id}">
+          ${getIcon("copy", "w-3.5 h-3.5")}
+        </button>
         <button type="button" class="btn-sec-ctrl btn-sec-vis" title="${isHidden ? 'Afficher' : 'Masquer'}" data-action="toggle-vis" data-id="${sec.id}">
           ${getIcon(isHidden ? "eyeOff" : "eye", "w-3.5 h-3.5")}
         </button>
@@ -381,8 +385,8 @@ function renderHeader(sec, project, options = {}) {
             ${c.brandName ? c.brandName.charAt(0).toUpperCase() : 'A'}
           </div>
           <div class="header-project-meta">
-            <span class="font-heading text-xl font-bold tracking-tight text-gray-900 block leading-tight" data-editable="brandName">${c.brandName}</span>
-            <span class="text-[11px] font-medium text-gray-500 uppercase tracking-wider block">${project.business.tradeLabel} • ${project.business.city}</span>
+            <span class="font-heading text-xl font-bold tracking-tight text-gray-900 block leading-tight" data-editable="brandName">${c.brandName || project.business?.name || 'Artisan'}</span>
+            <span class="text-[11px] font-medium text-gray-500 uppercase tracking-wider block">${project.business?.tradeLabel || c.badge || 'Artisan'}${project.business?.city ? ` • ${project.business.city}` : ''}</span>
           </div>
         </a>
 
@@ -391,9 +395,9 @@ function renderHeader(sec, project, options = {}) {
         </nav>
 
         <div class="flex items-center gap-3">
-          <a href="tel:${c.phone}" class="hidden sm:inline-flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-gray-900 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors">
+          <a href="tel:${c.phone || project.business?.phone || ''}" class="hidden sm:inline-flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-gray-900 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors">
             ${getIcon("phone", "w-4 h-4 text-emerald-600")}
-            <span data-editable="phone">${c.phone}</span>
+            <span data-editable="phone">${c.phone || project.business?.phone || ''}</span>
           </a>
           <button type="button" class="site-theme-toggle inline-flex items-center gap-2 px-3.5 py-2.5 rounded-full text-sm font-semibold text-gray-800 border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all" data-site-theme-toggle aria-label="Activer le mode sombre du site">
             <span class="site-theme-icon site-theme-icon-light">${getIcon("moon", "w-4 h-4")}</span>
@@ -1131,75 +1135,107 @@ function renderServices(sec, project, options = {}) {
 
 }
 
-// 7. Before / After Interactive Slider
+// 7. Before / After Interactive SplitReveal Slider
 function renderBeforeAfter(sec, project, options = {}) {
-  const c = sec.content;
+  const c = sec.content || {};
+  const direction = c.direction || sec.settings?.direction || (sec.variant === "vertical" ? "vertical" : "horizontal");
+  const initialSplit = Number(sec.settings?.initialSplit) || 50;
+  const isVertical = direction === "vertical";
+
+  const directionToggleBtn = options.isEditor ? `
+    <div class="flex justify-center mb-6">
+      <div class="inline-flex rounded-lg border border-zinc-200 bg-zinc-100 p-0.5 text-xs font-semibold shadow-xs">
+        <button type="button" onclick="event.stopPropagation(); window.app.setSectionSplitDirection('${sec.id}', 'horizontal')" class="px-3 py-1 rounded-md transition-all ${!isVertical ? 'bg-white shadow-xs text-zinc-900 font-bold' : 'text-zinc-500 hover:text-zinc-900'}">
+          ⬌ Horizontal
+        </button>
+        <button type="button" onclick="event.stopPropagation(); window.app.setSectionSplitDirection('${sec.id}', 'vertical')" class="px-3 py-1 rounded-md transition-all ${isVertical ? 'bg-white shadow-xs text-zinc-900 font-bold' : 'text-zinc-500 hover:text-zinc-900'}">
+          ⬍ Vertical (Façade/Toit)
+        </button>
+      </div>
+    </div>
+  ` : "";
 
   const beforeBadge = options.isEditor ? `
     <div class="absolute top-4 left-4 z-30 flex items-center gap-1.5 bg-zinc-900/90 backdrop-blur px-2.5 py-1 rounded-lg shadow-sm border border-zinc-800">
-      <span class="text-[10px] text-white font-medium uppercase mr-1" data-editable="beforeLabel">${c.beforeLabel}</span>
+      <span class="text-[10px] text-white font-medium uppercase mr-1" data-editable="beforeLabel">${c.beforeLabel || 'Avant travaux'}</span>
       <button type="button" onclick="event.stopPropagation(); window.app.openImagePicker('${sec.id}', 'beforeImage')" class="px-2 py-0.5 bg-white hover:bg-zinc-100 text-zinc-900 rounded text-[10px] font-medium border border-zinc-200 transition-colors">Remplacer</button>
       <button type="button" onclick="event.stopPropagation(); window.app.deletePhoto('${sec.id}', 'beforeImage')" class="p-1 bg-red-600 hover:bg-red-700 text-white rounded text-[10px] transition-colors" title="Poubelle">🗑️</button>
     </div>
   ` : `
     <div class="absolute top-4 left-4 z-30 bg-zinc-900/80 backdrop-blur text-white text-xs font-medium px-3 py-1 rounded-md uppercase tracking-wider shadow-xs border border-zinc-800/60">
-      ${c.beforeLabel}
+      ${c.beforeLabel || 'Avant travaux'}
     </div>
   `;
 
   const afterBadge = options.isEditor ? `
     <div class="absolute top-4 right-4 z-30 flex items-center gap-1.5 bg-zinc-900/90 backdrop-blur px-2.5 py-1 rounded-lg shadow-sm border border-zinc-800">
-      <span class="text-[10px] text-white font-medium uppercase mr-1" data-editable="afterLabel">${c.afterLabel}</span>
+      <span class="text-[10px] text-white font-medium uppercase mr-1" data-editable="afterLabel">${c.afterLabel || 'Après intervention'}</span>
       <button type="button" onclick="event.stopPropagation(); window.app.openImagePicker('${sec.id}', 'afterImage')" class="px-2 py-0.5 bg-white hover:bg-zinc-100 text-zinc-900 rounded text-[10px] font-medium border border-zinc-200 transition-colors">Remplacer</button>
       <button type="button" onclick="event.stopPropagation(); window.app.deletePhoto('${sec.id}', 'afterImage')" class="p-1 bg-red-600 hover:bg-red-700 text-white rounded text-[10px] transition-colors" title="Poubelle">🗑️</button>
     </div>
   ` : `
     <div class="absolute top-4 right-4 z-30 bg-white/90 backdrop-blur text-zinc-900 text-xs font-medium px-3 py-1 rounded-md uppercase tracking-wider shadow-xs border border-zinc-200">
-      ${c.afterLabel}
+      ${c.afterLabel || 'Après intervention'}
     </div>
   `;
 
   return `
     <div id="before-after" class="py-20 lg:py-28" style="background-color: var(--bg);">
       <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center max-w-2xl mx-auto space-y-3 mb-12">
+        <div class="text-center max-w-2xl mx-auto space-y-3 mb-10">
           <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-gray-100 text-gray-800" data-editable="badge">
-            ${c.badge}
+            ${c.badge || 'Preuve en images'}
           </div>
           <h2 class="font-heading text-3xl sm:text-4xl font-extrabold text-gray-900" data-editable="title">
-            ${c.title}
+            ${c.title || 'Transformation de vos espaces'}
           </h2>
           <p class="text-gray-600 text-base" data-editable="subtitle">
-            ${c.subtitle}
+            ${c.subtitle || 'Faites glisser le curseur pour visualiser la métamorphose avant et après nos travaux'}
           </p>
         </div>
 
-        <div class="ba-container shadow-2xl border-4 border-white">
-          <img src="${c.afterImage}" data-fallback-src="${getTradeFallbackDataUrl(project?.business?.tradeId || 'paysagiste', 'beforeAfter', 'Chantier Réalisé')}" alt="Après intervention" class="ba-img-after" onerror="if(!this.dataset.fallbackApplied){this.dataset.fallbackApplied='true';this.src=this.dataset.fallbackSrc;}">
+        ${directionToggleBtn}
 
-          <div class="ba-img-before-wrapper" style="width: 50%;">
-          <img src="${c.beforeImage}" data-fallback-src="${getTradeFallbackDataUrl(project?.business?.tradeId || 'paysagiste', 'beforeAfter', 'Avant Travaux')}" alt="Avant intervention" class="ba-img-before" onerror="if(!this.dataset.fallbackApplied){this.dataset.fallbackApplied='true';this.src=this.dataset.fallbackSrc;}">
+        <div class="ba-container split-reveal-container shadow-2xl border-4 border-white"
+             data-split-direction="${direction}"
+             data-split-pos="${initialSplit}"
+             data-sec-id="${sec.id}"
+             tabindex="0"
+             role="slider"
+             aria-label="Comparateur Avant Après"
+             aria-valuenow="${initialSplit}"
+             aria-valuemin="0"
+             aria-valuemax="100">
+          <img src="${c.afterImage}" data-fallback-src="${getTradeFallbackDataUrl(project?.business?.tradeId || 'paysagiste', 'beforeAfter', 'Chantier Réalisé')}" alt="Après intervention" class="ba-img-after sr-img-after" onerror="if(!this.dataset.fallbackApplied){this.dataset.fallbackApplied='true';this.src=this.dataset.fallbackSrc;}">
+
+          <div class="ba-img-before-wrapper sr-clipper" style="${isVertical ? `clip-path: polygon(0 0, 100% 0, 100% ${initialSplit}%, 0 ${initialSplit}%); width: 100%;` : `width: ${initialSplit}%;`}">
+            <img src="${c.beforeImage}" data-fallback-src="${getTradeFallbackDataUrl(project?.business?.tradeId || 'paysagiste', 'beforeAfter', 'Avant Travaux')}" alt="Avant intervention" class="ba-img-before sr-img-before" onerror="if(!this.dataset.fallbackApplied){this.dataset.fallbackApplied='true';this.src=this.dataset.fallbackSrc;}">
           </div>
 
-          <div class="ba-handle" style="left: 50%;">
-            <div class="ba-handle-button">
-              <span>‹ ›</span>
+          <div class="ba-handle sr-handle" style="${isVertical ? `top: ${initialSplit}%; left: 0; right: 0;` : `left: ${initialSplit}%; top: 0; bottom: 0;`}">
+            <div class="sr-line"></div>
+            <div class="ba-handle-button sr-button">
+              <span>${isVertical ? '▲ ▼' : '‹ ›'}</span>
             </div>
           </div>
+
+          <span class="sr-percent-badge">${initialSplit}%</span>
 
           <!-- Labels -->
           ${beforeBadge}
           ${afterBadge}
         </div>
 
+        ${c.caption ? `<p class="sr-caption mt-3 text-xs text-center text-gray-500 italic" data-editable="caption">${c.caption}</p>` : ''}
+
         <div class="mt-6 flex items-center justify-between text-xs font-medium text-gray-500 px-2">
           <div class="flex items-center gap-1.5">
             ${getIcon("mapPin", "w-4 h-4 text-gray-400")}
-            <span>${c.projectCity}</span>
+            <span>${c.projectCity || project.business?.city || 'Zone locale'}</span>
           </div>
           <div class="flex items-center gap-1.5">
             ${getIcon("clock", "w-4 h-4 text-gray-400")}
-            <span>Durée : ${c.duration}</span>
+            <span>Durée : ${c.duration || 'Sur devis'}</span>
           </div>
         </div>
       </div>
@@ -1646,9 +1682,9 @@ function renderFooter(sec, project) {
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
           <div class="space-y-4 md:col-span-2">
-            <div class="font-heading text-xl font-bold text-white">${c.brandName}</div>
-            <p class="text-xs text-gray-400 max-w-sm leading-relaxed">${c.desc}</p>
-            <div class="text-xs text-gray-500">${c.address}</div>
+            <div class="font-heading text-xl font-bold text-white">${c.brandName || project.business?.name || 'Artisan'}</div>
+            <p class="text-xs text-gray-400 max-w-sm leading-relaxed">${c.desc || `${project.business?.tradeLabel || 'Artisan'} professionnel à ${project.business?.city || 'votre service'}.`}</p>
+            <div class="text-xs text-gray-500">${c.address || project.business?.address || ''}</div>
           </div>
           <div>
             <div class="font-semibold text-white text-xs uppercase tracking-wider mb-3">Navigation</div>
@@ -1663,14 +1699,14 @@ function renderFooter(sec, project) {
           <div>
             <div class="font-semibold text-white text-xs uppercase tracking-wider mb-3">Contact Direct</div>
             <div class="space-y-2 text-xs">
-              <div>Téléphone : <a href="tel:${c.phone}" class="text-white hover:underline">${c.phone}</a></div>
-              <div>Email : <a href="mailto:${c.email}" class="text-white hover:underline">${c.email}</a></div>
-              <div>Localisation : ${c.city}</div>
+              <div>Téléphone : <a href="tel:${c.phone || project.business?.phone || ''}" class="text-white hover:underline">${c.phone || project.business?.phone || ''}</a></div>
+              <div>Email : <a href="mailto:${c.email || project.business?.email || ''}" class="text-white hover:underline">${c.email || project.business?.email || ''}</a></div>
+              <div>Localisation : ${c.city || project.business?.city || ''}</div>
             </div>
           </div>
         </div>
         <div class="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500">
-          <div>${c.copyright}</div>
+          <div>${c.copyright || `© ${new Date().getFullYear()} ${c.brandName || project.business?.name || 'Artisan'}. Tous droits réservés.`}</div>
           <div class="flex gap-4">
             <a href="#" class="hover:text-gray-300">Mentions légales</a>
             <a href="#" class="hover:text-gray-300">Données personnelles</a>
@@ -1720,6 +1756,89 @@ function renderCustomBlock(sec, project, options = {}) {
     `;
   }
 
+  if (blockType === "radarEmergency" || c.isRadar) {
+    return `
+      <div class="urgent-banner bg-gradient-to-r from-red-600 via-amber-600 to-red-700 text-white px-4 py-3.5 shadow-md">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-xs sm:text-sm font-semibold">
+          <div class="flex items-center gap-2.5">
+            <span class="radar-pulse-dot"></span>
+            <span class="px-2 py-0.5 rounded bg-black/40 text-amber-300 text-[11px] font-extrabold uppercase tracking-wider" data-editable="badge">${c.badge || "Astreinte 24/7"}</span>
+            <strong data-editable="title" class="font-bold text-white">${c.title || "Intervention d'Urgence 24h/24"} :</strong>
+            <span data-editable="text" class="text-white/90 hidden md:inline">${c.text || "Dépannage express sur site en moins de 30 minutes"}</span>
+          </div>
+          <div class="flex items-center gap-2.5">
+            <span class="physical-sticker">⚡ 30 MIN</span>
+            <span class="physical-sticker sticker-tilt-right">★ 100% AGRÉÉ</span>
+            ${c.ctaText ? `
+              <a href="${c.ctaLink || `tel:${project.business?.phone || ''}`}" class="btn-keycap btn-keycap-light ml-1 px-3 py-1.5 text-zinc-950 rounded-full text-xs font-bold" data-editable="ctaText">
+                ${c.ctaText}
+              </a>
+            ` : ''}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  if (blockType === "campaignCard") {
+    const current = Number(c.currentBookings) || 18;
+    const target = Number(c.targetBookings) || 25;
+    const progressPct = Math.min(100, Math.round((current / target) * 100));
+    const pills = Array.isArray(c.pills) ? c.pills : ["Formule Essentiel", "Formule Confort", "Clé en main"];
+    const activePill = c.activePill ?? 1;
+
+    return `
+      <div class="py-14 bg-white">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6">
+          <div class="campaign-card">
+            <div class="space-y-4">
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800" data-editable="badge">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
+                ${c.badge || "Offre & Calendrier Prioritaire"}
+              </span>
+              <h3 class="font-heading text-2xl sm:text-3xl font-extrabold text-zinc-900 leading-tight" data-editable="title">
+                ${c.title || `Campagne Rénovation & Chantiers ${project.business?.city || 'Locaux'}`}
+              </h3>
+              <p class="text-sm text-zinc-600 leading-relaxed" data-editable="text">
+                ${c.text || "Réservez votre créneau d'intervention dès maintenant pour bénéficier d'un démarrage garanti et d'un tarif négocié."}
+              </p>
+              <div class="text-xs font-semibold text-zinc-900 bg-zinc-100 px-3 py-2 rounded-lg inline-block" data-editable="priceText">
+                ${c.priceText || "Tarif indicatif : À partir de 450€ TTC"}
+              </div>
+            </div>
+
+            <div class="space-y-5 bg-zinc-50 p-6 rounded-xl border border-zinc-200/80">
+              <div class="space-y-2">
+                <div class="flex justify-between items-center text-xs font-bold text-zinc-700">
+                  <span>Disponibilités ce mois-ci</span>
+                  <span class="text-emerald-700 font-extrabold">${current} / ${target} chantiers confirmés (${progressPct}%)</span>
+                </div>
+                <div class="campaign-progress-bar">
+                  <div class="campaign-progress-fill" style="width: ${progressPct}%;"></div>
+                </div>
+              </div>
+
+              <div class="space-y-2">
+                <span class="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">Sélectionnez votre formule</span>
+                <div class="campaign-pill-selector">
+                  ${pills.map((pill, idx) => `
+                    <button type="button" class="campaign-pill-option ${idx === activePill ? 'is-active' : ''}">
+                      ${pill}
+                    </button>
+                  `).join("")}
+                </div>
+              </div>
+
+              <a href="${c.ctaLink || '#quoteSimulator'}" class="btn-cta w-full text-center block text-white font-bold py-3 shadow-md" style="background-color: var(--primary);">
+                <span data-editable="ctaText">${c.ctaText || "Réserver mon créneau prioritaire"}</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
   // Custom Card Box
   return `
     <div class="py-12 bg-white">
@@ -1730,7 +1849,7 @@ function renderCustomBlock(sec, project, options = {}) {
             <h3 class="text-xl font-bold text-zinc-900" data-editable="title">${c.title || "Vous avez un chantier urgent ou sur-mesure ?"}</h3>
             <p class="text-sm text-zinc-600 max-w-xl" data-editable="text">${c.text || c.desc || "Notre équipe se déplace directement chez vous pour évaluer vos travaux et vous remettre un devis ferme et gratuit sous 24h."}</p>
           </div>
-          <a href="${c.ctaLink || `tel:${project.business.phone}`}" class="btn-cta text-white whitespace-nowrap" style="background-color: var(--primary);">
+          <a href="${c.ctaLink || `tel:${project.business?.phone || ''}`}" class="btn-cta text-white whitespace-nowrap" style="background-color: var(--primary);">
             <span>${getIcon("phone", "w-4 h-4")}</span>
             <span data-editable="ctaText">${c.ctaText || c.cta || "Appeler l'artisan"}</span>
           </a>

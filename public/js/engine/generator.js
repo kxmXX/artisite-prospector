@@ -432,6 +432,20 @@ function slugify(text) {
 }
 
 export function createSectionData(type, variant, trade, business = {}) {
+  // Support flexible argument patterns (e.g. (type, business, variant) or (type, variant, trade, business))
+  if (variant && typeof variant === "object" && (!trade || typeof trade === "string")) {
+    const tempVariant = typeof trade === "string" ? trade : null;
+    business = variant;
+    variant = tempVariant;
+    trade = null;
+  }
+  if (!trade && business) {
+    trade = getTradeById(business.tradeId) || findTradeByKeywords(business.tradeLabel || business.tradeId || "paysagiste");
+  }
+  if (!trade) {
+    trade = getTradeById("renovation");
+  }
+
   const name = business.name || "Artisan Local";
   const city = business.city || "Secteur Local";
   const region = business.region || "Votre Région";
@@ -440,6 +454,44 @@ export function createSectionData(type, variant, trade, business = {}) {
   const address = business.address || `Zone Artisanale, ${city}`;
 
   switch (type) {
+    case "header":
+      return {
+        type: "header",
+        variant: variant || "sticky-premium",
+        content: {
+          brandName: name,
+          badge: trade?.badge || "Artisan Qualifié",
+          phone,
+          ctaText: "Demander un devis",
+          links: [
+            { label: "Services", target: "#services" },
+            { label: "Réalisations", target: "#realisations" },
+            { label: "Avant / Après", target: "#before-after" },
+            { label: "Avis", target: "#avis" },
+            { label: "Tarifs & Devis", target: "#simulateur" },
+            { label: "Contact", target: "#contact" }
+          ]
+        },
+        settings: { sticky: true }
+      };
+
+    case "footer":
+      return {
+        type: "footer",
+        variant: variant || "columns-classic",
+        content: {
+          brandName: name,
+          badge: trade?.badge || "Artisan Qualifié",
+          desc: `Artisan professionnel spécialisé en ${trade?.category?.toLowerCase() || 'rénovation'} à ${city} et ses alentours. Travail soigné, devis gratuits et respect des délais.`,
+          phone,
+          email,
+          address,
+          city,
+          copyright: `© ${new Date().getFullYear()} ${name}. Tous droits réservés. Site vitrine de présentation professionnelle.`
+        },
+        settings: { showLegalNotice: true }
+      };
+
     case "hero":
       return {
         type: "hero",
@@ -512,9 +564,11 @@ export function createSectionData(type, variant, trade, business = {}) {
           beforeLabel: trade.beforeAfter?.beforeLabel || "Avant travaux",
           afterLabel: trade.beforeAfter?.afterLabel || "Après notre intervention",
           projectCity: `${city}`,
-          duration: trade.beforeAfter?.duration || "3 jours de chantier"
+          duration: trade.beforeAfter?.duration || "3 jours de chantier",
+          direction: variant === "vertical" ? "vertical" : "horizontal",
+          caption: "Glissez le curseur interactif ou utilisez les flèches du clavier pour comparer nos réalisations"
         },
-        settings: { initialSplit: 50 }
+        settings: { initialSplit: 50, direction: variant === "vertical" ? "vertical" : "horizontal" }
       };
 
     case "gallery":
@@ -772,20 +826,36 @@ export function createSectionData(type, variant, trade, business = {}) {
         settings: {}
       };
 
-    case "customBlock":
+    case "customBlock": {
+      const isCampaign = variant === "campaignCard";
+      const isRadar = variant === "radarEmergency";
       return {
         type: "customBlock",
         variant: variant || "urgentBanner",
         content: {
           blockType: variant || "urgentBanner",
-          badge: "Information",
-          title: "Chantier urgent ou projet sur-mesure ?",
-          text: `Notre équipe se déplace directement à ${city} pour évaluer vos travaux et vous remettre un devis gratuit sous 24h.`,
-          ctaText: `Contacter l'artisan (${phone})`,
-          ctaLink: `tel:${phone}`
+          badge: isRadar ? "Astreinte 24/7" : (isCampaign ? "Réservations ouvertes" : "Information"),
+          title: isRadar 
+            ? "Intervention d'urgence & Dépannage rapide 24h/24"
+            : (isCampaign ? `Campagne Rénovation & Chantiers ${city}` : "Chantier urgent ou projet sur-mesure ?"),
+          text: isRadar
+            ? `Notre équipe intervient en moins de 30 minutes à ${city} et ses alentours. Matériel professionnel et devis immédiat.`
+            : (isCampaign 
+              ? `Planifiez votre projet dès maintenant pour garantir une disponibilité prioritaire sur notre calendrier d'intervention.`
+              : `Notre équipe se déplace directement à ${city} pour évaluer vos travaux et vous remettre un devis gratuit sous 24h.`),
+          ctaText: isRadar ? `Appel d'urgence (${phone})` : (isCampaign ? "Réserver mon créneau prioritaire" : `Contacter l'artisan (${phone})`),
+          ctaLink: isRadar ? `tel:${phone}` : "#quoteSimulator",
+          currentBookings: isCampaign ? 18 : undefined,
+          targetBookings: isCampaign ? 25 : undefined,
+          priceText: isCampaign ? "À partir de 450€ TTC" : undefined,
+          pills: isCampaign ? ["Formule Essentiel", "Formule Confort", "Clé en main"] : undefined,
+          activePill: isCampaign ? 1 : undefined,
+          isRadar: isRadar,
+          stickers: isRadar ? ["⚡ Intervention 30 min", "★ 100% Agréé Assurance"] : undefined
         },
         settings: {}
       };
+    }
 
     default:
       return {

@@ -112,6 +112,46 @@ export const STYLE_PRESETS = [
     "cardStyle": "flat",
     "heroOverlay": "rgba(17, 24, 39, 0.45)",
     "shadow": "0 8px 20px -3px rgba(0, 0, 0, 0.05)"
+  },
+  {
+    "id": "editorial-terroir",
+    "name": "Éditorial Terroir 2026",
+    "description": "Direction artistique éditoriale avec grain papier, typographie affûtée et tons chauds",
+    "primaryColor": "#2C3E2D",
+    "secondaryColor": "#C85A32",
+    "accentColor": "#D97706",
+    "bgColor": "#F5F1E8",
+    "bgSecondary": "#EAE4D5",
+    "textColor": "#1E241E",
+    "textMuted": "#5A6559",
+    "headingFont": "Instrument Serif",
+    "bodyFont": "Instrument Sans",
+    "borderRadius": "0.375rem",
+    "buttonRadius": "0.375rem",
+    "cardStyle": "paper",
+    "paperGrain": true,
+    "heroOverlay": "rgba(30, 45, 32, 0.5)",
+    "shadow": "3px 6px 12px rgba(60, 50, 40, 0.14)"
+  },
+  {
+    "id": "papercraft-mineral",
+    "name": "Papercraft Minéral",
+    "description": "Angles nets, ombre portée papier et matière minérale texturée",
+    "primaryColor": "#1E293B",
+    "secondaryColor": "#059669",
+    "accentColor": "#2563EB",
+    "bgColor": "#FAF8F3",
+    "bgSecondary": "#F0EDE6",
+    "textColor": "#0F172A",
+    "textMuted": "#475569",
+    "headingFont": "Clash Display",
+    "bodyFont": "Satoshi",
+    "borderRadius": "0px",
+    "buttonRadius": "0px",
+    "cardStyle": "paper",
+    "paperGrain": true,
+    "heroOverlay": "rgba(15, 23, 42, 0.6)",
+    "shadow": "4px 8px 16px rgba(40, 35, 30, 0.16)"
   }
 ];
 

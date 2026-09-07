@@ -45,7 +45,8 @@ export const SECTION_DEFINITIONS = [
     description: "Curseur interactif glissant démontrant l'efficacité spectaculaire des chantiers.",
     icon: "sliders",
     variants: [
-      { id: "interactive-slider", label: "Curseur Interactif Glissant", desc: "Composant interactif manipulable à la souris et au toucher tactile." }
+      { id: "interactive-slider", label: "Curseur Horizontal Glissant", desc: "Composant interactif classique pour paysagisme, intérieurs et rénovation." },
+      { id: "vertical", label: "SplitReveal Vertical (Façades & Toitures)", desc: "Curseur vertical de haut en bas, idéal pour toitures, façades et élagage." }
     ]
   },
   {
@@ -173,6 +174,8 @@ export const SECTION_DEFINITIONS = [
     description: "Module libre façon Canva (bannière urgente, macaron flottant ou carte personnalisée).",
     icon: "sparkles",
     variants: [
+      { id: "radarEmergency", label: "Bandeau Astreinte Radar 24/7 & Stickers", desc: "Pastille radar clignotante et stickers physiques tiltés pour dépannage express." },
+      { id: "campaignCard", label: "CampaignCard & Compteur Chantiers", desc: "Jauge de réservation, formule packagée et réservation prioritaire." },
       { id: "urgentBanner", label: "Bandeau Promo / Notification Haute", desc: "Bandeau contrasté avec badge d'annonce et lien d'action rapide." },
       { id: "floatingBadge", label: "Macaron Flottant Réassurance", desc: "Pastille verte lumineuse avec statut vérifié 2026." },
       { id: "customCard", label: "Boîte Carte Personnalisée", desc: "Encadré avec titre, argument fort et bouton d'appel direct." }

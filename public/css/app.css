@@ -2122,6 +2122,337 @@ body.dark-theme #right-inspector-panel select { background: #202027 !important; 
   border-radius: var(--cta-radius, var(--btn-radius, 8px)) !important;
 }
 
+/* ==========================================================================
+   SplitReveal (Avant / Après 2026 Multi-Instances & Directionnel)
+   ========================================================================== */
+.split-reveal-container {
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+  touch-action: none;
+  box-shadow: var(--shadow-paper, 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1));
+  border-radius: var(--card-radius, 1rem);
+  background-color: #09090b;
+}
+.split-reveal-container:focus-visible {
+  outline: 3px solid #3b82f6;
+  outline-offset: 3px;
+}
+.sr-img-after {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+.sr-clipper {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  will-change: clip-path;
+}
+.sr-img-before {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+.sr-handle {
+  position: absolute;
+  z-index: 25;
+  cursor: ew-resize;
+  touch-action: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+}
+.split-reveal-container[data-split-direction="horizontal"] .sr-handle {
+  top: 0;
+  bottom: 0;
+  width: 48px;
+  transform: translateX(-50%);
+  cursor: ew-resize;
+}
+.split-reveal-container[data-split-direction="vertical"] .sr-handle {
+  left: 0;
+  right: 0;
+  height: 48px;
+  transform: translateY(-50%);
+  cursor: ns-resize;
+}
+.sr-line {
+  position: absolute;
+  background-color: #ffffff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}
+.split-reveal-container[data-split-direction="horizontal"] .sr-line {
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  transform: translateX(-50%);
+}
+.split-reveal-container[data-split-direction="vertical"] .sr-line {
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 2px;
+  transform: translateY(-50%);
+}
+.sr-button {
+  width: 42px;
+  height: 42px;
+  border-radius: 9999px;
+  background: #ffffff;
+  color: #18181b;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  border: 2px solid #ffffff;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+  z-index: 2;
+}
+.sr-handle:hover .sr-button,
+.sr-handle:active .sr-button {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+}
+.sr-percent-badge {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(9, 9, 11, 0.85);
+  backdrop-filter: blur(8px);
+  color: #ffffff;
+  font-family: monospace;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  pointer-events: none;
+  z-index: 20;
+}
+.sr-caption {
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  color: #71717a;
+  text-align: center;
+  font-style: italic;
+}
+
+/* ==========================================================================
+   Papercraft & Grain Texture 2026
+   ========================================================================== */
+:root {
+  --bg-cream: #F5F1E8;
+  --bg-paper: #FAF8F3;
+  --shadow-paper: 3px 6px 12px rgba(60, 50, 40, 0.14);
+  --shadow-paper-lg: 6px 14px 28px rgba(60, 50, 40, 0.18);
+  --radius-paper: 0px;
+}
+.texture-paper-grain,
+[data-paper-grain="true"] {
+  position: relative;
+  background-color: var(--paper-bg, var(--bg-cream));
+}
+.texture-paper-grain::before,
+[data-paper-grain="true"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.048'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 160px 160px;
+  mix-blend-mode: multiply;
+  z-index: 1;
+}
+.paper-card {
+  background: var(--bg-paper, #FAF8F3);
+  border: 1px solid rgba(60, 50, 40, 0.12);
+  box-shadow: var(--shadow-paper);
+  border-radius: var(--radius-paper, 0px);
+  position: relative;
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   CampaignCard & Compteur Dynamique de Chantiers
+   ========================================================================== */
+.campaign-card {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  background: #ffffff;
+  border-radius: var(--card-radius, 1rem);
+  box-shadow: var(--shadow-paper, 0 10px 25px -5px rgba(0,0,0,0.1));
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  padding: 1.5rem;
+}
+@media (min-width: 768px) {
+  .campaign-card {
+    grid-template-columns: 4fr 6fr;
+    padding: 2rem;
+    align-items: center;
+  }
+}
+.campaign-progress-bar {
+  height: 10px;
+  width: 100%;
+  background-color: #e4e4e7;
+  border-radius: 9999px;
+  overflow: hidden;
+  position: relative;
+}
+.campaign-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #059669);
+  border-radius: 9999px;
+  transition: width 800ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.campaign-pill-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.campaign-pill-option {
+  padding: 0.4rem 0.85rem;
+  border-radius: 9999px;
+  border: 1px solid #d4d4d8;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: #f4f4f5;
+  color: #27272a;
+  transition: all 150ms ease;
+}
+.campaign-pill-option.is-active,
+.campaign-pill-option:hover {
+  background: #18181b;
+  color: #ffffff;
+  border-color: #18181b;
+}
+
+/* ==========================================================================
+   Bandeau Urgence Radar 24/7 & Stickers Tiltés
+   ========================================================================== */
+.radar-pulse-dot {
+  position: relative;
+  display: inline-flex;
+  width: 10px;
+  height: 10px;
+  border-radius: 9999px;
+  background-color: #ef4444;
+}
+.radar-pulse-dot::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 9999px;
+  background-color: rgba(239, 68, 68, 0.4);
+  animation: radar-ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+@keyframes radar-ping {
+  75%, 100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+.physical-sticker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: #fef08a;
+  color: #854d0e;
+  border: 1px solid rgba(133, 77, 14, 0.2);
+  box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.12);
+  border-radius: 4px;
+  transform: rotate(-2.5deg);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+  user-select: none;
+}
+.physical-sticker:hover {
+  transform: rotate(0deg) scale(1.04);
+  box-shadow: 3px 6px 14px rgba(0, 0, 0, 0.18);
+}
+.physical-sticker.sticker-tilt-right {
+  transform: rotate(2.5deg);
+}
+.physical-sticker.sticker-tilt-right:hover {
+  transform: rotate(0deg) scale(1.04);
+}
+
+/* ==========================================================================
+   Studio Assistant IA State Machine & Approval Card
+   ========================================================================== */
+.ai-state-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+.ai-state-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #3f3f46;
+}
+.ai-approval-card {
+  background: #ffffff;
+  border: 1px solid #e4e4e7;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  animation: ai-slide-up 250ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes ai-slide-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.ai-confidence-meter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: #71717a;
+}
+.ai-confidence-bar {
+  height: 6px;
+  background-color: #e4e4e7;
+  border-radius: 9999px;
+  overflow: hidden;
+  margin-top: 0.25rem;
+}
+.ai-confidence-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+  border-radius: 9999px;
+}
+.ai-approval-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 1ms !important;

@@ -87,8 +87,44 @@ ${UTILITY_CSS}
     @keyframes motion-slide-up { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes motion-slide-in { from { opacity: 0; transform: translateX(-24px); } to { opacity: 1; transform: translateX(0); } }
     @keyframes motion-spring { from { opacity: 0; transform: translateY(20px) scale(0.95); } 65% { transform: translateY(-3px) scale(1.015); } to { opacity: 1; transform: translateY(0) scale(1); } }
-    @keyframes motion-progress-fill { from { opacity: 0; transform: scaleX(0.7); } to { opacity: 1; transform: scaleX(1); } }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; scroll-behavior: auto !important; } }
+
+    /* SplitReveal 2026 */
+    .split-reveal-container { position: relative; overflow: hidden; user-select: none; touch-action: none; border-radius: 1.5rem; background-color: #09090b; }
+    .sr-img-after { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+    .sr-clipper { position: absolute; inset: 0; overflow: hidden; pointer-events: none; will-change: clip-path; }
+    .sr-img-before { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+    .sr-handle { position: absolute; z-index: 25; cursor: ew-resize; touch-action: none; display: flex; align-items: center; justify-content: center; pointer-events: auto; }
+    .split-reveal-container[data-split-direction="horizontal"] .sr-handle { top: 0; bottom: 0; width: 48px; transform: translateX(-50%); cursor: ew-resize; }
+    .split-reveal-container[data-split-direction="vertical"] .sr-handle { left: 0; right: 0; height: 48px; transform: translateY(-50%); cursor: ns-resize; }
+    .sr-line { position: absolute; background-color: #ffffff; box-shadow: 0 0 10px rgba(0,0,0,0.5); pointer-events: none; }
+    .split-reveal-container[data-split-direction="horizontal"] .sr-line { top: 0; bottom: 0; left: 50%; width: 2px; transform: translateX(-50%); }
+    .split-reveal-container[data-split-direction="vertical"] .sr-line { left: 0; right: 0; top: 50%; height: 2px; transform: translateY(-50%); }
+    .sr-button { width: 42px; height: 42px; border-radius: 9999px; background: #ffffff; color: #18181b; box-shadow: 0 4px 14px rgba(0,0,0,0.25); display: flex; align-items: center; justify-content: center; font-size: 14px; border: 2px solid #ffffff; }
+    .sr-percent-badge { position: absolute; bottom: 1rem; left: 50%; transform: translateX(-50%); background: rgba(9,9,11,0.85); backdrop-filter: blur(8px); color: #ffffff; font-family: monospace; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 9999px; border: 1px solid rgba(255,255,255,0.15); pointer-events: none; z-index: 20; }
+    .sr-caption { margin-top: 0.75rem; font-size: 0.875rem; color: #71717a; text-align: center; font-style: italic; }
+
+    /* Papercraft Texture 2026 */
+    :root { --bg-cream: #F5F1E8; --bg-paper: #FAF8F3; --shadow-paper: 3px 6px 12px rgba(60,50,40,0.14); }
+    .texture-paper-grain, [data-paper-grain="true"] { position: relative; background-color: var(--paper-bg, var(--bg-cream)); }
+    .texture-paper-grain::before, [data-paper-grain="true"]::before { content: ""; position: absolute; inset: 0; pointer-events: none; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.048'/%3E%3C/svg%3E"); background-repeat: repeat; background-size: 160px 160px; mix-blend-mode: multiply; z-index: 1; }
+    .paper-card { background: var(--bg-paper, #FAF8F3); border: 1px solid rgba(60,50,40,0.12); box-shadow: var(--shadow-paper); border-radius: 0px; position: relative; overflow: hidden; }
+
+    /* CampaignCard & Compteur */
+    .campaign-card { display: grid; grid-template-columns: 1fr; gap: 1.5rem; background: #ffffff; border-radius: 1rem; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); border: 1px solid rgba(0,0,0,0.08); overflow: hidden; padding: 1.5rem; }
+    @media (min-width: 768px) { .campaign-card { grid-template-columns: 4fr 6fr; padding: 2rem; align-items: center; } }
+    .campaign-progress-bar { height: 10px; width: 100%; background-color: #e4e4e7; border-radius: 9999px; overflow: hidden; position: relative; }
+    .campaign-progress-fill { height: 100%; background: linear-gradient(90deg, #10b981, #059669); border-radius: 9999px; }
+    .campaign-pill-selector { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .campaign-pill-option { padding: 0.4rem 0.85rem; border-radius: 9999px; border: 1px solid #d4d4d8; font-size: 0.8125rem; font-weight: 600; cursor: pointer; background: #f4f4f5; color: #27272a; }
+    .campaign-pill-option.is-active { background: #18181b; color: #ffffff; border-color: #18181b; }
+
+    /* Radar & Stickers */
+    .radar-pulse-dot { position: relative; display: inline-flex; width: 10px; height: 10px; border-radius: 9999px; background-color: #ef4444; }
+    .radar-pulse-dot::after { content: ""; position: absolute; inset: -4px; border-radius: 9999px; background-color: rgba(239,68,68,0.4); animation: radar-ping 1.5s cubic-bezier(0,0,0.2,1) infinite; }
+    @keyframes radar-ping { 75%, 100% { transform: scale(2.2); opacity: 0; } }
+    .physical-sticker { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.35rem 0.75rem; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; background: #fef08a; color: #854d0e; border: 1px solid rgba(133,77,14,0.2); box-shadow: 2px 4px 8px rgba(0,0,0,0.12); border-radius: 4px; transform: rotate(-2.5deg); }
+    .physical-sticker.sticker-tilt-right { transform: rotate(2.5deg); }
 
     /* Utilities */
     .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 1.25rem; }
@@ -267,53 +303,98 @@ ${UTILITY_CSS}
       window.setTimeout(hydrateImageFallbacks, 0);
     })();
 
-    // 3. Before-After Comparison Slider
+    // 3. Before-After SplitReveal Comparison Slider (Multi-instances, Horizontal & Vertical, Keyboard WCAG)
     (function initBeforeAfter() {
-      const container = document.querySelector('.ba-container');
-      if (!container) return;
-      const beforeWrapper = container.querySelector('.ba-img-before-wrapper');
-      const beforeImg = container.querySelector('.ba-img-before');
-      const handle = container.querySelector('.ba-handle');
-      if (!beforeWrapper || !handle) return;
+      document.querySelectorAll('.ba-container, .split-reveal-container').forEach(container => {
+        if (container.dataset.srReady) return;
+        container.dataset.srReady = 'true';
 
-      function updateSlider(x) {
-        const rect = container.getBoundingClientRect();
-        let posX = x - rect.left;
-        if (posX < 0) posX = 0;
-        if (posX > rect.width) posX = rect.width;
-        const percentage = (posX / rect.width) * 100;
-        beforeWrapper.style.width = percentage + '%';
-        handle.style.left = percentage + '%';
-        if (beforeImg) beforeImg.style.width = rect.width + 'px';
-      }
+        const beforeWrapper = container.querySelector('.ba-img-before-wrapper, .sr-clipper');
+        const beforeImg = container.querySelector('.ba-img-before, .sr-img-before');
+        const handle = container.querySelector('.ba-handle, .sr-handle');
+        const badge = container.querySelector('.sr-percent-badge');
+        const isVertical = container.dataset.splitDirection === 'vertical';
+        if (!beforeWrapper || !handle) return;
 
-      window.addEventListener('resize', () => {
-        const rect = container.getBoundingClientRect();
-        if (beforeImg) beforeImg.style.width = rect.width + 'px';
+        function updateSlider(coord) {
+          const rect = container.getBoundingClientRect();
+          let percentage = 50;
+          if (isVertical) {
+            let posY = coord - rect.top;
+            if (posY < 0) posY = 0;
+            if (posY > rect.height) posY = rect.height;
+            percentage = Math.round((posY / rect.height) * 100);
+            beforeWrapper.style.clipPath = 'polygon(0 0, 100% 0, 100% ' + percentage + '%, 0 ' + percentage + '%)';
+            beforeWrapper.style.width = '100%';
+            handle.style.top = percentage + '%';
+          } else {
+            let posX = coord - rect.left;
+            if (posX < 0) posX = 0;
+            if (posX > rect.width) posX = rect.width;
+            percentage = Math.round((posX / rect.width) * 100);
+            beforeWrapper.style.width = percentage + '%';
+            beforeWrapper.style.clipPath = 'none';
+            handle.style.left = percentage + '%';
+            if (beforeImg) beforeImg.style.width = rect.width + 'px';
+          }
+          container.dataset.splitPos = percentage;
+          container.setAttribute('aria-valuenow', percentage);
+          if (badge) badge.textContent = percentage + '%';
+        }
+
+        window.addEventListener('resize', () => {
+          if (!isVertical && beforeImg) {
+            const rect = container.getBoundingClientRect();
+            beforeImg.style.width = rect.width + 'px';
+          }
+        });
+
+        let isDragging = false;
+        function onStart(e) { isDragging = true; }
+        function onEnd() { isDragging = false; }
+        function onMove(e) {
+          if (!isDragging) return;
+          const p = e.touches ? e.touches[0] : e;
+          updateSlider(isVertical ? p.clientY : p.clientX);
+        }
+
+        handle.addEventListener('mousedown', onStart);
+        window.addEventListener('mouseup', onEnd);
+        window.addEventListener('mousemove', onMove);
+
+        handle.addEventListener('touchstart', onStart, { passive: true });
+        window.addEventListener('touchend', onEnd);
+        window.addEventListener('touchmove', onMove, { passive: true });
+
+        container.addEventListener('click', (e) => {
+          if (e.target.closest('button') || e.target.closest('.sr-handle')) return;
+          updateSlider(isVertical ? e.clientY : e.clientX);
+        });
+
+        container.addEventListener('keydown', (e) => {
+          let cur = Number(container.dataset.splitPos) || 50;
+          const step = e.shiftKey ? 10 : 2;
+          if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+            e.preventDefault();
+            const next = Math.max(0, cur - step);
+            const rect = container.getBoundingClientRect();
+            updateSlider(isVertical ? rect.top + (next / 100) * rect.height : rect.left + (next / 100) * rect.width);
+          } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+            e.preventDefault();
+            const next = Math.min(100, cur + step);
+            const rect = container.getBoundingClientRect();
+            updateSlider(isVertical ? rect.top + (next / 100) * rect.height : rect.left + (next / 100) * rect.width);
+          }
+        });
+
+        // Initial alignment
+        setTimeout(() => {
+          if (!isVertical && beforeImg) {
+            const rect = container.getBoundingClientRect();
+            beforeImg.style.width = rect.width + 'px';
+          }
+        }, 100);
       });
-
-      let isDragging = false;
-      function onStart(e) { isDragging = true; }
-      function onEnd() { isDragging = false; }
-      function onMove(e) {
-        if (!isDragging) return;
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        updateSlider(clientX);
-      }
-
-      handle.addEventListener('mousedown', onStart);
-      window.addEventListener('mouseup', onEnd);
-      window.addEventListener('mousemove', onMove);
-
-      handle.addEventListener('touchstart', onStart, { passive: true });
-      window.addEventListener('touchend', onEnd);
-      window.addEventListener('touchmove', onMove, { passive: true });
-
-      // Initial alignment
-      setTimeout(() => {
-        const rect = container.getBoundingClientRect();
-        if (beforeImg) beforeImg.style.width = rect.width + 'px';
-      }, 100);
     })();
 
     // 4. FAQ Accordion Toggle
