@@ -35,6 +35,7 @@ ${generateLocalBusinessSchema(project)}
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?${EXPORT_FONT_QUERY}&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&f[]=general-sans@500,600,700&f[]=clash-display@500,600,700&f[]=cabinet-grotesk@500,700,800&display=swap">
   
   <style>
 ${UTILITY_CSS}
@@ -83,6 +84,12 @@ ${UTILITY_CSS}
     [data-motion="slide-in"].is-revealed { animation: motion-slide-in 450ms cubic-bezier(0.16, 1, 0.3, 1) both; opacity: 1 !important; }
     [data-motion="spring"].is-revealed { animation: motion-spring 550ms cubic-bezier(0.34, 1.56, 0.64, 1) both; opacity: 1 !important; }
     [data-motion="progress-fill"].is-revealed { animation: motion-progress-fill 650ms cubic-bezier(0.16, 1, 0.3, 1) both; transform-origin: left; opacity: 1 !important; }
+    [data-motion="reveal"].is-revealed,
+    [data-motion="stagger"].is-revealed,
+    [data-motion="magnetic"].is-revealed,
+    [data-motion="shimmer"].is-revealed,
+    [data-motion="pulse"].is-revealed { animation: motion-fade-in 420ms cubic-bezier(0.16, 1, 0.3, 1) both; opacity: 1 !important; }
+    .is-revealed { opacity: 1 !important; }
     @keyframes motion-fade-in { from { opacity: 0; transform: scale(0.99); } to { opacity: 1; transform: scale(1); } }
     @keyframes motion-slide-up { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes motion-slide-in { from { opacity: 0; transform: translateX(-24px); } to { opacity: 1; transform: translateX(0); } }
@@ -110,7 +117,7 @@ ${UTILITY_CSS}
     .split-reveal-container[data-split-direction="horizontal"] .sr-line { top: 0; bottom: 0; left: 50%; width: 2px; transform: translateX(-50%); }
     .split-reveal-container[data-split-direction="vertical"] .sr-line { left: 0; right: 0; top: 50%; height: 2px; transform: translateY(-50%); }
     .sr-button { width: 42px; height: 42px; border-radius: 9999px; background: #ffffff; color: #18181b; box-shadow: 0 4px 14px rgba(0,0,0,0.25); display: flex; align-items: center; justify-content: center; font-size: 14px; border: 2px solid #ffffff; }
-    .sr-percent-badge { position: absolute; bottom: 1rem; left: 50%; transform: translateX(-50%); background: rgba(9,9,11,0.85); backdrop-filter: blur(8px); color: #ffffff; font-family: monospace; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 9999px; border: 1px solid rgba(255,255,255,0.15); pointer-events: none; z-index: 20; }
+    .sr-percent-badge { position: absolute; bottom: 1rem; right: 1rem; left: auto; transform: none; background: rgba(9,9,11,0.85); backdrop-filter: blur(8px); color: #ffffff; font-family: monospace; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 9999px; border: 1px solid rgba(255,255,255,0.15); pointer-events: none; z-index: 20; }
     .sr-caption { margin-top: 0.75rem; font-size: 0.875rem; color: #71717a; text-align: center; font-style: italic; }
 
     /* Papercraft Texture 2026 */
@@ -243,7 +250,23 @@ ${UTILITY_CSS}
     .artisite-root[data-site-theme="dark"] .text-gray-400 { color: #b4bac7 !important; }
     .artisite-root[data-site-theme="dark"] .border-gray-100,
     .artisite-root[data-site-theme="dark"] .border-gray-200,
+    .artisite-root[data-site-theme="dark"] .border-zinc-100,
+    .artisite-root[data-site-theme="dark"] .border-zinc-200,
     .artisite-root[data-site-theme="dark"] .border-black\\/5 { border-color: #303641 !important; }
+    .artisite-root[data-site-theme="dark"] .text-zinc-900,
+    .artisite-root[data-site-theme="dark"] .text-zinc-800,
+    .artisite-root[data-site-theme="dark"] .text-zinc-700 { color: #f4f4f5 !important; }
+    .artisite-root[data-site-theme="dark"] .text-zinc-600,
+    .artisite-root[data-site-theme="dark"] .text-zinc-500,
+    .artisite-root[data-site-theme="dark"] .text-zinc-400 { color: #b4bac7 !important; }
+    .artisite-root[data-site-theme="dark"] .faq-item { background-color: #171a20 !important; border-color: #303641 !important; }
+    .artisite-root[data-site-theme="dark"] .faq-header,
+    .artisite-root[data-site-theme="dark"] .faq-header span { color: #f4f4f5 !important; }
+    .artisite-root[data-site-theme="dark"] .faq-content,
+    .artisite-root[data-site-theme="dark"] .faq-content p { color: #b4bac7 !important; }
+    .artisite-root[data-site-theme="dark"] .campaign-card { background-color: #171a20 !important; color: #f4f4f5 !important; border-color: #303641 !important; }
+    .sticky-call-btn { background-color: #ffffff !important; color: #09090b !important; }
+    .sticky-call-btn:hover { background-color: #f4f4f5 !important; }
     .artisite-root[data-site-theme="dark"] .site-theme-toggle { background: #20242c !important; color: #f4f4f5 !important; border-color: #3b4350 !important; }
     .artisite-root[data-site-theme="dark"] .site-section { color: #f4f4f5; }
 

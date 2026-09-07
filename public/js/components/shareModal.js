@@ -14,8 +14,9 @@ export function renderShareModal(project) {
 
   const qrSvg = generateQRCodeSVG(demoUrl, 170, "#09090b", "#ffffff");
 
+  const cleanPhone = (b.phone || "").replace(/[^0-9+]/g, '');
   const smsText = `Bonjour, suite à notre échange téléphonique, j'ai préparé une démonstration concrète de ce que pourrait être le nouveau site de ${b.name} : ${demoUrl}`;
-  const whatsappUrl = `https://wa.me/${(b.phone || "").replace(/[^0-9]/g, '')}?text=${encodeURIComponent(smsText)}`;
+  const whatsappUrl = `https://wa.me/${cleanPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(smsText)}`;
 
   return `
     <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/60 backdrop-blur-xs animate-fade-in" onclick="if(event.target === this) window.app.closeShareModal()">
@@ -77,7 +78,7 @@ export function renderShareModal(project) {
 
           <!-- Direct Dispatch Actions -->
           <div class="grid grid-cols-2 gap-2.5 pt-1">
-            <a href="sms:${b.phone || ''}?&body=${encodeURIComponent(smsText)}" class="p-2.5 rounded-xl border border-zinc-200 hover:border-zinc-300 bg-white hover:bg-zinc-50 flex items-center justify-center gap-2 text-xs font-medium text-zinc-800 transition-colors shadow-2xs">
+            <a href="sms:${cleanPhone}?&body=${encodeURIComponent(smsText)}" class="p-2.5 rounded-xl border border-zinc-200 hover:border-zinc-300 bg-white hover:bg-zinc-50 flex items-center justify-center gap-2 text-xs font-medium text-zinc-800 transition-colors shadow-2xs">
               <span>💬</span>
               <span>Envoyer par SMS</span>
             </a>

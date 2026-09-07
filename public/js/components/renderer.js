@@ -171,6 +171,7 @@ export function renderWebsiteHTML(project, options = { isEditor: false, isStanda
       --font-heading: '${project.branding?.headingFont || 'Plus Jakarta Sans'}', -apple-system, BlinkMacSystemFont, sans-serif;
       --font-body: '${project.branding?.bodyFont || 'Inter'}', -apple-system, BlinkMacSystemFont, sans-serif;
       --radius: ${project.branding?.borderRadius || '0.75rem'};
+      --card-radius: ${project.branding?.borderRadius || '0.75rem'};
       --btn-radius: ${project.branding?.buttonRadius || '9999px'};
       --cta-radius: ${project.branding?.buttonRadius || '9999px'};
       --cta-padding: ${ctaPaddingMap[ctaSize] || '0.75rem 1.5rem'};
@@ -520,9 +521,13 @@ function renderHero(sec, project, options = {}) {
     ` : '';
 
     return `
-      <div class="relative overflow-hidden py-24 lg:py-36 text-white" style="
-                background: linear-gradient(rgba(15, 23, 42, 0.72), rgba(15, 23, 42, 0.85)), url('${c.heroImage || getTradeFallbackDataUrl(project.business.tradeId, 'hero', c.title)}') center/cover no-repeat;
-      ">
+      <div class="relative overflow-hidden py-24 lg:py-36 text-white">
+        <img src="${c.heroImage || getTradeFallbackDataUrl(project.business.tradeId, 'hero', c.title)}"
+             alt="${c.title || 'Artisan local'}"
+             class="absolute inset-0 w-full h-full object-cover -z-10 brightness-[0.3]"
+             loading="eager" fetchpriority="high" decoding="async"
+             onerror="if(!this.dataset.fallbackApplied){this.dataset.fallbackApplied='true';this.src='${getTradeFallbackDataUrl(project.business.tradeId, 'hero', c.title)}';}">
+        <div class="absolute inset-0 bg-slate-950/60 -z-10"></div>
         ${bgEditBtn}
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-7">
           <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-white/10 backdrop-blur-md border border-white/20 text-white mx-auto">
@@ -2054,12 +2059,14 @@ export function renderStickyCallBar(project, options = {}) {
     <div class="sticky-call-bar fixed z-40 w-[92%] max-w-md transition-all duration-300 pointer-events-auto ${isCustomDragged ? 'is-custom-dragged' : ''}" data-sticky-call-bar data-dock-position="${dockPosition}" ${stickyStyle}>
       <div class="bg-zinc-950/85 text-white backdrop-blur-md px-3 py-2 rounded-full shadow-2xl border border-white/10 flex items-center justify-between gap-2 text-xs">
 
+        ${options.isEditor ? `
         <button type="button" class="sticky-drag-handle" title="Déplacer le bandeau" aria-label="Déplacer le bandeau de contact">
           ${getIcon("gripVertical", "w-3.5 h-3.5")}
         </button>
+        ` : ''}
 
         <!-- Direct Call -->
-        <a href="tel:${cleanPhone || phone}" class="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-full bg-white text-zinc-950 hover:bg-zinc-100 font-semibold transition-colors shadow-xs" aria-label="Appeler ${phone || 'l’entreprise'}">
+        <a href="tel:${cleanPhone || phone}" class="sticky-call-btn flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-full font-semibold transition-colors shadow-xs" aria-label="Appeler ${phone || 'l’entreprise'}">
           ${getIcon("phone", "w-3.5 h-3.5")}
           <span class="truncate">${phone || "Appeler"}</span>
         </a>

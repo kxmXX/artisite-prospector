@@ -1,10 +1,10 @@
-# Artisite Prospector v4.1.0 — Spécifications Techniques & Architecture
+# Artisite Prospector v4.2.0 — Spécifications Techniques & Architecture
 
 ## 1. Présentation Générale
 
-**Artisite Prospector v4.1.0** est une plateforme SaaS/Sandbox haute performance conçue pour les commerciaux, agences web, freelances et prospecteurs (« Michel »). Elle permet de générer en quelques secondes des sites vitrines premium, hyper-personnalisés et prêts à la vente pour les artisans et petites entreprises locales.
+**Artisite Prospector v4.2.0** est une plateforme SaaS/Sandbox haute performance conçue pour les commerciaux, agences web, freelances et prospecteurs (« Michel »). Elle permet de générer en quelques secondes des sites vitrines premium, hyper-personnalisés et prêts à la vente pour les artisans et petites entreprises locales.
 
-Le produit transforme un minimum d'informations (nom, métier, ville, téléphone) en un site vitrine complet de 16 modules, avec proposition de valeur adaptée, palette de couleurs minérale/éditoriale, typographies modernes et déclencheurs de conversion (appels, devis, WhatsApp).
+Le produit transforme un minimum d'informations (nom, métier, ville, téléphone) en un site vitrine complet de plus de 16 modules, avec proposition de valeur adaptée, palette de couleurs minérale/éditoriale, textures de papier grainées, typographies modernes et déclencheurs de conversion (appels d'urgence radar, devis, WhatsApp, forfaits limités).
 
 ---
 
@@ -18,31 +18,53 @@ Le produit transforme un minimum d'informations (nom, métier, ville, téléphon
 
 ---
 
-## 3. Nouveautés Majeures de la Version 4.1.0
+## 3. Nouveautés Majeures de la Version 4.2.0
 
-### 3.1 Correction des Superpositions et Badges UI
+### 3.1 Comparateur SplitReveal Multi-Instance (Horizontal & Vertical)
+- Prise en charge bidirectionnelle : curseur horizontal classique OU vertical (indispensable pour les toitures, façades et ravalements).
+- Badge de pourcentage dynamique en temps réel (`sr-percent-badge`, ex: `50%`) avec support d'accessibilité clavier WCAG (`←`/`→` et `↑`/`↓`).
+- Isolation complète : instances multiples sans interférence mutuelle, adaptées aux écrans tactiles et souris.
+
+### 3.2 Moteur de Texture Papercraft & Grain Tactile 2026
+- Bruit fractal organique généré par filtre SVG `feTurbulence` intégré en CSS data-URI ultra-léger (zéro requête réseau, 100% offline-ready).
+- Nouveaux tokens de design system : `--bg-cream` (`#F5F1E8`), `--shadow-paper`, et presets *Éditorial Terroir* et *Papercraft Minéral*.
+
+### 3.3 Module Commercial CampaignCard & Jauge Dynamique de Chantiers
+- Carte de réservation avec jauge de progression calculée (ex: 18 / 25 chantiers confirmés = 72%).
+- Pilules de sélection interactive de forfaits (*Essentielle*, *Confort*, *Sérénité*).
+
+### 3.4 Bandeau d'Astreinte Radar 24/7 & Stickers Physiques Tiltés
+- Point radar clignotant animé (`radar-pulse-dot`) avec ondes concentriques d'urgence pour électriciens, plombiers et serruriers.
+- Stickers physiques découpés avec rotation subtile (`-2.5°` / `+2.5°`) et ombre portée tactile.
+
+### 3.5 Machine à États IA Studio & Carte d'Approbation Transparente
+- Carte d'approbation `AIApprovalCard` affichant la jauge de confiance (ex: 96%), le résumé des modifications et les boutons instantanés *Appliquer* / *Ignorer*.
+
+### 3.6 Performance & Accessibilité Modern Web Guidance
+- Jauge de lecture native sur thread compositeur GPU 120 FPS (`animation-timeline: scroll()`) sans aucun écouteur JS.
+- Optimisation LCP avec `fetchpriority="high"` et `loading="eager"` sur le Hero, et `loading="lazy"` + `decoding="async"` sur les autres médias.
+- Rendu différé des sections inférieures hors écran via `content-visibility: auto`.
+- Anneau de focus tactile WCAG 2.2 AA (`:focus-visible`).
+
+### 3.7 Correction des Superpositions et Badges UI
 - Suppression définitive des pseudo-éléments `::after` (`[data-ui-target="true"]::after`) qui affichaient des identifiants techniques bruyants (`#btn-phone`, `#cta`, `#h1`) sur les textes et les boutons du visualiseur.
 - Interface épurée et conforme à la charte graphique 2026–2030 (Linear, Raycast, Framer).
 
-### 3.2 Contrôleur Tactile de Boutons CTA & Suppression avec Historique (Undo / Redo)
+### 3.8 Contrôleur Tactile de Boutons CTA & Suppression avec Historique (Undo / Redo)
 - **Suppression granulaire** : Possibilité de supprimer individuellement un bouton d'action (CTA primaire, secondaire, d'urgence) depuis le visualiseur ou l'inspecteur, avec prise en charge complète de l'annulation (`⌘Z` / `Ctrl+Z`).
 - **Curseur de taille continu** : Remplacement des paliers rigides par un slider continu de mise à l'échelle (80% à 140% / 12px à 22px).
 - **Sélecteur de rayon (Corner Radius)** : Bascule instantanée entre bords droits (`0px`), bords adoucis (`8px` ou `12px`), et format pilule (`9999px`).
 - **Contrôles typographiques** : Boutons rapides `A-` / `A+` et bascule Casse Majuscules / Normal.
 
-### 3.3 Moteur d'Animation Scroll-Reveal à 60 FPS
+### 3.9 Moteur d'Animation Scroll-Reveal à 60 FPS
 - Activation via `IntersectionObserver` sur les sections annotées `[data-motion]`.
 - 4 préréglages cinématiques : `fade-in`, `slide-up`, `slide-in`, `spring`.
 - Feedback visuel immédiat dans l'éditeur lors du changement de préréglage d'animation.
 
-### 3.4 Réorganisation Drag & Drop Fiabilisée
+### 3.10 Réorganisation Drag & Drop Fiabilisée
 - Isolation du drag-handle sur la poignée de préhension dédiée (`.section-card-grip`).
 - Prévention des blocages lors des clics sur les contrôles enfants (accordéons, interrupteurs, inputs).
 - Réordonnancement temps réel dans le store réactif avec persistance locale automatique.
-
-### 3.5 Design Tactile Rétro-Moderne (Keycap 3D)
-- Finition des touches d'action en relief mécanique (biseautage discret, ombre d'enfoncement `:active { transform: translateY(1.5px); }`, rétro-éclairage hover).
-- Séparation stricte entre le Thème Sombre/Clair de l'application et le Mode Aperçu Client (qui masque l'intégralité des barres d'outils et bordures d'édition pour le partage d'écran commercial).
 
 ---
 
@@ -69,7 +91,7 @@ artisite-prospector/
 ├── tests/                   # Suite de tests unitaires (Node test runner natif)
 ├── document.md              # Spécifications & Architecture (ce fichier)
 ├── CHANGELOG.md             # Journal chronologique des versions
-└── package.json             # Métadonnées v4.1.0
+└── package.json             # Métadonnées v4.2.0
 ```
 
 ---

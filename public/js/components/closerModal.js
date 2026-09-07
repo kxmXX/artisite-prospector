@@ -9,9 +9,13 @@ import { generateColdCallScript, generateWhatsappPitch, generateEmailPitch, calc
 export function renderCloserModal(project) {
   if (!project) return '';
 
+  const demoUrl = typeof window !== 'undefined' && window.location
+    ? `${window.location.origin}${window.location.pathname}?demo=${project.id}`
+    : `https://artisite-prospector.vercel.app?demo=${project.id}`;
+
   const script = generateColdCallScript(project);
-  const whatsappText = generateWhatsappPitch(project);
-  const emailData = generateEmailPitch(project);
+  const whatsappText = generateWhatsappPitch(project, demoUrl);
+  const emailData = generateEmailPitch(project, demoUrl);
   const roi = calculateROI(850, 1200);
 
   return `

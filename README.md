@@ -1,4 +1,4 @@
-# ⚡ ARTISITE PROSPECTOR — VERSION 4.1.0
+# ⚡ ARTISITE PROSPECTOR — VERSION 4.2.0
 ### SAS & Sandbox de Création Ultra-Rapide de Sites Vitrines Premium pour Prospection Commerciale Locale
 
 ---
@@ -89,12 +89,16 @@ Intégré directement dans le produit, Michel dispose à chaque instant d'un tir
 
 ## 📍 5. État actuel & suivi des améliorations
 
-### Version 4.1.0 — Canvas d’édition fiable
+### Version 4.2.0 — Spécifications avancées merged.txt & performance 2026-2030
 
-- Contrôles de canvas ciblés par identifiants numériques lisibles.
-- Édition des boutons, textes, animations, couleurs, radius et visibilité avec historique Undo/Redo.
-- Bibliothèque de patterns UI/UX documentée et traduite en primitives vanilla JS.
-- Navigation, export HTML/JSON, thèmes et typographies couverts par des tests automatisés.
+- Comparateur `SplitReveal` multi-instance bidirectionnel (horizontal et vertical) avec badge de pourcentage temps réel et navigation clavier WCAG.
+- Moteur de texture `Papercraft` minéral et grain fractal SVG natif via `feTurbulence` (zéro requête externe, offline-ready).
+- Cartes d'offres limitées `CampaignCard` avec jauge de progression animée et pilules de forfaits.
+- Bandeau d'astreinte radar 24/7 et stickers physiques découpés avec rotation subtile.
+- Carte d'approbation IA Studio avec jauge de confiance transparente.
+- Performance Modern Web : indicateur de défilement GPU 120 FPS (`animation-timeline: scroll()`), priorité de chargement LCP (`fetchpriority="high"`), décodage asynchrone (`decoding="async"`) et rendu différé (`content-visibility: auto`).
+- Contrôles de canvas ciblés par identifiants numériques lisibles (#1, #2, #3) proportionnés S/M/L.
+- Édition des boutons, textes, animations, couleurs, radius et visibilité avec historique Undo/Redo (`⌘Z`).
 
 Le détail des décisions techniques et du plan de validation se trouve dans [`document.md`](document.md). Les changements versionnés sont listés dans [`CHANGELOG.md`](CHANGELOG.md).
 
@@ -174,4 +178,4 @@ npm test
 ```
 
 ---
-*Artisite Prospector v4.1.0 — Fait pour closer les artisans locaux avec excellence.*
+*Artisite Prospector v4.2.0 — Fait pour closer les artisans locaux avec excellence.*

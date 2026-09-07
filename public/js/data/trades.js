@@ -455,6 +455,10 @@ export const TRADES = [
         "desc": "Mise hors d'eau immédiate après coup de vent ou tempête"
       },
       {
+        "title": "Certification Qualibat RGE",
+        "desc": "Travaux d'isolation et toiture conformes et éligibles aux aides"
+      },
+      {
         "title": "Matériaux Norme NF",
         "desc": "Tuiles terre cuite et zinc garantis 30 ans"
       }
@@ -1450,10 +1454,10 @@ export const TRADES = [
     "heroImage": "https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=1600&q=80",
     "aboutImage": "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&w=1000&q=80",
     "trustBadges": [
+      { "title": "Qualification Qualibat", "desc": "Compétence technique validée pour les travaux de finition et peinture" },
       { "title": "Garantie Décennale & RC", "desc": "Assurance professionnelle couvrant 100% de vos chantiers" },
       { "title": "Protection Intégrale", "desc": "Bâchage rigoureux des meubles et sols avant travaux" },
-      { "title": "Peintures Éco-Certifiées", "desc": "Produits A+ à faible émission de COV pour un air sain" },
-      { "title": "Chantier Propre & Nettoyé", "desc": "Restitution impeccable de vos pièces en fin de journée" }
+      { "title": "Peintures Éco-Certifiées", "desc": "Produits A+ à faible émission de COV pour un air sain" }
     ],
     "aboutTitle": "L'exigence du détail et la passion des belles finitions",
     "aboutStory": "La peinture est bien plus qu'une simple couche de couleur : c'est la mise en lumière de votre espace de vie. Fort d'une expérience solide sur chantiers neufs et de rénovation, nous préparons minutieusement les supports (enduisage, ponçage fin, sous-couche) afin de garantir une surface parfaitement lisse, un tendu irréprochable et des teintes éclatantes qui durent dans le temps.",
@@ -1592,10 +1596,10 @@ export const TRADES = [
     "heroImage": "https://images.unsplash.com/photo-1541888946425-d0fbb186c5f7?auto=format&fit=crop&w=1600&q=80",
     "aboutImage": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1000&q=80",
     "trustBadges": [
+      { "title": "Qualification Qualibat", "desc": "Compétence technique validée pour le gros œuvre et la rénovation" },
       { "title": "Garantie Décennale 10 Ans", "desc": "Assurance SMABTP sur tous vos travaux structurels" },
       { "title": "Respect Normes DTU", "desc": "Calculs de charges et ferraillages conformes aux règles de l'art" },
-      { "title": "Matériel Pro Dédié", "desc": "Mini-pelles, camions-bennes et coffrages modernes" },
-      { "title": "Chantier Sécurisé", "desc": "Étaiements stricts et évacuation complète des gravats" }
+      { "title": "Matériel Pro Dédié", "desc": "Mini-pelles, camions-bennes et coffrages modernes" }
     ],
     "aboutTitle": "Bâtir pour durer, avec l'exigence du savoir-faire traditionnel",
     "aboutStory": "Dans le gros œuvre, il n'y a aucune place pour l'improvisation. Chaque fondation, chaque ouverture de mur porteur et chaque dalle béton exige un dosage exact, un ferraillage dimensionné et le respect absolu des temps de séchage. Fort de plus de 15 années sur les chantiers locaux, nous assurons des réalisations saines et robustes conçues pour traverser les décennies.",
@@ -1852,7 +1856,10 @@ export const TRADES = [
 ];
 
 export function getTradeById(id) {
-  return TRADES.find(t => t.id === id) || TRADES[0];
+  if (!id) return TRADES[0];
+  const exact = TRADES.find(t => t.id === id);
+  if (exact) return exact;
+  return findTradeByKeywords(id);
 }
 
 const TRADE_ALIASES = {

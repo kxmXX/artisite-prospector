@@ -48,7 +48,7 @@ export function generateColdCallScript(project) {
 
 export function generateWhatsappPitch(project, demoUrl = "") {
   const b = project.business;
-  const url = demoUrl || window.location.href;
+  const url = demoUrl || (typeof window !== "undefined" && window.location ? window.location.href : "");
   return `Bonjour ${b.name},
 
 C'est Michel. J'ai pris le temps de concevoir une démonstration de ce que pourrait être votre futur site vitrine professionnel pour vos prestations de ${b.tradeLabel.toLowerCase()} à ${b.city}.
@@ -61,7 +61,7 @@ Qu'en pensez-vous ? Si cela vous convient, nous pouvons le personnaliser et le m
 
 export function generateEmailPitch(project, demoUrl = "") {
   const b = project.business;
-  const url = demoUrl || window.location.href;
+  const url = demoUrl || (typeof window !== "undefined" && window.location ? window.location.href : "");
   return {
     subject: `Proposition de site vitrine pour ${b.name} (${b.city})`,
     body: `Bonjour ${b.name},

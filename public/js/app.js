@@ -85,10 +85,13 @@ class App {
 
     // Global keyboard shortcuts
     window.addEventListener("keydown", (e) => {
+      const isInput = e.target.matches("input, textarea, select") || e.target.isContentEditable;
       if ((e.metaKey || e.ctrlKey) && !e.shiftKey && e.key.toLowerCase() === "z") {
+        if (isInput) return;
         e.preventDefault();
         this.undo();
       } else if ((e.metaKey || e.ctrlKey) && (e.shiftKey && e.key.toLowerCase() === "z" || e.key.toLowerCase() === "y")) {
+        if (isInput) return;
         e.preventDefault();
         this.redo();
       } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
@@ -2238,7 +2241,7 @@ class App {
         </div>
 
         <div class="footer">
-          Document commercial non contractuel • Artisite Prospector v4.1.0
+          Document commercial non contractuel • Artisite Prospector v4.2.0
         </div>
       </body>
       </html>
@@ -2253,9 +2256,12 @@ class App {
     const project = state.currentProject;
     const siteHTML = renderWebsiteHTML(project, { isEditor: false, isStandalone: false });
 
+    const isClientDemo = window.location.search.includes("demo=");
+
     this.rootEl.innerHTML = `
       <div class="relative min-h-screen bg-zinc-950">
         
+        ${isClientDemo ? "" : `
         <!-- Floating Commercial Pitch Ribbon for Michel -->
         <div class="fixed top-3 left-1/2 transform -translate-x-1/2 z-50 bg-zinc-950/90 text-white px-4 py-2 rounded-full shadow-lg backdrop-blur-md border border-zinc-800 flex items-center gap-3.5 text-xs">
           <div class="flex items-center gap-2 font-medium text-zinc-300">
@@ -2275,6 +2281,7 @@ class App {
             <span>Script Appel</span>
           </button>
         </div>
+        `}
 
         <!-- The Clean Site Canvas without any editor chrome -->
         <div>
@@ -2339,25 +2346,32 @@ class App {
           if (badge) badge.textContent = `${percentage}%`;
         };
 
-        window.addEventListener("resize", () => {
-          if (!isVertical && beforeImg) {
-            const rect = container.getBoundingClientRect();
-            beforeImg.style.width = rect.width + "px";
-          }
-        });
+        if (!container.dataset.resizeAttached) {
+          container.dataset.resizeAttached = "true";
+          window.addEventListener("resize", () => {
+            if (!isVertical && beforeImg) {
+              const rect = container.getBoundingClientRect();
+              beforeImg.style.width = rect.width + "px";
+            }
+          });
+        }
 
-        let isDragging = false;
-        handle.onmousedown = (e) => { e.preventDefault(); isDragging = true; };
-        window.addEventListener("mouseup", () => { isDragging = false; });
-        window.addEventListener("mousemove", (e) => {
-          if (isDragging) updateSlider(isVertical ? e.clientY : e.clientX);
+        handle.addEventListener("pointerdown", (e) => {
+          e.preventDefault();
+          handle.setPointerCapture(e.pointerId);
+          const onMove = (ev) => {
+            updateSlider(isVertical ? ev.clientY : ev.clientX);
+          };
+          const onUp = (ev) => {
+            try { handle.releasePointerCapture(ev.pointerId); } catch (err) {}
+            handle.removeEventListener("pointermove", onMove);
+            handle.removeEventListener("pointerup", onUp);
+            handle.removeEventListener("pointercancel", onUp);
+          };
+          handle.addEventListener("pointermove", onMove);
+          handle.addEventListener("pointerup", onUp);
+          handle.addEventListener("pointercancel", onUp);
         });
-
-        handle.ontouchstart = () => { isDragging = true; };
-        window.addEventListener("touchend", () => { isDragging = false; });
-        window.addEventListener("touchmove", (e) => {
-          if (isDragging && e.touches[0]) updateSlider(isVertical ? e.touches[0].clientY : e.touches[0].clientX);
-        }, { passive: true });
 
         container.addEventListener("click", (e) => {
           if (e.target.closest("button") || e.target.closest(".sr-handle")) return;
@@ -2599,6 +2613,7 @@ class App {
       });
 
       el.addEventListener("focus", () => {
+        el.dataset.initialValue = el.innerText.trim();
         const secWrapper = el.closest(".editor-section-wrapper");
         const secId = secWrapper?.getAttribute("data-section-id");
         if (secId) {
@@ -2631,9 +2646,10 @@ class App {
       el.onblur = () => {
         const field = el.getAttribute("data-editable");
         const value = el.innerText.trim();
+        const initialValue = el.dataset.initialValue;
         const secWrapper = el.closest(".editor-section-wrapper");
         const secId = secWrapper?.getAttribute("data-section-id");
-        if (secId && field) {
+        if (secId && field && value !== initialValue) {
           this.commitFieldUpdate(secId, field, value);
         }
       };

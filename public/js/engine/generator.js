@@ -46,7 +46,23 @@ export function generateSite(input = {}) {
     phone,
     email,
     address,
-    openingHours: {
+    openingHours: trade.id === "restaurant" ? {
+      lundi: "Fermé",
+      mardi: "12h00 - 14h30 / 19h00 - 22h30",
+      mercredi: "12h00 - 14h30 / 19h00 - 22h30",
+      jeudi: "12h00 - 14h30 / 19h00 - 22h30",
+      vendredi: "12h00 - 14h30 / 19h00 - 23h00",
+      samedi: "12h00 - 15h00 / 19h00 - 23h30",
+      dimanche: "12h00 - 15h00 (Fermé le soir)"
+    } : trade.id === "boulanger" ? {
+      lundi: "Fermé",
+      mardi: "06h30 - 19h30",
+      mercredi: "06h30 - 19h30",
+      jeudi: "06h30 - 19h30",
+      vendredi: "06h30 - 19h30",
+      samedi: "06h30 - 19h30",
+      dimanche: "07h00 - 13h00"
+    } : {
       lundi: "08h00 - 19h00",
       mardi: "08h00 - 19h00",
       mercredi: "08h00 - 19h00",
@@ -56,6 +72,64 @@ export function generateSite(input = {}) {
       dimanche: "Fermé (urgences sur appel)"
     }
   };
+
+  const isFoodTrade = ["restaurant", "boulanger"].includes(trade.id);
+  const isPersonalCare = ["coiffeur"].includes(trade.id);
+  const isLiberal = ["avocat"].includes(trade.id);
+
+  let aboutPoints = [
+    `Déplacement offert et étude personnalisée à ${city}`,
+    "Assurance décennale et responsabilité civile professionnelle",
+    "Chantiers nettoyés et restitués impeccables",
+    "Interlocuteur unique tout au long de votre projet"
+  ];
+  let statsItems = [
+    { value: "24h", label: "Délai moyen d'envoi du devis", sub: "Étude chiffrée gratuite" },
+    { value: "100%", label: "Satisfaction garantie", sub: "Contrôle qualité systématique" },
+    { value: "10 ans", label: "Garantie décennale", sub: "Selon nature des travaux" },
+    { value: "0 €", label: "Frais de déplacement", sub: `Dans un rayon de 30 km de ${city}` }
+  ];
+
+  if (isFoodTrade) {
+    aboutPoints = [
+      "Produits frais rigoureusement sélectionnés chaque matin",
+      "Recettes traditionnelles et savoir-faire 100% artisanal",
+      "Respect strict des normes d'hygiène et de traçabilité HACCP",
+      `Accueil chaleureux et convivial au cœur de ${city}`
+    ];
+    statsItems = [
+      { value: "100%", label: "Fait Maison", sub: "Cuisine et préparation artisanale" },
+      { value: "Local", label: "Circuits Courts", sub: "Producteurs et maraîchers de proximité" },
+      { value: "Frais", label: "Arrivages Quotidiens", sub: "Sélection des meilleurs produits bruts" },
+      { value: "7j/7", label: "Plaisir & Convivialité", sub: `Votre adresse gourmande à ${city}` }
+    ];
+  } else if (isPersonalCare) {
+    aboutPoints = [
+      "Diagnostic personnalisé et écoute attentive de vos envies",
+      "Produits professionnels de haute qualité respectueux du cheveu",
+      "Espace détente soigné avec bacs massants et boissons offertes",
+      `Prestations soignées sur rendez-vous au cœur de ${city}`
+    ];
+    statsItems = [
+      { value: "100%", label: "Sur-Mesure", sub: "Conseil visagiste et diagnostic personnalisé" },
+      { value: "Pro", label: "Produits de Soin", sub: "Gammes professionnelles sélectionnées" },
+      { value: "Détente", label: "Cadre Apaisant", sub: "Un moment de bien-être rien que pour vous" },
+      { value: "5 ★", label: "Attention & Soin", sub: `Votre salon de référence à ${city}` }
+    ];
+  } else if (isLiberal) {
+    aboutPoints = [
+      "Confidentialité absolue et respect strict du secret professionnel",
+      "Transparence totale des honoraires fixés par convention préalable",
+      "Écoute humaine, disponibilité et réactivité pour défendre vos intérêts",
+      `Cabinet facilement accessible au centre de ${city}`
+    ];
+    statsItems = [
+      { value: "100%", label: "Secret Professionnel", sub: "Confidentialité et déontologie de l'Ordre" },
+      { value: "Clair", label: "Honoraires Maîtrisés", sub: "Convention préalable transparente" },
+      { value: "Dédié", label: "Conseil & Défense", sub: "Stratégie juridique sur mesure" },
+      { value: "Direct", label: "Écoute & Réactivité", sub: `À vos côtés à ${city} et sa région` }
+    ];
+  }
 
   // Section 1: Header
   const headerSection = {
@@ -67,14 +141,14 @@ export function generateSite(input = {}) {
       brandName: name,
       badge: trade.badge,
       phone,
-      ctaText: "Demander un devis",
+      ctaText: isFoodTrade ? "Réserver une table" : isPersonalCare ? "Prendre RDV" : isLiberal ? "Prendre RDV" : "Demander un devis",
       links: [
-        { label: "Services", target: "#services" },
+        { label: "Prestations", target: "#services" },
+        { label: "Savoir-Faire", target: "#about" },
         { label: "Réalisations", target: "#realisations" },
-        { label: "Avant / Après", target: "#before-after" },
-        { label: "Avis", target: "#avis" },
-        { label: "Tarifs & Devis", target: "#simulateur" },
-        { label: "Contact", target: "#contact" }
+        { label: "Avis Clients", target: "#reviews" },
+        { label: isFoodTrade ? "Réserver" : "Contact & Devis", target: "#quoteSimulator" },
+        { label: "Accès", target: "#location" }
       ]
     },
     settings: { sticky: true }
@@ -84,17 +158,17 @@ export function generateSite(input = {}) {
   const heroSection = {
     id: "sec-hero",
     type: "hero",
-    variant: input.heroVariant || "split-image",
+    variant: "split-image",
     visibility: true,
     content: {
-      badge: `${trade.badge} • ${city} & ${region}`,
-      title: trade.heroTitles[0],
-      subtitle: `${trade.heroSubtitles[0]} Intervention soignée à ${city} et dans tout le secteur ${region}.`,
+      badge: `${trade.badge} • ${city}`,
+      title: trade.heroTitles[0] || `Votre artisan de confiance à ${city}`,
+      subtitle: `${trade.heroSubtitles[0]} Intervention soignée à ${city} et ses environs.`,
       ctaPrimary: trade.ctaPrimary || "Demander mon devis gratuit",
       ctaSecondary: trade.ctaSecondary || "Appeler directement",
       phone,
       heroImage: trade.heroImage,
-      trustNote: "✓ Devis 100% gratuit sous 24h sans engagement"
+      trustNote: isLiberal ? "✓ Déontologie et secret professionnel garantis" : isFoodTrade ? "✓ Produits frais cuisinés maison chaque jour" : "✓ Devis 100% gratuit sous 24h sans engagement"
     },
     settings: { align: "left" }
   };
@@ -106,33 +180,27 @@ export function generateSite(input = {}) {
     variant: "grid-4",
     visibility: true,
     content: {
-      badges: trade.trustBadges.map(b => ({
-        title: b.title,
-        desc: b.desc
-      }))
+      badge: "Garanties & Engagements",
+      title: `Pourquoi Faire Confiance à ${name} ?`,
+      badges: trade.trustBadges
     },
-    settings: { fullWidth: false }
+    settings: { columns: 4 }
   };
 
-  // Section 4: About
+  // Section 4: About / Story
   const aboutSection = {
     id: "sec-about",
     type: "about",
-    variant: "editorial-split",
+    variant: "split-story",
     visibility: true,
     content: {
-      badge: "Notre savoir-faire",
-      title: trade.aboutTitle || `L'exigence d'un artisan local à ${city}`,
-      story: trade.aboutStory.replace(/notre entreprise/gi, name),
-      owner: trade.aboutOwner,
-      role: trade.aboutRole,
+      badge: "Notre Histoire & Philosophie",
+      title: trade.aboutTitle || `À propos de ${name}`,
+      story: trade.aboutStory.replace(/notre entreprise/g, name),
+      owner: trade.aboutOwner || "L'équipe",
+      role: trade.aboutRole || trade.label,
       image: trade.aboutImage,
-      points: [
-        `Déplacement offert et étude personnalisée à ${city}`,
-        "Assurance décennale et responsabilité civile professionnelle",
-        "Chantiers nettoyés et restitués impeccables",
-        "Interlocuteur unique tout au long de votre projet"
-      ]
+      points: aboutPoints
     },
     settings: { reversed: false }
   };
@@ -144,12 +212,7 @@ export function generateSite(input = {}) {
     variant: "ribbon",
     visibility: true,
     content: {
-      items: [
-        { value: "24h", label: "Délai moyen d'envoi du devis", sub: "Étude chiffrée gratuite" },
-        { value: "100%", label: "Satisfaction garantie", sub: "Contrôle qualité systématique" },
-        { value: "10 ans", label: "Garantie décennale", sub: "Selon nature des travaux" },
-        { value: "0 €", label: "Frais de déplacement", sub: `Dans un rayon de 30 km de ${city}` }
-      ]
+      items: statsItems
     },
     settings: { background: "primary" }
   };
@@ -304,20 +367,23 @@ export function generateSite(input = {}) {
   };
 
   // Section 13: Location / Intervention Zone
+  const isStorefront = isFoodTrade || isPersonalCare || isLiberal;
   const locationSection = {
     id: "sec-location",
     type: "location",
     variant: "zone-card",
     visibility: true,
     content: {
-      badge: "Proximité & Déplacement",
-      title: `Zone d'Intervention : ${city} & ${region}`,
-      subtitle: `Basés à ${city}, nous nous déplaçons rapidement dans un rayon de 35 km sans frais kilométriques superflus.`,
+      badge: isStorefront ? "Nous Rendre Visite" : "Proximité & Déplacement",
+      title: isStorefront ? `Notre Établissement à ${city}` : `Zone d'Intervention : ${city} & ${region}`,
+      subtitle: isStorefront
+        ? `Idéalement situé au cœur de ${city}, notre établissement vous accueille dans un cadre soigné et facile d'accès.`
+        : `Basés à ${city}, nous nous déplaçons rapidement dans un rayon de 35 km sans frais kilométriques superflus.`,
       city,
       region,
       address: business.address,
       phone,
-      radius: "Rayon de 35 km",
+      radius: isStorefront ? "Accueil sur place" : "Rayon de 35 km",
       citiesCovered: [
         city,
         `${city} Centre`,
@@ -341,30 +407,31 @@ export function generateSite(input = {}) {
       badge: "Foire Aux Questions",
       title: "Questions Fréquentes",
       subtitle: "Tout ce que vous devez savoir avant de nous confier votre projet.",
-      items: trade.faq.map((item, idx) => ({
+      items: (trade.faq || []).map((item, idx) => ({
         id: `faq-${idx + 1}`,
         q: item.q,
         a: item.a
       }))
     },
-    settings: { accordionAutoClose: true }
+    settings: { allowMultiple: false }
   };
 
   // Section 15: Final CTA
   const ctaSection = {
     id: "sec-cta",
     type: "cta",
-    variant: "banner-action",
+    variant: "banner-dark",
     visibility: true,
     content: {
-      badge: "Prenez Contact",
+      badge: "Passons à l'action",
       title: `Prêt à concrétiser votre projet à ${city} ?`,
-      subtitle: `Votre artisan ${trade.label.toLowerCase()} se déplace gratuitement pour vous conseiller et chiffrer votre besoin au juste prix.`,
-      ctaPrimary: "Demander mon devis gratuit",
-      ctaSecondary: `Appeler : ${phone}`,
-      phone
+      subtitle: `Bénéficiez dès aujourd'hui d'une écoute attentive, d'un travail soigné et d'un accompagnement personnalisé sans mauvaise surprise.`,
+      ctaPrimary: trade.ctaPrimary,
+      ctaSecondary: trade.ctaSecondary,
+      phone,
+      trustNote: "Intervention rapide • Garantie professionnelle • Devis gratuit"
     },
-    settings: { background: "dark" }
+    settings: { style: "dark" }
   };
 
   // Section 16: Footer
@@ -376,7 +443,11 @@ export function generateSite(input = {}) {
     content: {
       brandName: name,
       badge: trade.badge,
-      desc: `Artisan professionnel spécialisé en ${trade.category.toLowerCase()} à ${city} et ses alentours. Travail soigné, devis gratuits et respect des délais.`,
+      desc: isLiberal
+        ? `Cabinet professionnel de conseil juridique et de défense à ${city} et ses alentours. Rigueur, confidentialité et respect de la déontologie.`
+        : isFoodTrade
+        ? `Établissement artisanal de qualité à ${city}. Produits frais, savoir-faire traditionnel et passion du goût au quotidien.`
+        : `Artisan professionnel spécialisé en ${trade.category.toLowerCase()} à ${city} et ses alentours. Travail soigné, devis gratuits et respect des délais.`,
       phone,
       email,
       address: business.address,
@@ -386,9 +457,14 @@ export function generateSite(input = {}) {
     settings: { showLegalNotice: true }
   };
 
+  const isEmergencyTrade = ["plombier", "electricien", "serrurier", "couvreur", "depannage"].includes(trade.id);
+  const emergencyBanner = isEmergencyTrade ? createSectionData("customBlock", "radarEmergency", trade, business) : null;
+  if (emergencyBanner) emergencyBanner.id = "sec-radar-emergency";
+
   const sections = [
     headerSection,
     heroSection,
+    ...(emergencyBanner ? [emergencyBanner] : []),
     trustSection,
     aboutSection,
     statsSection,
@@ -530,7 +606,38 @@ export function createSectionData(type, variant, trade, business = {}) {
         settings: { columns: 3 }
       };
 
-    case "about":
+    case "about": {
+      const isFood = ["restaurant", "boulanger"].includes(trade.id);
+      const isPersonalCare = ["coiffeur"].includes(trade.id);
+      const isLiberal = ["avocat"].includes(trade.id);
+      let secAboutPoints = [
+        `Déplacement offert et étude personnalisée à ${city}`,
+        "Assurance décennale et responsabilité civile professionnelle",
+        "Chantiers nettoyés et restitués impeccables",
+        "Interlocuteur unique tout au long de votre projet"
+      ];
+      if (isFood) {
+        secAboutPoints = [
+          "Produits frais rigoureusement sélectionnés chaque matin",
+          "Recettes traditionnelles et savoir-faire 100% artisanal",
+          "Respect strict des normes d'hygiène et de traçabilité HACCP",
+          `Accueil chaleureux et convivial au cœur de ${city}`
+        ];
+      } else if (isPersonalCare) {
+        secAboutPoints = [
+          "Diagnostic personnalisé et écoute attentive de vos envies",
+          "Produits professionnels de haute qualité respectueux du cheveu",
+          "Espace détente soigné avec bacs massants et boissons offertes",
+          `Prestations soignées sur rendez-vous au cœur de ${city}`
+        ];
+      } else if (isLiberal) {
+        secAboutPoints = [
+          "Confidentialité absolue et respect strict du secret professionnel",
+          "Transparence totale des honoraires fixés par convention préalable",
+          "Écoute humaine, disponibilité et réactivité pour défendre vos intérêts",
+          `Cabinet facilement accessible au centre de ${city}`
+        ];
+      }
       return {
         type: "about",
         variant: variant || "editorial-split",
@@ -541,15 +648,11 @@ export function createSectionData(type, variant, trade, business = {}) {
           owner: trade.aboutOwner,
           role: trade.aboutRole,
           image: trade.aboutImage,
-          points: [
-            `Déplacement offert et étude personnalisée à ${city}`,
-            "Assurance décennale et responsabilité civile professionnelle",
-            "Chantiers nettoyés et restitués impeccables",
-            "Interlocuteur unique tout au long de votre projet"
-          ]
+          points: secAboutPoints
         },
         settings: { reversed: false }
       };
+    }
 
     case "beforeAfter":
       return {

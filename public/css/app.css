@@ -1010,6 +1010,9 @@ input, textarea, select, [contenteditable] {
   cursor: pointer;
   user-select: none;
 }
+.btn-keycap:active, .keycap-btn:active {
+  transform: translateY(1.5px) !important;
+}
 
 .btn-keycap-light {
   background: #f7f1e6;
@@ -1508,6 +1511,20 @@ body.dark-theme #right-inspector-panel select { background: #202027 !important; 
 .artisite-root[data-site-theme="dark"] .border-black\/10,
 .artisite-root[data-site-theme="dark"] .border-zinc-100,
 .artisite-root[data-site-theme="dark"] .border-zinc-200 { border-color: #303641 !important; }
+.artisite-root[data-site-theme="dark"] .text-zinc-900,
+.artisite-root[data-site-theme="dark"] .text-zinc-800,
+.artisite-root[data-site-theme="dark"] .text-zinc-700 { color: #f4f4f5 !important; }
+.artisite-root[data-site-theme="dark"] .text-zinc-600,
+.artisite-root[data-site-theme="dark"] .text-zinc-500,
+.artisite-root[data-site-theme="dark"] .text-zinc-400 { color: #b4bac7 !important; }
+.artisite-root[data-site-theme="dark"] .faq-item { background-color: #171a20 !important; border-color: #303641 !important; }
+.artisite-root[data-site-theme="dark"] .faq-header,
+.artisite-root[data-site-theme="dark"] .faq-header span { color: #f4f4f5 !important; }
+.artisite-root[data-site-theme="dark"] .faq-content,
+.artisite-root[data-site-theme="dark"] .faq-content p { color: #b4bac7 !important; }
+.artisite-root[data-site-theme="dark"] .campaign-card { background-color: #171a20 !important; color: #f4f4f5 !important; border-color: #303641 !important; }
+.sticky-call-btn { background-color: #ffffff !important; color: #09090b !important; }
+.sticky-call-btn:hover { background-color: #f4f4f5 !important; }
 .artisite-root[data-site-theme="dark"] .site-theme-toggle { background: #20242c !important; color: #f4f4f5 !important; border-color: #3b4350 !important; }
 .artisite-root[data-site-theme="dark"] .site-section { color: #f4f4f5; }
 .artisite-root[data-site-theme="dark"] input,
@@ -2226,8 +2243,9 @@ body.dark-theme #right-inspector-panel select { background: #202027 !important; 
 .sr-percent-badge {
   position: absolute;
   bottom: 1rem;
-  left: 50%;
-  transform: translateX(-50%);
+  right: 1rem;
+  left: auto;
+  transform: none;
   background: rgba(9, 9, 11, 0.85);
   backdrop-filter: blur(8px);
   color: #ffffff;
