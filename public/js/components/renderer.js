@@ -266,10 +266,10 @@ function renderSection(sec, project, options) {
   if (isEditor) innerHTML = decorateEditableMarkup(innerHTML, project, sec);
 
   const globalBg = String(project.branding?.bgColor || "").toLowerCase();
-  const inferredTheme = ["#09090b", "#0f0f11", "#111318", "#18181b"].includes(globalBg) ? "dark" : ["#f4f4f5", "#f8fafc"].includes(globalBg) ? "mineral" : "white";
+  const inferredTheme = sec.type === "cta" ? "primary" : (["#09090b", "#0f0f11", "#111318", "#18181b"].includes(globalBg) ? "dark" : ["#f4f4f5", "#f8fafc"].includes(globalBg) ? "mineral" : "white");
   const sectionTheme = sec.settings?.bgTheme || inferredTheme;
   const bgTheme = `bg-sec-${sectionTheme}`;
-  const themeColor = sectionTheme === "dark" ? "#09090b" : sectionTheme === "navy" ? "#0c1527" : sectionTheme === "warm" ? "#faf8f5" : sectionTheme === "mineral" ? "#f8fafc" : "#ffffff";
+  const themeColor = sectionTheme === "dark" ? "#09090b" : sectionTheme === "navy" ? "#0c1527" : sectionTheme === "warm" ? "#faf8f5" : sectionTheme === "mineral" ? "#f8fafc" : sectionTheme === "primary" ? (project.branding?.primaryColor || "#059669") : "#ffffff";
   const motionPreset = sec.settings?.motionPreset || (project.branding?.motionPreset && project.branding.motionPreset !== "none" ? project.branding.motionPreset : "")
   const customBackground = /^#[0-9a-f]{3,8}$/i.test(sec.settings?.customBackground || "")
     ? `background-color: ${sec.settings.customBackground} !important;`

@@ -861,6 +861,9 @@ input, textarea, select, [contenteditable] {
 .bg-sec-navy { background-color: #0c1527 !important; color: #f8fafc !important; }
 .bg-sec-navy h2, .bg-sec-navy h3, .bg-sec-navy h4 { color: #ffffff !important; }
 .bg-sec-navy p { color: #94a3b8 !important; }
+.bg-sec-primary { background-color: var(--primary, #059669) !important; color: #ffffff !important; }
+.bg-sec-primary h2, .bg-sec-primary h3, .bg-sec-primary h4 { color: #ffffff !important; }
+.bg-sec-primary p { color: rgba(255, 255, 255, 0.85) !important; }
 .bg-site { background-color: var(--bg, #fff) !important; }
 .text-main { color: var(--text, #18181b); }
 
@@ -890,6 +893,134 @@ input, textarea, select, [contenteditable] {
   background-color: rgba(255, 255, 255, 0.04) !important;
   border-color: rgba(255, 255, 255, 0.08) !important;
   color: #f4f4f5 !important;
+}
+
+/* Comprehensive contrast adaptation for dark & navy sections */
+.editor-section-wrapper[data-section-bg="dark"] h1,
+.editor-section-wrapper[data-section-bg="dark"] h2,
+.editor-section-wrapper[data-section-bg="dark"] h3,
+.editor-section-wrapper[data-section-bg="dark"] h4,
+.site-section[data-section-bg="dark"] h1,
+.site-section[data-section-bg="dark"] h2,
+.site-section[data-section-bg="dark"] h3,
+.site-section[data-section-bg="dark"] h4,
+.editor-section-wrapper[data-section-bg="navy"] h1,
+.editor-section-wrapper[data-section-bg="navy"] h2,
+.editor-section-wrapper[data-section-bg="navy"] h3,
+.editor-section-wrapper[data-section-bg="navy"] h4,
+.site-section[data-section-bg="navy"] h1,
+.site-section[data-section-bg="navy"] h2,
+.site-section[data-section-bg="navy"] h3,
+.site-section[data-section-bg="navy"] h4,
+.editor-section-wrapper[data-section-bg="primary"] h1,
+.editor-section-wrapper[data-section-bg="primary"] h2,
+.editor-section-wrapper[data-section-bg="primary"] h3,
+.editor-section-wrapper[data-section-bg="primary"] h4,
+.site-section[data-section-bg="primary"] h1,
+.site-section[data-section-bg="primary"] h2,
+.site-section[data-section-bg="primary"] h3,
+.site-section[data-section-bg="primary"] h4 {
+  color: #ffffff !important;
+}
+
+.editor-section-wrapper[data-section-bg="primary"] p,
+.editor-section-wrapper[data-section-bg="primary"] .text-gray-600,
+.editor-section-wrapper[data-section-bg="primary"] .text-gray-700,
+.editor-section-wrapper[data-section-bg="primary"] .text-gray-800,
+.editor-section-wrapper[data-section-bg="primary"] .text-gray-900,
+.editor-section-wrapper[data-section-bg="primary"] .text-zinc-600,
+.editor-section-wrapper[data-section-bg="primary"] .text-zinc-700,
+.editor-section-wrapper[data-section-bg="primary"] .text-zinc-800,
+.editor-section-wrapper[data-section-bg="primary"] .text-zinc-900,
+.site-section[data-section-bg="primary"] p,
+.site-section[data-section-bg="primary"] .text-gray-600,
+.site-section[data-section-bg="primary"] .text-gray-700,
+.site-section[data-section-bg="primary"] .text-gray-800,
+.site-section[data-section-bg="primary"] .text-gray-900,
+.site-section[data-section-bg="primary"] .text-zinc-600,
+.site-section[data-section-bg="primary"] .text-zinc-700,
+.site-section[data-section-bg="primary"] .text-zinc-800,
+.site-section[data-section-bg="primary"] .text-zinc-900 {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.editor-section-wrapper[data-section-bg="dark"] p,
+.editor-section-wrapper[data-section-bg="dark"] .text-gray-600,
+.editor-section-wrapper[data-section-bg="dark"] .text-gray-700,
+.editor-section-wrapper[data-section-bg="dark"] .text-gray-800,
+.editor-section-wrapper[data-section-bg="dark"] .text-gray-900,
+.editor-section-wrapper[data-section-bg="dark"] .text-zinc-600,
+.editor-section-wrapper[data-section-bg="dark"] .text-zinc-700,
+.editor-section-wrapper[data-section-bg="dark"] .text-zinc-800,
+.editor-section-wrapper[data-section-bg="dark"] .text-zinc-900,
+.site-section[data-section-bg="dark"] p,
+.site-section[data-section-bg="dark"] .text-gray-600,
+.site-section[data-section-bg="dark"] .text-gray-700,
+.site-section[data-section-bg="dark"] .text-gray-800,
+.site-section[data-section-bg="dark"] .text-gray-900,
+.site-section[data-section-bg="dark"] .text-zinc-600,
+.site-section[data-section-bg="dark"] .text-zinc-700,
+.site-section[data-section-bg="dark"] .text-zinc-800,
+.site-section[data-section-bg="dark"] .text-zinc-900,
+.editor-section-wrapper[data-section-bg="navy"] p,
+.editor-section-wrapper[data-section-bg="navy"] .text-gray-600,
+.editor-section-wrapper[data-section-bg="navy"] .text-gray-700,
+.editor-section-wrapper[data-section-bg="navy"] .text-gray-800,
+.editor-section-wrapper[data-section-bg="navy"] .text-gray-900,
+.site-section[data-section-bg="navy"] p,
+.site-section[data-section-bg="navy"] .text-gray-600,
+.site-section[data-section-bg="navy"] .text-gray-700,
+.site-section[data-section-bg="navy"] .text-gray-800,
+.site-section[data-section-bg="navy"] .text-gray-900 {
+  color: #d1d5db !important;
+}
+
+/* Comprehensive contrast adaptation for white & mineral sections */
+.editor-section-wrapper[data-section-bg="white"] h2,
+.editor-section-wrapper[data-section-bg="white"] h3,
+.editor-section-wrapper[data-section-bg="white"] h4,
+.editor-section-wrapper[data-section-bg="mineral"] h2,
+.editor-section-wrapper[data-section-bg="mineral"] h3,
+.editor-section-wrapper[data-section-bg="mineral"] h4,
+.site-section[data-section-bg="white"] h2,
+.site-section[data-section-bg="white"] h3,
+.site-section[data-section-bg="white"] h4,
+.site-section[data-section-bg="mineral"] h2,
+.site-section[data-section-bg="mineral"] h3,
+.site-section[data-section-bg="mineral"] h4 {
+  color: #0f172a !important;
+}
+
+.editor-section-wrapper[data-section-bg="white"] p,
+.editor-section-wrapper[data-section-bg="mineral"] p,
+.site-section[data-section-bg="white"] p,
+.site-section[data-section-bg="mineral"] p {
+  color: #475569 !important;
+}
+
+/* High-end 2026 glassmorphism for sticky dock */
+.sticky-dock-glass {
+  background: rgba(24, 24, 27, 0.88) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  backdrop-filter: blur(16px) saturate(130%) contrast(108%) brightness(104%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(130%) contrast(108%) brightness(104%) !important;
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.55),
+    0 2px 8px rgba(0, 0, 0, 0.2),
+    inset 1px 1px 0 rgba(255, 255, 255, 0.35),
+    inset -1px -1px 0 rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Bounded image modal preview preventing oversized SVGs or banner blowouts */
+#image-modal-preview {
+  max-width: 100% !important;
+  max-height: 100% !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+#image-modal img {
+  max-width: 100%;
 }
 
 /* Canva Floating Quick Insert Dock */
@@ -1211,11 +1342,11 @@ input, textarea, select, [contenteditable] {
   transition: all 0.15s ease;
 }
 
+/* When hovered, focused, or active, the popover provides the unified full controls. Hide the mini badge to prevent overlapping clashing toolbars. */
 .cta-button-wrapper:hover .cta-direct-badge,
 .cta-button-wrapper:focus-within .cta-direct-badge,
 .cta-button-wrapper.is-active .cta-direct-badge {
-  opacity: 1;
-  transform: scale(1.05);
+  display: none !important;
 }
 
 .cta-direct-btn {
@@ -1859,14 +1990,19 @@ body.dark-theme #right-inspector-panel select { background: #202027 !important; 
   position: relative;
 }
 
+/* Technical overlay badges (#btn-phone, #cta, #h1) are completely disabled in CSS */
+[data-ui-target="true"]::after {
+  display: none !important;
+}
+
 .editor-section-wrapper [data-ui-index]:hover::after,
 .editor-section-wrapper [data-ui-index]:focus-within::after {
   content: "#" attr(data-ui-index);
+  display: inline-flex !important;
   position: absolute;
   top: -8px;
   right: -6px;
   z-index: 65;
-  display: inline-flex;
   align-items: center;
   justify-content: center;
   min-width: 22px;
@@ -1903,10 +2039,6 @@ body.dark-theme #right-inspector-panel select { background: #202027 !important; 
 @keyframes badgePop {
   from { opacity: 0; transform: scale(0.85); }
   to { opacity: 1; transform: scale(1); }
-}
-
-[data-ui-target="true"]::after {
-  display: none !important;
 }
 
 .client-preview-mode [data-ui-index]::after {

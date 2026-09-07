@@ -164,10 +164,10 @@ export function renderEditor(state) {
 
           <!-- Export Dropdown with Tactile Keycap -->
           <div class="relative">
-            <button type="button" id="export-menu-button" aria-expanded="false" aria-controls="export-menu" aria-haspopup="menu" onclick="window.app.toggleExportMenu()" class="btn-keycap btn-keycap-accent inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold shadow-xs">
+            <button type="button" id="export-menu-button" aria-expanded="false" aria-controls="export-menu" aria-haspopup="menu" onclick="window.app.toggleExportMenu()" class="btn-keycap btn-keycap-accent inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold shadow-xs" title="Exporter le site vitrine">
               ${getIcon("download", "w-3.5 h-3.5")}
               <span>Exporter</span>
-              ${getIcon("chevronDown", "w-3 h-3 text-zinc-400")}
+              ${getIcon("chevronDown", "w-3 h-3 text-white/80")}
             </button>
             <div id="export-menu" data-open="false" role="menu" class="export-menu absolute right-0 top-full mt-1.5 w-64 bg-white rounded-xl shadow-xl border border-zinc-200 p-2 text-xs text-zinc-700 hidden z-50 animate-fade-in">
               <button type="button" onclick="window.app.exportHTML()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-zinc-50 flex items-center gap-2.5 transition-colors">
@@ -342,7 +342,7 @@ export function renderEditor(state) {
             <button type="button" id="ftb-close" class="ftb-btn text-zinc-400 hover:text-white px-1.5" title="Fermer">✕</button>
           </div>
 
-          <div class="transition-all duration-300 ${viewportWidthClass} ${isLivePreview ? 'client-preview-mode' : ''} bg-white min-h-full mt-3" id="canvas-container">
+          <div class="transition-all duration-300 ${viewportWidthClass} ${isLivePreview ? 'client-preview-mode' : ''} min-h-full mt-3 rounded-t-xl overflow-hidden shadow-sm" id="canvas-container" style="background-color: ${project.branding?.bgColor || '#ffffff'}; color: ${project.branding?.textColor || '#18181b'};">
             ${websiteHTML}
           </div>
         </main>
@@ -838,15 +838,20 @@ function renderSettingsAccordions(project) {
           <div>
             <label class="block text-[10px] font-medium text-zinc-400 uppercase tracking-wider mb-1.5">Ambiance Globale 1-Clic</label>
             <div class="grid grid-cols-3 gap-1.5 text-xs">
-              <button type="button" onclick="window.app.switchGlobalTheme('white')" class="py-2 border rounded-lg text-center text-[11px] font-medium transition-all ${project.branding?.globalTheme === 'white' || project.branding?.bgColor === '#ffffff' ? 'border-zinc-950 bg-white ring-2 ring-zinc-950 font-bold text-zinc-950 shadow-sm' : 'border-zinc-200 bg-white hover:border-zinc-300 text-zinc-700 shadow-2xs'}">
-                ☀️ Blanche
-              </button>
-              <button type="button" onclick="window.app.switchGlobalTheme('mineral')" class="py-2 border rounded-lg text-center text-[11px] font-medium transition-all ${project.branding?.globalTheme === 'mineral' || (!project.branding?.globalTheme && project.branding?.bgColor !== '#ffffff' && project.branding?.bgColor !== '#09090b') ? 'border-zinc-950 bg-zinc-100 ring-2 ring-zinc-950 font-bold text-zinc-950 shadow-sm' : 'border-zinc-200 bg-zinc-100 hover:border-zinc-300 text-zinc-700 shadow-2xs'}">
-                🪨 Minérale
-              </button>
-              <button type="button" onclick="window.app.switchGlobalTheme('dark')" class="py-2 border rounded-lg text-center text-[11px] font-medium transition-all ${project.branding?.globalTheme === 'dark' || project.branding?.bgColor === '#09090b' ? 'border-amber-400 bg-zinc-900 ring-2 ring-amber-400 font-bold text-amber-300 shadow-sm' : 'border-zinc-800 bg-zinc-900 text-zinc-300 hover:text-white shadow-2xs'}">
-                🌙 Sombre
-              </button>
+              ${(() => {
+                const curTheme = project.branding?.globalTheme || (project.branding?.bgColor === '#09090b' ? 'dark' : (project.branding?.bgColor === '#f4f4f5' ? 'mineral' : 'white'));
+                return `
+                  <button type="button" onclick="window.app.switchGlobalTheme('white')" class="py-2 border rounded-lg text-center text-[11px] font-medium transition-all ${curTheme === 'white' ? 'border-zinc-950 bg-white ring-2 ring-zinc-950 font-bold text-zinc-950 shadow-sm' : 'border-zinc-200 bg-white hover:border-zinc-300 text-zinc-700 shadow-2xs'}">
+                    ☀️ Blanche
+                  </button>
+                  <button type="button" onclick="window.app.switchGlobalTheme('mineral')" class="py-2 border rounded-lg text-center text-[11px] font-medium transition-all ${curTheme === 'mineral' ? 'border-zinc-950 bg-zinc-100 ring-2 ring-zinc-950 font-bold text-zinc-950 shadow-sm' : 'border-zinc-200 bg-zinc-100 hover:border-zinc-300 text-zinc-700 shadow-2xs'}">
+                    🪨 Minérale
+                  </button>
+                  <button type="button" onclick="window.app.switchGlobalTheme('dark')" class="py-2 border rounded-lg text-center text-[11px] font-medium transition-all ${curTheme === 'dark' ? 'border-amber-400 bg-zinc-900 ring-2 ring-amber-400 font-bold text-amber-300 shadow-sm' : 'border-zinc-800 bg-zinc-900 text-zinc-300 hover:text-white shadow-2xs'}">
+                    🌙 Sombre
+                  </button>
+                `;
+              })()}
             </div>
           </div>
 
