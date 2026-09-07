@@ -126,3 +126,25 @@ test("merged.txt Feature 5: AI State Machine & Approval Card Styles and Exporter
   assert.ok(standalone.includes("initBeforeAfter"), "Standalone export must embed initBeforeAfter script");
   assert.ok(standalone.includes("sr-percent-badge"), "Standalone export must embed percent badge script and styles");
 });
+
+test("merged.txt Feature 6: Modern Web Guidance — LCP fetchpriority, Native Scroll Indicator & Content-Visibility", () => {
+  const project = generateSite({ businessName: "Artisite Pro", tradeQuery: "peintre", city: "Nantes" });
+  const html = renderWebsiteHTML(project, { isEditor: false });
+
+  // Native 120fps scroll indicator element
+  assert.ok(html.includes('class="site-scroll-progress"'), "Must render .site-scroll-progress indicator");
+
+  // Modern image loading attributes (Hero LCP candidate vs offscreen)
+  assert.ok(html.includes('fetchpriority="high"'), "Hero image must have fetchpriority='high' for LCP optimization");
+  assert.ok(html.includes('loading="eager"'), "Hero image must have loading='eager'");
+  assert.ok(html.includes('loading="lazy"'), "Offscreen images must have loading='lazy'");
+  assert.ok(html.includes('decoding="async"'), "All images must have decoding='async'");
+
+  // CSS performance and accessibility verification
+  const cssPath = path.join(__dirname, "../public/css/app.css");
+  const css = fs.readFileSync(cssPath, "utf-8");
+  assert.ok(css.includes("animation-timeline: scroll()"), "CSS must support native scroll-driven animations");
+  assert.ok(css.includes("content-visibility: auto"), "CSS must defer offscreen section rendering");
+  assert.ok(css.includes("focus-visible"), "CSS must include WCAG 2.2 AA focus-visible ring styles");
+});
+

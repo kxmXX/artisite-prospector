@@ -89,6 +89,15 @@ ${UTILITY_CSS}
     @keyframes motion-spring { from { opacity: 0; transform: translateY(20px) scale(0.95); } 65% { transform: translateY(-3px) scale(1.015); } to { opacity: 1; transform: translateY(0) scale(1); } }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; scroll-behavior: auto !important; } }
 
+    /* Modern Web Guidance: Native 2026 Scroll Progress Indicator & Offscreen Optimization */
+    .site-scroll-progress { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: var(--primary, #059669); transform-origin: 0 50%; transform: scaleX(0); z-index: 9999; pointer-events: none; box-shadow: 0 0 10px var(--primary, rgba(5,150,105,0.4)); }
+    @supports (animation-timeline: scroll()) {
+      .site-scroll-progress { animation: site-scroll-grow auto linear; animation-timeline: scroll(); }
+      @keyframes site-scroll-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+    }
+    .site-section:not(:first-child):not(:nth-child(2)) { content-visibility: auto; contain-intrinsic-size: 1px 500px; }
+    a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--primary, #059669) !important; outline-offset: 2px !important; }
+
     /* SplitReveal 2026 */
     .split-reveal-container { position: relative; overflow: hidden; user-select: none; touch-action: none; border-radius: 1.5rem; background-color: #09090b; }
     .sr-img-after { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }

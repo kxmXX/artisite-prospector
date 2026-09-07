@@ -77,13 +77,17 @@ function renderRatingStars(rating = 5, { editor = false, sectionId = "", reviewI
  */
 export function renderEditableImage(url, { sectionId = "", fieldPath = "", alt = "", className = "", options = {}, itemIndex = null, tradeId = "paysagiste" } = {}) {
   const isEditor = options?.isEditor;
+  const isHero = fieldPath === "heroImage" || String(sectionId || "").toLowerCase().includes("hero");
   const activeTrade = tradeId || options?.tradeId || "paysagiste";
   const fallbackSvg = getTradeFallbackDataUrl(activeTrade, fieldPath, alt);
   const displayUrl = url || fallbackSvg;
   const onErrorAttr = `onerror="if(!this.dataset.fallbackApplied){this.dataset.fallbackApplied='true';this.src='${fallbackSvg}';}"`;
+  const perfAttrs = isHero
+    ? `loading="eager" fetchpriority="high" decoding="async"`
+    : `loading="lazy" decoding="async"`;
 
   if (!isEditor) {
-    return `<img src="${displayUrl}" data-fallback-src="${fallbackSvg}" alt="${alt}" class="${className}" ${onErrorAttr}>`;
+    return `<img src="${displayUrl}" data-fallback-src="${fallbackSvg}" alt="${alt}" class="${className}" ${perfAttrs} ${onErrorAttr}>`;
   }
 
   const indexParam = itemIndex !== null && itemIndex !== undefined ? itemIndex : 'null';
@@ -93,7 +97,7 @@ export function renderEditableImage(url, { sectionId = "", fieldPath = "", alt =
          ondragover="event.preventDefault(); this.classList.add('ring-2', 'ring-zinc-900');"
          ondragleave="this.classList.remove('ring-2', 'ring-zinc-900');"
          ondrop="event.preventDefault(); this.classList.remove('ring-2', 'ring-zinc-900'); window.app.handleImageElementDrop(event, '${sectionId}', '${fieldPath}', ${indexParam});">
-      <img src="${displayUrl}" data-fallback-src="${fallbackSvg}" alt="${alt}" class="${className}" ${onErrorAttr}>
+      <img src="${displayUrl}" data-fallback-src="${fallbackSvg}" alt="${alt}" class="${className}" ${perfAttrs} ${onErrorAttr}>
 
       <div class="absolute inset-0 bg-zinc-950/60 backdrop-blur-[2px] opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center gap-2 z-20 pointer-events-auto p-2">
         <button type="button"
@@ -174,6 +178,7 @@ export function renderWebsiteHTML(project, options = { isEditor: false, isStanda
       --cta-scale: ${project.branding?.ctaScale ? (project.branding.ctaScale / 100) : 1};
       --cta-transform: ${project.branding?.ctaTransform || 'none'};
     ">
+      <div class="site-scroll-progress" aria-hidden="true"></div>
       ${sectionsHTML}
       ${stickyBarHTML}
       ${lightboxHTML}

@@ -2453,6 +2453,53 @@ body.dark-theme #right-inspector-panel select { background: #202027 !important; 
   margin-top: 0.25rem;
 }
 
+/* ============================================================
+   MODERN WEB GUIDANCE: 2026 COMPOSITOR SCROLL PROGRESS
+   Pure native CSS scroll indicator (120fps GPU accelerated)
+   ============================================================ */
+.site-scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--primary, #059669);
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  z-index: 9999;
+  pointer-events: none;
+  box-shadow: 0 0 10px var(--primary, rgba(5, 150, 105, 0.4));
+  transition: transform 0.1s linear;
+}
+
+@supports (animation-timeline: scroll()) {
+  .site-scroll-progress {
+    animation: site-scroll-grow auto linear;
+    animation-timeline: scroll();
+    transition: none;
+  }
+
+  @keyframes site-scroll-grow {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+  }
+}
+
+/* Performance: defer rendering for offscreen sections outside editor */
+.artisite-root:not(.editor-mode) .site-section:not(:first-child):not(:nth-child(2)) {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 500px;
+}
+
+/* Accessibility: WCAG 2.2 AA Focus-Visible Ring */
+.artisite-root a:focus-visible,
+.artisite-root button:focus-visible,
+.artisite-root input:focus-visible,
+.artisite-root textarea:focus-visible {
+  outline: 2px solid var(--primary, #059669) !important;
+  outline-offset: 2px !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 1ms !important;
