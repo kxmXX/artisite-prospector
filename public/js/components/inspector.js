@@ -511,7 +511,13 @@ export function renderInspector(section, project, state) {
           process: 'card',
           certifications: 'badge',
           pricing: 'card',
-          customBlock: 'card'
+          customBlock: 'card',
+          quoteBlock: 'card',
+          videoBlock: 'carousel',
+          stepperBlock: 'card',
+          tableBlock: 'card',
+          sliderBlock: 'card',
+          tabsBlock: 'tabs'
         };
         const compId = typeMap[section.type] || 'card';
         const compDef = COMPONENT_INTELLIGENCE_REGISTRY[compId] || COMPONENT_INTELLIGENCE_REGISTRY.card;
