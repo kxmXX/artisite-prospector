@@ -270,7 +270,7 @@ function renderSection(sec, project, options) {
   const sectionTheme = sec.settings?.bgTheme || inferredTheme;
   const bgTheme = `bg-sec-${sectionTheme}`;
   const themeColor = sectionTheme === "dark" ? "#09090b" : sectionTheme === "navy" ? "#0c1527" : sectionTheme === "warm" ? "#faf8f5" : sectionTheme === "mineral" ? "#f8fafc" : sectionTheme === "primary" ? (project.branding?.primaryColor || "#059669") : "#ffffff";
-  const motionPreset = sec.settings?.motionPreset || (project.branding?.motionPreset && project.branding.motionPreset !== "none" ? project.branding.motionPreset : "")
+  const motionPreset = sec.settings?.motionPreset || sec.motionPreset || (project.branding?.motionPreset && project.branding.motionPreset !== "none" ? project.branding.motionPreset : "");
   const customBackground = /^#[0-9a-f]{3,8}$/i.test(sec.settings?.customBackground || "")
     ? `background-color: ${sec.settings.customBackground} !important;`
     : "";
@@ -344,7 +344,7 @@ function renderSection(sec, project, options) {
           <div id="sec-motion-popover-${sec.id}" data-section-id="${sec.id}" class="sec-motion-popover hidden absolute left-0 top-full mt-2 w-52 bg-zinc-900/95 backdrop-blur-md border border-white/20 rounded-xl p-2.5 shadow-2xl z-50 text-white text-xs">
             <div class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 mb-2 flex items-center justify-between">
               <span>Preset 60fps</span>
-              <span class="text-amber-400 font-mono">${sec.motionPreset || 'défaut'}</span>
+              <span class="text-amber-400 font-mono">${sec.settings?.motionPreset || sec.motionPreset || 'défaut'}</span>
             </div>
             <div class="grid grid-cols-2 gap-1.5">
               ${[
@@ -356,8 +356,10 @@ function renderSection(sec, project, options) {
                 ['pulse', 'Pulse'],
                 ['none', 'Aucun']
               ].map(([mPreset, mLabel]) => `
-                <button type="button" onclick="event.stopPropagation(); window.app.setSectionMotion('${sec.id}', '${mPreset}')"
-                        class="motion-chip ${sec.motionPreset === mPreset ? 'is-active' : ''}">
+                <button type="button" 
+                        onmouseenter="window.app.previewSectionMotion('${sec.id}', '${mPreset}')"
+                        onclick="event.stopPropagation(); window.app.setSectionMotion('${sec.id}', '${mPreset}')"
+                        class="motion-chip ${((sec.settings?.motionPreset || sec.motionPreset || 'none') === mPreset) ? 'is-active' : ''}">
                   ${mLabel}
                 </button>
               `).join('')}

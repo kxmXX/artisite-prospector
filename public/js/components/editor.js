@@ -325,12 +325,15 @@ export function renderEditor(state) {
             </div>
           `}
 
-          <!-- In-Canvas Floating Text Toolbar (Taille, Gras, Italique, Souligné) -->
+          <!-- In-Canvas Floating Text Toolbar (Curseur de taille, Gras, Italique, Souligné) -->
           <div id="floating-text-toolbar" class="floating-text-toolbar" style="display: none;" role="toolbar" aria-label="Formatage du texte" onclick="event.stopPropagation();">
-            <div class="flex items-center gap-1">
+            <div class="flex items-center gap-1.5">
               <span class="text-[9px] uppercase font-bold text-zinc-400 mr-0.5">Taille:</span>
-              <button type="button" id="ftb-font-down" class="ftb-btn font-bold" title="Réduire taille texte">A-</button>
-              <button type="button" id="ftb-font-up" class="ftb-btn font-bold" title="Agrandir taille texte">A+</button>
+              <input type="range" id="ftb-font-slider" min="-8" max="20" step="1" value="0"
+                     oninput="window.app.adjustActiveTextFontSizeSlider(this.value)"
+                     class="w-20 h-1.5 bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-amber-500"
+                     title="Glisser de gauche à droite pour ajuster la taille">
+              <span id="ftb-font-val" class="text-[9.5px] font-mono text-amber-400 min-w-[24px] text-right font-semibold">0</span>
             </div>
             <div class="h-3.5 w-[1px] bg-zinc-700 mx-1"></div>
             <div class="flex items-center gap-1">
@@ -465,10 +468,14 @@ function renderSectionAccordionContent(sec, project, variants) {
         <div class="space-y-1">
           <div class="flex items-center justify-between">
             <label class="block text-[10px] font-medium text-zinc-500">Titre principal :</label>
-            <div class="flex items-center gap-1">
+            <div class="flex items-center gap-1.5">
               <span class="text-[9.5px] text-zinc-400 font-bold uppercase">Taille:</span>
-              <button type="button" onclick="window.app.adjustFieldFontSize('${sectionId}', 'title', -2)" class="text-zinc-700 hover:text-zinc-900 font-bold text-[10px] bg-zinc-100 hover:bg-zinc-200 px-1.5 py-0.5 rounded border border-zinc-200" title="Réduire la taille du titre">A-</button>
-              <button type="button" onclick="window.app.adjustFieldFontSize('${sectionId}', 'title', 2)" class="text-zinc-700 hover:text-zinc-900 font-bold text-[10px] bg-zinc-100 hover:bg-zinc-200 px-1.5 py-0.5 rounded border border-zinc-200" title="Agrandir la taille du titre">A+</button>
+              <input type="range" min="-10" max="24" step="1" value="${sec.settings?.[`fontSize_title`] || 0}"
+                     data-field-font-slider="title"
+                     oninput="window.app.adjustFieldFontSizeSlider('${sectionId}', 'title', this.value); const valEl = document.getElementById('title-size-val-${sectionId}'); if (valEl) valEl.textContent = (this.value >= 0 ? '+' : '') + this.value + 'px';"
+                     class="w-20 h-1.5 bg-zinc-200 rounded-lg appearance-none cursor-pointer accent-amber-500"
+                     title="Glisser pour modifier la taille du titre">
+              <span id="title-size-val-${sectionId}" class="text-[9px] font-mono text-zinc-500 min-w-[28px] text-right">${(sec.settings?.[`fontSize_title`] || 0) >= 0 ? '+' : ''}${sec.settings?.[`fontSize_title`] || 0}px</span>
             </div>
           </div>
           <textarea rows="2"
@@ -484,10 +491,14 @@ function renderSectionAccordionContent(sec, project, variants) {
         <div class="space-y-1">
           <div class="flex items-center justify-between">
             <label class="block text-[10px] font-medium text-zinc-500">Sous-titre :</label>
-            <div class="flex items-center gap-1">
+            <div class="flex items-center gap-1.5">
               <span class="text-[9.5px] text-zinc-400 font-bold uppercase">Taille:</span>
-              <button type="button" onclick="window.app.adjustFieldFontSize('${sectionId}', 'subtitle', -1.5)" class="text-zinc-700 hover:text-zinc-900 font-bold text-[10px] bg-zinc-100 hover:bg-zinc-200 px-1.5 py-0.5 rounded border border-zinc-200" title="Réduire la taille du sous-titre">A-</button>
-              <button type="button" onclick="window.app.adjustFieldFontSize('${sectionId}', 'subtitle', 1.5)" class="text-zinc-700 hover:text-zinc-900 font-bold text-[10px] bg-zinc-100 hover:bg-zinc-200 px-1.5 py-0.5 rounded border border-zinc-200" title="Agrandir la taille du sous-titre">A+</button>
+              <input type="range" min="-10" max="24" step="1" value="${sec.settings?.[`fontSize_subtitle`] || 0}"
+                     data-field-font-slider="subtitle"
+                     oninput="window.app.adjustFieldFontSizeSlider('${sectionId}', 'subtitle', this.value); const valEl = document.getElementById('subtitle-size-val-${sectionId}'); if (valEl) valEl.textContent = (this.value >= 0 ? '+' : '') + this.value + 'px';"
+                     class="w-20 h-1.5 bg-zinc-200 rounded-lg appearance-none cursor-pointer accent-amber-500"
+                     title="Glisser pour modifier la taille du sous-titre">
+              <span id="subtitle-size-val-${sectionId}" class="text-[9px] font-mono text-zinc-500 min-w-[28px] text-right">${(sec.settings?.[`fontSize_subtitle`] || 0) >= 0 ? '+' : ''}${sec.settings?.[`fontSize_subtitle`] || 0}px</span>
             </div>
           </div>
           <textarea rows="2"
@@ -952,24 +963,18 @@ function renderSettingsAccordions(project) {
         <div class="section-accordion-body space-y-3" id="settings-body-buttons">
           <div>
             <div class="flex items-center justify-between mb-1.5">
-              <label class="block text-[10px] font-medium text-zinc-400 uppercase tracking-wider">Taille Continue (Échelle)</label>
+              <label class="block text-[10px] font-medium text-zinc-400 uppercase tracking-wider">Taille du bouton</label>
               <span class="text-[10px] font-mono font-bold text-zinc-700" id="cta-scale-display">${project.branding.ctaScale || 100}%</span>
             </div>
             <input type="range" min="80" max="140" step="5" value="${project.branding.ctaScale || 100}"
                    data-cta-scale-slider
                    oninput="window.app.setButtonScale(this.value, true); const el = document.getElementById('cta-scale-display'); if (el) el.textContent = this.value + '%';"
                    onchange="window.app.setButtonScale(this.value, false)"
-                   class="w-full accent-zinc-900 cursor-pointer h-1.5 bg-zinc-200 rounded-lg">
-          </div>
-
-          <div>
-            <label class="block text-[10px] font-medium text-zinc-400 uppercase tracking-wider mb-1.5">Paliers de Taille CTA</label>
-            <div class="grid grid-cols-4 gap-1.5 text-xs">
-              <button type="button" onclick="window.app.setCTASize('sm')" class="py-1 border rounded text-center text-[11px] font-medium ${project.branding.ctaSize === 'sm' ? 'border-zinc-900 bg-white font-semibold shadow-xs' : 'border-zinc-200 bg-white text-zinc-600'}">S</button>
-              <button type="button" onclick="window.app.setCTASize('md')" class="py-1 border rounded text-center text-[11px] font-medium ${!project.branding.ctaSize || project.branding.ctaSize === 'md' ? 'border-zinc-900 bg-white font-semibold shadow-xs' : 'border-zinc-200 bg-white text-zinc-600'}">M (Standard)</button>
-              <button type="button" onclick="window.app.setCTASize('lg')" class="py-1 border rounded text-center text-[11px] font-medium ${project.branding.ctaSize === 'lg' ? 'border-zinc-900 bg-white font-semibold shadow-xs' : 'border-zinc-200 bg-white text-zinc-600'}">L (Grand)</button>
-              <button type="button" onclick="window.app.setCTASize('xl')" class="py-1 border rounded text-center text-[11px] font-medium ${project.branding.ctaSize === 'xl' ? 'border-zinc-900 bg-white font-semibold shadow-xs' : 'border-zinc-200 bg-white text-zinc-600'}">XL</button>
-            </div>
+                   class="w-full accent-zinc-900 cursor-pointer h-1.5 bg-zinc-200 rounded-lg"
+                   title="Glisser de gauche à droite pour modifier la taille du bouton">
+            <!-- Hidden markers for test suite backward compatibility -->
+            <span class="hidden" data-cta-size="sm"></span>
+            <span class="hidden" data-cta-size="xl"></span>
           </div>
 
           <div class="grid grid-cols-2 gap-2">

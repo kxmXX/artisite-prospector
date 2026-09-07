@@ -1,6 +1,12 @@
 import { getIcon } from "./icons.js";
 import { SECTION_DEFINITIONS } from "./addSectionModal.js";
 import { getSectionFriendlyTitle } from "./editor.js";
+import {
+  COMPONENT_INTELLIGENCE_REGISTRY,
+  calculateComponentConfidence,
+  verifyAccessibility,
+  detectAntiPatterns
+} from "../engine/componentIntelligence.js";
 
 /**
  * Sendpage / Linear Minimalist Inspector Panel.
@@ -370,6 +376,79 @@ export function renderInspector(section, project, state) {
         ` : ''}
 
       </form>
+
+      <!-- Component Intelligence & Audit Qualité (Section 16) -->
+      ${(() => {
+        const typeMap = {
+          hero: 'hero',
+          trust: 'badge',
+          services: 'card',
+          about: 'card',
+          gallery: 'carousel',
+          beforeAfter: 'carousel',
+          reviews: 'card',
+          location: 'card',
+          hours: 'card',
+          faq: 'accordion',
+          cta: 'button',
+          process: 'card',
+          certifications: 'badge',
+          pricing: 'card',
+          customBlock: 'card'
+        };
+        const compId = typeMap[section.type] || 'card';
+        const compDef = COMPONENT_INTELLIGENCE_REGISTRY[compId] || COMPONENT_INTELLIGENCE_REGISTRY.card;
+        const tradeId = project?.business?.trade || project?.business?.category || 'paysagiste';
+        const confidence = calculateComponentConfidence(compId, { tradeId, pageType: 'landing' });
+        const a11y = verifyAccessibility({
+          type: compId,
+          content: { label: section.content?.title || section.content?.badge || section.type },
+          props: { ariaLabel: friendlyTitle }
+        });
+        const projectSectionTypes = (project?.sections || []).map(s => typeMap[s.type] || s.type);
+        const antiPatterns = detectAntiPatterns(projectSectionTypes, { pageType: 'landing' });
+
+        return `
+          <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-lg space-y-2.5 text-xs">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1.5">
+                <span class="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">Intelligence Composant</span>
+                <span class="px-1.5 py-0.5 rounded text-[9px] font-medium bg-zinc-200 text-zinc-700">${compDef.family}</span>
+              </div>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold ${confidence.score >= 80 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                Score: ${confidence.score}%
+              </span>
+            </div>
+
+            <div class="text-[11px] text-zinc-600 leading-snug">
+              <span class="font-medium text-zinc-800">${compDef.name} :</span> ${compDef.primaryUseCases?.[0] || compDef.intent?.[0]}
+            </div>
+
+            <div class="grid grid-cols-2 gap-1.5 pt-1 text-[10px]">
+              <div class="bg-white p-1.5 rounded border border-zinc-200">
+                <span class="text-zinc-400 block text-[9px]">Rôle sémantique</span>
+                <span class="font-mono text-zinc-700">&lt;${compDef.accessibilityPolicy?.semanticRole || 'section'}&gt;</span>
+              </div>
+              <div class="bg-white p-1.5 rounded border border-zinc-200">
+                <span class="text-zinc-400 block text-[9px]">Accessibilité</span>
+                <span class="text-emerald-600 font-medium">${a11y.compliant ? '✓ WCAG Conforme' : '⚠️ Vérifier labels'}</span>
+              </div>
+            </div>
+
+            <div class="text-[9.5px] text-zinc-400 flex items-center justify-between pt-1 border-t border-zinc-200">
+              <span>Tag Analytics:</span>
+              <span class="font-mono text-zinc-500">track-${section.type}</span>
+            </div>
+
+            ${antiPatterns.length > 0 ? `
+              <div class="p-1.5 bg-amber-50 border border-amber-200 rounded text-[10px] text-amber-800 space-y-0.5">
+                <span class="font-semibold block">⚠️ Alerte Anti-Pattern :</span>
+                ${antiPatterns.map(ap => `<div>• ${escapeHtml(ap.message)}</div>`).join('')}
+              </div>
+            ` : ''}
+          </div>
+        `;
+      })()}
 
       <!-- Section Actions -->
       <div class="pt-3 border-t border-zinc-100 space-y-1.5">

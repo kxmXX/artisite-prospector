@@ -1,5 +1,6 @@
 import { getStylePresetById } from "../data/styles.js";
 import { getUiId, getSectionUiId } from "../data/uiIds.js";
+import { copilotComponentReasoning } from "./componentIntelligence.js";
 
 export function getProjectUiTargets(project) {
   const targets = new Map();
@@ -233,6 +234,16 @@ export function processCopilotPrompt(project, promptText) {
     if (text.includes("avant/après") || text.includes("avant apres")) {
       const sec = updated.sections.find(s => s.type === "beforeAfter");
       if (sec) { sec.visibility = true; logs.push("Section Avant/Après réactivée"); }
+    }
+  }
+
+  // 7. Component Intelligence reasoning for structural suggestions
+  if (text.includes("composant") || text.includes("conseil") || text.includes("recommande") || text.includes("structure") || text.includes("optimise")) {
+    const tradeId = updated.business?.trade || updated.business?.category || "paysagiste";
+    const recommendation = copilotComponentReasoning(promptText, tradeId);
+    if (recommendation) {
+      logs.push(`Recommandation UI (${recommendation.family}/${recommendation.component}) : ${recommendation.reasoning}`);
+      updated._lastComponentRecommendation = recommendation;
     }
   }
 

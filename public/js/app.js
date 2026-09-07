@@ -660,6 +660,8 @@ class App {
       const selectedSec = state.currentProject.sections.find(s => s.id === sectionId) || state.currentProject.sections[0];
       rightInspector.innerHTML = renderInspector(selectedSec, state.currentProject, state);
     }
+    // 5. Instantly scroll visualizer canvas to the selected section
+    this.scrollToSection(sectionId);
   }
 
   scrollSidebarCardIntoView(card) {
@@ -693,25 +695,31 @@ class App {
 
     if (!canvasSec) return false;
 
+    // 1. Native scrollIntoView guarantees viewport alignment across Safari & Chrome
+    try {
+      canvasSec.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" });
+    } catch (e) {
+      if (typeof canvasSec.scrollIntoView === "function") {
+        canvasSec.scrollIntoView(true);
+      }
+    }
+
+    // 2. Also ensure scrollHost (main) scrolls to exact section offset
     const scrollHost = canvas?.closest("main") || canvas?.parentElement;
     if (scrollHost && typeof scrollHost.scrollTo === "function") {
       const hostRect = scrollHost.getBoundingClientRect();
       const targetRect = canvasSec.getBoundingClientRect();
-      const targetTop = scrollHost.scrollTop + targetRect.top - hostRect.top -
-        (scrollHost.clientHeight - canvasSec.offsetHeight) / 2;
-
+      const targetTop = scrollHost.scrollTop + (targetRect.top - hostRect.top) - 16;
       scrollHost.scrollTo({
         top: Math.max(0, targetTop),
         behavior: "smooth"
       });
-    } else {
-      canvasSec.scrollIntoView({ behavior: "smooth", block: "center" });
     }
 
     canvasSec.classList.remove("section-focus-glow");
     void canvasSec.offsetWidth;
     canvasSec.classList.add("section-focus-glow");
-    setTimeout(() => canvasSec.classList.remove("section-focus-glow"), 1600);
+    setTimeout(() => canvasSec.classList.remove("section-focus-glow"), 1800);
     return true;
   }
 
@@ -918,16 +926,6 @@ class App {
     this.showToast(`Pattern appliqué : ${labelMap[patternId] || preset}`);
   }
 
-  setSectionMotion(sectionId, preset) {
-    if (!state.currentProject) return;
-    const allowed = new Set(["none", "fade-in", "slide-up", "slide-in", "spring", "progress-fill", "reveal", "stagger", "shimmer", "pulse"]);
-    if (!allowed.has(preset)) return;
-    const updated = JSON.parse(JSON.stringify(state.currentProject));
-    const sec = updated.sections.find(s => s.id === sectionId);
-    if (!sec) return;
-    sec.settings = { ...(sec.settings || {}), motionPreset: preset === "none" ? "" : preset };
-    state.updateProject(updated, true, `Animation du bloc : ${preset}`);
-  }
 
   setComponentMotion(sectionId, targetId, preset) {
     if (!state.currentProject) return;
@@ -988,6 +986,21 @@ class App {
       document.body.appendChild(container);
     }
 
+    // Limit active toasts to 2 to prevent stacking towers
+    const existing = container.querySelectorAll(".artisite-toast");
+    if (existing.length >= 2) {
+      existing[0].remove();
+    }
+
+    // If identical message exists, refresh it rather than stacking duplicate toasts
+    const duplicate = Array.from(existing).find(t => t.querySelector("span")?.textContent === message);
+    if (duplicate) {
+      duplicate.classList.remove("animate-pulse");
+      void duplicate.offsetWidth;
+      duplicate.classList.add("animate-pulse");
+      return;
+    }
+
     const toast = document.createElement("div");
     toast.className = "artisite-toast";
     toast.innerHTML = `
@@ -1011,7 +1024,7 @@ class App {
       toast.style.opacity = "0";
       toast.style.transform = "translateY(8px) scale(0.96)";
       setTimeout(() => toast.remove(), 260);
-    }, 4000);
+    }, 2800);
   }
 
   setButtonScale(scalePercent, isLive = false) {
@@ -1120,6 +1133,21 @@ class App {
     this.showToast(`Taille du texte : ${next >= 0 ? '+' : ''}${next}px`, "info");
   }
 
+  adjustFieldFontSizeSlider(sectionId, field, deltaVal) {
+    if (!state.currentProject) return;
+    const delta = parseFloat(deltaVal) || 0;
+    const sec = state.currentProject.sections.find(s => s.id === sectionId);
+    if (!sec) return;
+    sec.settings = sec.settings || {};
+    sec.settings[`fontSize_${field}`] = delta;
+
+    const el = document.querySelector(`#section-${sectionId} [data-editable="${field}"]`);
+    if (el) {
+      el.style.fontSize = delta === 0 ? "" : `calc(1em + ${delta}px)`;
+    }
+    state.saveToStorage();
+  }
+
   adjustActiveTextFontSize(delta) {
     if (!this._activeEditableEl) return;
     const el = this._activeEditableEl;
@@ -1132,6 +1160,35 @@ class App {
       const currentSize = parseFloat(window.getComputedStyle(el).fontSize) || 16;
       const newSize = Math.max(10, Math.min(64, currentSize + delta * 2));
       el.style.fontSize = `${newSize}px`;
+    }
+  }
+
+  adjustActiveTextFontSizeSlider(deltaVal) {
+    const delta = parseFloat(deltaVal) || 0;
+    const valEl = document.getElementById("ftb-font-val");
+    if (valEl) valEl.textContent = `${delta >= 0 ? '+' : ''}${delta}`;
+
+    if (!this._activeEditableEl) return;
+    const el = this._activeEditableEl;
+    const secWrapper = el.closest(".editor-section-wrapper");
+    const secId = secWrapper?.getAttribute("data-section-id");
+    const field = el.getAttribute("data-editable");
+
+    if (secId && field && state.currentProject) {
+      const sec = state.currentProject.sections.find(s => s.id === secId);
+      if (sec) {
+        sec.settings = sec.settings || {};
+        sec.settings[`fontSize_${field}`] = delta;
+      }
+      el.style.fontSize = delta === 0 ? "" : `calc(1em + ${delta}px)`;
+      state.saveToStorage();
+    } else {
+      let baseSize = parseFloat(el.getAttribute("data-base-font-size"));
+      if (!baseSize) {
+        baseSize = parseFloat(window.getComputedStyle(el).fontSize) || 16;
+        el.setAttribute("data-base-font-size", String(baseSize));
+      }
+      el.style.fontSize = `${baseSize + delta}px`;
     }
   }
 
@@ -1622,25 +1679,32 @@ class App {
     }
   }
 
+  previewSectionMotion(secId, preset) {
+    const secEl = document.getElementById(`section-${secId}`) || document.querySelector(`.editor-section-wrapper[data-section-id="${secId}"]`);
+    if (!secEl) return;
+    const motion = preset === "none" ? "" : preset;
+    secEl.setAttribute("data-motion", motion);
+    secEl.classList.remove("is-revealed");
+    void secEl.offsetWidth; // trigger DOM reflow to restart CSS animation
+    secEl.classList.add("is-revealed");
+  }
+
   setSectionMotion(secId, preset) {
     if (!state.currentProject) return;
     const updated = JSON.parse(JSON.stringify(state.currentProject));
     const sec = updated.sections.find(s => s.id === secId);
     if (!sec) return;
     sec.motionPreset = preset;
+    sec.settings = sec.settings || {};
+    sec.settings.motionPreset = preset === "none" ? "" : preset;
     state.updateProject(updated, true, `Animation section (${preset})`);
 
     const pop = document.getElementById(`sec-motion-popover-${secId}`);
     if (pop) pop.classList.add("hidden");
 
     // Immediate live replay on canvas element
-    const secEl = document.getElementById(`section-${secId}`);
-    if (secEl) {
-      secEl.setAttribute("data-motion", preset);
-      secEl.classList.remove("is-revealed");
-      void secEl.offsetWidth; // trigger DOM reflow to restart CSS animation
-      secEl.classList.add("is-revealed");
-    }
+    this.previewSectionMotion(secId, preset);
+    this.showToast(`Animation : ${preset === 'none' ? 'Aucune' : preset}`, "info");
   }
 
   setSectionSplitDirection(secId, direction) {
