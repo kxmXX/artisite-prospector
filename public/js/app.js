@@ -632,6 +632,22 @@ class App {
     }, 2000);
   }
 
+  handleQuickGenerate(e) {
+    e?.preventDefault?.();
+    const name = document.getElementById("quick-gen-name")?.value?.trim() || "Nouvel Artisan";
+    const tradeId = document.getElementById("quick-gen-trade")?.value || "paysagiste";
+    const city = document.getElementById("quick-gen-city")?.value?.trim() || "Lyon";
+
+    const newProject = generateSite({
+      name,
+      tradeId,
+      city,
+      phone: "07 82 14 39 50"
+    });
+
+    state.addProject(newProject, true);
+  }
+
   // Actions on Sections
   selectSection(sectionId, options = {}) {
     const alreadySelected = state.selectedSectionId === sectionId;
@@ -726,30 +742,25 @@ class App {
 
     if (!canvasSec) return false;
 
-    // Ensure scrollHost (main / canvas parent) scrolls smoothly to section offset
-    const scrollHost = canvas?.closest("main") || canvas?.parentElement || document.querySelector("main") || window;
-    if (scrollHost) {
-      if (typeof scrollHost.scrollTo === "function") {
-        const hostRect = scrollHost.getBoundingClientRect ? scrollHost.getBoundingClientRect() : { top: 0, height: window.innerHeight };
-        const targetRect = canvasSec.getBoundingClientRect();
-        
-        // Precise scroll computation with clean 24px clearance from top
-        const currentScroll = scrollHost.scrollTop !== undefined ? scrollHost.scrollTop : window.scrollY;
-        const targetTop = currentScroll + (targetRect.top - hostRect.top) - 24;
-        
-        scrollHost.scrollTo({
-          top: Math.max(0, targetTop),
-          behavior: "smooth"
-        });
-      } else if (typeof canvasSec.scrollIntoView === "function") {
-        canvasSec.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
+    const scrollHost = canvas?.closest("main") || canvas?.parentElement;
+    if (scrollHost && typeof scrollHost.scrollTo === "function") {
+      const hostRect = scrollHost.getBoundingClientRect();
+      const targetRect = canvasSec.getBoundingClientRect();
+      const targetTop = scrollHost.scrollTop + targetRect.top - hostRect.top -
+        (scrollHost.clientHeight - canvasSec.offsetHeight) / 2;
+
+      scrollHost.scrollTo({
+        top: Math.max(0, targetTop),
+        behavior: "smooth"
+      });
+    } else {
+      canvasSec.scrollIntoView({ behavior: "smooth", block: "center" });
     }
 
     canvasSec.classList.remove("section-focus-glow");
     void canvasSec.offsetWidth;
     canvasSec.classList.add("section-focus-glow");
-    setTimeout(() => canvasSec.classList.remove("section-focus-glow"), 1800);
+    setTimeout(() => canvasSec.classList.remove("section-focus-glow"), 1600);
     return true;
   }
 
@@ -763,7 +774,13 @@ class App {
       this.toggleSectionAccordion(sectionId, event, { skipScroll: true });
     }
 
-    this.selectSection(sectionId, { scroll: true });
+    this.selectSection(sectionId);
+    const run = () => this.scrollToSection(sectionId);
+    if (typeof window !== "undefined" && typeof window.requestAnimationFrame === "function") {
+      window.requestAnimationFrame(run);
+    } else {
+      setTimeout(run, 0);
+    }
   }
 
   toggleSectionAccordion(sectionId, event, options = {}) {

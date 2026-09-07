@@ -466,5 +466,39 @@ test("Component Intelligence: customBlock and customCard rendering and inspector
   assert.ok(inspectorHtml.includes("Demander une étude"));
 });
 
+test("Component Gallery: Inspector controls and interactive tabs switching for new components", () => {
+  const project = generateSite({ name: "Artisite Pro", tradeId: "paysagiste" });
+  
+  // Test stepper inspector
+  const stepperSec = createSectionData("stepperBlock", project.business);
+  project.sections.push(stepperSec);
+  const stepperInspector = renderInspector(stepperSec, project, state);
+  assert.ok(stepperInspector.includes("Étapes de Chantier"));
+  assert.ok(stepperInspector.includes("steps.0.title"));
+  assert.ok(stepperInspector.includes("steps.0.desc"));
 
+  // Test table inspector
+  const tableSec = createSectionData("tableBlock", project.business);
+  project.sections.push(tableSec);
+  const tableInspector = renderInspector(tableSec, project, state);
+  assert.ok(tableInspector.includes("Tableau Comparatif"));
+  assert.ok(tableInspector.includes("rows.0.standard"));
 
+  // Test slider inspector
+  const sliderSec = createSectionData("sliderBlock", project.business);
+  project.sections.push(sliderSec);
+  const sliderInspector = renderInspector(sliderSec, project, state);
+  assert.ok(sliderInspector.includes("Curseur de Surface m²"));
+
+  // Test tabs inspector and rendered interactive buttons
+  const tabsSec = createSectionData("tabsBlock", project.business);
+  project.sections.push(tabsSec);
+  const tabsInspector = renderInspector(tabsSec, project, state);
+  assert.ok(tabsInspector.includes("Onglets Prestations"));
+  assert.ok(tabsInspector.includes("tabs.0.tag"));
+
+  const tabsHtml = renderWebsiteHTML(project, { isEditor: true });
+  assert.ok(tabsHtml.includes('data-tab-btn="0"'));
+  assert.ok(tabsHtml.includes('data-tab-btn="1"'));
+  assert.ok(tabsHtml.includes('id="tab-content-'));
+});

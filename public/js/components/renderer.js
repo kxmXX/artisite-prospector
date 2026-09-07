@@ -2340,14 +2340,16 @@ function renderSliderBlock(sec, project, options = {}) {
 // 26. Category Tabs (Component Gallery: Tabs)
 function renderTabsBlock(sec, project, options = {}) {
   const c = sec.content || {};
-  const tabs = Array.isArray(c.tabs) ? c.tabs : [
+  const tabs = Array.isArray(c.tabs) && c.tabs.length > 0 ? c.tabs : [
     { title: "Entretien Régulier", text: "Tonte, taille de haies, désherbage écologique et remise en état saisonnière.", tag: "Formule Abonnement" },
     { title: "Création & Aménagement", text: "Conception paysagère sur-mesure, allées pavées, clôtures et plantations durables.", tag: "Projet Clé en main" },
     { title: "Élagage & Soins", text: "Élagage raisonné grande hauteur, abattage sécurisé et rognage de souches.", tag: "Intervention Sécurisée" }
   ];
 
+  const tabsJsonSafe = JSON.stringify(tabs).replace(/"/g, '&quot;');
+
   return `
-    <div class="py-16 sm:py-24 bg-white">
+    <div class="py-16 sm:py-24 bg-white" id="tabs-block-${sec.id}" data-tabs="${tabsJsonSafe}">
       <div class="max-w-5xl mx-auto px-4 sm:px-6">
         <div class="text-center max-w-2xl mx-auto mb-10 space-y-2">
           <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-black/5 text-zinc-700" data-editable="badge">
@@ -2361,17 +2363,38 @@ function renderTabsBlock(sec, project, options = {}) {
         <div class="component-tabs space-y-6">
           <div class="flex flex-wrap items-center justify-center gap-2 p-1.5 rounded-2xl bg-zinc-100 max-w-xl mx-auto border border-zinc-200">
             ${tabs.map((tb, idx) => `
-              <button type="button" class="px-4 py-2 rounded-xl text-xs font-bold transition-all ${idx === 0 ? 'bg-white text-zinc-900 shadow-xs' : 'text-zinc-600 hover:text-zinc-900'}">
+              <button type="button"
+                      data-tab-btn="${idx}"
+                      onclick="(function(btn){
+                        const root = btn.closest('[data-tabs]');
+                        if (!root) return;
+                        try {
+                          const data = JSON.parse(root.getAttribute('data-tabs').replace(/&quot;/g, '\"'));
+                          const item = data[${idx}];
+                          if (!item) return;
+                          root.querySelectorAll('[data-tab-btn]').forEach(b => {
+                            b.className = 'px-4 py-2 rounded-xl text-xs font-bold transition-all text-zinc-600 hover:text-zinc-900';
+                          });
+                          btn.className = 'px-4 py-2 rounded-xl text-xs font-bold transition-all bg-white text-zinc-900 shadow-xs';
+                          const tagEl = root.querySelector('[data-tab-tag]');
+                          const titleEl = root.querySelector('[data-tab-title]');
+                          const textEl = root.querySelector('[data-tab-text]');
+                          if (tagEl) tagEl.textContent = item.tag || 'Spécialité';
+                          if (titleEl) titleEl.textContent = item.title;
+                          if (textEl) textEl.textContent = item.text;
+                        } catch(e){}
+                      })(this)"
+                      class="px-4 py-2 rounded-xl text-xs font-bold transition-all ${idx === 0 ? 'bg-white text-zinc-900 shadow-xs' : 'text-zinc-600 hover:text-zinc-900'}">
                 ${tb.title}
               </button>
             `).join('')}
           </div>
 
-          <div class="p-8 sm:p-10 rounded-3xl bg-zinc-50 border border-zinc-200/80 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div id="tab-content-${sec.id}" class="p-8 sm:p-10 rounded-3xl bg-zinc-50 border border-zinc-200/80 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-6">
             <div class="space-y-2 text-center sm:text-left">
-              <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full uppercase tracking-wider">${tabs[0]?.tag || 'Spécialité'}</span>
-              <h3 class="text-xl font-bold text-zinc-900">${tabs[0]?.title || 'Prestation'}</h3>
-              <p class="text-sm text-zinc-600 max-w-lg leading-relaxed">${tabs[0]?.text || 'Descriptif détaillé de la prestation artisanale.'}</p>
+              <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full uppercase tracking-wider" data-tab-tag>${tabs[0]?.tag || 'Spécialité'}</span>
+              <h3 class="text-xl font-bold text-zinc-900" data-tab-title>${tabs[0]?.title || 'Prestation'}</h3>
+              <p class="text-sm text-zinc-600 max-w-lg leading-relaxed" data-tab-text>${tabs[0]?.text || 'Descriptif détaillé de la prestation artisanale.'}</p>
             </div>
             <a href="#simulateur" class="btn-cta text-white px-6 py-3 rounded-xl text-xs font-bold shadow-xs whitespace-nowrap" style="background-color: var(--primary);">
               Consulter nos disponibilités

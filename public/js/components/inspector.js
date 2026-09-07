@@ -492,6 +492,61 @@ export function renderInspector(section, project, state) {
           </div>
         ` : ''}
 
+        <!-- Stepper Block specific fields -->
+        ${section.type === 'stepperBlock' && Array.isArray(c.steps) ? `
+          <div class="space-y-2.5 pt-2 border-t border-zinc-100">
+            <div class="font-medium text-zinc-700 text-xs">Étapes de Chantier (4 étapes)</div>
+            ${c.steps.map((st, sIdx) => `
+              <div class="p-2 bg-zinc-50 rounded-md border border-zinc-200 space-y-1">
+                <span class="text-[9.5px] font-bold text-zinc-500 uppercase">Étape 0${sIdx + 1}</span>
+                <input type="text" value="${escapeHtml(st.title || '')}" placeholder="Titre de l'étape" onchange="window.app.updateSectionContent('${sectionId}', 'steps.${sIdx}.title', this.value)" class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-xs font-semibold">
+                <textarea rows="2" placeholder="Description de l'étape" onchange="window.app.updateSectionContent('${sectionId}', 'steps.${sIdx}.desc', this.value)" class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-[11px] leading-snug">${escapeHtml(st.desc || '')}</textarea>
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
+
+        <!-- Table Block specific fields -->
+        ${section.type === 'tableBlock' && Array.isArray(c.rows) ? `
+          <div class="space-y-2.5 pt-2 border-t border-zinc-100">
+            <div class="font-medium text-zinc-700 text-xs">Tableau Comparatif</div>
+            ${c.rows.map((row, rIdx) => `
+              <div class="p-2 bg-zinc-50 rounded-md border border-zinc-200 space-y-1">
+                <input type="text" value="${escapeHtml(row.label || '')}" placeholder="Critère" onchange="window.app.updateSectionContent('${sectionId}', 'rows.${rIdx}.label', this.value)" class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-xs font-semibold">
+                <div class="grid grid-cols-2 gap-1.5">
+                  <input type="text" value="${escapeHtml(row.standard || '')}" placeholder="Standard" onchange="window.app.updateSectionContent('${sectionId}', 'rows.${rIdx}.standard', this.value)" class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-[11px]">
+                  <input type="text" value="${escapeHtml(row.premium || '')}" placeholder="Formule Pro" onchange="window.app.updateSectionContent('${sectionId}', 'rows.${rIdx}.premium', this.value)" class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-[11px] font-bold text-emerald-700">
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
+
+        <!-- Slider Block specific fields -->
+        ${section.type === 'sliderBlock' ? `
+          <div class="space-y-2 pt-2 border-t border-zinc-100">
+            <div class="font-medium text-zinc-700 text-xs">Curseur de Surface m²</div>
+            <div>
+              <label class="block text-[10px] text-zinc-500 mb-1">Chiffrage / Argument d'accompagnement :</label>
+              <input type="text" value="${escapeHtml(c.text || 'Devis ferme sous 24h • Déplacement offert')}" data-field="text" oninput="window.app.liveUpdateText('${sectionId}', 'text', this.value)" onchange="window.app.commitTextUpdate('${sectionId}', 'text', this.value)" class="w-full bg-white border border-zinc-200 rounded-md px-2.5 py-1 text-xs">
+            </div>
+          </div>
+        ` : ''}
+
+        <!-- Tabs Block specific fields -->
+        ${section.type === 'tabsBlock' && Array.isArray(c.tabs) ? `
+          <div class="space-y-2.5 pt-2 border-t border-zinc-100">
+            <div class="font-medium text-zinc-700 text-xs">Onglets Prestations (${c.tabs.length})</div>
+            ${c.tabs.map((tb, tIdx) => `
+              <div class="p-2 bg-zinc-50 rounded-md border border-zinc-200 space-y-1">
+                <input type="text" value="${escapeHtml(tb.title || '')}" placeholder="Nom de l'onglet" onchange="window.app.updateSectionContent('${sectionId}', 'tabs.${tIdx}.title', this.value)" class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-xs font-semibold">
+                <input type="text" value="${escapeHtml(tb.tag || '')}" placeholder="Tag (ex: Formule Abonnement)" onchange="window.app.updateSectionContent('${sectionId}', 'tabs.${tIdx}.tag', this.value)" class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-[11px]">
+                <textarea rows="2" placeholder="Description de la prestation" onchange="window.app.updateSectionContent('${sectionId}', 'tabs.${tIdx}.text', this.value)" class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-[11px] leading-snug">${escapeHtml(tb.text || '')}</textarea>
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
+
       </form>
 
       <!-- Component Intelligence & Audit Qualité (Section 16) -->
