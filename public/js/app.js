@@ -876,6 +876,98 @@ class App {
     this.updateUndoRedoUI();
   }
 
+  showToast(message, type = "info", action = null) {
+    let container = document.getElementById("artisite-toast-container");
+    if (!container) {
+      container = document.createElement("div");
+      container.id = "artisite-toast-container";
+      container.className = "artisite-toast-container";
+      document.body.appendChild(container);
+    }
+
+    const toast = document.createElement("div");
+    toast.className = "artisite-toast";
+    toast.innerHTML = `
+      <span>${message}</span>
+      ${action ? `<button type="button" class="artisite-toast-btn">${action.label || 'Action'}</button>` : ''}
+    `;
+
+    if (action && action.onClick) {
+      const btn = toast.querySelector(".artisite-toast-btn");
+      if (btn) {
+        btn.onclick = () => {
+          action.onClick();
+          toast.remove();
+        };
+      }
+    }
+
+    container.appendChild(toast);
+    setTimeout(() => {
+      toast.style.transition = "opacity 0.25s ease, transform 0.25s ease";
+      toast.style.opacity = "0";
+      toast.style.transform = "translateY(8px) scale(0.96)";
+      setTimeout(() => toast.remove(), 260);
+    }, 4000);
+  }
+
+  setButtonScale(scalePercent) {
+    state.setButtonScale(scalePercent);
+    const root = document.querySelector(".artisite-root");
+    if (root) {
+      root.style.setProperty("--cta-scale", (Number(scalePercent) / 100).toString());
+    }
+  }
+
+  setButtonRadius(radius) {
+    state.setButtonRadius(radius);
+    const root = document.querySelector(".artisite-root");
+    if (root) {
+      root.style.setProperty("--cta-radius", radius);
+      root.style.setProperty("--btn-radius", radius);
+    }
+    this.updateUndoRedoUI();
+  }
+
+  toggleButtonCase() {
+    state.toggleButtonCase();
+    const root = document.querySelector(".artisite-root");
+    if (root) {
+      root.style.setProperty("--cta-transform", state.currentProject?.branding?.ctaTransform || "none");
+    }
+    this.updateUndoRedoUI();
+  }
+
+  adjustButtonFontSize(delta) {
+    state.adjustButtonFontSize(delta);
+    const root = document.querySelector(".artisite-root");
+    if (root) {
+      root.style.setProperty("--cta-font-size", state.currentProject?.branding?.ctaFontSize || "0.95rem");
+    }
+    this.updateUndoRedoUI();
+  }
+
+  deleteButton(sectionId, buttonType) {
+    state.deleteButton(sectionId, buttonType);
+    this.showToast(`🗑️ Bouton masqué`, "info", {
+      label: "Annuler (⌘Z)",
+      onClick: () => this.undo()
+    });
+    this.updateUndoRedoUI();
+  }
+
+  restoreButton(sectionId, buttonType) {
+    state.restoreButton(sectionId, buttonType);
+    this.showToast(`Bouton restauré`, "info");
+    this.updateUndoRedoUI();
+  }
+
+  restoreAllButtons(sectionId = null) {
+    state.restoreAllButtons(sectionId);
+    this.showToast(`Tous les boutons ont été restaurés`, "info");
+    this.updateUndoRedoUI();
+  }
+
   addCanvaElement(blockType) {
     if (!state.currentProject) return;
     const project = state.currentProject;
@@ -1489,6 +1581,44 @@ class App {
     const updated = JSON.parse(JSON.stringify(state.currentProject));
     updated.branding.motionPreset = preset;
     state.updateProject(updated, true, `Animation : ${preset}`);
+
+    // Immediate visual preview feedback on visible sections in canvas
+    const motionTargets = document.querySelectorAll("#canvas-container [data-motion], .site-section[data-motion], .editor-section-wrapper[data-motion]");
+    motionTargets.forEach(el => {
+      el.setAttribute("data-motion", preset);
+      el.classList.remove("is-revealed");
+      void el.offsetHeight; // trigger reflow
+      el.classList.add("is-revealed");
+    });
+    this.showToast(`Animation : ${preset}`);
+  }
+
+  initScrollObserver() {
+    if (typeof IntersectionObserver === "undefined") {
+      document.querySelectorAll("[data-motion]:not([data-motion='none'])").forEach(el => {
+        el.classList.add("is-revealed");
+      });
+      return;
+    }
+
+    if (this._scrollObserver) {
+      this._scrollObserver.disconnect();
+    }
+
+    this._scrollObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-revealed");
+        }
+      });
+    }, {
+      threshold: 0.05,
+      rootMargin: "0px 0px -30px 0px"
+    });
+
+    document.querySelectorAll("[data-motion]:not([data-motion='none'])").forEach(el => {
+      this._scrollObserver.observe(el);
+    });
   }
 
   updateTypography(headingFont, bodyFont) {
@@ -1795,7 +1925,7 @@ class App {
         </div>
 
         <div class="footer">
-          Document commercial non contractuel • Artisite Prospector v4.0
+          Document commercial non contractuel • Artisite Prospector v4.1.0
         </div>
       </body>
       </html>
@@ -1855,6 +1985,8 @@ class App {
         this.toggleSiteTheme();
       };
     });
+
+    this.initScrollObserver();
 
     // 1. Before / After slider
     const container = document.querySelector(".ba-container");
@@ -2108,50 +2240,48 @@ class App {
     });
 
     // Sidebar Section Reordering via HTML5 Drag & Drop
-    document.querySelectorAll(".section-card[draggable='true'], .section-item-drag").forEach(item => {
-      item.addEventListener("dragstart", (e) => {
-        if (e.target.closest("input, textarea, select, button, .section-accordion-body")) {
-          e.preventDefault();
-          return;
-        }
-        const secId = item.getAttribute("data-sec-id");
+    document.querySelectorAll(".section-card-grip[draggable='true']").forEach(grip => {
+      grip.addEventListener("dragstart", (e) => {
+        const secId = grip.getAttribute("data-sec-id");
         e.dataTransfer.setData("text/plain", secId);
         e.dataTransfer.effectAllowed = "move";
-        item.classList.add("is-dragging");
+        const card = grip.closest(".section-card");
+        if (card) card.classList.add("is-dragging");
       });
 
-      item.addEventListener("dragend", () => {
-        item.classList.remove("is-dragging");
-        document.querySelectorAll(".section-card, .section-item-drag").forEach(el => {
-          el.classList.remove("drop-above", "drop-below");
+      grip.addEventListener("dragend", () => {
+        document.querySelectorAll(".section-card").forEach(el => {
+          el.classList.remove("is-dragging", "drop-above", "drop-below");
         });
       });
+    });
 
-      item.addEventListener("dragover", (e) => {
+    document.querySelectorAll(".section-card").forEach(card => {
+      card.addEventListener("dragover", (e) => {
         e.preventDefault();
         e.dataTransfer.dropEffect = "move";
-        const rect = item.getBoundingClientRect();
+        const rect = card.getBoundingClientRect();
         const isAfter = (e.clientY - rect.top) > (rect.height / 2);
         if (isAfter) {
-          item.classList.remove("drop-above");
-          item.classList.add("drop-below");
+          card.classList.remove("drop-above");
+          card.classList.add("drop-below");
         } else {
-          item.classList.remove("drop-below");
-          item.classList.add("drop-above");
+          card.classList.remove("drop-below");
+          card.classList.add("drop-above");
         }
       });
 
-      item.addEventListener("dragleave", (e) => {
-        if (e.relatedTarget && item.contains(e.relatedTarget)) return;
-        item.classList.remove("drop-above", "drop-below");
+      card.addEventListener("dragleave", (e) => {
+        if (e.relatedTarget && card.contains(e.relatedTarget)) return;
+        card.classList.remove("drop-above", "drop-below");
       });
 
-      item.addEventListener("drop", (e) => {
+      card.addEventListener("drop", (e) => {
         e.preventDefault();
         const sourceId = e.dataTransfer.getData("text/plain");
-        const targetId = item.getAttribute("data-sec-id");
-        const isAfter = item.classList.contains("drop-below");
-        item.classList.remove("drop-above", "drop-below");
+        const targetId = card.getAttribute("data-sec-id");
+        const isAfter = card.classList.contains("drop-below");
+        card.classList.remove("drop-above", "drop-below");
         if (sourceId && targetId && sourceId !== targetId) {
           state.reorderSections(sourceId, targetId, isAfter ? "after" : "before");
         }

@@ -242,13 +242,12 @@ export function renderEditor(state) {
 
                 return `
                   <div class="section-card ${isSel ? 'is-selected' : ''} ${!isVis ? 'is-hidden' : ''}"
-                       data-sec-id="${s.id}"
-                       draggable="true">
+                       data-sec-id="${s.id}">
 
                     <!-- Compact Header with Smooth Scroll to Canvas Section -->
                     <div class="section-card-header" role="button" tabindex="0" aria-controls="accordion-${s.id}" aria-expanded="${isOpen}" onclick="window.app.handleSectionNavigation('${s.id}', event)" onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); window.app.handleSectionNavigation('${s.id}', event); }">
                       <div class="flex items-center gap-2 min-w-0 flex-1">
-                        <span class="section-card-grip" title="Glisser pour réorganiser">
+                        <span class="section-card-grip cursor-grab active:cursor-grabbing p-0.5 hover:text-zinc-900 rounded" draggable="true" data-sec-id="${s.id}" title="Glisser pour réorganiser">
                           ${getIcon("gripVertical", "w-3.5 h-3.5")}
                         </span>
                         <span class="text-[10px] font-mono text-zinc-400 w-4">${idx < 9 ? '0' + (idx + 1) : (idx + 1)}</span>
@@ -797,12 +796,37 @@ function renderSettingsAccordions(project) {
         </div>
         <div class="section-accordion-body space-y-3" id="settings-body-buttons">
           <div>
-            <label class="block text-[10px] font-medium text-zinc-400 uppercase tracking-wider mb-1.5">Taille des Boutons CTA</label>
+            <div class="flex items-center justify-between mb-1.5">
+              <label class="block text-[10px] font-medium text-zinc-400 uppercase tracking-wider">Taille Continue (Échelle)</label>
+              <span class="text-[10px] font-mono font-bold text-zinc-700" id="cta-scale-display">${project.branding.ctaScale || 100}%</span>
+            </div>
+            <input type="range" min="80" max="140" step="5" value="${project.branding.ctaScale || 100}"
+                   oninput="window.app.setButtonScale(this.value); const el = document.getElementById('cta-scale-display'); if (el) el.textContent = this.value + '%';"
+                   class="w-full accent-zinc-900 cursor-pointer h-1.5 bg-zinc-200 rounded-lg">
+          </div>
+
+          <div>
+            <label class="block text-[10px] font-medium text-zinc-400 uppercase tracking-wider mb-1.5">Paliers de Taille CTA</label>
             <div class="grid grid-cols-4 gap-1.5 text-xs">
               <button type="button" onclick="window.app.setCTASize('sm')" class="py-1 border rounded text-center text-[11px] font-medium ${project.branding.ctaSize === 'sm' ? 'border-zinc-900 bg-white font-semibold shadow-xs' : 'border-zinc-200 bg-white text-zinc-600'}">S</button>
               <button type="button" onclick="window.app.setCTASize('md')" class="py-1 border rounded text-center text-[11px] font-medium ${!project.branding.ctaSize || project.branding.ctaSize === 'md' ? 'border-zinc-900 bg-white font-semibold shadow-xs' : 'border-zinc-200 bg-white text-zinc-600'}">M (Standard)</button>
               <button type="button" onclick="window.app.setCTASize('lg')" class="py-1 border rounded text-center text-[11px] font-medium ${project.branding.ctaSize === 'lg' ? 'border-zinc-900 bg-white font-semibold shadow-xs' : 'border-zinc-200 bg-white text-zinc-600'}">L (Grand)</button>
               <button type="button" onclick="window.app.setCTASize('xl')" class="py-1 border rounded text-center text-[11px] font-medium ${project.branding.ctaSize === 'xl' ? 'border-zinc-900 bg-white font-semibold shadow-xs' : 'border-zinc-200 bg-white text-zinc-600'}">XL</button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[10px] font-medium text-zinc-400 uppercase tracking-wider mb-1.5">Typographie</label>
+              <button type="button" onclick="window.app.toggleButtonCase()" class="w-full py-1.5 border rounded text-center text-[11px] font-medium ${project.branding.ctaTransform === 'uppercase' ? 'border-zinc-900 bg-white font-semibold shadow-xs text-zinc-950' : 'border-zinc-200 bg-white text-zinc-600'}">
+                ${project.branding.ctaTransform === 'uppercase' ? '🔠 MAJUSCULES' : '🔡 Casse Normale'}
+              </button>
+            </div>
+            <div>
+              <label class="block text-[10px] font-medium text-zinc-400 uppercase tracking-wider mb-1.5">Boutons Masqués</label>
+              <button type="button" onclick="window.app.restoreAllButtons()" class="w-full py-1.5 border border-zinc-200 bg-zinc-50 hover:bg-white rounded text-center text-[11px] font-medium text-zinc-700 transition-colors" title="Restaurer tous les boutons supprimés">
+                🔄 Restaurer tout
+              </button>
             </div>
           </div>
 

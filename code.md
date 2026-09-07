@@ -1,4 +1,4 @@
-# Artisite Prospector — état technique v4.1.0
+# Artisite Prospector v4.1.0 — état technique
 
 ## Parcours principal
 
@@ -10,14 +10,18 @@ La version courante est `4.1.0`. Les modifications de cette itération sont déc
 4. `public/js/engine/exporter.js` transforme le projet en HTML autonome avec les interactions client.
 5. `server/apiHandler.js` expose les endpoints de santé, d’enrichissement IA et d’image.
 
-## État validé
+## État validé (v4.1.0)
 
-- Interface PC élargie avec contrôles tactiles type keycap, libellés d’appareils et tooltips.
+- Suppression des badges techniques parasites (`#btn-phone`, `#cta`, `#h1`) sur les textes et boutons.
+- Contrôleur de boutons CTA avec suppression unitaire (Undo/Redo `⌘Z`), curseur de dimensionnement continu (80%-140%), rayons personnalisés et contrôles typographiques.
+- Moteur d'animation cinématique Scroll-Reveal 60 FPS déclenché par `IntersectionObserver` et feedback instantané dans l'éditeur.
+- Réorganisation Drag & Drop de sections fiabilisée sur la poignée `.section-card-grip`.
+- Interface PC élargie avec contrôles tactiles type keycap 3D, libellés d’appareils et tooltips.
 - Mode Conception séparé du mode Aperçu Client final.
 - Thème de l’éditeur séparé du thème jour/nuit du site généré et de l’export.
 - Fallback SVG local pour les images distantes défaillantes, y compris dans l’API image.
 - CTA éditables avec réglage continu de taille, radius et animations ; sections réordonnables par glisser-déposer et catalogue de patterns navigable.
-- Documentation de suivi complète dans `README.md`.
+- Documentation de suivi complète dans `README.md`, `document.md` et `CHANGELOG.md`.
 
 ## Vérification
 

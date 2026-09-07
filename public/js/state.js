@@ -341,6 +341,112 @@ class AppStateManager {
     this.closeDrawer();
   }
 
+  // Button Management within currentProject (Undo/Redo supported)
+  deleteButton(sectionId, buttonType) {
+    if (!this.currentProject) return;
+    this.pushHistory(`Suppression bouton ${buttonType}`);
+    const project = JSON.parse(JSON.stringify(this.currentProject));
+    const sec = project.sections.find(s => s.id === sectionId);
+    if (sec) {
+      sec.settings = sec.settings || {};
+      sec.settings[`${buttonType}-visible`] = false;
+      sec.settings[`btn-${buttonType}-visible`] = false;
+      sec.settings[`btn-${sec.type}-${buttonType}-visible`] = false;
+      if (buttonType === "primary" || buttonType === "ctaPrimary") {
+        sec.settings["btn-hero-primary-visible"] = false;
+        sec.settings["btn-primary-visible"] = false;
+        sec.settings["ctaPrimary-visible"] = false;
+      } else if (buttonType === "phone" || buttonType === "ctaSecondary" || buttonType === "secondary") {
+        sec.settings["btn-phone-visible"] = false;
+        sec.settings["btn-hero-phone-visible"] = false;
+        sec.settings["ctaSecondary-visible"] = false;
+      }
+      sec.settings.hiddenButtons = sec.settings.hiddenButtons || [];
+      if (!sec.settings.hiddenButtons.includes(buttonType)) {
+        sec.settings.hiddenButtons.push(buttonType);
+      }
+      this.updateProject(project, false);
+    }
+  }
+
+  restoreButton(sectionId, buttonType) {
+    if (!this.currentProject) return;
+    this.pushHistory(`Restauration bouton ${buttonType}`);
+    const project = JSON.parse(JSON.stringify(this.currentProject));
+    const sec = project.sections.find(s => s.id === sectionId);
+    if (sec && sec.settings) {
+      delete sec.settings[`${buttonType}-visible`];
+      delete sec.settings[`btn-${buttonType}-visible`];
+      delete sec.settings[`btn-${sec.type}-${buttonType}-visible`];
+      delete sec.settings["btn-hero-primary-visible"];
+      delete sec.settings["btn-primary-visible"];
+      delete sec.settings["ctaPrimary-visible"];
+      delete sec.settings["btn-phone-visible"];
+      delete sec.settings["btn-hero-phone-visible"];
+      delete sec.settings["ctaSecondary-visible"];
+      if (Array.isArray(sec.settings.hiddenButtons)) {
+        sec.settings.hiddenButtons = sec.settings.hiddenButtons.filter(b => b !== buttonType);
+      }
+      this.updateProject(project, false);
+    }
+  }
+
+  restoreAllButtons(sectionId = null) {
+    if (!this.currentProject) return;
+    this.pushHistory("Restauration de tous les boutons");
+    const project = JSON.parse(JSON.stringify(this.currentProject));
+    const sectionsToRestore = sectionId 
+      ? project.sections.filter(s => s.id === sectionId)
+      : project.sections;
+    
+    sectionsToRestore.forEach(sec => {
+      if (sec.settings) {
+        Object.keys(sec.settings).forEach(k => {
+          if (k.endsWith("-visible") && (k.includes("btn") || k.includes("cta") || k.includes("phone") || k.includes("primary") || k.includes("secondary"))) {
+            delete sec.settings[k];
+          }
+        });
+        delete sec.settings.hiddenButtons;
+      }
+    });
+    this.updateProject(project, false);
+  }
+
+  setButtonScale(scalePercent) {
+    if (!this.currentProject) return;
+    const val = Number(scalePercent) || 100;
+    this.currentProject.branding.ctaScale = val;
+    this.saveToStorage();
+    this.notify("project_updated");
+  }
+
+  setButtonRadius(radius) {
+    if (!this.currentProject) return;
+    this.pushHistory(`Rayon boutons : ${radius}`);
+    const project = JSON.parse(JSON.stringify(this.currentProject));
+    project.branding.buttonRadius = radius;
+    project.branding.borderRadius = radius === "0px" ? "0px" : (radius === "9999px" ? "1.5rem" : "0.75rem");
+    this.updateProject(project, false);
+  }
+
+  toggleButtonCase() {
+    if (!this.currentProject) return;
+    this.pushHistory("Bascule casse boutons");
+    const project = JSON.parse(JSON.stringify(this.currentProject));
+    project.branding.ctaTransform = project.branding.ctaTransform === "uppercase" ? "none" : "uppercase";
+    this.updateProject(project, false);
+  }
+
+  adjustButtonFontSize(delta) {
+    if (!this.currentProject) return;
+    this.pushHistory(delta > 0 ? "Agrandir texte bouton" : "Réduire texte bouton");
+    const project = JSON.parse(JSON.stringify(this.currentProject));
+    const currentSize = parseInt(project.branding.ctaFontSize || "15", 10);
+    const newSize = Math.max(11, Math.min(24, currentSize + delta));
+    project.branding.ctaFontSize = `${newSize}px`;
+    this.updateProject(project, false);
+  }
+
   // History: Undo / Redo
   pushHistory(actionDescription = "Action") {
     if (!this.currentProject) return;

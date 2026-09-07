@@ -124,9 +124,11 @@ export function renderWebsiteHTML(project, options = { isEditor: false, isStanda
       --font-body: '${project.branding.bodyFont}', -apple-system, BlinkMacSystemFont, sans-serif;
       --radius: ${project.branding.borderRadius};
       --btn-radius: ${project.branding.buttonRadius};
-      --cta-radius: ${project.branding.buttonRadius};
+      --cta-radius: ${project.branding.buttonRadius || '9999px'};
       --cta-padding: ${ctaPaddingMap[ctaSize] || '0.75rem 1.5rem'};
-      --cta-font-size: ${ctaFontMap[ctaSize] || '0.95rem'};
+      --cta-font-size: ${project.branding.ctaFontSize || ctaFontMap[ctaSize] || '0.95rem'};
+      --cta-scale: ${project.branding.ctaScale ? (project.branding.ctaScale / 100) : 1};
+      --cta-transform: ${project.branding.ctaTransform || 'none'};
     ">
       ${sectionsHTML}
       ${stickyBarHTML}
@@ -320,15 +322,75 @@ function renderHeader(sec, project, options = {}) {
   `;
 }
 
+function isButtonHidden(sec, buttonType, specificKey = null) {
+  if (!sec || !sec.settings) return false;
+  if (specificKey && sec.settings[specificKey] === false) return true;
+  if (sec.settings[`${buttonType}-visible`] === false) return true;
+  if (sec.settings[`btn-${buttonType}-visible`] === false) return true;
+  if (sec.settings[`btn-${sec.type}-${buttonType}-visible`] === false) return true;
+  if (Array.isArray(sec.settings.hiddenButtons) && sec.settings.hiddenButtons.includes(buttonType)) return true;
+  return false;
+}
+
+function renderButtonPopover(sec, buttonType, options = {}, project = {}) {
+  if (!options.isEditor) return "";
+  const currentScale = project?.branding?.ctaScale || 100;
+  const currentRadius = project?.branding?.buttonRadius || "9999px";
+  const isUpper = project?.branding?.ctaTransform === "uppercase";
+  const hasPulse = !!project?.branding?.ctaPulse;
+  const ctaSize = project?.branding?.ctaSize || "md";
+
+  return `
+    <div id="cta-popover-${sec.id}-${buttonType}" class="cta-context-popover" role="dialog" aria-label="Réglages du bouton ${buttonType}" onclick="event.stopPropagation();">
+      <div class="flex items-center gap-1">
+        <span class="text-[9.5px] uppercase font-bold text-zinc-400 mr-0.5">Taille:</span>
+        <button type="button" data-cta-size="sm" onclick="event.preventDefault(); window.app.setCTASize('sm')" class="cta-context-btn ${ctaSize === 'sm' ? 'is-selected' : ''}" title="Taille Petite">S</button>
+        <button type="button" data-cta-size="md" onclick="event.preventDefault(); window.app.setCTASize('md')" class="cta-context-btn ${ctaSize === 'md' ? 'is-selected' : ''}" title="Taille Moyenne">M</button>
+        <button type="button" data-cta-size="lg" onclick="event.preventDefault(); window.app.setCTASize('lg')" class="cta-context-btn ${ctaSize === 'lg' ? 'is-selected' : ''}" title="Taille Grande">L</button>
+        <button type="button" data-cta-size="xl" onclick="event.preventDefault(); window.app.setCTASize('xl')" class="cta-context-btn ${ctaSize === 'xl' ? 'is-selected' : ''}" title="Taille XL">XL</button>
+      </div>
+
+      <div class="h-3 w-[1px] bg-zinc-700 mx-0.5"></div>
+
+      <div class="flex items-center gap-1.5">
+        <input type="range" min="80" max="140" step="5" value="${currentScale}" 
+          oninput="window.app.setButtonScale(this.value)" 
+          class="w-12 h-1.5 accent-white cursor-pointer bg-zinc-700 rounded-lg" 
+          title="Échelle continue (${currentScale}%)">
+        <button type="button" onclick="event.preventDefault(); window.app.adjustButtonFontSize(-1)" class="cta-context-btn" title="Diminuer taille texte">A-</button>
+        <button type="button" onclick="event.preventDefault(); window.app.adjustButtonFontSize(1)" class="cta-context-btn" title="Agrandir taille texte">A+</button>
+      </div>
+
+      <div class="h-3 w-[1px] bg-zinc-700 mx-0.5"></div>
+
+      <div class="flex items-center gap-1">
+        <button type="button" onclick="event.preventDefault(); window.app.toggleButtonCase()" class="cta-context-btn ${isUpper ? 'is-selected' : ''}" title="Bascule Majuscules / Normal">TT</button>
+        <button type="button" onclick="event.preventDefault(); window.app.setButtonRadius('0px')" class="cta-context-btn ${currentRadius === '0px' ? 'is-selected' : ''}" title="Bords droits">▮</button>
+        <button type="button" onclick="event.preventDefault(); window.app.setButtonRadius('8px')" class="cta-context-btn ${currentRadius === '8px' || currentRadius === '0.5rem' ? 'is-selected' : ''}" title="Bords adoucis">▢</button>
+        <button type="button" onclick="event.preventDefault(); window.app.setButtonRadius('9999px')" class="cta-context-btn ${currentRadius === '9999px' ? 'is-selected' : ''}" title="Format pilule">⬭</button>
+      </div>
+
+      <div class="h-3 w-[1px] bg-zinc-700 mx-0.5"></div>
+
+      <div class="flex items-center gap-1">
+        <button type="button" onclick="event.preventDefault(); window.app.toggleCTAPulse()" class="cta-context-btn ${hasPulse ? 'is-selected' : ''}" title="Effet pulsation">✨</button>
+        <button type="button" onclick="event.preventDefault(); window.app.deleteButton('${sec.id}', '${buttonType}')" class="cta-context-btn cta-btn-delete" title="Supprimer ce bouton (Annuler ⌘Z)">🗑️</button>
+      </div>
+    </div>
+  `;
+}
+
 // 2. Hero
 function renderHero(sec, project, options = {}) {
   const c = sec.content;
   const variant = sec.variant || "split-image";
   const ctaPulseClass = project?.branding?.ctaPulse ? " btn-cta-pulse" : "";
   const heroButtonId = getUiId(project, sec, "btn");
-  const heroButtonVisibility = sec.settings?.[`${heroButtonId}-visible`] === false ? " hidden" : "";
-  const heroButtonMotion = sec.settings?.[`${heroButtonId}-motion`] || "";
   const heroPhoneId = getUiId(project, sec, "btn-phone");
+  const primaryHidden = isButtonHidden(sec, "primary", `${heroButtonId}-visible`);
+  const phoneHidden = isButtonHidden(sec, "phone", `${heroPhoneId}-visible`);
+  const heroButtonVisibility = primaryHidden ? " hidden" : "";
+  const heroButtonMotion = sec.settings?.[`${heroButtonId}-motion`] || "";
   const heroPhoneMotion = sec.settings?.[`${heroPhoneId}-motion`] || "";
 
   // Variant A: Fullscreen Image
@@ -362,15 +424,25 @@ function renderHero(sec, project, options = {}) {
           </p>
 
           <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a href="#simulateur" class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full text-base font-bold text-white shadow-2xl hover:opacity-95 transition-all transform hover:-translate-y-0.5" style="background-color: var(--primary);">
-              ${getIcon("sparkles", "w-5 h-5")}
-              <span data-editable="ctaPrimary">${c.ctaPrimary}</span>
-            </a>
+            ${primaryHidden ? '' : `
+              <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-primary" data-cta-popover-wrapper data-ui-id="${heroButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
+                <a href="#simulateur" class="btn-cta btn-keycap${ctaPulseClass} w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full text-base font-bold text-white shadow-2xl transition-all" data-ui-id="${heroButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}" style="background-color: var(--primary);">
+                  ${getIcon("sparkles", "w-5 h-5")}
+                  <span data-editable="ctaPrimary">${c.ctaPrimary}</span>
+                </a>
+                ${renderButtonPopover(sec, 'primary', options, project)}
+              </div>
+            `}
 
-            <a href="tel:${c.phone}" class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-full text-base font-semibold text-white bg-white/15 backdrop-blur-md border border-white/30 hover:bg-white/25 transition-colors">
-              ${getIcon("phone", "w-5 h-5 text-emerald-400")}
-              <span data-editable="ctaSecondary">${c.ctaSecondary}</span>
-            </a>
+            ${phoneHidden ? '' : `
+              <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-phone" data-cta-popover-wrapper data-ui-id="${heroPhoneId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
+                <a href="tel:${c.phone}" class="btn-cta btn-keycap${ctaPulseClass} w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-full text-base font-semibold text-white bg-white/15 backdrop-blur-md border border-white/30 hover:bg-white/25 transition-colors" data-ui-id="${heroPhoneId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
+                  ${getIcon("phone", "w-5 h-5 text-emerald-400")}
+                  <span data-editable="ctaSecondary">${c.ctaSecondary}</span>
+                </a>
+                ${renderButtonPopover(sec, 'phone', options, project)}
+              </div>
+            `}
           </div>
 
           <div class="pt-6 flex flex-wrap items-center justify-center gap-6 text-xs text-slate-300 font-medium">
@@ -408,15 +480,25 @@ function renderHero(sec, project, options = {}) {
               </p>
 
               <div class="pt-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-                <a href="#simulateur" class="inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-full text-base font-bold text-white shadow-xl hover:shadow-2xl transition-all transform hover:-translate-y-0.5" style="background-color: var(--primary);">
-                  ${getIcon("sparkles", "w-5 h-5")}
-                  <span data-editable="ctaPrimary">${c.ctaPrimary}</span>
-                </a>
+                ${primaryHidden ? '' : `
+                  <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-primary" data-cta-popover-wrapper data-ui-id="${heroButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
+                    <a href="#simulateur" class="btn-cta btn-keycap${ctaPulseClass} inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-full text-base font-bold text-white shadow-xl hover:shadow-2xl transition-all transform hover:-translate-y-0.5" data-ui-id="${heroButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}" style="background-color: var(--primary);">
+                      ${getIcon("sparkles", "w-5 h-5")}
+                      <span data-editable="ctaPrimary">${c.ctaPrimary}</span>
+                    </a>
+                    ${renderButtonPopover(sec, 'primary', options, project)}
+                  </div>
+                `}
 
-                <a href="tel:${c.phone}" class="inline-flex items-center justify-center gap-2.5 px-6 py-4 rounded-full text-base font-semibold text-white bg-slate-900 border border-slate-700 hover:bg-slate-800 transition-colors">
-                  ${getIcon("phone", "w-5 h-5 text-emerald-400")}
-                  <span data-editable="ctaSecondary">${c.ctaSecondary}</span>
-                </a>
+                ${phoneHidden ? '' : `
+                  <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-phone" data-cta-popover-wrapper data-ui-id="${heroPhoneId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
+                    <a href="tel:${c.phone}" class="btn-cta btn-keycap${ctaPulseClass} inline-flex items-center justify-center gap-2.5 px-6 py-4 rounded-full text-base font-semibold text-white bg-slate-900 border border-slate-700 hover:bg-slate-800 transition-colors" data-ui-id="${heroPhoneId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
+                      ${getIcon("phone", "w-5 h-5 text-emerald-400")}
+                      <span data-editable="ctaSecondary">${c.ctaSecondary}</span>
+                    </a>
+                    ${renderButtonPopover(sec, 'phone', options, project)}
+                  </div>
+                `}
               </div>
 
               <div class="pt-2 text-xs text-slate-400 flex items-center gap-3">
@@ -459,15 +541,25 @@ function renderHero(sec, project, options = {}) {
           </p>
 
           <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a href="#simulateur" class="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm font-bold text-white shadow-md hover:shadow-lg transition-all" style="background-color: var(--primary);">
-              ${getIcon("sparkles", "w-4 h-4")}
-              <span data-editable="ctaPrimary">${c.ctaPrimary}</span>
-            </a>
+            ${primaryHidden ? '' : `
+              <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-primary" data-cta-popover-wrapper data-ui-id="${heroButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
+                <a href="#simulateur" class="btn-cta btn-keycap${ctaPulseClass} inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm font-bold text-white shadow-md hover:shadow-lg transition-all" data-ui-id="${heroButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}" style="background-color: var(--primary);">
+                  ${getIcon("sparkles", "w-4 h-4")}
+                  <span data-editable="ctaPrimary">${c.ctaPrimary}</span>
+                </a>
+                ${renderButtonPopover(sec, 'primary', options, project)}
+              </div>
+            `}
 
-            <a href="tel:${c.phone}" class="inline-flex items-center gap-2 px-7 py-3.5 rounded-full text-sm font-semibold text-gray-800 bg-white border border-gray-300 hover:bg-gray-50 transition-colors">
-              ${getIcon("phone", "w-4 h-4 text-emerald-600")}
-              <span data-editable="ctaSecondary">${c.ctaSecondary}</span>
-            </a>
+            ${phoneHidden ? '' : `
+              <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-phone" data-cta-popover-wrapper data-ui-id="${heroPhoneId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
+                <a href="tel:${c.phone}" class="btn-cta btn-keycap${ctaPulseClass} inline-flex items-center gap-2 px-7 py-3.5 rounded-full text-sm font-semibold text-gray-800 bg-white border border-gray-300 hover:bg-gray-50 transition-colors" data-ui-id="${heroPhoneId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
+                  ${getIcon("phone", "w-4 h-4 text-emerald-600")}
+                  <span data-editable="ctaSecondary">${c.ctaSecondary}</span>
+                </a>
+                ${renderButtonPopover(sec, 'phone', options, project)}
+              </div>
+            `}
           </div>
 
           <div class="pt-4 text-xs text-gray-400">
@@ -498,42 +590,25 @@ function renderHero(sec, project, options = {}) {
               ${c.subtitle}
             </p>
 
-              <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-primary" data-cta-popover-wrapper data-ui-id="${getUiId(project, sec, 'cta')}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
-              <a href="#simulateur" class="btn-cta btn-keycap${ctaPulseClass}${heroButtonVisibility} inline-flex items-center justify-center gap-2.5 shadow-xl transition-all" data-ui-id="${heroButtonId}" data-ui-code="${getUiCode(project?.id, sec?.id, heroButtonId)}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}"${heroButtonMotion ? ` data-motion="${heroButtonMotion}"` : ''} style="background-color: var(--primary); color: #ffffff;">
-                ${getIcon("sparkles", "w-5 h-5")}
-                <span data-editable="ctaPrimary">${c.ctaPrimary}</span>
-              </a>
-              ${options.isEditor ? `
-                <div id="cta-popover-${sec.id}-primary" class="cta-context-popover" role="dialog" aria-label="Réglages du bouton principal" onclick="event.stopPropagation();">
-                  <span class="text-[9.5px] uppercase font-bold text-zinc-400 mr-0.5">Taille:</span>
-                  <button type="button" data-cta-size="sm" onclick="event.preventDefault(); window.app.setCTASize('sm')" class="cta-context-btn">S</button>
-                  <button type="button" data-cta-size="md" onclick="event.preventDefault(); window.app.setCTASize('md')" class="cta-context-btn">M</button>
-                  <button type="button" data-cta-size="lg" onclick="event.preventDefault(); window.app.setCTASize('lg')" class="cta-context-btn">L</button>
-                  <button type="button" data-cta-size="xl" onclick="event.preventDefault(); window.app.setCTASize('xl')" class="cta-context-btn">XL</button>
-                  <button type="button" data-action="pulse" onclick="event.preventDefault(); window.app.toggleCTAPulse()" class="cta-context-btn" title="Pulsation lumineuse">Pulse</button>
-                  <span class="cta-motion-label">Animation</span>
-                  ${[['none','Off'],['fade-in','Fade'],['slide-up','Slide'],['spring','Spring'],['stagger','Stagger'],['shimmer','Shimmer']].map(([preset,label]) => `<button type="button" data-motion-preset="${preset}" onclick="event.preventDefault(); window.app.setComponentMotion('${sec.id}', '${heroButtonId}', '${preset}')" class="cta-context-btn">${label}</button>`).join('')}
+            <div class="pt-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+              ${primaryHidden ? '' : `
+                <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-primary" data-cta-popover-wrapper data-ui-id="${heroButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
+                  <a href="#simulateur" class="btn-cta btn-keycap${ctaPulseClass} inline-flex items-center justify-center gap-2.5 shadow-xl transition-all" data-ui-id="${heroButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}"${heroButtonMotion ? ` data-motion="${heroButtonMotion}"` : ''} style="background-color: var(--primary); color: #ffffff;">
+                    ${getIcon("sparkles", "w-5 h-5")}
+                    <span data-editable="ctaPrimary">${c.ctaPrimary}</span>
+                  </a>
+                  ${renderButtonPopover(sec, 'primary', options, project)}
                 </div>
-              ` : ''}
-            </div>
-
-            <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-phone" data-cta-popover-wrapper>
-              <a href="tel:${c.phone}" class="btn-cta btn-keycap${ctaPulseClass} inline-flex items-center justify-center gap-2.5 shadow-sm transition-all" data-ui-id="${heroPhoneId}" data-ui-code="${getUiCode(project?.id, sec?.id, heroPhoneId)}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}"${heroPhoneMotion ? ` data-motion="${heroPhoneMotion}"` : ''} style="background-color: #ffffff; color: #18181b; border: 1px solid #e4e4e7;">
-                ${getIcon("phone", "w-5 h-5 text-emerald-600")}
-                <span data-editable="ctaSecondary">${c.ctaSecondary}</span>
-              </a>
-              ${options.isEditor ? `
-                <div id="cta-popover-${sec.id}-phone" class="cta-context-popover" role="dialog" aria-label="Réglages du bouton téléphone" onclick="event.stopPropagation();">
-                  <span class="text-[9.5px] uppercase font-bold text-zinc-400 mr-0.5">Taille:</span>
-                  <button type="button" data-cta-size="sm" onclick="event.preventDefault(); window.app.setCTASize('sm')" class="cta-context-btn">S</button>
-                  <button type="button" data-cta-size="md" onclick="event.preventDefault(); window.app.setCTASize('md')" class="cta-context-btn">M</button>
-                  <button type="button" data-cta-size="lg" onclick="event.preventDefault(); window.app.setCTASize('lg')" class="cta-context-btn">L</button>
-                  <button type="button" data-cta-size="xl" onclick="event.preventDefault(); window.app.setCTASize('xl')" class="cta-context-btn">XL</button>
-                  <button type="button" data-action="pulse" onclick="event.preventDefault(); window.app.toggleCTAPulse()" class="cta-context-btn" title="Pulsation lumineuse">Pulse</button>
-                  <span class="cta-motion-label">Animation</span>
-                  ${[['none','Off'],['fade-in','Fade'],['slide-up','Slide'],['spring','Spring'],['stagger','Stagger'],['shimmer','Shimmer']].map(([preset,label]) => `<button type="button" data-motion-preset="${preset}" onclick="event.preventDefault(); window.app.setComponentMotion('${sec.id}', '${heroPhoneId}', '${preset}')" class="cta-context-btn">${label}</button>`).join('')}
+              `}
+              ${phoneHidden ? '' : `
+                <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-phone" data-cta-popover-wrapper data-ui-id="${heroPhoneId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
+                  <a href="tel:${c.phone}" class="btn-cta btn-keycap${ctaPulseClass} inline-flex items-center justify-center gap-2.5 shadow-sm transition-all" data-ui-id="${heroPhoneId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}"${heroPhoneMotion ? ` data-motion="${heroPhoneMotion}"` : ''} style="background-color: #ffffff; color: #18181b; border: 1px solid #e4e4e7;">
+                    ${getIcon("phone", "w-5 h-5 text-emerald-600")}
+                    <span data-editable="ctaSecondary">${c.ctaSecondary}</span>
+                  </a>
+                  ${renderButtonPopover(sec, 'phone', options, project)}
                 </div>
-              ` : ''}
+              `}
             </div>
 
             <div class="pt-3 flex items-center gap-3 text-xs font-medium text-gray-500">
@@ -1408,8 +1483,13 @@ function renderFaq(sec, project) {
 function renderCta(sec, project, options = {}) {
   const c = sec.content;
   const primaryButtonId = getUiId(project, sec, "btn-primary");
-  const primaryButtonVisibility = sec.settings?.[`${primaryButtonId}-visible`] === false ? " hidden" : "";
+  const phoneButtonId = getUiId(project, sec, "btn-phone");
+  const primaryHidden = isButtonHidden(sec, "primary", `${primaryButtonId}-visible`);
+  const phoneHidden = isButtonHidden(sec, "phone", `${phoneButtonId}-visible`);
   const primaryButtonMotion = sec.settings?.[`${primaryButtonId}-motion`] || "";
+  const phoneButtonMotion = sec.settings?.[`${phoneButtonId}-motion`] || "";
+  const ctaPulseClass = project?.branding?.ctaPulse ? " btn-cta-pulse" : "";
+
   return `
     <div class="py-20 text-white relative overflow-hidden" style="background-color: var(--primary);">
       <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6 relative z-10">
@@ -1417,14 +1497,25 @@ function renderCta(sec, project, options = {}) {
         <h2 class="font-heading text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight" data-editable="title">${c.title}</h2>
         <p class="text-white/80 text-base sm:text-lg max-w-2xl mx-auto" data-editable="subtitle">${c.subtitle}</p>
         <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a href="#simulateur" class="btn-cta${primaryButtonVisibility} bg-white text-gray-900 shadow-xl hover:bg-gray-50" data-ui-id="${primaryButtonId}" data-ui-code="${getUiCode(project?.id, sec?.id, primaryButtonId)}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}"${primaryButtonMotion ? ` data-motion="${primaryButtonMotion}"` : ''}>
-            ${getIcon("sparkles", "w-5 h-5 text-amber-500")}
-            <span data-editable="ctaPrimary">${c.ctaPrimary}</span>
-          </a>
-          <a href="tel:${c.phone}" class="btn-cta border border-white/30 text-white hover:bg-white/10" data-ui-id="${getUiId(project, sec, 'btn-phone')}" data-ui-code="${getUiCode(project?.id, sec?.id, 'btn-phone')}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
-            ${getIcon("phone", "w-5 h-5")}
-            <span data-editable="ctaSecondary">${c.ctaSecondary}</span>
-          </a>
+          ${primaryHidden ? '' : `
+            <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-primary" data-cta-popover-wrapper data-ui-id="${primaryButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
+              <a href="#simulateur" class="btn-cta btn-keycap${ctaPulseClass} bg-white text-gray-900 shadow-xl hover:bg-gray-50" data-ui-id="${primaryButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}"${primaryButtonMotion ? ` data-motion="${primaryButtonMotion}"` : ''}>
+                ${getIcon("sparkles", "w-5 h-5 text-amber-500")}
+                <span data-editable="ctaPrimary">${c.ctaPrimary}</span>
+              </a>
+              ${renderButtonPopover(sec, 'primary', options, project)}
+            </div>
+          `}
+          ${phoneHidden ? '' : `
+            <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-phone" data-cta-popover-wrapper data-ui-id="${phoneButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
+              <a href="tel:${c.phone}" class="btn-cta btn-keycap${ctaPulseClass} border border-white/30 text-white hover:bg-white/10" data-ui-id="${phoneButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}"${phoneButtonMotion ? ` data-motion="${phoneButtonMotion}"` : ''}>
+                ${getIcon("phone", "w-5 h-5")}
+                <span data-editable="ctaSecondary">${c.ctaSecondary}</span>
+              </a>
+              ${renderButtonPopover(sec, 'phone', options, project)}
+            </div>
+          `}
+        </div>
         </div>
       </div>
     </div>

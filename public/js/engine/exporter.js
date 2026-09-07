@@ -77,6 +77,17 @@ ${UTILITY_CSS}
 
     .sticky-call-bar { position: fixed; left: 50%; bottom: max(1rem, env(safe-area-inset-bottom)); transform: translateX(-50%); width: min(92vw, 28rem); z-index: 120; }
     [data-ui-target="false"]::after { display: none !important; }
+    [data-motion]:not([data-motion="none"]) { opacity: 0; transition: opacity 350ms cubic-bezier(0.16, 1, 0.3, 1), transform 350ms cubic-bezier(0.16, 1, 0.3, 1); will-change: opacity, transform; }
+    [data-motion="fade-in"].is-revealed { animation: motion-fade-in 380ms cubic-bezier(0.16, 1, 0.3, 1) both; opacity: 1 !important; }
+    [data-motion="slide-up"].is-revealed { animation: motion-slide-up 450ms cubic-bezier(0.16, 1, 0.3, 1) both; opacity: 1 !important; }
+    [data-motion="slide-in"].is-revealed { animation: motion-slide-in 450ms cubic-bezier(0.16, 1, 0.3, 1) both; opacity: 1 !important; }
+    [data-motion="spring"].is-revealed { animation: motion-spring 550ms cubic-bezier(0.34, 1.56, 0.64, 1) both; opacity: 1 !important; }
+    [data-motion="progress-fill"].is-revealed { animation: motion-progress-fill 650ms cubic-bezier(0.16, 1, 0.3, 1) both; transform-origin: left; opacity: 1 !important; }
+    @keyframes motion-fade-in { from { opacity: 0; transform: scale(0.99); } to { opacity: 1; transform: scale(1); } }
+    @keyframes motion-slide-up { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes motion-slide-in { from { opacity: 0; transform: translateX(-24px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes motion-spring { from { opacity: 0; transform: translateY(20px) scale(0.95); } 65% { transform: translateY(-3px) scale(1.015); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    @keyframes motion-progress-fill { from { opacity: 0; transform: scaleX(0.7); } to { opacity: 1; transform: scaleX(1); } }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; scroll-behavior: auto !important; } }
 
     /* Utilities */
@@ -352,6 +363,22 @@ ${UTILITY_CSS}
           form.style.display = 'none';
         }
       });
+    })();
+
+    // 7. Scroll-Reveal 60fps Motion
+    (function initScrollReveal() {
+      if (!window.IntersectionObserver) {
+        document.querySelectorAll('[data-motion]:not([data-motion="none"])').forEach(el => el.classList.add('is-revealed'));
+        return;
+      }
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-revealed');
+          }
+        });
+      }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+      document.querySelectorAll('[data-motion]:not([data-motion="none"])').forEach(el => obs.observe(el));
     })();
   </script>
 </body>
