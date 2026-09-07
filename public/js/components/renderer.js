@@ -194,6 +194,15 @@ function renderSection(sec, project, options) {
     case "customBlock":
       innerHTML = renderCustomBlock(sec, project, options);
       break;
+    case "process":
+      innerHTML = renderProcess(sec, project, options);
+      break;
+    case "certifications":
+      innerHTML = renderCertifications(sec, project, options);
+      break;
+    case "pricing":
+      innerHTML = renderPricing(sec, project, options);
+      break;
     default:
       innerHTML = `<div class="p-8 text-center text-gray-400">Section ${sec.type}</div>`;
   }
@@ -204,7 +213,7 @@ function renderSection(sec, project, options) {
   const inferredTheme = ["#09090b", "#0f0f11", "#111318", "#18181b"].includes(globalBg) ? "dark" : ["#f4f4f5", "#f8fafc"].includes(globalBg) ? "mineral" : "white";
   const sectionTheme = sec.settings?.bgTheme || inferredTheme;
   const bgTheme = `bg-sec-${sectionTheme}`;
-  const themeColor = sectionTheme === "dark" ? "#09090b" : sectionTheme === "mineral" ? "#f8fafc" : "#ffffff";
+  const themeColor = sectionTheme === "dark" ? "#09090b" : sectionTheme === "navy" ? "#0c1527" : sectionTheme === "warm" ? "#faf8f5" : sectionTheme === "mineral" ? "#f8fafc" : "#ffffff";
   const motionPreset = sec.settings?.motionPreset || (project.branding?.motionPreset && project.branding.motionPreset !== "none" ? project.branding.motionPreset : "")
   const customBackground = /^#[0-9a-f]{3,8}$/i.test(sec.settings?.customBackground || "")
     ? `background-color: ${sec.settings.customBackground} !important;`
@@ -233,7 +242,10 @@ function renderSection(sec, project, options) {
     faq: "FAQ",
     cta: "Appel Action",
     footer: "Pied de page",
-    customBlock: "Bloc Canva"
+    customBlock: "Bloc Canva",
+    process: "Processus",
+    certifications: "Certifications",
+    pricing: "Tarifs & Forfaits"
   };
 
   return `
@@ -1618,6 +1630,173 @@ function renderCustomBlock(sec, project, options = {}) {
             <span>${getIcon("phone", "w-4 h-4")}</span>
             <span data-editable="ctaText">${c.ctaText || c.cta || "Appeler l'artisan"}</span>
           </a>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// 18. Process Steps
+function renderProcess(sec, project, options = {}) {
+  const c = sec.content || {};
+  const steps = Array.isArray(c.steps) ? c.steps : [
+    { num: "01", title: "Premier Contact & Écoute", desc: "Échange direct sur votre besoin, visite sur site si nécessaire et conseils techniques adaptés." },
+    { num: "02", title: "Devis Détaillé sous 24h", desc: "Proposition claire, chiffrage transparent sans mauvaise surprise et calendrier d'intervention." },
+    { num: "03", title: "Réalisation & Réception", desc: "Exécution soignée dans les règles de l'art, respect des délais et chantier rendu impeccable." }
+  ];
+
+  return `
+    <div id="process" class="py-20 lg:py-28" style="background-color: var(--bg);">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-3xl mx-auto mb-16 space-y-3">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-black/5 text-gray-700" data-editable="badge">
+            ${c.badge || "Notre Méthode"}
+          </div>
+          <h2 class="font-heading text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight" data-editable="title">
+            ${c.title || "Un déroulement simple et transparent"}
+          </h2>
+          <p class="text-gray-600 text-base sm:text-lg" data-editable="subtitle">
+            ${c.subtitle || "De la prise de contact à la livraison de vos travaux, nous vous accompagnons à chaque étape."}
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8 relative">
+          ${steps.map((st, idx) => `
+            <div class="relative p-6 sm:p-8 rounded-2xl bg-white border border-black/5 shadow-sm flex flex-col justify-between">
+              <div class="flex items-center justify-between mb-6">
+                <span class="text-3xl font-extrabold text-zinc-300 font-mono" data-editable="steps.${idx}.num">${st.num || '0' + (idx + 1)}</span>
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold" style="background-color: var(--primary);">
+                  ${getIcon(idx === 0 ? "phone" : idx === 1 ? "fileText" : "checkCircle", "w-5 h-5")}
+                </div>
+              </div>
+              <div class="space-y-2.5">
+                <h3 class="font-heading text-lg font-bold text-gray-900" data-editable="steps.${idx}.title">${st.title}</h3>
+                <p class="text-sm text-gray-600 leading-relaxed" data-editable="steps.${idx}.desc">${st.desc}</p>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// 19. Certifications & Warranties
+function renderCertifications(sec, project, options = {}) {
+  const c = sec.content || {};
+  const items = Array.isArray(c.items) ? c.items : [
+    { title: "Garantie Décennale", desc: "Couverture décennale sur tous les travaux de gros œuvre et second œuvre.", icon: "shield" },
+    { title: "Responsabilité Civile Pro", desc: "Assurance professionnelle complète protégeant vos locaux et biens.", icon: "badgeCheck" },
+    { title: "Respect des Normes DTU", desc: "Interventions conformes aux documents techniques unifiés et règles de l'art.", icon: "checkCircle" },
+    { title: "Artisan de Proximité", desc: "Implantation locale garantissant réactivité et suivi personnalisé.", icon: "mapPin" }
+  ];
+
+  return `
+    <div id="certifications" class="py-16 lg:py-20" style="background-color: var(--bg);">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-2xl mx-auto mb-12 space-y-3">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800" data-editable="badge">
+            ${c.badge || "Sérénité & Garanties"}
+          </div>
+          <h2 class="font-heading text-2xl sm:text-3xl font-extrabold text-gray-900" data-editable="title">
+            ${c.title || "Vos travaux en toute sécurité"}
+          </h2>
+          <p class="text-gray-600 text-sm sm:text-base" data-editable="subtitle">
+            ${c.subtitle || "Des assurances solides et des engagements vérifiés pour votre totale tranquillité d'esprit."}
+          </p>
+        </div>
+
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          ${items.map((it, idx) => `
+            <div class="p-6 rounded-2xl bg-white border border-black/5 shadow-xs flex flex-col items-start gap-3">
+              <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                ${getIcon(it.icon || "shield", "w-5 h-5")}
+              </div>
+              <h4 class="font-bold text-gray-900 text-base" data-editable="items.${idx}.title">${it.title}</h4>
+              <p class="text-xs text-gray-500 leading-normal" data-editable="items.${idx}.desc">${it.desc}</p>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// 20. Pricing / Formules
+function renderPricing(sec, project, options = {}) {
+  const c = sec.content || {};
+  const tiers = Array.isArray(c.tiers) ? c.tiers : [
+    {
+      name: "Formule Essentielle",
+      price: "Sur devis",
+      desc: "Idéale pour les interventions ciblées et l'entretien régulier.",
+      features: ["Déplacement & diagnostic offert", "Devis détaillé sous 24h", "Fourniture de matériaux standard", "Chantier nettoyé"],
+      isPopular: false
+    },
+    {
+      name: "Formule Confort",
+      price: "Sur-mesure",
+      desc: "La solution la plus choisie pour la rénovation complète et l'embellissement.",
+      features: ["Toutes les options Essentielles", "Matériaux haut de gamme garantis", "Garantie décennale incluse", "Suivi prioritaire 7j/7"],
+      isPopular: true
+    },
+    {
+      name: "Formule Intégrale",
+      price: "Projet clé en main",
+      desc: "Accompagnement total de la conception à la réalisation finale sur-mesure.",
+      features: ["Étude d'architecture & plans 3D", "Gestion complète des approvisionnements", "Interlocuteur unique dédié", "Garantie de parfait achèvement"],
+      isPopular: false
+    }
+  ];
+
+  return `
+    <div id="tarifs" class="py-20 lg:py-28" style="background-color: var(--bg);">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-3xl mx-auto mb-16 space-y-3">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-black/5 text-gray-700" data-editable="badge">
+            ${c.badge || "Transparence Tarifaire"}
+          </div>
+          <h2 class="font-heading text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight" data-editable="title">
+            ${c.title || "Des formules adaptées à chaque projet"}
+          </h2>
+          <p class="text-gray-600 text-base sm:text-lg" data-editable="subtitle">
+            ${c.subtitle || "Des prix justes, clairs et sans surprise. Chaque devis est 100% personnalisé et gratuit."}
+          </p>
+        </div>
+
+        <div class="grid lg:grid-cols-3 gap-8 items-stretch">
+          ${tiers.map((t, idx) => `
+            <div class="relative p-8 rounded-2xl bg-white border ${t.isPopular ? 'border-2 ring-1 shadow-lg' : 'border-black/5 shadow-sm'} flex flex-col justify-between" style="${t.isPopular ? 'border-color: var(--primary); ring-color: var(--primary);' : ''}">
+              ${t.isPopular ? `
+                <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider text-white shadow-xs" style="background-color: var(--primary);">
+                  Recommandé
+                </div>
+              ` : ''}
+              <div>
+                <div class="mb-4">
+                  <h3 class="text-xl font-bold text-gray-900" data-editable="tiers.${idx}.name">${t.name}</h3>
+                  <p class="text-xs text-gray-500 mt-1" data-editable="tiers.${idx}.desc">${t.desc}</p>
+                </div>
+                <div class="my-6">
+                  <span class="text-3xl font-extrabold text-gray-900 font-heading" data-editable="tiers.${idx}.price">${t.price}</span>
+                  <span class="text-xs text-gray-500 block mt-1">Étude gratuite sans engagement</span>
+                </div>
+                <ul class="space-y-3 my-6 text-sm text-gray-600">
+                  ${(t.features || []).map((f, fIdx) => `
+                    <li class="flex items-center gap-2.5">
+                      <span class="text-emerald-500 flex-shrink-0">${getIcon("checkCircle", "w-4 h-4")}</span>
+                      <span data-editable="tiers.${idx}.features.${fIdx}">${f}</span>
+                    </li>
+                  `).join('')}
+                </ul>
+              </div>
+              <div class="pt-6 border-t border-gray-100">
+                <a href="#simulateur" class="btn-cta w-full text-center text-sm font-bold text-white py-3 rounded-xl block" style="background-color: var(--primary);">
+                  Demander une étude gratuite
+                </a>
+              </div>
+            </div>
+          `).join('')}
         </div>
       </div>
     </div>

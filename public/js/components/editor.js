@@ -254,16 +254,16 @@ export function renderEditor(state) {
                         <span class="text-xs font-medium text-zinc-900 truncate capitalize">${friendlyTitle}</span>
                       </div>
 
-                      <div class="flex items-center gap-0.5 flex-shrink-0">
+                      <div class="flex items-center gap-1 flex-shrink-0">
                         <button type="button"
                                 onclick="event.stopPropagation(); window.app.toggleSectionVisibility('${s.id}')"
-                                class="p-1 rounded text-zinc-400 hover:text-zinc-800 hover:bg-zinc-100 transition-colors"
+                                class="btn-keycap btn-keycap-light p-1.5 rounded-md text-zinc-800 hover:text-black border border-zinc-200 shadow-2xs transition-all"
                                 title="${isVis ? 'Masquer la section' : 'Afficher la section'}">
                           ${getIcon(isVis ? "eye" : "eyeOff", "w-3.5 h-3.5")}
                         </button>
                         <button type="button"
                                 onclick="event.stopPropagation(); window.app.handleSectionNavigation('${s.id}', event)"
-                                class="accordion-chevron p-1 rounded text-zinc-400 hover:text-zinc-800 hover:bg-zinc-100 transition-transform ${isOpen ? 'rotate-180' : ''}"
+                                class="btn-keycap btn-keycap-light accordion-chevron p-1.5 rounded-md text-zinc-800 hover:text-black border border-zinc-200 shadow-2xs transition-all ${isOpen ? 'rotate-180' : ''}"
                                 title="${isOpen ? 'Fermer l\'accordéon' : 'Ouvrir l\'accordéon'}">
                           ${getIcon("chevronDown", "w-3.5 h-3.5")}
                         </button>
@@ -546,10 +546,22 @@ function renderSectionAccordionContent(sec, project, variants) {
       <!-- Section Background Switcher -->
       <div class="pt-1 border-t border-zinc-200/60">
         <label class="block text-[10px] font-medium text-zinc-400 uppercase tracking-wider mb-1">Couleur de fond</label>
-        <div class="grid grid-cols-3 gap-1.5">
-          <button type="button" onclick="window.app.setSectionBg('${sectionId}', 'white')" class="py-1 text-[11px] font-medium border rounded text-center transition-colors ${sec.settings?.bgTheme !== 'mineral' && sec.settings?.bgTheme !== 'dark' ? 'border-zinc-900 bg-white font-semibold shadow-xs' : 'border-zinc-200 bg-zinc-50 text-zinc-600 hover:bg-white'}">Blanc</button>
-          <button type="button" onclick="window.app.setSectionBg('${sectionId}', 'mineral')" class="py-1 text-[11px] font-medium border rounded text-center transition-colors ${sec.settings?.bgTheme === 'mineral' ? 'border-zinc-900 bg-white font-semibold shadow-xs' : 'border-zinc-200 bg-zinc-50 text-zinc-600 hover:bg-white'}">Gris doux</button>
-          <button type="button" onclick="window.app.setSectionBg('${sectionId}', 'dark')" class="py-1 text-[11px] font-medium border rounded text-center transition-colors ${sec.settings?.bgTheme === 'dark' ? 'border-zinc-900 bg-zinc-900 text-white font-semibold shadow-xs' : 'border-zinc-200 bg-zinc-50 text-zinc-600 hover:bg-white'}">Sombre</button>
+        <div class="grid grid-cols-5 gap-1 mb-1.5">
+          <button type="button" onclick="window.app.setSectionBg('${sectionId}', 'white')" class="py-1 text-[10.5px] font-medium border rounded text-center transition-colors ${sec.settings?.bgTheme !== 'mineral' && sec.settings?.bgTheme !== 'dark' && sec.settings?.bgTheme !== 'warm' && sec.settings?.bgTheme !== 'navy' && !sec.settings?.customBackground ? 'border-zinc-900 bg-white font-semibold shadow-xs' : 'border-zinc-200 bg-zinc-50 text-zinc-600 hover:bg-white'}" title="Fond Blanc">Blanc</button>
+          <button type="button" onclick="window.app.setSectionBg('${sectionId}', 'mineral')" class="py-1 text-[10.5px] font-medium border rounded text-center transition-colors ${sec.settings?.bgTheme === 'mineral' ? 'border-zinc-900 bg-white font-semibold shadow-xs' : 'border-zinc-200 bg-zinc-50 text-zinc-600 hover:bg-white'}" title="Fond Gris Doux">Gris</button>
+          <button type="button" onclick="window.app.setSectionBg('${sectionId}', 'dark')" class="py-1 text-[10.5px] font-medium border rounded text-center transition-colors ${sec.settings?.bgTheme === 'dark' ? 'border-zinc-900 bg-zinc-900 text-white font-semibold shadow-xs' : 'border-zinc-200 bg-zinc-50 text-zinc-600 hover:bg-white'}" title="Fond Nuit Sombre">Nuit</button>
+          <button type="button" onclick="window.app.setSectionBg('${sectionId}', 'warm')" class="py-1 text-[10.5px] font-medium border rounded text-center transition-colors ${sec.settings?.bgTheme === 'warm' ? 'border-amber-700 bg-amber-50 text-amber-950 font-semibold shadow-xs' : 'border-zinc-200 bg-zinc-50 text-zinc-600 hover:bg-white'}" title="Fond Sable Chaud">Sable</button>
+          <button type="button" onclick="window.app.setSectionBg('${sectionId}', 'navy')" class="py-1 text-[10.5px] font-medium border rounded text-center transition-colors ${sec.settings?.bgTheme === 'navy' ? 'border-blue-900 bg-slate-900 text-white font-semibold shadow-xs' : 'border-zinc-200 bg-zinc-50 text-zinc-600 hover:bg-white'}" title="Fond Bleu Marine">Marine</button>
+        </div>
+        <div class="flex items-center gap-2 mt-1 px-1">
+          <label class="text-[10px] text-zinc-500 flex items-center gap-1.5 cursor-pointer">
+            <input type="color" value="${sec.settings?.customBackground || '#ffffff'}" onchange="window.app.setSectionCustomBg('${sectionId}', this.value)" class="w-5 h-5 rounded border border-zinc-200 cursor-pointer p-0">
+            <span>Personnalisé</span>
+          </label>
+          ${sec.settings?.customBackground ? `
+            <span class="text-[10px] font-mono text-zinc-400">${sec.settings.customBackground}</span>
+            <button type="button" onclick="window.app.setSectionCustomBg('${sectionId}', '')" class="text-[10px] text-red-500 hover:underline ml-auto">Réinitialiser</button>
+          ` : ''}
         </div>
       </div>
 
@@ -564,7 +576,18 @@ function renderSectionAccordionContent(sec, project, variants) {
         </div>
         <p class="text-[10px] text-zinc-500 mt-1">Le mouvement est appliqué au bloc complet et respecte la réduction des mouvements.</p>
         <div class="pattern-catalog mt-2" aria-label="Patterns d'inspiration">
-          ${INSPIRATION_PATTERNS.slice(0, 4).map(pattern => `<span class="pattern-chip" title="${pattern.description}">${pattern.label}<small>${pattern.source}</small></span>`).join('')}
+          ${INSPIRATION_PATTERNS.slice(0, 4).map(pattern => {
+            const motionKey = pattern.id === 'progress' ? 'progress-fill' : pattern.id;
+            const isActive = (sec.settings?.motionPreset || '') === motionKey;
+            return `
+              <button type="button" 
+                      class="pattern-chip ${isActive ? 'is-active' : ''}" 
+                      title="${pattern.description}"
+                      onclick="window.app.applyInspirationPattern('${sectionId}', '${pattern.id}')">
+                ${pattern.label}<small>${pattern.source}</small>
+              </button>
+            `;
+          }).join('')}
         </div>
       </div>
 

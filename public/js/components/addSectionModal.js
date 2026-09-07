@@ -130,6 +130,53 @@ export const SECTION_DEFINITIONS = [
     variants: [
       { id: "banner-action", label: "Bannière Contraste Haute Conversion", desc: "Titre mobilisateur, rappel du devis gratuit et bouton d'appel direct." }
     ]
+  },
+  {
+    type: "trust",
+    title: "Badges de Réassurance & Garanties",
+    description: "4 engagements majeurs (déplacement offert, devis 24h, assurance pro, nettoyage).",
+    icon: "shield",
+    variants: [
+      { id: "grid-4", label: "Grille 4 Piliers Réassurance", desc: "4 piliers de confiance avec icônes colorées et descriptif." }
+    ]
+  },
+  {
+    type: "process",
+    title: "Processus & Déroulement en 3 Étapes",
+    description: "Parcours client limpide en 3 étapes rassurantes pour convertir un prospect hésitant.",
+    icon: "layers",
+    variants: [
+      { id: "steps-3", label: "Parcours 3 Étapes Numérotées", desc: "Étapes 01, 02, 03 claires de l'appel initial à la réception du chantier." }
+    ]
+  },
+  {
+    type: "certifications",
+    title: "Labels, Assurances & Garantie Décennale",
+    description: "Attestations légales françaises rassurant immédiatement particuliers et entreprises.",
+    icon: "badgeCheck",
+    variants: [
+      { id: "cards-4", label: "Cartes Certifications & Assurances", desc: "Garantie décennale 10 ans, RC Pro, conformité DTU et proximité." }
+    ]
+  },
+  {
+    type: "pricing",
+    title: "Grille Tarifaire & Forfaits Clairs",
+    description: "Formules packagées transparentes avec badge « Recommandé » pour accélérer la vente.",
+    icon: "dollarSign",
+    variants: [
+      { id: "cards-3", label: "3 Formules Claires avec Forfaits", desc: "Formule Essentielle, Confort et Intégrale avec liste à puces." }
+    ]
+  },
+  {
+    type: "customBlock",
+    title: "Bloc Canva Personnalisé & Bandeau Promo",
+    description: "Module libre façon Canva (bannière urgente, macaron flottant ou carte personnalisée).",
+    icon: "sparkles",
+    variants: [
+      { id: "urgentBanner", label: "Bandeau Promo / Notification Haute", desc: "Bandeau contrasté avec badge d'annonce et lien d'action rapide." },
+      { id: "floatingBadge", label: "Macaron Flottant Réassurance", desc: "Pastille verte lumineuse avec statut vérifié 2026." },
+      { id: "customCard", label: "Boîte Carte Personnalisée", desc: "Encadré avec titre, argument fort et bouton d'appel direct." }
+    ]
   }
 ];
 

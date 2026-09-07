@@ -93,3 +93,69 @@ test("v4.1.0: Technical overlay badges (#btn-phone, #cta, #h1) are completely di
     "Badge pseudo-elements must have display: none !important to avoid visual clutter on desktop"
   );
 });
+
+test("v4.1.0: Keycap button border-radius honors variable radius", () => {
+  const cssPath = path.resolve(process.cwd(), "public/css/app.css");
+  const css = fs.readFileSync(cssPath, "utf-8");
+
+  assert.ok(
+    css.includes("border-radius: var(--btn-radius, var(--cta-radius, 8px));"),
+    ".btn-keycap must honor CSS variables for continuous border-radius control"
+  );
+});
+
+test("v4.1.0: Motion engine supports reveal, stagger, shimmer and pulse presets with 60fps animations", () => {
+  const cssPath = path.resolve(process.cwd(), "public/css/app.css");
+  const css = fs.readFileSync(cssPath, "utf-8");
+
+  assert.ok(css.includes('[data-motion="reveal"].is-revealed'), "CSS must define reveal animation");
+  assert.ok(css.includes('[data-motion="stagger"].is-revealed'), "CSS must define stagger animation");
+  assert.ok(css.includes('[data-motion="shimmer"].is-revealed'), "CSS must define shimmer animation");
+  assert.ok(css.includes('[data-motion="pulse"].is-revealed'), "CSS must define pulse animation");
+  assert.ok(css.includes(".pattern-chip"), ".pattern-chip must be styled");
+  assert.ok(css.includes(".pattern-chip:hover"), ".pattern-chip must have hover state");
+});
+
+test("v4.1.0: Dark and Navy sections have cascading contrast rules to prevent black-on-black text", () => {
+  const cssPath = path.resolve(process.cwd(), "public/css/app.css");
+  const css = fs.readFileSync(cssPath, "utf-8");
+
+  assert.ok(css.includes('.editor-section-wrapper[data-section-bg="dark"] .section-canvas-content .text-gray-900'), "Dark sections must override text-gray-900 to light text");
+  assert.ok(css.includes('.editor-section-wrapper[data-section-bg="dark"] .section-canvas-content .bg-gray-50'), "Dark sections must override bg-gray-50 to dark card background");
+  assert.ok(css.includes('.bg-sec-warm'), "CSS must define .bg-sec-warm theme");
+  assert.ok(css.includes('.bg-sec-navy'), "CSS must define .bg-sec-navy theme");
+});
+
+test("v4.1.0: Expanded section catalog (process, certifications, pricing, customBlock) creates valid data and renders cleanly", async () => {
+  const { SECTION_DEFINITIONS } = await import("../public/js/components/addSectionModal.js");
+  const { createSectionData } = await import("../public/js/engine/generator.js");
+  const { TRADES } = await import("../public/js/data/trades.js");
+
+  const types = SECTION_DEFINITIONS.map(s => s.type);
+  assert.ok(types.includes("process"), "SECTION_DEFINITIONS must include process");
+  assert.ok(types.includes("certifications"), "SECTION_DEFINITIONS must include certifications");
+  assert.ok(types.includes("pricing"), "SECTION_DEFINITIONS must include pricing");
+  assert.ok(types.includes("customBlock"), "SECTION_DEFINITIONS must include customBlock");
+  assert.ok(types.includes("trust"), "SECTION_DEFINITIONS must include trust");
+
+  const trade = TRADES[0];
+  const business = { name: "Pro Démo", city: "Bordeaux", phone: "06 12 34 56 78" };
+
+  for (const t of ["process", "certifications", "pricing", "customBlock", "trust"]) {
+    const secData = createSectionData(t, null, trade, business);
+    assert.ok(secData, `createSectionData must return valid object for type ${t}`);
+    assert.equal(secData.type, t);
+  }
+
+  // Create project with new sections and render
+  const p = generateSite({ name: "Rénov 33", tradeId: "macon", city: "Bordeaux" });
+  p.sections.push(createSectionData("process", null, trade, business));
+  p.sections.push(createSectionData("certifications", null, trade, business));
+  p.sections.push(createSectionData("pricing", null, trade, business));
+
+  const html = renderWebsiteHTML(p, { isEditor: true });
+  assert.ok(html.includes('id="process"'), "Rendered HTML must contain process section");
+  assert.ok(html.includes('id="certifications"'), "Rendered HTML must contain certifications section");
+  assert.ok(html.includes('id="tarifs"'), "Rendered HTML must contain pricing section");
+});
+

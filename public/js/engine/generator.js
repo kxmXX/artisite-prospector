@@ -679,12 +679,112 @@ export function createSectionData(type, variant, trade, business = {}) {
         content: {
           badge: "Prenez Contact",
           title: `Prêt à concrétiser votre projet à ${city} ?`,
-          subtitle: `Votre artisan ${trade.label.toLowerCase()} se déplace gratuitement pour vous conseiller et chiffrer votre besoin.`,
+          subtitle: `Votre artisan ${trade.label?.toLowerCase() || 'local'} se déplace gratuitement pour vous conseiller et chiffrer votre besoin.`,
           ctaPrimary: "Demander mon devis gratuit",
           ctaSecondary: `Appeler : ${phone}`,
           phone
         },
         settings: { background: "dark" }
+      };
+
+    case "trust":
+      return {
+        type: "trust",
+        variant: variant || "grid-4",
+        content: {
+          badges: [
+            { title: "Devis en 24h", desc: "Étude chiffrée gratuite et sans engagement" },
+            { title: "Garantie Décennale", desc: "Tous travaux couverts et assurés" },
+            { title: "Artisan Qualifié", desc: `Intervention soignée à ${city}` },
+            { title: "Chantier Propre", desc: "Nettoyage rigoureux après travaux" }
+          ]
+        },
+        settings: {}
+      };
+
+    case "process":
+      return {
+        type: "process",
+        variant: variant || "steps-3",
+        content: {
+          badge: "Notre Méthode",
+          title: "Un déroulement simple et transparent",
+          subtitle: `De la prise de contact à la livraison de vos travaux à ${city}, nous vous accompagnons à chaque étape.`,
+          steps: [
+            { num: "01", title: "Premier Contact & Écoute", desc: "Échange direct sur votre besoin, visite sur site si nécessaire et conseils techniques adaptés." },
+            { num: "02", title: "Devis Détaillé sous 24h", desc: "Proposition claire, chiffrage transparent sans mauvaise surprise et calendrier d'intervention." },
+            { num: "03", title: "Réalisation & Réception", desc: "Exécution soignée dans les règles de l'art, respect des délais et chantier rendu impeccable." }
+          ]
+        },
+        settings: {}
+      };
+
+    case "certifications":
+      return {
+        type: "certifications",
+        variant: variant || "cards-4",
+        content: {
+          badge: "Sérénité & Garanties",
+          title: "Vos travaux en toute sécurité",
+          subtitle: "Des assurances solides et des engagements vérifiés pour votre totale tranquillité d'esprit.",
+          items: [
+            { title: "Garantie Décennale", desc: "Couverture décennale sur tous les travaux de gros œuvre et second œuvre.", icon: "shield" },
+            { title: "Responsabilité Civile Pro", desc: "Assurance professionnelle complète protégeant vos locaux et biens.", icon: "badgeCheck" },
+            { title: "Respect des Normes DTU", desc: "Interventions conformes aux documents techniques unifiés et règles de l'art.", icon: "checkCircle" },
+            { title: "Artisan de Proximité", desc: `Implantation locale à ${city} garantissant réactivité et suivi personnalisé.`, icon: "mapPin" }
+          ]
+        },
+        settings: {}
+      };
+
+    case "pricing":
+      return {
+        type: "pricing",
+        variant: variant || "cards-3",
+        content: {
+          badge: "Transparence Tarifaire",
+          title: "Des formules adaptées à chaque projet",
+          subtitle: "Des prix justes, clairs et sans surprise. Chaque devis est 100% personnalisé et gratuit.",
+          tiers: [
+            {
+              name: "Formule Essentielle",
+              price: "Sur devis",
+              desc: "Idéale pour les interventions ciblées et l'entretien régulier.",
+              features: ["Déplacement & diagnostic offert", "Devis détaillé sous 24h", "Fourniture de matériaux standard", "Chantier nettoyé"],
+              isPopular: false
+            },
+            {
+              name: "Formule Confort",
+              price: "Sur-mesure",
+              desc: "La solution la plus choisie pour la rénovation complète et l'embellissement.",
+              features: ["Toutes les options Essentielles", "Matériaux haut de gamme garantis", "Garantie décennale incluse", "Suivi prioritaire 7j/7"],
+              isPopular: true
+            },
+            {
+              name: "Formule Intégrale",
+              price: "Projet clé en main",
+              desc: "Accompagnement total de la conception à la réalisation finale sur-mesure.",
+              features: ["Étude d'architecture & plans 3D", "Gestion complète des approvisionnements", "Interlocuteur unique dédié", "Garantie de parfait achèvement"],
+              isPopular: false
+            }
+          ]
+        },
+        settings: {}
+      };
+
+    case "customBlock":
+      return {
+        type: "customBlock",
+        variant: variant || "urgentBanner",
+        content: {
+          blockType: variant || "urgentBanner",
+          badge: "Information",
+          title: "Chantier urgent ou projet sur-mesure ?",
+          text: `Notre équipe se déplace directement à ${city} pour évaluer vos travaux et vous remettre un devis gratuit sous 24h.`,
+          ctaText: `Contacter l'artisan (${phone})`,
+          ctaLink: `tel:${phone}`
+        },
+        settings: {}
       };
 
     default:

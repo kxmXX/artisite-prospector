@@ -129,6 +129,7 @@ class App {
     this.renderModals();
     this.syncSiteThemeToggle();
     this.hydrateImageFallbacks();
+    this.initScrollObserver();
     if (previousScrollTop !== null && previousScrollTop !== undefined) {
       requestAnimationFrame(() => {
         const main = document.querySelector("main");
@@ -659,6 +660,7 @@ class App {
   }
 
   handleSectionNavigation(sectionId, event) {
+    if (this._justDragged) return;
     event?.preventDefault?.();
 
     const accordion = document.getElementById(`accordion-${sectionId}`);
@@ -799,7 +801,7 @@ class App {
     const sec = state.currentProject.sections.find(s => s.id === sectionId);
     if (!sec) return;
     if (!sec.settings) sec.settings = {};
-    const themes = ["white", "mineral", "dark"];
+    const themes = ["white", "mineral", "dark", "warm", "navy"];
     const current = sec.settings.bgTheme || "white";
     const nextIdx = (themes.indexOf(current) + 1) % themes.length;
     this.setSectionBg(sectionId, themes[nextIdx]);
@@ -807,12 +809,57 @@ class App {
 
   setSectionBg(sectionId, theme) {
     if (!state.currentProject) return;
-    if (!["white", "mineral", "dark"].includes(theme)) return;
+    if (!["white", "mineral", "dark", "warm", "navy"].includes(theme)) return;
     const updated = JSON.parse(JSON.stringify(state.currentProject));
     const sec = updated.sections.find(s => s.id === sectionId);
     if (!sec) return;
-    sec.settings = { ...(sec.settings || {}), bgTheme: theme };
+    sec.settings = { ...(sec.settings || {}), bgTheme: theme, customBackground: "" };
     state.updateProject(updated, true, `Changement fond (${theme})`);
+  }
+
+  setSectionCustomBg(sectionId, hexColor) {
+    if (!state.currentProject) return;
+    const updated = JSON.parse(JSON.stringify(state.currentProject));
+    const sec = updated.sections.find(s => s.id === sectionId);
+    if (!sec) return;
+    sec.settings = { ...(sec.settings || {}), customBackground: hexColor || "" };
+    if (!hexColor) {
+      if (sec.settings.bgTheme === "custom") sec.settings.bgTheme = "white";
+    } else {
+      sec.settings.bgTheme = "custom";
+    }
+    state.updateProject(updated, true, hexColor ? `Fond personnalisé : ${hexColor}` : "Réinitialisation fond");
+  }
+
+  applyInspirationPattern(sectionId, patternId) {
+    const motionKeyMap = {
+      reveal: "reveal",
+      stagger: "stagger",
+      spring: "spring",
+      progress: "progress-fill",
+      bento: "slide-up",
+      spotlight: "pulse",
+      glass: "fade-in",
+      brutalist: "spring"
+    };
+    const preset = motionKeyMap[patternId] || patternId;
+    this.setSectionMotion(sectionId, preset);
+
+    // Instant visual replay on the canvas element for immediate 60fps tactile feedback
+    const el = document.getElementById(`section-${sectionId}`) || document.getElementById(sectionId);
+    if (el) {
+      el.classList.remove("is-revealed");
+      el.setAttribute("data-motion", preset);
+      void el.offsetHeight; // trigger reflow
+      el.classList.add("is-revealed");
+    }
+    const labelMap = {
+      reveal: "Reveal au scroll",
+      stagger: "Stagger éditorial",
+      spring: "Spring physique",
+      progress: "Progression"
+    };
+    this.showToast(`Pattern appliqué : ${labelMap[patternId] || preset}`);
   }
 
   setSectionMotion(sectionId, preset) {
@@ -2242,6 +2289,8 @@ class App {
     // Sidebar Section Reordering via HTML5 Drag & Drop
     document.querySelectorAll(".section-card-grip[draggable='true']").forEach(grip => {
       grip.addEventListener("dragstart", (e) => {
+        this._isDragging = true;
+        this._justDragged = true;
         const secId = grip.getAttribute("data-sec-id");
         e.dataTransfer.setData("text/plain", secId);
         e.dataTransfer.effectAllowed = "move";
@@ -2250,6 +2299,8 @@ class App {
       });
 
       grip.addEventListener("dragend", () => {
+        this._isDragging = false;
+        setTimeout(() => { this._justDragged = false; }, 200);
         document.querySelectorAll(".section-card").forEach(el => {
           el.classList.remove("is-dragging", "drop-above", "drop-below");
         });
@@ -2278,13 +2329,17 @@ class App {
 
       card.addEventListener("drop", (e) => {
         e.preventDefault();
+        e.stopPropagation();
+        this._justDragged = true;
         const sourceId = e.dataTransfer.getData("text/plain");
         const targetId = card.getAttribute("data-sec-id");
-        const isAfter = card.classList.contains("drop-below");
+        const rect = card.getBoundingClientRect();
+        const isAfter = (e.clientY - rect.top) > (rect.height / 2);
         card.classList.remove("drop-above", "drop-below");
         if (sourceId && targetId && sourceId !== targetId) {
           state.reorderSections(sourceId, targetId, isAfter ? "after" : "before");
         }
+        setTimeout(() => { this._justDragged = false; }, 200);
       });
     });
   }
