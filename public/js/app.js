@@ -42,7 +42,11 @@ class App {
       }
       if (event === "theme_mode_change") {
         document.body.classList.toggle("dark-theme", s.themeMode === "dark");
-        this.render();
+        const btn = document.getElementById("theme-mode-toggle-btn");
+        if (btn) {
+          const isDark = s.themeMode === "dark";
+          btn.innerHTML = `${getIcon(isDark ? 'sun' : 'moon', 'w-4 h-4')} <span class="theme-control-label">${isDark ? 'Éditeur clair' : 'Éditeur sombre'}</span>`;
+        }
         return;
       }
       if (event === "editor_mode_change") {
@@ -94,6 +98,21 @@ class App {
         this.closeModals();
         this.toggleExportMenu(false);
       }
+    });
+
+    // Outside-click dismissal for dropdowns and popovers
+    document.addEventListener("click", (e) => {
+      const menu = document.getElementById("export-menu");
+      const btn = document.getElementById("export-menu-button");
+      if (menu && menu.dataset.open === "true" && !menu.contains(e.target) && !btn?.contains(e.target)) {
+        this.toggleExportMenu(false);
+      }
+      document.querySelectorAll(".sec-motion-popover:not(.hidden)").forEach(pop => {
+        const secId = pop.dataset.sectionId;
+        if (!pop.contains(e.target) && !e.target.closest(`[data-motion-trigger="${secId}"]`)) {
+          pop.classList.add("hidden");
+        }
+      });
     });
 
     // Check URL parameters (e.g. ?demo=proj-esprit-nature)
@@ -1427,13 +1446,92 @@ class App {
   }
 
   updateReviewRating(sectionId, reviewIndex, rating) {
-    if (!state.currentProject || reviewIndex < 0) return;
+    if (!state.currentProject) return;
     const section = state.currentProject.sections.find(item => item.id === sectionId);
-    const review = section?.content?.reviews?.[reviewIndex];
-    if (!review) return;
+    if (!section?.content) return;
     const updated = JSON.parse(JSON.stringify(state.currentProject));
-    updated.sections.find(item => item.id === sectionId).content.reviews[reviewIndex].rating = Math.max(0, Math.min(5, Number(rating) || 0));
+    const targetSection = updated.sections.find(item => item.id === sectionId);
+    if (!targetSection?.content) return;
+
+    if (reviewIndex === -1) {
+      targetSection.content.overallRating = (Number(rating) || 5).toFixed(1);
+    } else {
+      const review = targetSection.content.reviews?.[reviewIndex];
+      if (!review) return;
+      review.rating = Math.max(0, Math.min(5, Number(rating) || 0));
+    }
     state.updateProject(updated, true, "Modification note Google");
+  }
+
+  previewRatingHover(starBtn, starValue) {
+    const container = starBtn?.closest(".interactive-rating-container");
+    if (!container) return;
+    const buttons = container.querySelectorAll(".rating-star-btn");
+    buttons.forEach((btn, idx) => {
+      const shouldFill = idx < starValue;
+      btn.classList.toggle("is-hover-fill", shouldFill);
+      btn.classList.toggle("text-amber-400", shouldFill);
+      btn.classList.toggle("text-gray-300", !shouldFill);
+    });
+  }
+
+  resetRatingHover(starBtn) {
+    const container = starBtn?.closest(".interactive-rating-container");
+    if (!container) return;
+    const buttons = container.querySelectorAll(".rating-star-btn");
+    buttons.forEach((btn) => {
+      btn.classList.remove("is-hover-fill");
+      const isFilled = btn.classList.contains("is-filled");
+      btn.classList.toggle("text-amber-400", isFilled);
+      btn.classList.toggle("text-gray-300", !isFilled);
+    });
+  }
+
+  setStickyDockPosition(position) {
+    if (!state.currentProject) return;
+    const updated = JSON.parse(JSON.stringify(state.currentProject));
+    updated.settings = { ...(updated.settings || {}), stickyDockPosition: position, stickyBarPosition: {} };
+    state.updateProject(updated, true, `Position bandeau (${position})`);
+
+    const stickyBar = document.querySelector("[data-sticky-call-bar]");
+    if (stickyBar) {
+      stickyBar.dataset.dockPosition = position;
+      stickyBar.classList.remove("is-custom-dragged");
+      stickyBar.style.removeProperty("--sticky-left");
+      stickyBar.style.removeProperty("--sticky-top");
+      stickyBar.style.removeProperty("bottom");
+    }
+  }
+
+  toggleSectionMotionMenu(secId) {
+    const pop = document.getElementById(`sec-motion-popover-${secId}`);
+    if (!pop) return;
+    const isClosed = pop.classList.contains("hidden");
+    document.querySelectorAll(".sec-motion-popover:not(.hidden)").forEach(p => p.classList.add("hidden"));
+    if (isClosed) {
+      pop.classList.remove("hidden");
+    }
+  }
+
+  setSectionMotion(secId, preset) {
+    if (!state.currentProject) return;
+    const updated = JSON.parse(JSON.stringify(state.currentProject));
+    const sec = updated.sections.find(s => s.id === secId);
+    if (!sec) return;
+    sec.motionPreset = preset;
+    state.updateProject(updated, true, `Animation section (${preset})`);
+
+    const pop = document.getElementById(`sec-motion-popover-${secId}`);
+    if (pop) pop.classList.add("hidden");
+
+    // Immediate live replay on canvas element
+    const secEl = document.getElementById(`section-${secId}`);
+    if (secEl) {
+      secEl.setAttribute("data-motion", preset);
+      secEl.classList.remove("is-revealed");
+      void secEl.offsetWidth; // trigger DOM reflow to restart CSS animation
+      secEl.classList.add("is-revealed");
+    }
   }
 
   syncSiteThemeToggle(root = document.querySelector(".artisite-root")) {
@@ -2365,6 +2463,7 @@ class App {
         if (action === "move-up") this.moveSection(secId, "up");
         else if (action === "move-down") this.moveSection(secId, "down");
         else if (action === "toggle-bg") this.cycleSectionBg(secId);
+        else if (action === "toggle-motion-menu") this.toggleSectionMotionMenu(secId);
         else if (action === "insert-after") this.openAddSectionModal();
         else if (action === "toggle-vis") this.toggleSectionVisibility(secId);
         else if (action === "duplicate") this.duplicateSection(secId);

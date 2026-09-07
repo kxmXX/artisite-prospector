@@ -1,4 +1,8 @@
 export const FONT_CATALOG = [
+  { name: "Satoshi", category: "Sans", description: "Géométrique suisse & moderne (Uncut)", source: "fontshare" },
+  { name: "General Sans", category: "Sans", description: "Grotesk percutant & élégant", source: "fontshare" },
+  { name: "Clash Display", category: "Display", description: "Audacieux pour BTP & artisans", source: "fontshare" },
+  { name: "Cabinet Grotesk", category: "Display", description: "Singulier et architectural", source: "fontshare" },
   { name: "Inter", category: "Sans", description: "Neutre et ultra lisible" },
   { name: "DM Sans", category: "Sans", description: "Géométrique et chaleureux" },
   { name: "Manrope", category: "Sans", description: "Compact et contemporain" },
@@ -29,16 +33,23 @@ export function ensureFontCatalog() {
   if (fontCatalogPromise) return fontCatalogPromise;
 
   fontCatalogPromise = new Promise((resolve) => {
-    const query = new URLSearchParams();
-    FONT_CATALOG.forEach(({ name }) => {
-      query.append("family", `${name}:wght@400;500;600;700`);
-    });
-    query.set("display", "swap");
+    // 1. Fontshare (Uncut.wtf contemporary fonts)
+    if (!document.getElementById("artisite-fontshare-catalog")) {
+      const fsLink = document.createElement("link");
+      fsLink.id = "artisite-fontshare-catalog";
+      fsLink.rel = "stylesheet";
+      fsLink.href = "https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&f[]=general-sans@500,600,700&f[]=clash-display@500,600,700&f[]=cabinet-grotesk@500,700,800&display=swap";
+      document.head.appendChild(fsLink);
+    }
+
+    // 2. Google Fonts API v2 (Unencoded colons and semicolons required by Google)
+    const googleFonts = FONT_CATALOG.filter(f => f.source !== "fontshare");
+    const query = googleFonts.map(f => `family=${f.name.replace(/ /g, "+")}:wght@400;500;600;700`).join("&") + "&display=swap";
 
     const link = document.createElement("link");
     link.id = "artisite-font-catalog";
     link.rel = "stylesheet";
-    link.href = `https://fonts.googleapis.com/css2?${query.toString()}`;
+    link.href = `https://fonts.googleapis.com/css2?${query}`;
     link.onload = () => resolve();
     link.onerror = () => resolve();
     document.head.appendChild(link);

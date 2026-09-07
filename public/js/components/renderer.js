@@ -10,6 +10,11 @@ function getInitialSiteTheme(project) {
   return (0.299 * r + 0.587 * g + 0.114 * b) < 132 ? "dark" : "light";
 }
 
+let globalElementIndex = 0;
+export function resetGlobalElementIndex() {
+  globalElementIndex = 0;
+}
+
 function decorateEditableMarkup(markup, project, section) {
   return markup.replace(/<([a-z][\w-]*)(\s[^>]*data-editable="([^"]+)"[^>]*)>/gi, (full, tag, attrs, fieldPath) => {
     const fontSizeDelta = section?.settings?.[`fontSize_${fieldPath}`] || 0;
@@ -20,26 +25,50 @@ function decorateEditableMarkup(markup, project, section) {
     if (isBold === false) customStyles.push(`font-weight: 400 !important;`);
     const styleAttr = customStyles.length ? ` style="${customStyles.join(' ')}"` : "";
 
+    globalElementIndex++;
+    const elementIndex = globalElementIndex;
+    const lowerAttrs = attrs.toLowerCase();
+    let badgeSize = "m";
+    if (tag === "h1" || tag === "h2" || lowerAttrs.includes("text-3xl") || lowerAttrs.includes("text-4xl") || lowerAttrs.includes("text-5xl") || lowerAttrs.includes("text-6xl")) {
+      badgeSize = "l";
+    } else if (tag === "small" || lowerAttrs.includes("text-xs") || lowerAttrs.includes("text-[10px]") || lowerAttrs.includes("text-[11px]")) {
+      badgeSize = "s";
+    }
+
     if (attrs.includes("data-ui-id=")) {
       if (styleAttr && !attrs.includes("style=")) {
-        return `<${tag}${attrs}${styleAttr}>`;
+        return `<${tag}${attrs}${styleAttr} data-ui-index="${elementIndex}" data-ui-index-size="${badgeSize}">`;
       }
-      return full;
+      return full.replace(/data-ui-target="true"/, `data-ui-target="true" data-ui-index="${elementIndex}" data-ui-index-size="${badgeSize}"`);
     }
     const targetId = getUiId(project, section, `field-${fieldPath}`);
     const code = getUiCode(project?.id, section?.id, fieldPath);
-    return `<${tag}${attrs} data-ui-id="${targetId}" data-ui-code="${code}" data-ui-type="field" data-ui-target="true"${styleAttr}>`;
+    return `<${tag}${attrs} data-ui-id="${targetId}" data-ui-code="${code}" data-ui-type="field" data-ui-target="true" data-ui-index="${elementIndex}" data-ui-index-size="${badgeSize}"${styleAttr}>`;
   });
 }
 
 function renderRatingStars(rating = 5, { editor = false, sectionId = "", reviewIndex = 0 } = {}) {
-  const value = Math.max(0, Math.min(5, Number(rating) || 0));
-  return [...Array(5)].map((_, index) => {
+  const value = Math.max(0, Math.min(5, Math.round(Number(rating)) || 0));
+  const starsHtml = [...Array(5)].map((_, index) => {
     const filled = index < value;
-    const icon = getIcon("star", `w-4 h-4 ${filled ? "fill-current" : "text-gray-300"}`);
-    if (!editor) return icon;
-    return `<button type="button" class="review-rating-star ${filled ? "is-filled" : ""}" data-rating="${index + 1}" aria-label="${index + 1} étoile${index ? "s" : ""}" onclick="event.stopPropagation(); window.app.updateReviewRating('${sectionId}', ${reviewIndex}, ${index + 1})">${icon}</button>`;
+    const starIcon = getIcon(filled ? "starFilled" : "star", "w-4 h-4");
+    if (!editor) {
+      return `<span class="${filled ? 'text-amber-400' : 'text-gray-300'} inline-flex items-center">${starIcon}</span>`;
+    }
+    return `
+      <button type="button" class="rating-star-btn review-rating-star ${filled ? "is-filled text-amber-400" : "text-gray-300"}"
+              data-rating="${index + 1}"
+              data-index="${index}"
+              aria-label="${index + 1} étoile${index ? "s" : ""}"
+              onmouseenter="window.app?.previewRatingHover?.(this, ${index + 1})"
+              onmouseleave="window.app?.resetRatingHover?.(this)"
+              onclick="event.stopPropagation(); window.app.updateReviewRating('${sectionId}', ${reviewIndex}, ${index + 1})">
+        ${starIcon}
+      </button>
+    `;
   }).join("");
+
+  return `<span class="interactive-rating-container inline-flex items-center gap-0.5" data-rating-value="${value}">${starsHtml}</span>`;
 }
 
 /**
@@ -91,6 +120,7 @@ export function renderEditableImage(url, { sectionId = "", fieldPath = "", alt =
  */
 
 export function renderWebsiteHTML(project, options = { isEditor: false, isStandalone: false }) {
+  resetGlobalElementIndex();
   if (!project || !project.sections) {
     return `<div class="p-12 text-center text-gray-500">Aucun projet chargé</div>`;
   }
@@ -261,6 +291,8 @@ function renderSection(sec, project, options) {
     pricing: "Tarifs & Forfaits"
   };
 
+  const hasCustomBg = !!sec?.settings?.customBackground;
+
   return `
     <div id="section-${sec.id}"
          class="editor-section-wrapper relative group ${bgTheme} ${isSelected ? 'is-active-section' : ''} ${isHidden ? 'opacity-40 grayscale' : ''}"
@@ -271,8 +303,9 @@ function renderSection(sec, project, options) {
          data-ui-type="section"
          data-ui-target="true"
          data-section-bg="${sectionTheme}"
+         data-has-custom-bg="${hasCustomBg ? 'true' : 'false'}"
          ${motionPreset ? `data-motion="${motionPreset}"` : ''}
-         style="--section-bg: ${themeColor}; ${customBackground}"
+         style="--section-bg: ${themeColor}; ${hasCustomBg ? `--custom-section-bg: ${sec.settings.customBackground};` : ''} ${customBackground}"
          tabindex="-1">
 
       <!-- Sleek Floating Action Bar (Linear / Framer style) -->
@@ -290,6 +323,34 @@ function renderSection(sec, project, options) {
         <button type="button" class="btn-sec-ctrl btn-sec-bg" title="Changer le style de fond" data-action="toggle-bg" data-id="${sec.id}">
           ${getIcon("palette", "w-3.5 h-3.5")}
         </button>
+        <div class="relative inline-block">
+          <button type="button" class="btn-sec-ctrl btn-sec-anim" title="Animations 60fps" data-action="toggle-motion-menu" data-id="${sec.id}" data-motion-trigger="${sec.id}">
+            ${getIcon("sparkles", "w-3.5 h-3.5 text-amber-400")}
+            <span class="sec-ctrl-text">Anim</span>
+          </button>
+          <div id="sec-motion-popover-${sec.id}" data-section-id="${sec.id}" class="sec-motion-popover hidden absolute left-0 top-full mt-2 w-52 bg-zinc-900/95 backdrop-blur-md border border-white/20 rounded-xl p-2.5 shadow-2xl z-50 text-white text-xs">
+            <div class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 mb-2 flex items-center justify-between">
+              <span>Preset 60fps</span>
+              <span class="text-amber-400 font-mono">${sec.motionPreset || 'défaut'}</span>
+            </div>
+            <div class="grid grid-cols-2 gap-1.5">
+              ${[
+                ['reveal', 'Reveal'],
+                ['stagger', 'Stagger'],
+                ['spring', 'Spring'],
+                ['magnetic', 'Magnetic'],
+                ['shimmer', 'Shimmer'],
+                ['pulse', 'Pulse'],
+                ['none', 'Aucun']
+              ].map(([mPreset, mLabel]) => `
+                <button type="button" onclick="event.stopPropagation(); window.app.setSectionMotion('${sec.id}', '${mPreset}')"
+                        class="motion-chip ${sec.motionPreset === mPreset ? 'is-active' : ''}">
+                  ${mLabel}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+        </div>
         <button type="button" class="btn-sec-ctrl btn-sec-insert" title="Insérer une section après" data-action="insert-after" data-id="${sec.id}">
           ${getIcon("plus", "w-3.5 h-3.5")}
         </button>
@@ -472,7 +533,7 @@ function renderHero(sec, project, options = {}) {
             ${primaryHidden ? '' : `
               <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-primary" data-cta-popover-wrapper data-section-id="${sec.id}" data-button-type="primary" data-ui-id="${heroButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
                 ${renderButtonActionBadge(sec, 'primary', options, project)}
-                <a href="#simulateur" class="btn-cta btn-keycap${ctaPulseClass} w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full text-base font-bold text-white shadow-2xl transition-all" data-ui-id="${heroButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}" style="background-color: var(--primary);">
+                <a href="#simulateur" class="btn-cta btn-keycap${ctaPulseClass} w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 text-base font-bold text-white shadow-2xl transition-all" data-ui-id="${heroButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}" style="background-color: var(--primary);">
                   ${getIcon("sparkles", "w-5 h-5")}
                   <span data-editable="ctaPrimary">${c.ctaPrimary}</span>
                 </a>
@@ -483,7 +544,7 @@ function renderHero(sec, project, options = {}) {
             ${phoneHidden ? '' : `
               <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-phone" data-cta-popover-wrapper data-section-id="${sec.id}" data-button-type="phone" data-ui-id="${heroPhoneId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
                 ${renderButtonActionBadge(sec, 'phone', options, project)}
-                <a href="tel:${c.phone}" class="btn-cta btn-keycap${ctaPulseClass} w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-full text-base font-semibold text-white bg-white/15 backdrop-blur-md border border-white/30 hover:bg-white/25 transition-colors" data-ui-id="${heroPhoneId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
+                <a href="tel:${c.phone}" class="btn-cta btn-keycap${ctaPulseClass} w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-4 text-base font-semibold text-white bg-white/15 backdrop-blur-md border border-white/30 hover:bg-white/25 transition-colors" data-ui-id="${heroPhoneId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
                   ${getIcon("phone", "w-5 h-5 text-emerald-400")}
                   <span data-editable="ctaSecondary">${c.ctaSecondary}</span>
                 </a>
@@ -530,7 +591,7 @@ function renderHero(sec, project, options = {}) {
                 ${primaryHidden ? '' : `
                   <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-primary" data-cta-popover-wrapper data-section-id="${sec.id}" data-button-type="primary" data-ui-id="${heroButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
                     ${renderButtonActionBadge(sec, 'primary', options, project)}
-                    <a href="#simulateur" class="btn-cta btn-keycap${ctaPulseClass} inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-full text-base font-bold text-white shadow-xl hover:shadow-2xl transition-all transform hover:-translate-y-0.5" data-ui-id="${heroButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}" style="background-color: var(--primary);">
+                    <a href="#simulateur" class="btn-cta btn-keycap${ctaPulseClass} inline-flex items-center justify-center gap-2.5 px-7 py-4 text-base font-bold text-white shadow-xl hover:shadow-2xl transition-all transform hover:-translate-y-0.5" data-ui-id="${heroButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}" style="background-color: var(--primary);">
                       ${getIcon("sparkles", "w-5 h-5")}
                       <span data-editable="ctaPrimary">${c.ctaPrimary}</span>
                     </a>
@@ -541,7 +602,7 @@ function renderHero(sec, project, options = {}) {
                 ${phoneHidden ? '' : `
                   <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-phone" data-cta-popover-wrapper data-section-id="${sec.id}" data-button-type="phone" data-ui-id="${heroPhoneId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
                     ${renderButtonActionBadge(sec, 'phone', options, project)}
-                    <a href="tel:${c.phone}" class="btn-cta btn-keycap${ctaPulseClass} inline-flex items-center justify-center gap-2.5 px-6 py-4 rounded-full text-base font-semibold text-white bg-slate-900 border border-slate-700 hover:bg-slate-800 transition-colors" data-ui-id="${heroPhoneId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
+                    <a href="tel:${c.phone}" class="btn-cta btn-keycap${ctaPulseClass} inline-flex items-center justify-center gap-2.5 px-6 py-4 text-base font-semibold text-white bg-slate-900 border border-slate-700 hover:bg-slate-800 transition-colors" data-ui-id="${heroPhoneId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
                       ${getIcon("phone", "w-5 h-5 text-emerald-400")}
                       <span data-editable="ctaSecondary">${c.ctaSecondary}</span>
                     </a>
@@ -593,7 +654,7 @@ function renderHero(sec, project, options = {}) {
             ${primaryHidden ? '' : `
               <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-primary" data-cta-popover-wrapper data-section-id="${sec.id}" data-button-type="primary" data-ui-id="${heroButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
                 ${renderButtonActionBadge(sec, 'primary', options, project)}
-                <a href="#simulateur" class="btn-cta btn-keycap${ctaPulseClass} inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm font-bold text-white shadow-md hover:shadow-lg transition-all" data-ui-id="${heroButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}" style="background-color: var(--primary);">
+                <a href="#simulateur" class="btn-cta btn-keycap${ctaPulseClass} inline-flex items-center gap-2 px-8 py-3.5 text-sm font-bold text-white shadow-md hover:shadow-lg transition-all" data-ui-id="${heroButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}" style="background-color: var(--primary);">
                   ${getIcon("sparkles", "w-4 h-4")}
                   <span data-editable="ctaPrimary">${c.ctaPrimary}</span>
                 </a>
@@ -604,7 +665,7 @@ function renderHero(sec, project, options = {}) {
             ${phoneHidden ? '' : `
               <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-phone" data-cta-popover-wrapper data-section-id="${sec.id}" data-button-type="phone" data-ui-id="${heroPhoneId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
                 ${renderButtonActionBadge(sec, 'phone', options, project)}
-                <a href="tel:${c.phone}" class="btn-cta btn-keycap${ctaPulseClass} inline-flex items-center gap-2 px-7 py-3.5 rounded-full text-sm font-semibold text-gray-800 bg-white border border-gray-300 hover:bg-gray-50 transition-colors" data-ui-id="${heroPhoneId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
+                <a href="tel:${c.phone}" class="btn-cta btn-keycap${ctaPulseClass} inline-flex items-center gap-2 px-7 py-3.5 text-sm font-semibold text-gray-800 bg-white border border-gray-300 hover:bg-gray-50 transition-colors" data-ui-id="${heroPhoneId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
                   ${getIcon("phone", "w-4 h-4 text-emerald-600")}
                   <span data-editable="ctaSecondary">${c.ctaSecondary}</span>
                 </a>
@@ -1265,7 +1326,7 @@ function renderReviews(sec, project, options = {}) {
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="text-center max-w-2xl mx-auto space-y-3 mb-14">
             <div class="inline-flex items-center gap-1.5 text-amber-500 text-sm font-bold">
-              ${renderRatingStars(5, { editor: options.isEditor, sectionId: sec.id, reviewIndex: -1 })}
+              ${renderRatingStars(Math.round(Number(c.overallRating) || 5), { editor: options.isEditor, sectionId: sec.id, reviewIndex: -1 })}
               <span class="text-gray-700 ml-1.5" data-editable="overallRating">${c.overallRating || '4.9'}/5 — Avis vérifiés</span>
             </div>
             <h2 class="font-heading text-3xl font-extrabold text-gray-900" data-editable="title">${c.title}</h2>
@@ -1304,7 +1365,7 @@ function renderReviews(sec, project, options = {}) {
 
           <div class="lg:col-span-4 bg-gray-50 p-8 rounded-3xl border border-black/5 space-y-4">
             <div class="inline-flex items-center gap-2 text-amber-500">
-              ${renderRatingStars(5, { editor: options.isEditor, sectionId: sec.id, reviewIndex: -1 })}
+              ${renderRatingStars(Math.round(Number(c.overallRating) || 5), { editor: options.isEditor, sectionId: sec.id, reviewIndex: -1 })}
             </div>
             <div class="font-heading text-5xl font-extrabold text-gray-900" data-editable="overallRating">${c.overallRating || '4.9'} <span class="text-xl font-semibold text-gray-400">/ 5</span></div>
             <div class="text-sm font-bold text-gray-800" data-editable="totalReviews">${c.totalReviews || '48 avis vérifiés'}</div>
@@ -1858,13 +1919,15 @@ export function renderStickyCallBar(project, options = {}) {
   const cleanPhone = phone.replace(/[^0-9]/g, "");
   const waNumber = (project.settings?.whatsappNumber || cleanPhone).replace(/[^0-9]/g, "");
   const waText = encodeURIComponent(`Bonjour ${b.name}, je souhaiterais un devis.`);
+  const dockPosition = project.settings?.stickyDockPosition || "bottom-center";
   const stickyPosition = project.settings?.stickyBarPosition || {};
-  const stickyStyle = Number.isFinite(stickyPosition.left) || Number.isFinite(stickyPosition.top)
+  const isCustomDragged = Number.isFinite(stickyPosition.left) || Number.isFinite(stickyPosition.top);
+  const stickyStyle = isCustomDragged
     ? `style="${Number.isFinite(stickyPosition.left) ? `--sticky-left:${stickyPosition.left}%;` : ''}${Number.isFinite(stickyPosition.top) ? `--sticky-top:${stickyPosition.top}px;` : ''}"`
     : '';
 
   return `
-    <div class="sticky-call-bar fixed z-40 w-[92%] max-w-md transition-all duration-300 pointer-events-auto" data-sticky-call-bar ${stickyStyle}>
+    <div class="sticky-call-bar fixed z-40 w-[92%] max-w-md transition-all duration-300 pointer-events-auto ${isCustomDragged ? 'is-custom-dragged' : ''}" data-sticky-call-bar data-dock-position="${dockPosition}" ${stickyStyle}>
       <div class="bg-zinc-950/85 text-white backdrop-blur-md px-3 py-2 rounded-full shadow-2xl border border-white/10 flex items-center justify-between gap-2 text-xs">
 
         <button type="button" class="sticky-drag-handle" title="Déplacer le bandeau" aria-label="Déplacer le bandeau de contact">

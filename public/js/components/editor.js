@@ -140,7 +140,7 @@ export function renderEditor(state) {
         <div class="flex items-center gap-2">
 
           <!-- True Dark / Light Mode Switcher -->
-          <button type="button" onclick="window.app.toggleThemeMode()" class="btn-keycap btn-keycap-light px-3 py-2 rounded-lg text-xs font-bold text-zinc-800 border border-zinc-200 flex items-center gap-1.5" title="Changer l'ambiance de l'éditeur" aria-label="Changer l'ambiance de l'éditeur">
+          <button type="button" id="theme-mode-toggle-btn" onclick="window.app.toggleThemeMode()" class="btn-keycap btn-keycap-light px-3 py-2 rounded-lg text-xs font-bold text-zinc-800 border border-zinc-200 flex items-center gap-1.5" title="Changer l'ambiance de l'éditeur" aria-label="Changer l'ambiance de l'éditeur">
             ${getIcon(state.themeMode === 'dark' ? 'sun' : 'moon', 'w-4 h-4')}
             <span class="theme-control-label">${state.themeMode === 'dark' ? 'Éditeur clair' : 'Éditeur sombre'}</span>
           </button>
@@ -171,14 +171,14 @@ export function renderEditor(state) {
             </button>
             <div id="export-menu" data-open="false" role="menu" class="export-menu absolute right-0 top-full mt-1.5 w-64 bg-white rounded-xl shadow-xl border border-zinc-200 p-2 text-xs text-zinc-700 hidden z-50 animate-fade-in">
               <button type="button" onclick="window.app.exportHTML()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-zinc-50 flex items-center gap-2.5 transition-colors">
-                ${getIcon("download", "w-4 h-4 text-zinc-700")}
+                ${getIcon("code", "w-4 h-4 text-zinc-700")}
                 <div>
                   <div class="font-semibold text-zinc-900">Site Web Autonome (.HTML)</div>
                   <div class="text-[10px] text-zinc-400">Prêt pour hébergement ou envoi direct</div>
                 </div>
               </button>
               <button type="button" onclick="window.app.exportJSON()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-zinc-50 flex items-center gap-2.5 transition-colors">
-                ${getIcon("layers", "w-4 h-4 text-zinc-700")}
+                ${getIcon("fileJson", "w-4 h-4 text-zinc-700")}
                 <div>
                   <div class="font-semibold text-zinc-900">Données Projet (.JSON)</div>
                   <div class="text-[10px] text-zinc-400">Sauvegarde et structure complète</div>
@@ -390,9 +390,16 @@ export function renderEditor(state) {
           <div id="copilot-feedback" class="copilot-feedback hidden"></div>
         </div>
       ` : `
-        <button type="button" aria-label="Ouvrir Assistant Studio" onclick="window.app.toggleCopilotPanel(true)" class="copilot-launcher">
-          <span class="assistant-avatar">${getIcon("bot", "w-4 h-4 text-amber-300")}</span>
-          <span>Assistant Studio</span>
+        <button type="button" aria-label="Ouvrir Studio Assistant IA" onclick="window.app.toggleCopilotPanel(true)" class="copilot-launcher ai-launcher-pill">
+          <span class="ai-avatar-wrapper relative">
+            <span class="assistant-avatar">${getIcon("bot", "w-4 h-4 text-amber-300")}</span>
+            <span class="ai-status-dot"></span>
+          </span>
+          <div class="text-left flex flex-col">
+            <span class="font-bold text-zinc-100 text-xs">Studio Assistant IA</span>
+            <span class="text-[10px] text-zinc-400 font-normal">Génération & Édition IA</span>
+          </div>
+          <span class="ml-auto text-amber-400 pl-1">${getIcon("sparkles", "w-3.5 h-3.5")}</span>
         </button>
       `}
 
@@ -802,7 +809,7 @@ function renderSettingsAccordions(project) {
       <div class="section-card">
         <div class="section-card-header" onclick="window.app.toggleSettingsItem('favicon')">
           <div class="flex items-center gap-2 text-xs font-medium text-zinc-900">
-            ${getIcon("star", "w-4 h-4 text-zinc-500")}
+            ${getIcon("tag", "w-4 h-4 text-zinc-500")}
             <span>Favicon & Identité</span>
           </div>
           <span class="text-zinc-400">${getIcon("chevronDown", "w-3.5 h-3.5")}</span>
@@ -1027,6 +1034,15 @@ function renderSettingsAccordions(project) {
             </div>
 
             <div>
+              <label class="block text-[10px] text-zinc-500 mb-1">Position d'ancrage :</label>
+              <div class="grid grid-cols-3 gap-1.5 text-xs">
+                <button type="button" onclick="window.app.setStickyDockPosition('bottom-left')" class="py-1 border rounded text-center text-[11px] font-medium ${(project.settings?.stickyDockPosition === 'bottom-left') ? 'border-zinc-900 bg-white font-semibold shadow-xs text-zinc-950' : 'border-zinc-200 bg-white text-zinc-600'}">Gauche</button>
+                <button type="button" onclick="window.app.setStickyDockPosition('bottom-center')" class="py-1 border rounded text-center text-[11px] font-medium ${(!project.settings?.stickyDockPosition || project.settings?.stickyDockPosition === 'bottom-center') ? 'border-zinc-900 bg-white font-semibold shadow-xs text-zinc-950' : 'border-zinc-200 bg-white text-zinc-600'}">Centre</button>
+                <button type="button" onclick="window.app.setStickyDockPosition('bottom-right')" class="py-1 border rounded text-center text-[11px] font-medium ${(project.settings?.stickyDockPosition === 'bottom-right') ? 'border-zinc-900 bg-white font-semibold shadow-xs text-zinc-950' : 'border-zinc-200 bg-white text-zinc-600'}">Droite</button>
+              </div>
+            </div>
+
+            <div>
               <label class="block text-[10px] text-zinc-500 mb-1">Numéro WhatsApp direct :</label>
               <input type="text" value="${escapeHtml(project.settings?.whatsappNumber || project.business.phone || '')}"
                      placeholder="Ex: 06 12 34 56 78"
@@ -1049,11 +1065,11 @@ function renderSettingsAccordions(project) {
         <div class="section-accordion-body hidden space-y-2" id="settings-body-export">
           <button type="button" onclick="window.app.exportHTML()" class="w-full py-2 px-2.5 rounded-lg bg-white hover:bg-zinc-50 border border-zinc-200 flex items-center justify-between text-xs font-medium text-zinc-900 transition-colors">
             <span>Télécharger site autonome (.HTML)</span>
-            ${getIcon("download", "w-3.5 h-3.5 text-zinc-400")}
+            ${getIcon("code", "w-3.5 h-3.5 text-zinc-500")}
           </button>
           <button type="button" onclick="window.app.exportJSON()" class="w-full py-2 px-2.5 rounded-lg bg-white hover:bg-zinc-50 border border-zinc-200 flex items-center justify-between text-xs font-medium text-zinc-900 transition-colors">
             <span>Exporter sauvegarde projet (.JSON)</span>
-            ${getIcon("layers", "w-3.5 h-3.5 text-zinc-400")}
+            ${getIcon("fileJson", "w-3.5 h-3.5 text-zinc-500")}
           </button>
         </div>
       </div>
