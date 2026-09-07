@@ -48,6 +48,8 @@ const ICONS = {
   moon: `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/>`,
   panelBottom: `<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15h18"/><path d="M8 19h8"/>`,
   pipette: `<path d="m2 22 1.5-4.5L14 7l3 3L6.5 20.5 2 22Z"/><path d="m13 8 3-3 3 3-3 3"/><path d="m16 5 2-2 3 3-2 2"/>`
+  ,briefcase: `<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18M10 12v2h4v-2"/>`
+  ,bot: `<rect x="4" y="7" width="16" height="12" rx="3"/><path d="M12 3v4M8 12h.01M16 12h.01M8 16h8"/><path d="M2 11v4M22 11v4"/>`
 };
 
 export function getIcon(name, className = "w-4 h-4", size = 24) {

@@ -4,6 +4,13 @@ import { renderInspector } from "./inspector.js";
 import { STYLE_PRESETS } from "../data/styles.js";
 import { FONT_CATALOG, ensureFontCatalog } from "../data/fonts.js";
 import { SECTION_DEFINITIONS } from "./addSectionModal.js";
+import { INSPIRATION_PATTERNS } from "../data/inspiration.js";
+
+function hexToRgbText(hex) {
+  const raw = String(hex || "").replace("#", "");
+  if (!/^[0-9a-f]{6}$/i.test(raw)) return "rgb(24, 24, 27)";
+  return `rgb(${parseInt(raw.slice(0, 2), 16)}, ${parseInt(raw.slice(2, 4), 16)}, ${parseInt(raw.slice(4, 6), 16)})`;
+}
 
 /**
  * Sendpage / Linear / Raycast / Apple 2026-2030 Visual Editor Component.
@@ -150,19 +157,19 @@ export function renderEditor(state) {
             <span class="hidden xl:inline">Partager (QR)</span>
           </button>
 
-          <button type="button" onclick="window.app.openCloserModal('${project.id}')" class="btn-keycap btn-keycap-light inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-700 border border-zinc-200" title="Kit Vente Closer & Argumentaire">
-            ${getIcon("sparkles", "w-3.5 h-3.5 text-amber-500")}
+          <button type="button" onclick="window.app.openCloserModal('${project.id}')" class="btn-keycap btn-keycap-light inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-700 border border-zinc-200" title="Ouvrir le kit commercial">
+            ${getIcon("briefcase", "w-3.5 h-3.5 text-amber-500")}
             <span class="hidden md:inline">Kit Closer</span>
           </button>
 
           <!-- Export Dropdown with Tactile Keycap -->
-          <div class="relative group">
-            <button type="button" class="btn-keycap btn-keycap-accent inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold shadow-xs">
+          <div class="relative">
+            <button type="button" id="export-menu-button" aria-expanded="false" aria-controls="export-menu" aria-haspopup="menu" onclick="window.app.toggleExportMenu()" class="btn-keycap btn-keycap-accent inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold shadow-xs">
               ${getIcon("download", "w-3.5 h-3.5")}
               <span>Exporter</span>
               ${getIcon("chevronDown", "w-3 h-3 text-zinc-400")}
             </button>
-            <div class="absolute right-0 top-full mt-1.5 w-64 bg-white rounded-xl shadow-xl border border-zinc-200 p-2 text-xs text-zinc-700 hidden group-hover:block z-50 animate-fade-in">
+            <div id="export-menu" data-open="false" role="menu" class="export-menu absolute right-0 top-full mt-1.5 w-64 bg-white rounded-xl shadow-xl border border-zinc-200 p-2 text-xs text-zinc-700 hidden z-50 animate-fade-in">
               <button type="button" onclick="window.app.exportHTML()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-zinc-50 flex items-center gap-2.5 transition-colors">
                 ${getIcon("download", "w-4 h-4 text-zinc-700")}
                 <div>
@@ -339,11 +346,11 @@ export function renderEditor(state) {
             <div class="flex items-center gap-2">
               ${getIcon("sparkles", "w-4 h-4 text-amber-400")}
               <div>
-                <div class="text-xs font-bold text-white">Copilot IA</div>
+              <div class="text-xs font-bold text-white">Assistant Studio</div>
                 <div class="text-[10px] text-zinc-400">Modifications ciblées avec Undo</div>
               </div>
             </div>
-            <button type="button" aria-label="Fermer Copilot" onclick="window.app.toggleCopilotPanel(false)" class="copilot-close-btn">
+            <button type="button" aria-label="Fermer Assistant Studio" onclick="window.app.toggleCopilotPanel(false)" class="copilot-close-btn">
               ${getIcon("x", "w-4 h-4")}
             </button>
           </div>
@@ -361,9 +368,9 @@ export function renderEditor(state) {
           <div id="copilot-feedback" class="copilot-feedback hidden"></div>
         </div>
       ` : `
-        <button type="button" aria-label="Ouvrir Copilot IA" onclick="window.app.toggleCopilotPanel(true)" class="copilot-launcher">
-          ${getIcon("sparkles", "w-4 h-4 text-amber-400")}
-          <span>Copilot</span>
+        <button type="button" aria-label="Ouvrir Assistant Studio" onclick="window.app.toggleCopilotPanel(true)" class="copilot-launcher">
+          <span class="assistant-avatar">${getIcon("bot", "w-4 h-4 text-amber-300")}</span>
+          <span>Assistant Studio</span>
         </button>
       `}
 
@@ -547,6 +554,21 @@ function renderSectionAccordionContent(sec, project, variants) {
         </div>
       </div>
 
+      <!-- Per-block motion catalog -->
+      <div class="pt-2 border-t border-zinc-200/60">
+        <label class="block text-[10px] font-medium text-zinc-400 uppercase tracking-wider mb-1">Animation du bloc</label>
+        <div class="motion-fan-grid">
+          ${[
+            ['none', 'Aucune'], ['fade-in', 'Fade'], ['slide-up', 'Slide'], ['spring', 'Spring'],
+            ['reveal', 'Reveal'], ['stagger', 'Stagger'], ['shimmer', 'Shimmer'], ['pulse', 'Pulse']
+          ].map(([preset, label]) => `<button type="button" class="motion-option ${((sec.settings?.motionPreset || 'none') === preset || (!sec.settings?.motionPreset && preset === 'none')) ? 'is-active' : ''}" onclick="window.app.setSectionMotion('${sectionId}', '${preset}')">${label}</button>`).join('')}
+        </div>
+        <p class="text-[10px] text-zinc-500 mt-1">Le mouvement est appliqué au bloc complet et respecte la réduction des mouvements.</p>
+        <div class="pattern-catalog mt-2" aria-label="Patterns d'inspiration">
+          ${INSPIRATION_PATTERNS.slice(0, 4).map(pattern => `<span class="pattern-chip" title="${pattern.description}">${pattern.label}<small>${pattern.source}</small></span>`).join('')}
+        </div>
+      </div>
+
       <!-- Section Actions: Monter, Descendre, Dupliquer & Supprimer -->
       <div class="pt-2 border-t border-zinc-200/60 flex items-center justify-between gap-1.5">
         <button type="button" onclick="window.app.moveSection('${sectionId}', 'up')" class="py-1 px-2 text-[10.5px] font-medium text-zinc-700 bg-white hover:bg-zinc-100 border border-zinc-200 rounded flex items-center gap-1 transition-colors" title="Monter">
@@ -724,6 +746,9 @@ function renderSettingsAccordions(project) {
                   <input id="color-text-${key}" class="color-hex-input" value="${color}" inputmode="text" maxlength="7"
                          oninput="window.app.updateColorFromText('${key}', this.value)"
                          onchange="window.app.commitColorFromText('${key}', this.value)" aria-label="Valeur HEX ${label}">
+                  <input class="color-rgb-input" value="${hexToRgbText(color)}" inputmode="decimal"
+                         oninput="window.app.updateColorFromRgb('${key}', this.value)"
+                         onchange="window.app.commitColorFromRgb('${key}', this.value)" aria-label="Valeur RGB ${label}">
                   <div class="color-harmony-row" aria-label="Harmonies de couleur">
                     <button type="button" style="--harmony-color: ${harmony[0]}" onclick="window.app.applyHarmonyColor('${key}', '${harmony[0]}')" title="Couleur actuelle"></button>
                     <button type="button" style="--harmony-color: ${harmony[1]}" onclick="window.app.applyHarmonyColor('${key}', '${harmony[1]}')" title="Couleur complémentaire"></button>
@@ -747,8 +772,12 @@ function renderSettingsAccordions(project) {
         </div>
         <div class="section-accordion-body hidden space-y-2.5" id="settings-body-typography">
           <div class="space-y-1.5 max-h-72 overflow-y-auto pr-1">
+            <div class="grid grid-cols-2 gap-1.5 mb-2">
+              <button type="button" onclick="window.app.setTypographyTarget('heading')" class="py-1.5 rounded border text-[11px] ${window.app?.typographyTarget !== 'body' ? 'border-zinc-900 bg-zinc-900 text-white' : 'border-zinc-200 bg-white text-zinc-600'}">Titres</button>
+              <button type="button" onclick="window.app.setTypographyTarget('body')" class="py-1.5 rounded border text-[11px] ${window.app?.typographyTarget === 'body' ? 'border-zinc-900 bg-zinc-900 text-white' : 'border-zinc-200 bg-white text-zinc-600'}">Texte</button>
+            </div>
             ${FONT_CATALOG.map(font => `
-              <button type="button" aria-label="Utiliser ${font.name}" onclick="window.app.updateTypography('${font.name}', '${project.branding.bodyFont || 'Inter'}')" class="font-option w-full text-left p-2 rounded-lg border bg-white hover:border-zinc-400 text-xs ${project.branding.headingFont === font.name ? 'is-active' : ''}" style="font-family: '${font.name}', sans-serif">
+              <button type="button" aria-label="Utiliser ${font.name}" onclick="window.app.applyTypographyFont('${font.name}')" class="font-option w-full text-left p-2 rounded-lg border bg-white hover:border-zinc-400 text-xs ${(project.branding.headingFont === font.name || project.branding.bodyFont === font.name) ? 'is-active' : ''}" style="font-family: '${font.name}', sans-serif">
                 <div class="font-bold text-zinc-900">${font.name}</div>
                 <div class="text-[10px] text-zinc-400">${font.category} · ${font.description}</div>
               </button>

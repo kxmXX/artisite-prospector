@@ -8,6 +8,10 @@ export function stableUiNumber(...parts) {
   return (hash >>> 0) % 9000 + 1000;
 }
 
+export function getUiCode(...parts) {
+  return String((stableUiNumber(...parts) % 99) + 1).padStart(2, "0");
+}
+
 export function getUiId(project, section, role = "component") {
   return `${role}-${stableUiNumber(project?.id || "project", section?.id || "section", role)}`;
 }

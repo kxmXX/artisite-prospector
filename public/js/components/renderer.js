@@ -1,6 +1,6 @@
 import { getIcon } from "./icons.js";
 import { getTradeFallbackDataUrl } from "../data/imageFallbacks.js";
-import { getUiId, getSectionUiId } from "../data/uiIds.js";
+import { getUiId, getSectionUiId, getUiCode } from "../data/uiIds.js";
 
 function getInitialSiteTheme(project) {
   const color = project?.branding?.bgColor || "#ffffff";
@@ -8,6 +8,25 @@ function getInitialSiteTheme(project) {
   if (!/^[0-9a-f]{6}$/i.test(hex)) return "light";
   const [r, g, b] = [0, 2, 4].map(i => parseInt(hex.slice(i, i + 2), 16));
   return (0.299 * r + 0.587 * g + 0.114 * b) < 132 ? "dark" : "light";
+}
+
+function decorateEditableMarkup(markup, project, section) {
+  return markup.replace(/<([a-z][\w-]*)(\s[^>]*data-editable="([^"]+)"[^>]*)>/gi, (full, tag, attrs, fieldPath) => {
+    if (attrs.includes("data-ui-id=")) return full;
+    const targetId = getUiId(project, section, `field-${fieldPath}`);
+    const code = getUiCode(project?.id, section?.id, fieldPath);
+    return `<${tag}${attrs} data-ui-id="${targetId}" data-ui-code="${code}" data-ui-type="field" data-ui-target="true">`;
+  });
+}
+
+function renderRatingStars(rating = 5, { editor = false, sectionId = "", reviewIndex = 0 } = {}) {
+  const value = Math.max(0, Math.min(5, Number(rating) || 0));
+  return [...Array(5)].map((_, index) => {
+    const filled = index < value;
+    const icon = getIcon("star", `w-4 h-4 ${filled ? "fill-current" : "text-gray-300"}`);
+    if (!editor) return icon;
+    return `<button type="button" class="review-rating-star ${filled ? "is-filled" : ""}" data-rating="${index + 1}" aria-label="${index + 1} étoile${index ? "s" : ""}" onclick="event.stopPropagation(); window.app.updateReviewRating('${sectionId}', ${reviewIndex}, ${index + 1})">${icon}</button>`;
+  }).join("");
 }
 
 /**
@@ -105,6 +124,7 @@ export function renderWebsiteHTML(project, options = { isEditor: false, isStanda
       --font-body: '${project.branding.bodyFont}', -apple-system, BlinkMacSystemFont, sans-serif;
       --radius: ${project.branding.borderRadius};
       --btn-radius: ${project.branding.buttonRadius};
+      --cta-radius: ${project.branding.buttonRadius};
       --cta-padding: ${ctaPaddingMap[ctaSize] || '0.75rem 1.5rem'};
       --cta-font-size: ${ctaFontMap[ctaSize] || '0.95rem'};
     ">
@@ -176,16 +196,20 @@ function renderSection(sec, project, options) {
       innerHTML = `<div class="p-8 text-center text-gray-400">Section ${sec.type}</div>`;
   }
 
-  const bgTheme = sec.settings?.bgTheme ? `bg-sec-${sec.settings.bgTheme}` : "";
-  const motionPreset = project.branding?.motionPreset && project.branding.motionPreset !== "none"
-    ? project.branding.motionPreset
-    : "";
+  if (isEditor) innerHTML = decorateEditableMarkup(innerHTML, project, sec);
+
+  const globalBg = String(project.branding?.bgColor || "").toLowerCase();
+  const inferredTheme = ["#09090b", "#0f0f11", "#111318", "#18181b"].includes(globalBg) ? "dark" : ["#f4f4f5", "#f8fafc"].includes(globalBg) ? "mineral" : "white";
+  const sectionTheme = sec.settings?.bgTheme || inferredTheme;
+  const bgTheme = `bg-sec-${sectionTheme}`;
+  const themeColor = sectionTheme === "dark" ? "#09090b" : sectionTheme === "mineral" ? "#f8fafc" : "#ffffff";
+  const motionPreset = sec.settings?.motionPreset || (project.branding?.motionPreset && project.branding.motionPreset !== "none" ? project.branding.motionPreset : "")
   const customBackground = /^#[0-9a-f]{3,8}$/i.test(sec.settings?.customBackground || "")
     ? `background-color: ${sec.settings.customBackground} !important;`
     : "";
 
   if (!isEditor) {
-    return `<section id="${sec.type}" class="site-section ${bgTheme} ${isHidden ? 'hidden' : ''}" style="${customBackground}" data-ui-id="${getSectionUiId(sec)}" data-ui-type="section"${motionPreset ? ` data-motion="${motionPreset}"` : ''}>${innerHTML}</section>`;
+    return `<section id="${sec.type}" class="site-section ${bgTheme} ${isHidden ? 'hidden' : ''}" style="--section-bg: ${themeColor}; ${customBackground}" data-section-bg="${sectionTheme}" data-ui-id="${getSectionUiId(sec)}" data-ui-type="section"${motionPreset ? ` data-motion="${motionPreset}"` : ''}>${innerHTML}</section>`;
   }
 
   // Editor Wrapper with Controls
@@ -216,9 +240,12 @@ function renderSection(sec, project, options) {
          data-section-id="${sec.id}"
          data-section-type="${sec.type}"
          data-ui-id="section-${sec.id}"
+         data-ui-code="${getUiCode(project?.id, sec?.id, 'section')}"
          data-ui-type="section"
+         data-ui-target="true"
+         data-section-bg="${sectionTheme}"
          ${motionPreset ? `data-motion="${motionPreset}"` : ''}
-         style="${customBackground}"
+         style="--section-bg: ${themeColor}; ${customBackground}"
          tabindex="-1">
 
       <!-- Sleek Floating Action Bar (Linear / Framer style) -->
@@ -300,6 +327,9 @@ function renderHero(sec, project, options = {}) {
   const ctaPulseClass = project?.branding?.ctaPulse ? " btn-cta-pulse" : "";
   const heroButtonId = getUiId(project, sec, "btn");
   const heroButtonVisibility = sec.settings?.[`${heroButtonId}-visible`] === false ? " hidden" : "";
+  const heroButtonMotion = sec.settings?.[`${heroButtonId}-motion`] || "";
+  const heroPhoneId = getUiId(project, sec, "btn-phone");
+  const heroPhoneMotion = sec.settings?.[`${heroPhoneId}-motion`] || "";
 
   // Variant A: Fullscreen Image
   if (variant === "fullscreen-image") {
@@ -469,7 +499,7 @@ function renderHero(sec, project, options = {}) {
             </p>
 
               <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-primary" data-cta-popover-wrapper data-ui-id="${getUiId(project, sec, 'cta')}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
-              <a href="#simulateur" class="btn-cta btn-keycap${ctaPulseClass}${heroButtonVisibility} inline-flex items-center justify-center gap-2.5 shadow-xl transition-all" data-ui-id="${heroButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}" style="background-color: var(--primary); color: #ffffff;">
+              <a href="#simulateur" class="btn-cta btn-keycap${ctaPulseClass}${heroButtonVisibility} inline-flex items-center justify-center gap-2.5 shadow-xl transition-all" data-ui-id="${heroButtonId}" data-ui-code="${getUiCode(project?.id, sec?.id, heroButtonId)}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}"${heroButtonMotion ? ` data-motion="${heroButtonMotion}"` : ''} style="background-color: var(--primary); color: #ffffff;">
                 ${getIcon("sparkles", "w-5 h-5")}
                 <span data-editable="ctaPrimary">${c.ctaPrimary}</span>
               </a>
@@ -480,13 +510,15 @@ function renderHero(sec, project, options = {}) {
                   <button type="button" data-cta-size="md" onclick="event.preventDefault(); window.app.setCTASize('md')" class="cta-context-btn">M</button>
                   <button type="button" data-cta-size="lg" onclick="event.preventDefault(); window.app.setCTASize('lg')" class="cta-context-btn">L</button>
                   <button type="button" data-cta-size="xl" onclick="event.preventDefault(); window.app.setCTASize('xl')" class="cta-context-btn">XL</button>
-                  <button type="button" data-action="pulse" onclick="event.preventDefault(); window.app.toggleCTAPulse()" class="cta-context-btn" title="Pulsation lumineuse">✨ Pulse</button>
+                  <button type="button" data-action="pulse" onclick="event.preventDefault(); window.app.toggleCTAPulse()" class="cta-context-btn" title="Pulsation lumineuse">Pulse</button>
+                  <span class="cta-motion-label">Animation</span>
+                  ${[['none','Off'],['fade-in','Fade'],['slide-up','Slide'],['spring','Spring'],['stagger','Stagger'],['shimmer','Shimmer']].map(([preset,label]) => `<button type="button" data-motion-preset="${preset}" onclick="event.preventDefault(); window.app.setComponentMotion('${sec.id}', '${heroButtonId}', '${preset}')" class="cta-context-btn">${label}</button>`).join('')}
                 </div>
               ` : ''}
             </div>
 
             <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-phone" data-cta-popover-wrapper>
-              <a href="tel:${c.phone}" class="btn-cta btn-keycap${ctaPulseClass} inline-flex items-center justify-center gap-2.5 shadow-sm transition-all" style="background-color: #ffffff; color: #18181b; border: 1px solid #e4e4e7;">
+              <a href="tel:${c.phone}" class="btn-cta btn-keycap${ctaPulseClass} inline-flex items-center justify-center gap-2.5 shadow-sm transition-all" data-ui-id="${heroPhoneId}" data-ui-code="${getUiCode(project?.id, sec?.id, heroPhoneId)}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}"${heroPhoneMotion ? ` data-motion="${heroPhoneMotion}"` : ''} style="background-color: #ffffff; color: #18181b; border: 1px solid #e4e4e7;">
                 ${getIcon("phone", "w-5 h-5 text-emerald-600")}
                 <span data-editable="ctaSecondary">${c.ctaSecondary}</span>
               </a>
@@ -497,7 +529,9 @@ function renderHero(sec, project, options = {}) {
                   <button type="button" data-cta-size="md" onclick="event.preventDefault(); window.app.setCTASize('md')" class="cta-context-btn">M</button>
                   <button type="button" data-cta-size="lg" onclick="event.preventDefault(); window.app.setCTASize('lg')" class="cta-context-btn">L</button>
                   <button type="button" data-cta-size="xl" onclick="event.preventDefault(); window.app.setCTASize('xl')" class="cta-context-btn">XL</button>
-                  <button type="button" data-action="pulse" onclick="event.preventDefault(); window.app.toggleCTAPulse()" class="cta-context-btn" title="Pulsation lumineuse">${getIcon("sparkles", "w-3 h-3")} Pulse</button>
+                  <button type="button" data-action="pulse" onclick="event.preventDefault(); window.app.toggleCTAPulse()" class="cta-context-btn" title="Pulsation lumineuse">Pulse</button>
+                  <span class="cta-motion-label">Animation</span>
+                  ${[['none','Off'],['fade-in','Fade'],['slide-up','Slide'],['spring','Spring'],['stagger','Stagger'],['shimmer','Shimmer']].map(([preset,label]) => `<button type="button" data-motion-preset="${preset}" onclick="event.preventDefault(); window.app.setComponentMotion('${sec.id}', '${heroPhoneId}', '${preset}')" class="cta-context-btn">${label}</button>`).join('')}
                 </div>
               ` : ''}
             </div>
@@ -1093,7 +1127,7 @@ function renderGallery(sec, project, options = {}) {
 }
 
 // 10. Reviews
-function renderReviews(sec, project) {
+function renderReviews(sec, project, options = {}) {
   const c = sec.content;
   const variant = sec.variant || "google-cards";
 
@@ -1103,7 +1137,7 @@ function renderReviews(sec, project) {
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="text-center max-w-2xl mx-auto space-y-3 mb-14">
             <div class="inline-flex items-center gap-1.5 text-amber-500 text-sm font-bold">
-              ${[...Array(5)].map(() => getIcon("star", "w-4 h-4 fill-current")).join('')}
+              ${renderRatingStars(5, { editor: options.isEditor, sectionId: sec.id, reviewIndex: -1 })}
               <span class="text-gray-700 ml-1.5" data-editable="overallRating">${c.overallRating || '4.9'}/5 — Avis vérifiés</span>
             </div>
             <h2 class="font-heading text-3xl font-extrabold text-gray-900" data-editable="title">${c.title}</h2>
@@ -1115,7 +1149,7 @@ function renderReviews(sec, project) {
               <div class="bg-gray-50/80 p-8 rounded-3xl border border-gray-100 shadow-sm flex flex-col justify-between space-y-6">
                 <div class="space-y-4">
                   <div class="flex text-amber-400">
-                    ${[...Array(r.rating || 5)].map(() => getIcon("star", "w-4 h-4 fill-current")).join('')}
+                    ${renderRatingStars(r.rating, { editor: options.isEditor, sectionId: sec.id, reviewIndex: idx })}
                   </div>
                   <p class="text-gray-700 text-sm leading-relaxed italic" data-editable="reviews.${idx}.text">« ${r.text} »</p>
                 </div>
@@ -1142,7 +1176,7 @@ function renderReviews(sec, project) {
 
           <div class="lg:col-span-4 bg-gray-50 p-8 rounded-3xl border border-black/5 space-y-4">
             <div class="inline-flex items-center gap-2 text-amber-500">
-              ${[...Array(5)].map(() => getIcon("star", "w-5 h-5 fill-current")).join('')}
+              ${renderRatingStars(5, { editor: options.isEditor, sectionId: sec.id, reviewIndex: -1 })}
             </div>
             <div class="font-heading text-5xl font-extrabold text-gray-900" data-editable="overallRating">${c.overallRating || '4.9'} <span class="text-xl font-semibold text-gray-400">/ 5</span></div>
             <div class="text-sm font-bold text-gray-800" data-editable="totalReviews">${c.totalReviews || '48 avis vérifiés'}</div>
@@ -1162,7 +1196,7 @@ function renderReviews(sec, project) {
                   <div class="flex items-center justify-between">
                     <div class="font-bold text-gray-900 text-sm" data-editable="reviews.${idx}.author">${r.author}</div>
                     <div class="flex text-amber-400">
-                      ${[...Array(r.rating || 5)].map(() => getIcon("star", "w-3.5 h-3.5 fill-current")).join('')}
+                      ${renderRatingStars(r.rating, { editor: options.isEditor, sectionId: sec.id, reviewIndex: idx })}
                     </div>
                   </div>
                   <p class="text-xs text-gray-600 leading-relaxed italic" data-editable="reviews.${idx}.text">« ${r.text} »</p>
@@ -1375,6 +1409,7 @@ function renderCta(sec, project, options = {}) {
   const c = sec.content;
   const primaryButtonId = getUiId(project, sec, "btn-primary");
   const primaryButtonVisibility = sec.settings?.[`${primaryButtonId}-visible`] === false ? " hidden" : "";
+  const primaryButtonMotion = sec.settings?.[`${primaryButtonId}-motion`] || "";
   return `
     <div class="py-20 text-white relative overflow-hidden" style="background-color: var(--primary);">
       <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6 relative z-10">
@@ -1382,11 +1417,11 @@ function renderCta(sec, project, options = {}) {
         <h2 class="font-heading text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight" data-editable="title">${c.title}</h2>
         <p class="text-white/80 text-base sm:text-lg max-w-2xl mx-auto" data-editable="subtitle">${c.subtitle}</p>
         <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a href="#simulateur" class="btn-cta${primaryButtonVisibility} bg-white text-gray-900 shadow-xl hover:bg-gray-50" data-ui-id="${primaryButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
+          <a href="#simulateur" class="btn-cta${primaryButtonVisibility} bg-white text-gray-900 shadow-xl hover:bg-gray-50" data-ui-id="${primaryButtonId}" data-ui-code="${getUiCode(project?.id, sec?.id, primaryButtonId)}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}"${primaryButtonMotion ? ` data-motion="${primaryButtonMotion}"` : ''}>
             ${getIcon("sparkles", "w-5 h-5 text-amber-500")}
             <span data-editable="ctaPrimary">${c.ctaPrimary}</span>
           </a>
-          <a href="tel:${c.phone}" class="btn-cta border border-white/30 text-white hover:bg-white/10" data-ui-id="${getUiId(project, sec, 'btn-phone')}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
+          <a href="tel:${c.phone}" class="btn-cta border border-white/30 text-white hover:bg-white/10" data-ui-id="${getUiId(project, sec, 'btn-phone')}" data-ui-code="${getUiCode(project?.id, sec?.id, 'btn-phone')}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
             ${getIcon("phone", "w-5 h-5")}
             <span data-editable="ctaSecondary">${c.ctaSecondary}</span>
           </a>
@@ -1510,10 +1545,18 @@ export function renderStickyCallBar(project, options = {}) {
   const cleanPhone = phone.replace(/[^0-9]/g, "");
   const waNumber = (project.settings?.whatsappNumber || cleanPhone).replace(/[^0-9]/g, "");
   const waText = encodeURIComponent(`Bonjour ${b.name}, je souhaiterais un devis.`);
+  const stickyPosition = project.settings?.stickyBarPosition || {};
+  const stickyStyle = Number.isFinite(stickyPosition.left) || Number.isFinite(stickyPosition.top)
+    ? `style="${Number.isFinite(stickyPosition.left) ? `--sticky-left:${stickyPosition.left}%;` : ''}${Number.isFinite(stickyPosition.top) ? `--sticky-top:${stickyPosition.top}px;` : ''}"`
+    : '';
 
   return `
-    <div class="sticky-call-bar fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-[92%] max-w-md transition-all duration-300 pointer-events-auto">
+    <div class="sticky-call-bar fixed z-40 w-[92%] max-w-md transition-all duration-300 pointer-events-auto" data-sticky-call-bar ${stickyStyle}>
       <div class="bg-zinc-950/85 text-white backdrop-blur-md px-3 py-2 rounded-full shadow-2xl border border-white/10 flex items-center justify-between gap-2 text-xs">
+
+        <button type="button" class="sticky-drag-handle" title="Déplacer le bandeau" aria-label="Déplacer le bandeau de contact">
+          ${getIcon("gripVertical", "w-3.5 h-3.5")}
+        </button>
 
         <!-- Direct Call -->
         <a href="tel:${cleanPhone || phone}" class="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-full bg-white text-zinc-950 hover:bg-zinc-100 font-semibold transition-colors shadow-xs" aria-label="Appeler ${phone || 'l’entreprise'}">

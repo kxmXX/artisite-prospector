@@ -24,6 +24,7 @@ class App {
     this.wizardMode = "fast";
     this.activeSidebarTab = "sections";
     this.closerTab = "script";
+    this.typographyTarget = "heading";
 
     this.init();
   }
@@ -91,6 +92,7 @@ class App {
         this.openCommandPalette();
       } else if (e.key === "Escape") {
         this.closeModals();
+        this.toggleExportMenu(false);
       }
     });
 
@@ -110,6 +112,9 @@ class App {
 
   render() {
     if (!this.rootEl) return;
+    const previousScrollTop = state.currentView === "editor"
+      ? document.querySelector("main")?.scrollTop
+      : null;
 
     if (state.currentView === "dashboard") {
       this.rootEl.innerHTML = renderDashboard(state);
@@ -124,6 +129,12 @@ class App {
     this.renderModals();
     this.syncSiteThemeToggle();
     this.hydrateImageFallbacks();
+    if (previousScrollTop !== null && previousScrollTop !== undefined) {
+      requestAnimationFrame(() => {
+        const main = document.querySelector("main");
+        if (main) main.scrollTop = previousScrollTop;
+      });
+    }
   }
 
   renderModals() {
@@ -311,6 +322,7 @@ class App {
       b.textColor = "#f4f4f5";
       b.textMuted = "#a1a1aa";
     }
+    state.currentProject.siteTheme = theme === "dark" ? "dark" : "light";
     state.pushHistory(`Ambiance : ${theme}`);
     state.saveToStorage();
     this.render();
@@ -795,35 +807,34 @@ class App {
 
   setSectionBg(sectionId, theme) {
     if (!state.currentProject) return;
-    const sec = state.currentProject.sections.find(s => s.id === sectionId);
+    if (!["white", "mineral", "dark"].includes(theme)) return;
+    const updated = JSON.parse(JSON.stringify(state.currentProject));
+    const sec = updated.sections.find(s => s.id === sectionId);
     if (!sec) return;
-    if (!sec.settings) sec.settings = {};
-    sec.settings.bgTheme = theme;
+    sec.settings = { ...(sec.settings || {}), bgTheme: theme };
+    state.updateProject(updated, true, `Changement fond (${theme})`);
+  }
 
-    // Apply directly to canvas element classes
-    const canvasSec = document.getElementById(`section-${sectionId}`) || document.querySelector(`.editor-section-wrapper[data-section-id="${sectionId}"]`);
-    if (canvasSec) {
-      canvasSec.classList.remove("bg-sec-white", "bg-sec-mineral", "bg-sec-dark");
-      canvasSec.classList.add(`bg-sec-${theme}`);
-    }
+  setSectionMotion(sectionId, preset) {
+    if (!state.currentProject) return;
+    const allowed = new Set(["none", "fade-in", "slide-up", "slide-in", "spring", "progress-fill", "reveal", "stagger", "shimmer", "pulse"]);
+    if (!allowed.has(preset)) return;
+    const updated = JSON.parse(JSON.stringify(state.currentProject));
+    const sec = updated.sections.find(s => s.id === sectionId);
+    if (!sec) return;
+    sec.settings = { ...(sec.settings || {}), motionPreset: preset === "none" ? "" : preset };
+    state.updateProject(updated, true, `Animation du bloc : ${preset}`);
+  }
 
-    state.pushHistory(`Changement fond (${theme})`);
-    state.saveToStorage();
-    this.updateUndoRedoUI();
-
-    // Update active button state in sidebar if open
-    const accordion = document.getElementById(`accordion-${sectionId}`);
-    if (accordion) {
-      const btns = accordion.querySelectorAll(".grid-cols-3 button");
-      const map = ["white", "mineral", "dark"];
-      btns.forEach((b, i) => {
-        if (map[i] === theme) {
-          b.className = "py-1 text-[11px] font-medium border rounded text-center transition-colors border-zinc-900 bg-white font-semibold shadow-xs";
-        } else {
-          b.className = "py-1 text-[11px] font-medium border rounded text-center transition-colors border-zinc-200 bg-zinc-50 text-zinc-600 hover:bg-white";
-        }
-      });
-    }
+  setComponentMotion(sectionId, targetId, preset) {
+    if (!state.currentProject) return;
+    const allowed = new Set(["none", "fade-in", "slide-up", "slide-in", "spring", "stagger", "shimmer", "pulse"]);
+    if (!allowed.has(preset)) return;
+    const updated = JSON.parse(JSON.stringify(state.currentProject));
+    const sec = updated.sections.find(s => s.id === sectionId);
+    if (!sec) return;
+    sec.settings = { ...(sec.settings || {}), [`${targetId}-motion`]: preset === "none" ? "" : preset };
+    state.updateProject(updated, true, `Animation du composant : ${preset}`);
   }
 
   setCTASize(size) {
@@ -1136,6 +1147,16 @@ class App {
     state.setEditorMode(mode === "preview" ? "preview" : "conception");
   }
 
+  toggleExportMenu(force) {
+    const menu = document.getElementById("export-menu");
+    const button = document.getElementById("export-menu-button");
+    if (!menu) return;
+    const open = typeof force === "boolean" ? force : menu.dataset.open !== "true";
+    menu.dataset.open = String(open);
+    menu.classList.toggle("hidden", !open);
+    button?.setAttribute("aria-expanded", String(open));
+  }
+
   toggleCopilotPanel(force) {
     state.setCopilotOpen(typeof force === "boolean" ? force : !state.copilotOpen);
   }
@@ -1156,6 +1177,16 @@ class App {
     state.currentProject.siteTheme = next;
     state.saveToStorage();
     this.syncSiteThemeToggle(root);
+  }
+
+  updateReviewRating(sectionId, reviewIndex, rating) {
+    if (!state.currentProject || reviewIndex < 0) return;
+    const section = state.currentProject.sections.find(item => item.id === sectionId);
+    const review = section?.content?.reviews?.[reviewIndex];
+    if (!review) return;
+    const updated = JSON.parse(JSON.stringify(state.currentProject));
+    updated.sections.find(item => item.id === sectionId).content.reviews[reviewIndex].rating = Math.max(0, Math.min(5, Number(rating) || 0));
+    state.updateProject(updated, true, "Modification note Google");
   }
 
   syncSiteThemeToggle(root = document.querySelector(".artisite-root")) {
@@ -1345,6 +1376,13 @@ class App {
     if (hexEl) hexEl.textContent = value;
     const textInput = document.getElementById(`color-text-${colorKey}`);
     if (textInput && document.activeElement !== textInput) textInput.value = value;
+    const rgbInput = document.querySelector(`[data-color-field="${colorKey}"] .color-rgb-input`);
+    if (rgbInput && document.activeElement !== rgbInput) {
+      const hex = String(value || "").replace("#", "");
+      if (/^[0-9a-f]{6}$/i.test(hex)) {
+        rgbInput.value = `rgb(${parseInt(hex.slice(0, 2), 16)}, ${parseInt(hex.slice(2, 4), 16)}, ${parseInt(hex.slice(4, 6), 16)})`;
+      }
+    }
   }
 
   commitColorUpdate(colorKey, value) {
@@ -1374,6 +1412,27 @@ class App {
     this.updateBrandingColor(colorKey, normalized);
   }
 
+  rgbToHex(value) {
+    const match = String(value || "").match(/rgba?\s*\(\s*(\d{1,3})\s*[, ]\s*(\d{1,3})\s*[, ]\s*(\d{1,3})/i) || String(value || "").match(/^\s*(\d{1,3})\s*[,; ]\s*(\d{1,3})\s*[,; ]\s*(\d{1,3})\s*$/);
+    if (!match) return null;
+    const channels = match.slice(1, 4).map(Number);
+    if (channels.some(channel => channel < 0 || channel > 255)) return null;
+    return `#${channels.map(channel => channel.toString(16).padStart(2, "0")).join("")}`;
+  }
+
+  updateColorFromRgb(colorKey, value) {
+    const hex = this.rgbToHex(value);
+    if (!hex) return;
+    this.liveUpdateColor(colorKey, hex);
+    const input = document.querySelector(`[data-color-field="${colorKey}"] .color-rgb-input`);
+    if (input && document.activeElement !== input) input.value = value;
+  }
+
+  commitColorFromRgb(colorKey, value) {
+    const hex = this.rgbToHex(value);
+    if (hex) this.updateBrandingColor(colorKey, hex);
+  }
+
   async pickColorWithEyedropper(colorKey) {
     if (typeof window === "undefined" || !window.EyeDropper) return;
     try {
@@ -1397,6 +1456,7 @@ class App {
     if (root) {
       root.style.setProperty("--radius", radius);
       root.style.setProperty("--btn-radius", btnRadius);
+      root.style.setProperty("--cta-radius", btnRadius);
     }
     state.pushHistory("Modification arrondi");
     state.saveToStorage();
@@ -1424,7 +1484,7 @@ class App {
 
   setMotionPreset(preset) {
     if (!state.currentProject) return;
-    const allowed = new Set(['none', 'fade-in', 'slide-up', 'slide-in', 'spring', 'progress-fill']);
+    const allowed = new Set(['none', 'fade-in', 'slide-up', 'slide-in', 'spring', 'progress-fill', 'reveal', 'stagger', 'shimmer', 'pulse']);
     if (!allowed.has(preset)) return;
     const updated = JSON.parse(JSON.stringify(state.currentProject));
     updated.branding.motionPreset = preset;
@@ -1445,6 +1505,18 @@ class App {
     state.pushHistory(`Typographie : ${headingFont}`);
     state.saveToStorage();
     this.updateUndoRedoUI();
+  }
+
+  setTypographyTarget(target) {
+    this.typographyTarget = target === "body" ? "body" : "heading";
+    this.render();
+  }
+
+  applyTypographyFont(font) {
+    if (!state.currentProject) return;
+    const heading = state.currentProject.branding.headingFont || "Inter";
+    const body = state.currentProject.branding.bodyFont || "Inter";
+    this.updateTypography(this.typographyTarget === "body" ? heading : font, this.typographyTarget === "body" ? font : body);
   }
 
   liveUpdateBusiness(field, value) {
@@ -1635,12 +1707,14 @@ class App {
 
   // Standalone Exports
   exportHTML() {
+    this.toggleExportMenu(false);
     if (state.currentProject) {
       downloadHTML(state.currentProject);
     }
   }
 
   exportJSON() {
+    this.toggleExportMenu(false);
     if (state.currentProject) {
       downloadJSON(state.currentProject);
     }
@@ -1867,6 +1941,55 @@ class App {
           success.style.display = "block";
           quoteForm.style.display = "none";
         }
+      };
+    }
+
+    // Draggable contact/WhatsApp bar. Position is persisted without rerendering
+    // so dragging never interrupts the canvas or steals scroll ownership.
+    const stickyBar = document.querySelector("[data-sticky-call-bar]");
+    const stickyHandle = stickyBar?.querySelector(".sticky-drag-handle");
+    if (stickyBar && stickyHandle && !stickyHandle.dataset.bound) {
+      stickyHandle.dataset.bound = "true";
+      let dragging = false;
+      let startX = 0;
+      let startY = 0;
+      let startLeft = 50;
+      let startTop = null;
+      const onMove = (event) => {
+        if (!dragging) return;
+        const dx = event.clientX - startX;
+        const dy = event.clientY - startY;
+        const parentWidth = window.innerWidth || 1;
+        const nextLeft = Math.max(8, Math.min(92, startLeft + (dx / parentWidth) * 100));
+        const nextTop = Math.max(8, Math.min((window.innerHeight || 800) - stickyBar.offsetHeight - 8, (startTop ?? (window.innerHeight - stickyBar.offsetHeight - 16)) + dy));
+        stickyBar.style.setProperty("--sticky-left", `${nextLeft}%`);
+        stickyBar.style.setProperty("--sticky-top", `${nextTop}px`);
+        stickyBar.style.bottom = "auto";
+      };
+      const onUp = () => {
+        if (!dragging) return;
+        dragging = false;
+        stickyHandle.classList.remove("is-dragging");
+        window.removeEventListener("pointermove", onMove);
+        window.removeEventListener("pointerup", onUp);
+        const left = parseFloat(stickyBar.style.getPropertyValue("--sticky-left"));
+        const top = parseFloat(stickyBar.style.getPropertyValue("--sticky-top"));
+        if (state.currentProject && Number.isFinite(left) && Number.isFinite(top)) {
+          state.currentProject.settings = { ...(state.currentProject.settings || {}), stickyBarPosition: { left, top } };
+          state.saveToStorage();
+        }
+      };
+      stickyHandle.onpointerdown = (event) => {
+        event.preventDefault();
+        dragging = true;
+        startX = event.clientX;
+        startY = event.clientY;
+        const rect = stickyBar.getBoundingClientRect();
+        startLeft = parseFloat(stickyBar.style.getPropertyValue("--sticky-left")) || ((rect.left + rect.width / 2) / (window.innerWidth || 1)) * 100;
+        startTop = rect.top;
+        stickyHandle.classList.add("is-dragging");
+        window.addEventListener("pointermove", onMove);
+        window.addEventListener("pointerup", onUp, { once: true });
       };
     }
 
