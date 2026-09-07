@@ -116,6 +116,15 @@ class App {
           pop.classList.add("hidden");
         }
       });
+      document.querySelectorAll("[id^='img-motion-menu-']:not(.hidden)").forEach(m => {
+        if (!m.contains(e.target) && !e.target.closest("[onclick*='toggleImageMotionMenu']")) {
+          m.classList.add("hidden");
+        }
+      });
+      const ftbMenu = document.getElementById("ftb-anim-menu");
+      if (ftbMenu && !ftbMenu.classList.contains("hidden") && !ftbMenu.contains(e.target) && !e.target.closest("#ftb-anim-btn")) {
+        ftbMenu.classList.add("hidden");
+      }
     });
 
     // Check URL parameters (e.g. ?demo=proj-esprit-nature)
@@ -180,7 +189,7 @@ class App {
         document.getElementById("cmd-palette-input")?.focus();
       }, 50);
     } else if (state.activeDrawer === "add_section") {
-      modalContainer.innerHTML = renderAddSectionModal(state.currentProject);
+      modalContainer.innerHTML = renderAddSectionModal(state.currentProject, this._addModalTab || "sections");
     } else if (state.activeDrawer === "image_modal") {
       modalContainer.innerHTML = renderImageModal(state);
     } else {
@@ -361,8 +370,29 @@ class App {
     alert("✓ Schema.org (LocalBusiness JSON-LD) copié dans le presse-papier !");
   }
 
-  openAddSectionModal() {
+  openAddSectionModal(tab = "sections") {
+    this._addModalTab = tab;
     state.setDrawer("add_section");
+  }
+
+  switchAddModalTab(tab = "sections") {
+    this._addModalTab = tab;
+    const tabSectionsBtn = document.getElementById("tab-add-sections");
+    const tabComponentsBtn = document.getElementById("tab-add-components");
+    const viewSections = document.getElementById("add-modal-sections-view");
+    const viewComponents = document.getElementById("add-modal-components-view");
+
+    if (tab === "components") {
+      tabSectionsBtn?.classList.remove("is-active");
+      tabComponentsBtn?.classList.add("is-active");
+      viewSections?.classList.add("hidden");
+      viewComponents?.classList.remove("hidden");
+    } else {
+      tabSectionsBtn?.classList.add("is-active");
+      tabComponentsBtn?.classList.remove("is-active");
+      viewSections?.classList.remove("hidden");
+      viewComponents?.classList.add("hidden");
+    }
   }
 
   closeAddSectionModal() {
@@ -603,10 +633,13 @@ class App {
   }
 
   // Actions on Sections
-  selectSection(sectionId) {
+  selectSection(sectionId, options = {}) {
     const alreadySelected = state.selectedSectionId === sectionId;
     state.setSelectedSection(sectionId);
     if (alreadySelected) this.updateSelectedSectionUI();
+    if (options.scroll) {
+      this.scrollToSection(sectionId);
+    }
   }
 
   updateSelectedSectionUI() {
@@ -660,8 +693,6 @@ class App {
       const selectedSec = state.currentProject.sections.find(s => s.id === sectionId) || state.currentProject.sections[0];
       rightInspector.innerHTML = renderInspector(selectedSec, state.currentProject, state);
     }
-    // 5. Instantly scroll visualizer canvas to the selected section
-    this.scrollToSection(sectionId);
   }
 
   scrollSidebarCardIntoView(card) {
@@ -695,25 +726,21 @@ class App {
 
     if (!canvasSec) return false;
 
-    // 1. Native scrollIntoView guarantees viewport alignment across Safari & Chrome
-    try {
-      canvasSec.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" });
-    } catch (e) {
-      if (typeof canvasSec.scrollIntoView === "function") {
-        canvasSec.scrollIntoView(true);
-      }
-    }
-
-    // 2. Also ensure scrollHost (main) scrolls to exact section offset
-    const scrollHost = canvas?.closest("main") || canvas?.parentElement;
+    // Ensure scrollHost (main) scrolls smoothly to section offset without fighting user gestures
+    const scrollHost = canvas?.closest("main") || canvas?.parentElement || document.querySelector("main");
     if (scrollHost && typeof scrollHost.scrollTo === "function") {
       const hostRect = scrollHost.getBoundingClientRect();
       const targetRect = canvasSec.getBoundingClientRect();
-      const targetTop = scrollHost.scrollTop + (targetRect.top - hostRect.top) - 16;
-      scrollHost.scrollTo({
-        top: Math.max(0, targetTop),
-        behavior: "smooth"
-      });
+      
+      // If the section is already comfortably in view, do not jerk the scroll position
+      const isComfortablyVisible = targetRect.top >= hostRect.top + 20 && targetRect.top <= hostRect.bottom - 120;
+      if (!isComfortablyVisible) {
+        const targetTop = scrollHost.scrollTop + (targetRect.top - hostRect.top) - 16;
+        scrollHost.scrollTo({
+          top: Math.max(0, targetTop),
+          behavior: "smooth"
+        });
+      }
     }
 
     canvasSec.classList.remove("section-focus-glow");
@@ -733,13 +760,7 @@ class App {
       this.toggleSectionAccordion(sectionId, event, { skipScroll: true });
     }
 
-    this.selectSection(sectionId);
-    const run = () => this.scrollToSection(sectionId);
-    if (typeof window !== "undefined" && typeof window.requestAnimationFrame === "function") {
-      window.requestAnimationFrame(run);
-    } else {
-      setTimeout(run, 0);
-    }
+    this.selectSection(sectionId, { scroll: true });
   }
 
   toggleSectionAccordion(sectionId, event, options = {}) {
@@ -1393,6 +1414,12 @@ class App {
     const secData = createSectionData(type, variant, trade, project.business);
     state.addSection(secData);
     state.closeDrawer();
+    setTimeout(() => {
+      const newSecId = state.selectedSectionId;
+      if (newSecId) {
+        this.scrollToSection(newSecId);
+      }
+    }, 120);
   }
 
   changeSectionVariant(sectionId, variant) {
@@ -1705,6 +1732,134 @@ class App {
     // Immediate live replay on canvas element
     this.previewSectionMotion(secId, preset);
     this.showToast(`Animation : ${preset === 'none' ? 'Aucune' : preset}`, "info");
+  }
+
+  toggleImageMotionMenu(secId, fieldPath, itemIndex) {
+    const idx = (itemIndex !== null && itemIndex !== undefined && itemIndex !== "null") ? itemIndex : 0;
+    const sanitizedField = String(fieldPath || "").replace(/\./g, "-");
+    const menuId = `img-motion-menu-${secId}-${sanitizedField}-${idx}`;
+    const menu = document.getElementById(menuId);
+    if (!menu) return;
+    const isClosed = menu.classList.contains("hidden");
+    document.querySelectorAll("[id^='img-motion-menu-']:not(.hidden)").forEach(m => m.classList.add("hidden"));
+    if (isClosed) menu.classList.remove("hidden");
+  }
+
+  setImageMotion(secId, fieldPath, itemIndex, preset) {
+    const idx = (itemIndex !== null && itemIndex !== undefined && itemIndex !== "null") ? itemIndex : 0;
+    const sanitizedField = String(fieldPath || "").replace(/\./g, "-");
+    const menuId = `img-motion-menu-${secId}-${sanitizedField}-${idx}`;
+    const menu = document.getElementById(menuId);
+    if (menu) menu.classList.add("hidden");
+
+    if (!state.currentProject) return;
+    const updated = JSON.parse(JSON.stringify(state.currentProject));
+    const sec = updated.sections.find(s => s.id === secId);
+    if (!sec) return;
+
+    sec.settings = sec.settings || {};
+    sec.settings.imageMotions = sec.settings.imageMotions || {};
+    const imgKey = `${fieldPath}_${idx}`;
+    sec.settings.imageMotions[imgKey] = preset === "none" ? "" : preset;
+    state.updateProject(updated, false);
+
+    const secEl = document.getElementById(`section-${secId}`) || document.querySelector(`.editor-section-wrapper[data-section-id="${secId}"]`);
+    const imgEl = secEl?.querySelector(`[data-image-field="${fieldPath}"][data-image-index="${idx}"]`) || secEl?.querySelector("img");
+    if (imgEl) {
+      const motion = preset === "none" ? "" : preset;
+      if (motion) imgEl.setAttribute("data-motion", motion);
+      else imgEl.removeAttribute("data-motion");
+      this.previewElementMotion(imgEl, preset);
+    }
+    this.showToast(`Animation image : ${preset === 'none' ? 'Aucune' : preset}`, "info");
+  }
+
+  toggleTextMotionMenu() {
+    const menu = document.getElementById("ftb-anim-menu");
+    if (menu) menu.classList.toggle("hidden");
+  }
+
+  setActiveTextMotion(preset) {
+    const el = this._activeEditableEl;
+    const menu = document.getElementById("ftb-anim-menu");
+    if (menu) menu.classList.add("hidden");
+    if (!el) return;
+
+    const motion = preset === "none" ? "" : preset;
+    if (motion) {
+      el.setAttribute("data-motion", motion);
+    } else {
+      el.removeAttribute("data-motion");
+    }
+
+    const field = el.getAttribute("data-editable");
+    const secWrapper = el.closest(".editor-section-wrapper");
+    const secId = secWrapper?.getAttribute("data-section-id");
+
+    if (secId && state.currentProject) {
+      const updated = JSON.parse(JSON.stringify(state.currentProject));
+      const sec = updated.sections.find(s => s.id === secId);
+      if (sec) {
+        sec.settings = sec.settings || {};
+        sec.settings.elementMotions = sec.settings.elementMotions || {};
+        sec.settings.elementMotions[field || "text"] = motion;
+        state.updateProject(updated, false);
+      }
+    }
+
+    this.previewElementMotion(el, preset);
+    this.showToast(`Animation texte : ${preset === 'none' ? 'Aucune' : preset}`, "info");
+  }
+
+  previewElementMotion(el, preset) {
+    if (!el) return;
+    const motion = preset === "none" ? "" : preset;
+    if (motion) el.setAttribute("data-motion", motion);
+    el.classList.remove("is-revealed");
+    el.classList.add("motion-preview");
+    void el.offsetWidth;
+    el.classList.add("is-revealed");
+    setTimeout(() => {
+      el.classList.remove("motion-preview");
+      el.classList.add("is-revealed");
+    }, 600);
+  }
+
+  insertQuickComponent(secId, compType) {
+    if (!state.currentProject) return;
+    const updated = JSON.parse(JSON.stringify(state.currentProject));
+    const sec = updated.sections.find(s => s.id === secId);
+    if (!sec) return;
+
+    sec.content = sec.content || {};
+
+    if (compType === "button") {
+      sec.content.secondaryButtonText = "En savoir plus";
+      sec.content.secondaryButtonLink = "#contact";
+      this.showToast("Bouton d'action ajouté avec succès !");
+    } else if (compType === "badge") {
+      const defaultBadge = "🛡️ Artisan Recommandé & Certifié";
+      if (!sec.content.badge) {
+        sec.content.badge = defaultBadge;
+      } else {
+        sec.content.badges = Array.isArray(sec.content.badges) ? sec.content.badges : [sec.content.badge];
+        sec.content.badges.push("✓ Assurance décennale valide");
+      }
+      this.showToast("Badge de confiance inséré !");
+    } else if (compType === "quote") {
+      sec.content.quote = {
+        author: "Client vérifié",
+        text: "Intervention rapide, travail soigné et prix très honnête. Je recommande à 100% !",
+        stars: 5
+      };
+      this.showToast("Citation avis client insérée !");
+    } else if (compType === "separator") {
+      sec.content.hasSeparator = true;
+      this.showToast("Séparateur visuel ajouté !");
+    }
+
+    state.updateProject(updated, true, `Ajout composant rapide (${compType})`);
+    this.selectSection(secId, { scroll: false });
   }
 
   setSectionSplitDirection(secId, direction) {
@@ -2036,6 +2191,11 @@ class App {
   initScrollObserver() {
     const motionElements = document.querySelectorAll("[data-motion]:not([data-motion='none'])");
     if (!motionElements.length) return;
+
+    if (state.currentView === "editor") {
+      motionElements.forEach(el => el.classList.add("is-revealed"));
+      return;
+    }
 
     if (typeof IntersectionObserver === "undefined") {
       motionElements.forEach(el => el.classList.add("is-revealed"));

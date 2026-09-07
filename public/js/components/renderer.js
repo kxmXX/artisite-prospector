@@ -113,6 +113,25 @@ export function renderEditableImage(url, { sectionId = "", fieldPath = "", alt =
           ${getIcon("eye", "w-3.5 h-3.5 text-zinc-700")}
           <span>Remplacer</span>
         </button>
+        <div class="relative inline-block">
+          <button type="button"
+                  onclick="event.stopPropagation(); window.app.toggleImageMotionMenu('${sectionId}', '${fieldPath}', ${indexParam})"
+                  class="btn-keycap btn-keycap-light px-2 py-1.5 text-zinc-900 rounded-lg text-xs font-medium shadow-xs flex items-center gap-1 transition-all"
+                  title="Animer cette image (60fps)">
+            ${getIcon("sparkles", "w-3.5 h-3.5 text-amber-500")}
+            <span>Anim</span>
+          </button>
+          <div id="img-motion-menu-${sectionId}-${String(fieldPath).replace(/\./g, '-')}-${indexParam !== 'null' ? indexParam : '0'}" class="hidden absolute left-0 bottom-full mb-2 w-48 bg-zinc-900/95 backdrop-blur-md border border-white/20 rounded-xl p-2 shadow-2xl z-50 text-white text-[11px]">
+            <div class="text-[9px] font-bold uppercase tracking-wider text-zinc-400 mb-1">Animation Image</div>
+            <div class="grid grid-cols-2 gap-1">
+              <button type="button" onclick="event.stopPropagation(); window.app.setImageMotion('${sectionId}', '${fieldPath}', ${indexParam}, 'zoom-in')" class="motion-chip">Zoom</button>
+              <button type="button" onclick="event.stopPropagation(); window.app.setImageMotion('${sectionId}', '${fieldPath}', ${indexParam}, 'fade-in')" class="motion-chip">Fade</button>
+              <button type="button" onclick="event.stopPropagation(); window.app.setImageMotion('${sectionId}', '${fieldPath}', ${indexParam}, 'spring')" class="motion-chip">Spring</button>
+              <button type="button" onclick="event.stopPropagation(); window.app.setImageMotion('${sectionId}', '${fieldPath}', ${indexParam}, 'shimmer')" class="motion-chip">Shimmer</button>
+              <button type="button" onclick="event.stopPropagation(); window.app.setImageMotion('${sectionId}', '${fieldPath}', ${indexParam}, 'none')" class="motion-chip col-span-2 text-zinc-400">Aucune</button>
+            </div>
+          </div>
+        </div>
         <button type="button"
                 onclick="event.stopPropagation(); window.app.deletePhoto('${sectionId}', '${fieldPath}', ${indexParam})"
                 class="btn-keycap btn-keycap-danger p-1.5 text-white rounded-lg text-xs font-medium shadow-xs flex items-center justify-center transition-all"
@@ -967,16 +986,27 @@ function renderAbout(sec, project, options = {}) {
 
 // 5. Stats
 function renderStats(sec, project) {
-  const c = sec.content;
+  const c = sec.content || {};
+  const city = project.business?.city || "votre secteur";
+  const defaultItems = [
+    { value: "24h", label: "Délai moyen devis", sub: "Étude chiffrée gratuite" },
+    { value: "100%", label: "Satisfaction garantie", sub: "Contrôle qualité systématique" },
+    { value: "10 ans", label: "Garantie décennale", sub: "Assurance professionnelle" },
+    { value: "0 €", label: "Frais de déplacement", sub: `Rayon de 30 km autour de ${city}` }
+  ];
+  const items = (Array.isArray(c.items) && c.items.length > 0)
+    ? c.items
+    : ((Array.isArray(c.stats) && c.stats.length > 0) ? c.stats : defaultItems);
+
   return `
-    <div class="py-14 text-white" style="background-color: var(--primary);">
+    <div class="py-14 text-white shadow-inner" style="background-color: var(--primary);">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center divide-y sm:divide-y-0 sm:divide-x divide-white/15">
-          ${(c.items || []).map((item, idx) => `
-            <div class="p-4">
-              <div class="font-heading text-4xl sm:text-5xl font-extrabold text-white tracking-tight" data-editable="items.${idx}.value">${item.value}</div>
-              <div class="font-bold text-white/90 text-sm mt-2" data-editable="items.${idx}.label">${item.label}</div>
-              <div class="text-xs text-white/70 mt-1" data-editable="items.${idx}.sub">${item.sub}</div>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 text-center divide-y sm:divide-y-0 sm:divide-x divide-white/20">
+          ${items.map((item, idx) => `
+            <div class="p-4 flex flex-col justify-center items-center">
+              <div class="font-heading text-4xl sm:text-5xl font-black text-white tracking-tight leading-none" data-editable="items.${idx}.value">${item.value || '100%'}</div>
+              <div class="font-bold text-white/95 text-sm sm:text-base mt-2.5 leading-snug" data-editable="items.${idx}.label">${item.label || 'Engagement Qualité'}</div>
+              <div class="text-xs text-white/80 mt-1 font-medium leading-normal" data-editable="items.${idx}.sub">${item.sub || 'Service certifié'}</div>
             </div>
           `).join('')}
         </div>

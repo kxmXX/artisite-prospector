@@ -183,7 +183,172 @@ export const SECTION_DEFINITIONS = [
   }
 ];
 
-export function renderAddSectionModal(project) {
+export const COMPONENT_CATALOG_ITEMS = [
+  // 1. Actions
+  {
+    id: "cta-call-direct",
+    family: "action",
+    familyName: "⚡ Actions & Boutons",
+    name: "Bouton d'Appel Direct",
+    description: "Bouton d'appel téléphonique 1-clic avec icône et micro-animation de pulsation.",
+    badge: "P0 • Conversion",
+    icon: "phone",
+    targetSectionType: "cta",
+    variant: "banner-action"
+  },
+  {
+    id: "action-button-group",
+    family: "action",
+    familyName: "⚡ Actions & Boutons",
+    name: "Duo d'Actions (Appel + Devis)",
+    description: "Paire de boutons coordonnés (primaire fort + secondaire neutre).",
+    badge: "P0 • Navigation",
+    icon: "layers",
+    targetSectionType: "hero",
+    variant: "split-image"
+  },
+  // 2. Status & Badges
+  {
+    id: "badge-reassurance",
+    family: "status",
+    familyName: "🏷️ Statuts & Réassurance",
+    name: "Pastilles de Réassurance (RGE, Décennale)",
+    description: "Macarons de confiance légale et certifications artisanales vérifiées.",
+    badge: "P0 • Confiance",
+    icon: "shield",
+    targetSectionType: "certifications",
+    variant: "cards-4"
+  },
+  {
+    id: "badge-emergency-radar",
+    family: "status",
+    familyName: "🏷️ Statuts & Réassurance",
+    name: "Badge Radar Astreinte 24/7",
+    description: "Pastille radar lumineuse clignotante indiquant l'intervention d'urgence.",
+    badge: "P1 • Urgence",
+    icon: "sparkles",
+    targetSectionType: "customBlock",
+    variant: "radarEmergency"
+  },
+  // 3. Content & Cards
+  {
+    id: "content-service-card",
+    family: "content",
+    familyName: "📄 Contenus & Preuves",
+    name: "Carte de Prestation / Service",
+    description: "Encadré de service avec photo 16:10, tag de catégorie et bouton de chiffrage.",
+    badge: "P0 • Métier",
+    icon: "layers",
+    targetSectionType: "services",
+    variant: "cards-grid"
+  },
+  {
+    id: "content-quote",
+    family: "content",
+    familyName: "📄 Contenus & Preuves",
+    name: "Citation / Parole d'Artisan",
+    description: "Mise en avant éditoriale d'un mot du fondateur ou d'un avis client phare.",
+    badge: "P1 • Éditorial",
+    icon: "checkCircle",
+    targetSectionType: "about",
+    variant: "quote-card"
+  },
+  {
+    id: "content-process-steps",
+    family: "content",
+    familyName: "📄 Contenus & Preuves",
+    name: "Parcours en 3 Étapes Numérotées",
+    description: "Explication pas à pas du déroulement du chantier pour rassurer le prospect.",
+    badge: "P1 • Pédagogique",
+    icon: "layers",
+    targetSectionType: "process",
+    variant: "steps-3"
+  },
+  {
+    id: "content-pricing-card",
+    family: "content",
+    familyName: "📄 Contenus & Preuves",
+    name: "Forfaits & Grille Tarifaire",
+    description: "Cartes transparentes de formules packagées avec badge « Recommandé ».",
+    badge: "P1 • Vente",
+    icon: "dollarSign",
+    targetSectionType: "pricing",
+    variant: "cards-3"
+  },
+  // 4. Media
+  {
+    id: "media-before-after",
+    family: "media",
+    familyName: "🖼️ Médias & Interactif",
+    name: "Comparateur Glissant Avant / Après",
+    description: "Curseur tactile glissant montrant la transformation spectaculaire avant/après travaux.",
+    badge: "P0 • Preuve 60fps",
+    icon: "sliders",
+    targetSectionType: "beforeAfter",
+    variant: "interactive-slider"
+  },
+  {
+    id: "media-gallery-lightbox",
+    family: "media",
+    familyName: "🖼️ Médias & Interactif",
+    name: "Mosaïque Galerie avec Lightbox",
+    description: "Grille de photographies 4K plein écran avec agrandissement instantané.",
+    badge: "P0 • Visuel",
+    icon: "eye",
+    targetSectionType: "gallery",
+    variant: "masonry-grid"
+  },
+  // 5. Disclosure
+  {
+    id: "disclosure-faq",
+    family: "disclosure",
+    familyName: "📂 Divulgation & FAQ",
+    name: "Accordéon Fluide (FAQ)",
+    description: "Questions cliquables avec déploiement animé sans allonger la page.",
+    badge: "P0 • Rassurance",
+    icon: "helpCircle",
+    targetSectionType: "faq",
+    variant: "accordion"
+  },
+  // 6. Feedback & Alert
+  {
+    id: "feedback-urgent-banner",
+    family: "feedback",
+    familyName: "🔔 Feedback & Alertes",
+    name: "Bandeau Notification d'Astreinte",
+    description: "Bandeau contrasté en haut de page pour annoncer une permanence ou promo.",
+    badge: "P0 • Notification",
+    icon: "sparkles",
+    targetSectionType: "customBlock",
+    variant: "urgentBanner"
+  },
+  // 7. Navigation
+  {
+    id: "nav-sticky-bar",
+    family: "navigation",
+    familyName: "🗺️ Navigation & Flottant",
+    name: "Barre d'Appel Flottante",
+    description: "Bouton d'appel persistant en bas d'écran avec numéro de téléphone direct.",
+    badge: "P0 • Mobile",
+    icon: "phone",
+    targetSectionType: "header",
+    variant: "sticky-premium"
+  },
+  // 8. Input & Calculator
+  {
+    id: "input-quote-simulator",
+    family: "input",
+    familyName: "📝 Devis & Formulaires",
+    name: "Simulateur Interactif de Devis",
+    description: "Calculateur de devis en 3 clics avec sélection de surface et rappel 24h.",
+    badge: "P0 • Conversion",
+    icon: "dollarSign",
+    targetSectionType: "quoteSimulator",
+    variant: "interactive-calculator"
+  }
+];
+
+export function renderAddSectionModal(project, activeTab = "sections") {
   const sections = project?.sections || [];
 
   return `
@@ -197,8 +362,8 @@ export function renderAddSectionModal(project) {
               ⊞
             </div>
             <div>
-              <div class="text-[10.5px] font-bold uppercase tracking-wider text-zinc-400">Catalogue & Bibliothèque</div>
-              <h2 class="font-bold text-base sm:text-lg text-zinc-950 mt-0.5">Sections Disponibles pour ${project?.business?.name || 'le Site'}</h2>
+              <div class="text-[10.5px] font-bold uppercase tracking-wider text-zinc-400">Bibliothèque & Intelligence Composants</div>
+              <h2 class="font-bold text-base sm:text-lg text-zinc-950 mt-0.5">Composants Disponibles pour ${project?.business?.name || 'le Site'}</h2>
             </div>
           </div>
           <button type="button" onclick="window.app.closeAddSectionModal()" class="p-2 text-zinc-400 hover:text-zinc-800 rounded-lg hover:bg-zinc-100 transition-colors">
@@ -206,11 +371,25 @@ export function renderAddSectionModal(project) {
           </button>
         </div>
 
-        <!-- Section List & Variant Picker with PC Grid Proportions -->
-        <div class="p-6 overflow-y-auto space-y-4 flex-1 text-xs">
+        <!-- Segmented Tab Switcher (Linear / Sendpage style) -->
+        <div class="px-6 pt-3 pb-2 bg-zinc-50 border-b border-zinc-200 flex items-center justify-between flex-shrink-0">
+          <div class="pill-tabs-container max-w-md">
+            <button type="button" id="tab-add-sections" onclick="window.app.switchAddModalTab('sections')" class="pill-tab-btn ${activeTab === 'sections' ? 'is-active' : ''}">
+              <span>📐 Sections Complètes (${SECTION_DEFINITIONS.length})</span>
+            </button>
+            <button type="button" id="tab-add-components" onclick="window.app.switchAddModalTab('components')" class="pill-tab-btn ${activeTab === 'components' ? 'is-active' : ''}">
+              <span>🧩 Composants Individuels (${COMPONENT_CATALOG_ITEMS.length})</span>
+            </button>
+          </div>
+          <div class="text-[11px] text-zinc-500 font-medium hidden sm:block">
+            ${activeTab === 'sections' ? `${sections.length} sections actives sur la page` : 'Composants Add-on calibrés 2026'}
+          </div>
+        </div>
+
+        <!-- Tab 1: Full Sections List -->
+        <div id="add-modal-sections-view" class="p-6 overflow-y-auto space-y-4 flex-1 text-xs ${activeTab === 'sections' ? '' : 'hidden'}">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-1 border-b border-zinc-100 text-zinc-500">
-            <span>Cliquez sur <strong>« Aller à la section »</strong> pour naviguer directement dessus, ou ajoutez de nouvelles sections calibrées pour <strong>${project?.business?.tradeLabel || 'votre artisan'}</strong>.</span>
-            <span class="font-semibold text-zinc-800 flex-shrink-0">${sections.length} sections actives</span>
+            <span>Sélectionnez une section et sa variante pour enrichir le site de <strong>${project?.business?.tradeLabel || 'votre artisan'}</strong>.</span>
           </div>
 
           <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -267,9 +446,47 @@ export function renderAddSectionModal(project) {
           </div>
         </div>
 
+        <!-- Tab 2: Individual Component Intelligence Catalog -->
+        <div id="add-modal-components-view" class="p-6 overflow-y-auto space-y-4 flex-1 text-xs ${activeTab === 'components' ? '' : 'hidden'}">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-1 border-b border-zinc-100 text-zinc-500">
+            <span>Composants certifiés conformes au cahier des charges Add-on Intelligence (Actions, Médias, Divulgation, Statuts).</span>
+          </div>
+
+          <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            ${COMPONENT_CATALOG_ITEMS.map(comp => `
+              <div class="bg-zinc-50/80 hover:bg-white border border-zinc-200 hover:border-zinc-400 rounded-2xl p-4 transition-all space-y-3 flex flex-col justify-between group">
+                <div>
+                  <div class="flex items-center justify-between gap-2 mb-2">
+                    <span class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">${comp.familyName}</span>
+                    <span class="text-[9.5px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold">${comp.badge}</span>
+                  </div>
+                  <div class="flex items-start gap-3">
+                    <div class="w-8 h-8 rounded-xl bg-white border border-zinc-200 text-zinc-800 flex items-center justify-center flex-shrink-0 shadow-2xs">
+                      ${getIcon(comp.icon, "w-4 h-4 text-zinc-700")}
+                    </div>
+                    <div class="min-w-0 flex-1">
+                      <h4 class="font-bold text-xs sm:text-sm text-zinc-900">${comp.name}</h4>
+                      <p class="text-[11px] text-zinc-500 mt-1 leading-relaxed">${comp.description}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="pt-2 border-t border-zinc-200/60">
+                  <button type="button" 
+                          onclick="window.app.handleAddSection('${comp.targetSectionType}', '${comp.variant}')"
+                          class="w-full btn-keycap btn-keycap-dark py-2 rounded-lg text-xs font-semibold text-white shadow-xs flex items-center justify-center gap-1.5">
+                    ${getIcon("plus", "w-3.5 h-3.5")}
+                    <span>+ Insérer ce composant</span>
+                  </button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
         <!-- Footer -->
         <div class="px-6 py-4 bg-zinc-50 border-t border-zinc-200 flex items-center justify-between flex-shrink-0 text-xs text-zinc-500">
-          <span>Sections réorganisables par simple glisser-déposer sur la gauche.</span>
+          <span>Prêt pour l'exportation et 100% conforme WCAG AA.</span>
           <button type="button" onclick="window.app.closeAddSectionModal()" class="btn-keycap btn-keycap-light px-4 py-1.5 rounded-lg font-semibold text-zinc-700 hover:bg-zinc-100">
             Fermer
           </button>
@@ -279,3 +496,4 @@ export function renderAddSectionModal(project) {
     </div>
   `;
 }
+

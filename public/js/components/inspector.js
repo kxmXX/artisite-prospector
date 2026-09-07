@@ -72,6 +72,69 @@ export function renderInspector(section, project, state) {
         </div>
       ` : ''}
 
+      <!-- Animation Suite 60fps -->
+      <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-xl space-y-2.5">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-1.5">
+            <span class="text-amber-500 font-bold">✨</span>
+            <label class="text-[10px] font-bold uppercase tracking-wider text-zinc-700">Animation du Bloc (60fps)</label>
+          </div>
+          <span class="text-[9.5px] font-mono font-semibold px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">
+            ${section.settings?.motionPreset || section.motionPreset || 'aucune'}
+          </span>
+        </div>
+
+        <div class="grid grid-cols-4 gap-1">
+          ${[
+            ['none', 'Aucune'],
+            ['fade-in', 'Fade'],
+            ['slide-up', 'Slide'],
+            ['spring', 'Spring'],
+            ['reveal', 'Reveal'],
+            ['stagger', 'Stagger'],
+            ['shimmer', 'Shimmer'],
+            ['pulse', 'Pulse'],
+            ['magnetic', 'Magnetic'],
+            ['zoom-in', 'Zoom']
+          ].map(([preset, label]) => `
+            <button type="button"
+                    onmouseenter="window.app.previewSectionMotion('${sectionId}', '${preset}')"
+                    onclick="window.app.setSectionMotion('${sectionId}', '${preset}')"
+                    class="py-1 px-1 border rounded text-[10px] font-medium text-center transition-all ${((section.settings?.motionPreset || section.motionPreset || 'none') === preset || (!section.settings?.motionPreset && !section.motionPreset && preset === 'none')) ? 'border-zinc-900 bg-zinc-900 text-white font-semibold shadow-2xs' : 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-400'}">
+              ${label}
+            </button>
+          `).join('')}
+        </div>
+
+        <button type="button"
+                onclick="window.app.previewSectionMotion('${sectionId}', '${section.settings?.motionPreset || section.motionPreset || 'fade-in'}')"
+                class="w-full py-1.5 bg-white hover:bg-zinc-100 text-zinc-800 rounded-lg text-xs font-semibold border border-zinc-200 flex items-center justify-center gap-1.5 shadow-2xs transition-colors">
+          <span>▶ Tester l'animation en direct</span>
+        </button>
+      </div>
+
+      <!-- Quick Component Inserter -->
+      <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-xl space-y-2">
+        <div class="flex items-center justify-between">
+          <label class="text-[10px] font-bold uppercase tracking-wider text-zinc-700">+ Ajouter un élément</label>
+          <button type="button" onclick="window.app.openAddSectionModal('components')" class="text-[10px] font-semibold text-zinc-900 hover:underline">Catalogue complet →</button>
+        </div>
+        <div class="grid grid-cols-2 gap-1 text-[11px]">
+          <button type="button" onclick="window.app.insertQuickComponent('${sectionId}', 'button')" class="py-1.5 px-2 bg-white hover:bg-zinc-100 border border-zinc-200 rounded-lg text-zinc-700 font-medium flex items-center gap-1.5 transition-colors">
+            <span>🔘 Bouton CTA</span>
+          </button>
+          <button type="button" onclick="window.app.insertQuickComponent('${sectionId}', 'badge')" class="py-1.5 px-2 bg-white hover:bg-zinc-100 border border-zinc-200 rounded-lg text-zinc-700 font-medium flex items-center gap-1.5 transition-colors">
+            <span>🏷️ Badge Confiance</span>
+          </button>
+          <button type="button" onclick="window.app.insertQuickComponent('${sectionId}', 'quote')" class="py-1.5 px-2 bg-white hover:bg-zinc-100 border border-zinc-200 rounded-lg text-zinc-700 font-medium flex items-center gap-1.5 transition-colors">
+            <span>💬 Citation Avis</span>
+          </button>
+          <button type="button" onclick="window.app.insertQuickComponent('${sectionId}', 'separator')" class="py-1.5 px-2 bg-white hover:bg-zinc-100 border border-zinc-200 rounded-lg text-zinc-700 font-medium flex items-center gap-1.5 transition-colors">
+            <span>➖ Séparateur</span>
+          </button>
+        </div>
+      </div>
+
       <!-- Quick Fields Form with Live OnInput -->
       <form id="inspector-form" onsubmit="event.preventDefault();" class="space-y-3.5 text-xs">
         

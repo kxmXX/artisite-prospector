@@ -319,8 +319,11 @@ export function renderEditor(state) {
               <button type="button" onclick="window.app.addCanvaElement('customCard')" class="canva-dock-btn" title="Ajouter un encadré d'information">
                 <span>📦 Encadré sur-mesure</span>
               </button>
-              <button type="button" onclick="window.app.openAddSectionModal()" class="canva-dock-btn" title="Ouvrir le catalogue des sections">
-                <span>⊞ Catalogue...</span>
+              <button type="button" onclick="window.app.openAddSectionModal('components')" class="canva-dock-btn" title="Ouvrir la bibliothèque des composants Add-on">
+                <span>🧩 Composants Add-on...</span>
+              </button>
+              <button type="button" onclick="window.app.openAddSectionModal('sections')" class="canva-dock-btn" title="Ouvrir le catalogue des sections complètes">
+                <span>⊞ Sections...</span>
               </button>
             </div>
           `}
@@ -340,6 +343,24 @@ export function renderEditor(state) {
               <button type="button" id="ftb-bold" class="ftb-btn font-bold" title="Mettre en gras (B)">B</button>
               <button type="button" id="ftb-italic" class="ftb-btn italic font-serif" title="Mettre en italique (I)">I</button>
               <button type="button" id="ftb-underline" class="ftb-btn underline" title="Souligner le texte (U)">U</button>
+            </div>
+            <div class="h-3.5 w-[1px] bg-zinc-700 mx-1"></div>
+            <div class="relative inline-block">
+              <button type="button" id="ftb-anim-btn" onclick="window.app.toggleTextMotionMenu()" class="ftb-btn text-amber-400 font-semibold flex items-center gap-1 px-1.5" title="Appliquer une animation à ce texte (60fps)">
+                <span>✨ Anim</span>
+              </button>
+              <div id="ftb-anim-menu" class="hidden absolute left-0 top-full mt-2 w-48 bg-zinc-900/95 backdrop-blur-md border border-white/20 rounded-xl p-2 shadow-2xl z-50 text-white text-[11px]">
+                <div class="text-[9px] font-bold uppercase tracking-wider text-zinc-400 mb-1">Animation Texte</div>
+                <div class="grid grid-cols-2 gap-1">
+                  <button type="button" onclick="window.app.setActiveTextMotion('fade-in')" class="motion-chip">Fade</button>
+                  <button type="button" onclick="window.app.setActiveTextMotion('slide-up')" class="motion-chip">Slide</button>
+                  <button type="button" onclick="window.app.setActiveTextMotion('spring')" class="motion-chip">Spring</button>
+                  <button type="button" onclick="window.app.setActiveTextMotion('pulse')" class="motion-chip">Pulse</button>
+                  <button type="button" onclick="window.app.setActiveTextMotion('shimmer')" class="motion-chip">Shimmer</button>
+                  <button type="button" onclick="window.app.setActiveTextMotion('zoom-in')" class="motion-chip">Zoom</button>
+                  <button type="button" onclick="window.app.setActiveTextMotion('none')" class="motion-chip col-span-2 text-zinc-400">Aucune</button>
+                </div>
+              </div>
             </div>
             <div class="h-3.5 w-[1px] bg-zinc-700 mx-1"></div>
             <button type="button" id="ftb-close" class="ftb-btn text-zinc-400 hover:text-white px-1.5" title="Fermer">✕</button>

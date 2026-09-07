@@ -619,8 +619,477 @@ export const COMPONENT_INTELLIGENCE_REGISTRY = {
     editorControls: [],
     exportable: false,
     priority: 'P1'
+  },
+  stepper: {
+    id: 'stepper',
+    family: 'action',
+    name: 'Incrémenteur numérique (Stepper)',
+    intent: ['numeric-stepper', 'adjust-quantity'],
+    primaryUseCases: ['Ajustement pas à pas d\'une quantité ou d\'une valeur'],
+    avoidWhen: ['Grandes plages de valeurs continues (préférer slider)'],
+    variants: ['inline', 'split'],
+    states: ['default', 'hover', 'focus', 'disabled'],
+    responsivePolicy: { desktop: 'inline-flex', mobile: 'inline-flex' },
+    accessibilityPolicy: { keyboard: true, visibleFocus: true, semanticRole: 'spinbutton', labelRequired: true },
+    compatibleTrades: ['all'],
+    compatiblePageTypes: ['editor', 'landing'],
+    editorControls: ['min', 'max', 'step', 'value'],
+    exportable: true,
+    priority: 'P2'
+  },
+  colorPicker: {
+    id: 'colorPicker',
+    family: 'selection',
+    name: 'Sélecteur de couleur (Color Picker)',
+    intent: ['color-selection'],
+    primaryUseCases: ['Choix d\'une couleur de marque ou de fond de section'],
+    avoidWhen: ['Palette restreinte à 2 couleurs (préférer radios ou switch)'],
+    variants: ['swatches', 'native'],
+    states: ['default', 'hover', 'focus'],
+    responsivePolicy: { desktop: 'inline-block', mobile: 'native-picker' },
+    accessibilityPolicy: { keyboard: true, visibleFocus: true, semanticRole: 'combobox', labelRequired: true },
+    compatibleTrades: ['all'],
+    compatiblePageTypes: ['editor'],
+    editorControls: ['palette', 'value'],
+    exportable: true,
+    priority: 'P3'
+  },
+  dateInput: {
+    id: 'dateInput',
+    family: 'selection',
+    name: 'Champ Date (Date Input)',
+    intent: ['date-entry-text'],
+    primaryUseCases: ['Saisie structurée d\'une date de rendez-vous ou chantier'],
+    avoidWhen: ['Navigation temporelle libre'],
+    variants: ['masked-input'],
+    states: ['default', 'hover', 'focus', 'error'],
+    responsivePolicy: { desktop: 'block', mobile: 'block' },
+    accessibilityPolicy: { keyboard: true, visibleFocus: true, semanticRole: 'textbox', labelRequired: true },
+    compatibleTrades: ['garage', 'coiffeur', 'all'],
+    compatiblePageTypes: ['landing', 'editor'],
+    editorControls: ['label', 'format'],
+    exportable: true,
+    priority: 'P3'
+  },
+  datepicker: {
+    id: 'datepicker',
+    family: 'selection',
+    name: 'Calendrier (Datepicker)',
+    intent: ['visual-calendar-selection'],
+    primaryUseCases: ['Choix visuel d\'une date dans un calendrier de réservation'],
+    avoidWhen: ['Saisie rapide d\'une date de naissance'],
+    variants: ['inline-calendar', 'dropdown-calendar'],
+    states: ['default', 'hover', 'focus'],
+    responsivePolicy: { desktop: 'dropdown', mobile: 'sheet' },
+    accessibilityPolicy: { keyboard: true, visibleFocus: true, semanticRole: 'dialog', labelRequired: true },
+    compatibleTrades: ['garage', 'coiffeur', 'restaurant', 'all'],
+    compatiblePageTypes: ['landing', 'editor'],
+    editorControls: ['minDate', 'maxDate', 'disabledDays'],
+    exportable: true,
+    priority: 'P1'
+  },
+  searchInput: {
+    id: 'searchInput',
+    family: 'input',
+    name: 'Champ de recherche (Search Input)',
+    intent: ['interface-search', 'corpus-filter'],
+    primaryUseCases: ['Recherche dans la palette de commande ⌘K, recherche de section'],
+    avoidWhen: ['Formulaire sans données filtrables'],
+    variants: ['header-search', 'inline-filter'],
+    states: ['default', 'hover', 'focus', 'disabled'],
+    responsivePolicy: { desktop: 'inline-flex', mobile: 'full-width' },
+    accessibilityPolicy: { keyboard: true, visibleFocus: true, semanticRole: 'searchbox', labelRequired: true },
+    compatibleTrades: ['all'],
+    compatiblePageTypes: ['editor', 'dashboard'],
+    editorControls: ['placeholder', 'autoFocus'],
+    exportable: true,
+    priority: 'P1'
+  },
+  fileUpload: {
+    id: 'fileUpload',
+    family: 'input',
+    name: 'Dépôt de fichier (File Upload)',
+    intent: ['file-upload', 'media-attachment'],
+    primaryUseCases: ['Import de photo d\'entreprise ou pièces jointes de devis'],
+    avoidWhen: ['Saisie purement textuelle'],
+    variants: ['dropzone', 'button-upload'],
+    states: ['default', 'hover', 'focus', 'active', 'disabled'],
+    responsivePolicy: { desktop: 'block', mobile: 'block' },
+    accessibilityPolicy: { keyboard: true, visibleFocus: true, semanticRole: 'button', labelRequired: true },
+    compatibleTrades: ['all'],
+    compatiblePageTypes: ['editor', 'landing'],
+    editorControls: ['acceptedFormats', 'maxSize'],
+    exportable: true,
+    priority: 'P1'
+  },
+  richTextEditor: {
+    id: 'richTextEditor',
+    family: 'input',
+    name: 'Éditeur de texte enrichi (Rich Text Editor)',
+    intent: ['rich-text-formatting'],
+    primaryUseCases: ['Édition de paragraphes avec gras, italique et liens'],
+    avoidWhen: ['Saisie simple de nom ou téléphone'],
+    variants: ['minimal-bar', 'full-suite'],
+    states: ['default', 'focus', 'disabled'],
+    responsivePolicy: { desktop: 'block', mobile: 'block' },
+    accessibilityPolicy: { keyboard: true, visibleFocus: true, semanticRole: 'textbox', labelRequired: true },
+    compatibleTrades: ['all'],
+    compatiblePageTypes: ['editor'],
+    editorControls: ['controlsList'],
+    exportable: true,
+    priority: 'P3'
+  },
+  fieldset: {
+    id: 'fieldset',
+    family: 'input',
+    name: 'Groupe de champs (Fieldset)',
+    intent: ['group-related-inputs'],
+    primaryUseCases: ['Regroupement logique de coordonnées ou critères de devis'],
+    avoidWhen: ['Formulaire à champ unique'],
+    variants: ['bordered', 'legend-only'],
+    states: ['default', 'disabled'],
+    responsivePolicy: { desktop: 'block', mobile: 'block' },
+    accessibilityPolicy: { keyboard: false, visibleFocus: false, semanticRole: 'group', labelRequired: true },
+    compatibleTrades: ['all'],
+    compatiblePageTypes: ['landing', 'editor'],
+    editorControls: ['legend'],
+    exportable: true,
+    priority: 'P0'
+  },
+  navigation: {
+    id: 'navigation',
+    family: 'navigation',
+    name: 'Menu de navigation (Navigation)',
+    intent: ['links-container', 'site-browsing'],
+    primaryUseCases: ['Navigation entre les sections du site vitrine'],
+    avoidWhen: ['Page isolée sans sections'],
+    variants: ['horizontal', 'vertical', 'pills'],
+    states: ['default'],
+    responsivePolicy: { desktop: 'horizontal', mobile: 'vertical-drawer' },
+    accessibilityPolicy: { keyboard: true, visibleFocus: true, semanticRole: 'navigation', labelRequired: true },
+    compatibleTrades: ['all'],
+    compatiblePageTypes: ['landing', 'editor'],
+    editorControls: ['links'],
+    exportable: true,
+    priority: 'P0'
+  },
+  breadcrumbs: {
+    id: 'breadcrumbs',
+    family: 'navigation',
+    name: 'Fil d\'Ariane (Breadcrumbs)',
+    intent: ['hierarchical-location', 'backtrack-navigation'],
+    primaryUseCases: ['Navigation hiérarchique sur site à plusieurs niveaux'],
+    avoidWhen: ['Site mono-page simple d\'artisan'],
+    variants: ['slash', 'chevron'],
+    states: ['default'],
+    responsivePolicy: { desktop: 'inline-flex', mobile: 'scroll-horizontal' },
+    accessibilityPolicy: { keyboard: true, visibleFocus: true, semanticRole: 'navigation', labelRequired: true },
+    compatibleTrades: ['all'],
+    compatiblePageTypes: ['dashboard', 'editor'],
+    editorControls: ['items'],
+    exportable: true,
+    priority: 'P1'
+  },
+  pagination: {
+    id: 'pagination',
+    family: 'navigation',
+    name: 'Pagination',
+    intent: ['paged-results-navigation'],
+    primaryUseCases: ['Navigation entre pages de réalisations ou de projets'],
+    avoidWhen: ['Moins de 6 éléments au total'],
+    variants: ['numeric', 'simple-prev-next'],
+    states: ['default', 'active', 'disabled'],
+    responsivePolicy: { desktop: 'inline-flex', mobile: 'compact-prev-next' },
+    accessibilityPolicy: { keyboard: true, visibleFocus: true, semanticRole: 'navigation', labelRequired: true },
+    compatibleTrades: ['all'],
+    compatiblePageTypes: ['dashboard', 'landing'],
+    editorControls: ['totalPages', 'currentPage'],
+    exportable: true,
+    priority: 'P1'
+  },
+  dropdownMenu: {
+    id: 'dropdownMenu',
+    family: 'navigation',
+    name: 'Menu déroulant (Dropdown Menu)',
+    intent: ['context-actions-list'],
+    primaryUseCases: ['Menu d\'actions secondaires d\'export ou de projet'],
+    avoidWhen: ['Sélection de valeur dans un formulaire (préférer select)'],
+    variants: ['compact', 'icon-menu'],
+    states: ['default', 'hover', 'open'],
+    responsivePolicy: { desktop: 'anchored-dropdown', mobile: 'bottom-sheet' },
+    accessibilityPolicy: { keyboard: true, visibleFocus: true, semanticRole: 'menu', labelRequired: true },
+    compatibleTrades: ['all'],
+    compatiblePageTypes: ['editor', 'dashboard'],
+    editorControls: ['items'],
+    exportable: true,
+    priority: 'P0'
+  },
+  skipLink: {
+    id: 'skipLink',
+    family: 'accessibility',
+    name: 'Lien d\'évitement (Skip Link)',
+    intent: ['keyboard-quick-access', 'a11y-skip-nav'],
+    primaryUseCases: ['Accès rapide direct au contenu principal pour navigation clavier WCAG'],
+    avoidWhen: ['Page sans navigation d\'en-tête'],
+    variants: ['floating-on-focus'],
+    states: ['default', 'focus'],
+    responsivePolicy: { desktop: 'sr-only-focusable', mobile: 'sr-only-focusable' },
+    accessibilityPolicy: { keyboard: true, visibleFocus: true, semanticRole: 'link', labelRequired: true },
+    compatibleTrades: ['all'],
+    compatiblePageTypes: ['landing', 'editor'],
+    editorControls: ['targetId'],
+    exportable: true,
+    priority: 'P0'
+  },
+  progressBar: {
+    id: 'progressBar',
+    family: 'feedback',
+    name: 'Barre de progression continue (Progress Bar)',
+    intent: ['continuous-task-progress'],
+    primaryUseCases: ['Jauge de complétion du profil artisan ou quota de chantiers'],
+    avoidWhen: ['Processus séquentiel à étapes discrètes (préférer stepper)'],
+    variants: ['determinate', 'indeterminate'],
+    states: ['default'],
+    responsivePolicy: { desktop: 'block', mobile: 'block' },
+    accessibilityPolicy: { keyboard: false, visibleFocus: false, semanticRole: 'progressbar', labelRequired: true },
+    compatibleTrades: ['all'],
+    compatiblePageTypes: ['editor', 'dashboard', 'landing'],
+    editorControls: ['value', 'max'],
+    exportable: true,
+    priority: 'P1'
+  },
+  spinner: {
+    id: 'spinner',
+    family: 'feedback',
+    name: 'Indicateur de chargement (Spinner)',
+    intent: ['active-process-waiting'],
+    primaryUseCases: ['Indication d\'appel API ou génération IA en cours'],
+    avoidWhen: ['Chargement de structure globale (préférer skeleton)'],
+    variants: ['circle', 'dots'],
+    states: ['default'],
+    responsivePolicy: { desktop: 'inline-block', mobile: 'inline-block' },
+    accessibilityPolicy: { keyboard: false, visibleFocus: false, semanticRole: 'status', labelRequired: true },
+    compatibleTrades: ['all'],
+    compatiblePageTypes: ['editor', 'dashboard'],
+    editorControls: ['size'],
+    exportable: true,
+    priority: 'P0'
+  },
+  rating: {
+    id: 'rating',
+    family: 'status',
+    name: 'Évaluation par étoiles (Rating)',
+    intent: ['customer-score-display', 'interactive-review'],
+    primaryUseCases: ['Affichage de la note Google 5 étoiles et avis vérifiés'],
+    avoidWhen: ['Données sans avis clients'],
+    variants: ['stars-5', 'score-badge'],
+    states: ['default', 'hover'],
+    responsivePolicy: { desktop: 'inline-flex', mobile: 'inline-flex' },
+    accessibilityPolicy: { keyboard: true, visibleFocus: true, semanticRole: 'meter', labelRequired: true },
+    compatibleTrades: ['all'],
+    compatiblePageTypes: ['landing', 'editor'],
+    editorControls: ['score', 'maxScore'],
+    exportable: true,
+    priority: 'P2'
+  },
+  list: {
+    id: 'list',
+    family: 'content',
+    name: 'Liste d\'éléments (List)',
+    intent: ['group-simple-items'],
+    primaryUseCases: ['Liste de points forts, étapes ou avantages'],
+    avoidWhen: ['Entités visuelles riches avec photos et prix (préférer cards)'],
+    variants: ['bullet', 'ordered', 'checklist'],
+    states: ['default'],
+    responsivePolicy: { desktop: 'block', mobile: 'block' },
+    accessibilityPolicy: { keyboard: false, visibleFocus: false, semanticRole: 'list', labelRequired: true },
+    compatibleTrades: ['all'],
+    compatiblePageTypes: ['landing', 'editor'],
+    editorControls: ['items', 'style'],
+    exportable: true,
+    priority: 'P0'
+  },
+  quote: {
+    id: 'quote',
+    family: 'content',
+    name: 'Citation / Témoignage (Quote)',
+    intent: ['highlight-statement', 'social-proof-quote'],
+    primaryUseCases: ['Mise en valeur d\'un mot du fondateur ou d\'un avis phare'],
+    avoidWhen: ['Long corpus d\'avis multiples'],
+    variants: ['pull-quote', 'block-quote'],
+    states: ['default'],
+    responsivePolicy: { desktop: 'block', mobile: 'block' },
+    accessibilityPolicy: { keyboard: false, visibleFocus: false, semanticRole: 'blockquote', labelRequired: true },
+    compatibleTrades: ['paysagiste', 'peintre', 'all'],
+    compatiblePageTypes: ['landing'],
+    editorControls: ['text', 'author'],
+    exportable: true,
+    priority: 'P2'
+  },
+  separator: {
+    id: 'separator',
+    family: 'layout',
+    name: 'Séparateur visuel (Separator)',
+    intent: ['visual-separation'],
+    primaryUseCases: ['Ligne fine de démarcation entre sections'],
+    avoidWhen: ['Séparer des éléments déjà espacés par un stack'],
+    variants: ['horizontal-line', 'decorative-dot'],
+    states: ['default'],
+    responsivePolicy: { desktop: 'block', mobile: 'block' },
+    accessibilityPolicy: { keyboard: false, visibleFocus: false, semanticRole: 'separator', labelRequired: false },
+    compatibleTrades: ['all'],
+    compatiblePageTypes: ['landing', 'editor'],
+    editorControls: ['style', 'spacing'],
+    exportable: true,
+    priority: 'P0'
+  },
+  file: {
+    id: 'file',
+    family: 'content',
+    name: 'Fichier joint (File)',
+    intent: ['downloadable-asset-preview'],
+    primaryUseCases: ['Lien de téléchargement de plaquette PDF ou devis type'],
+    avoidWhen: ['Contenu consultable directement en HTML'],
+    variants: ['card-file', 'inline-link'],
+    states: ['default', 'hover'],
+    responsivePolicy: { desktop: 'inline-flex', mobile: 'block' },
+    accessibilityPolicy: { keyboard: true, visibleFocus: true, semanticRole: 'link', labelRequired: true },
+    compatibleTrades: ['all'],
+    compatiblePageTypes: ['landing', 'editor'],
+    editorControls: ['name', 'size', 'url'],
+    exportable: true,
+    priority: 'P3'
+  },
+  image: {
+    id: 'image',
+    family: 'media',
+    name: 'Image illustrative (Image)',
+    intent: ['visual-illustration'],
+    primaryUseCases: ['Illustration de savoir-faire, outillage ou atelier'],
+    avoidWhen: ['Image sans relation avec le métier de l\'artisan'],
+    variants: ['rounded', 'cover', 'aspect-ratio'],
+    states: ['default'],
+    responsivePolicy: { desktop: 'responsive-img', mobile: 'responsive-img' },
+    accessibilityPolicy: { keyboard: false, visibleFocus: false, semanticRole: 'img', labelRequired: true },
+    compatibleTrades: ['all'],
+    compatiblePageTypes: ['landing', 'editor'],
+    editorControls: ['src', 'alt', 'caption'],
+    exportable: true,
+    priority: 'P0'
+  },
+  video: {
+    id: 'video',
+    family: 'media',
+    name: 'Lecteur vidéo (Video)',
+    intent: ['video-playback', 'interactive-demo'],
+    primaryUseCases: ['Présentation vidéo d\'une réalisation de chantier'],
+    avoidWhen: ['Vidéo lourde auto-play non optimisée'],
+    variants: ['player', 'background-loop'],
+    states: ['default', 'playing', 'paused'],
+    responsivePolicy: { desktop: 'aspect-video', mobile: 'aspect-video' },
+    accessibilityPolicy: { keyboard: true, visibleFocus: true, semanticRole: 'region', labelRequired: true },
+    compatibleTrades: ['all'],
+    compatiblePageTypes: ['landing', 'editor'],
+    editorControls: ['src', 'poster', 'controls'],
+    exportable: true,
+    priority: 'P2'
+  },
+  icon: {
+    id: 'icon',
+    family: 'media',
+    name: 'Icône (Icon)',
+    intent: ['visual-indicator'],
+    primaryUseCases: ['Représentation visuelle compacte d\'un service ou avantage'],
+    avoidWhen: ['Icône seule sans texte explicatif ou aria-label'],
+    variants: ['stroke', 'solid'],
+    states: ['default'],
+    responsivePolicy: { desktop: 'inline-block', mobile: 'inline-block' },
+    accessibilityPolicy: { keyboard: false, visibleFocus: false, semanticRole: 'img', labelRequired: false },
+    compatibleTrades: ['all'],
+    compatiblePageTypes: ['landing', 'editor'],
+    editorControls: ['name', 'size', 'color'],
+    exportable: true,
+    priority: 'P0'
+  },
+  avatar: {
+    id: 'avatar',
+    family: 'media',
+    name: 'Avatar / Portrait (Avatar)',
+    intent: ['user-representation', 'founder-portrait'],
+    primaryUseCases: ['Portrait de l\'artisan fondateur ou avatar d\'avis client'],
+    avoidWhen: ['Image de chantier (préférer image)'],
+    variants: ['circle', 'squircle'],
+    states: ['default'],
+    responsivePolicy: { desktop: 'inline-block', mobile: 'inline-block' },
+    accessibilityPolicy: { keyboard: false, visibleFocus: false, semanticRole: 'img', labelRequired: true },
+    compatibleTrades: ['all'],
+    compatiblePageTypes: ['landing', 'editor'],
+    editorControls: ['src', 'alt', 'size'],
+    exportable: true,
+    priority: 'P2'
+  },
+  stack: {
+    id: 'stack',
+    family: 'layout',
+    name: 'Pile d\'espacement (Stack)',
+    intent: ['consistent-layout-spacing'],
+    primaryUseCases: ['Alignement vertical ou horizontal avec espacement homogène'],
+    avoidWhen: ['Mise en page tabulaire complexe'],
+    variants: ['vertical', 'horizontal'],
+    states: ['default'],
+    responsivePolicy: { desktop: 'flex', mobile: 'flex-col' },
+    accessibilityPolicy: { keyboard: false, visibleFocus: false, semanticRole: 'group', labelRequired: false },
+    compatibleTrades: ['all'],
+    compatiblePageTypes: ['landing', 'editor'],
+    editorControls: ['gap', 'direction'],
+    exportable: true,
+    priority: 'P0'
+  },
+  visuallyHidden: {
+    id: 'visuallyHidden',
+    family: 'accessibility',
+    name: 'Masqué visuellement (Visually Hidden)',
+    intent: ['screen-reader-only-text'],
+    primaryUseCases: ['Titre ou repère pour lecteurs d\'écran sans impact visuel'],
+    avoidWhen: ['Texte devant être lu par tous'],
+    variants: ['sr-only'],
+    states: ['default'],
+    responsivePolicy: { desktop: 'sr-only', mobile: 'sr-only' },
+    accessibilityPolicy: { keyboard: false, visibleFocus: false, labelRequired: true },
+    compatibleTrades: ['all'],
+    compatiblePageTypes: ['all'],
+    editorControls: ['text'],
+    exportable: true,
+    priority: 'P0'
   }
 };
+
+// Enrich all components with default Quality Signals (Section 14) and full Accessibility Policy (Section 13)
+Object.keys(COMPONENT_INTELLIGENCE_REGISTRY).forEach(k => {
+  const comp = COMPONENT_INTELLIGENCE_REGISTRY[k];
+  comp.qualitySignals = {
+    codeExamples: true,
+    openSource: true,
+    usageGuidelines: true,
+    accessibilityDocumented: true,
+    toneOfVoiceDocumented: false,
+    accessibilityIssuesKnown: false,
+    unmaintained: false,
+    researchBacked: true,
+    ...(comp.qualitySignals || {})
+  };
+  comp.accessibilityPolicy = {
+    keyboard: true,
+    visibleFocus: true,
+    semanticRole: 'region',
+    labelRequired: true,
+    descriptionSupported: true,
+    reducedMotion: true,
+    contrastValidation: true,
+    screenReaderBehavior: ['readable'],
+    ...(comp.accessibilityPolicy || {})
+  };
+});
 
 // ============================================================================
 // 2. MOTEUR DE DÉCISION & RÈGLES DE SÉLECTION (Sections 4 & 5)
@@ -1007,6 +1476,30 @@ export function detectAntiPatterns(componentList, context = {}) {
     });
   }
 
+  // 4. Dead action
+  if (context.hasDeadActions || (Array.isArray(context.elements) && context.elements.some(el => (el.type === 'button' || el.type === 'link') && (!el.content?.label && !el.content?.text)))) {
+    flagged.push({
+      pattern: 'dead-action',
+      message: 'Bouton ou lien orphelin sans libellé textuel clair : risque d\'abandon de conversion.'
+    });
+  }
+
+  // 5. Nested drawers
+  if (componentList.filter(c => c === 'drawer').length > 1 || context.nestedDrawers) {
+    flagged.push({
+      pattern: 'nested-drawers',
+      message: 'Tiroirs imbriqués : risque d\'incohérence spatiale et de conflit de z-index sur mobile.'
+    });
+  }
+
+  // 6. Low contrast chip
+  if (context.lowContrastChips || (Array.isArray(context.elements) && context.elements.some(el => el.type === 'chip' && el.contrastRatio && el.contrastRatio < 4.5))) {
+    flagged.push({
+      pattern: 'low-contrast-chip',
+      message: 'Pastille ou chip à faible contraste (< 4.5:1) : non conforme WCAG AA.'
+    });
+  }
+
   return flagged;
 }
 
@@ -1098,3 +1591,92 @@ export function copilotComponentReasoning(userRequest, tradeId) {
     reasoning: `INTENTION: Valorisation métier recommandée pour ${trade.name}.`
   };
 }
+
+// ============================================================================
+// 10. RECOMMANDATION PAR CONTEXTE & VALIDATION EXPORT (Sections 10 & 19)
+// ============================================================================
+
+export function recommendComponentForContext(context = {}) {
+  const { family, intent, tradeId = 'paysagiste', pageType = 'landing', optionCount, isBinary, isImmediate, isSearchable, depth } = context;
+
+  if (family === 'action') {
+    return ComponentSelectionEngine.recommendActionComponent({
+      isPrimary: intent === 'primary',
+      isSecondary: intent === 'secondary',
+      isTertiary: intent === 'tertiary',
+      isGrouped: intent === 'grouped'
+    });
+  }
+  if (family === 'selection') {
+    if (isBinary) {
+      return ComponentSelectionEngine.recommendMultipleChoiceComponent({
+        isBinary: true,
+        isImmediateStateChange: isImmediate
+      });
+    }
+    return ComponentSelectionEngine.recommendSelectionComponent({
+      optionCount: optionCount || 3,
+      isSearchable,
+      needComparison: true
+    });
+  }
+  if (family === 'navigation') {
+    return ComponentSelectionEngine.recommendNavigationComponent({
+      isGlobal: intent === 'global',
+      isSameContext: intent === 'contextual',
+      depth
+    });
+  }
+  if (family === 'disclosure' || family === 'content') {
+    return ComponentSelectionEngine.recommendDenseContentComponent({
+      isCollapsibleSecondary: intent === 'faq',
+      isSteps: intent === 'steps',
+      isDiscreteEntities: true
+    });
+  }
+  if (family === 'feedback') {
+    return ComponentSelectionEngine.recommendFeedbackComponent({
+      isImportantPersistent: intent === 'urgent',
+      isTemporaryConfirmation: intent === 'toast',
+      isCompactStatus: intent === 'badge'
+    });
+  }
+  if (family === 'overlay') {
+    return ComponentSelectionEngine.recommendOverlayComponent({
+      mustBlockDecision: intent === 'blocking',
+      isSecondaryContext: intent === 'drawer',
+      isLocalDetail: true
+    });
+  }
+
+  const trade = getRecommendedComponentsForTrade(tradeId);
+  const primaryId = trade.priorityComponents[0] || 'card';
+  return {
+    component: primaryId,
+    family: COMPONENT_INTELLIGENCE_REGISTRY[primaryId]?.family || 'content',
+    confidence: calculateComponentConfidence(primaryId, { tradeId, pageType })
+  };
+}
+
+export function validateExportableComponents(componentList = []) {
+  const nonExportable = [];
+  let exportableCount = 0;
+
+  for (const item of componentList) {
+    const compId = typeof item === 'string' ? item : item?.type;
+    const def = COMPONENT_INTELLIGENCE_REGISTRY[compId];
+    if (!def || def.exportable === false) {
+      nonExportable.push(compId);
+    } else {
+      exportableCount++;
+    }
+  }
+
+  return {
+    valid: nonExportable.length === 0,
+    nonExportable,
+    exportableCount,
+    totalChecked: componentList.length
+  };
+}
+

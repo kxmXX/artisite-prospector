@@ -14,10 +14,15 @@ import {
   calculateComponentConfidence,
   detectAntiPatterns,
   createComponentInstance,
-  copilotComponentReasoning
+  copilotComponentReasoning,
+  recommendComponentForContext,
+  validateExportableComponents
 } from "../public/js/engine/componentIntelligence.js";
 import { renderInspector } from "../public/js/components/inspector.js";
 import { generateSite } from "../public/js/engine/generator.js";
+import { renderAddSectionModal, COMPONENT_CATALOG_ITEMS } from "../public/js/components/addSectionModal.js";
+import { renderEditor } from "../public/js/components/editor.js";
+import { state } from "../public/js/state.js";
 
 test("Component Intelligence: Canonical Families and Registry Integrity", () => {
   assert.equal(COMPONENT_FAMILIES.length, 12);
@@ -279,3 +284,133 @@ test("Component Intelligence: Inspector panel integrates Component Intelligence 
   assert.ok(inspectorHtml.includes("Tag Analytics:"), "Le tag analytics doit être présent");
   assert.ok(inspectorHtml.includes("track-hero"), "Le tag track-hero doit être présent");
 });
+
+test("Component Intelligence: recommendComponentForContext and validateExportableComponents", () => {
+  // recommendComponentForContext for action
+  const recAction = recommendComponentForContext({ family: "action", intent: "primary" });
+  assert.equal(recAction.component, "button");
+  assert.equal(recAction.variant, "primary");
+
+  // recommendComponentForContext for binary selection
+  const recBinary = recommendComponentForContext({ family: "selection", isBinary: true, isImmediate: true });
+  assert.equal(recBinary.component, "toggle");
+
+  // recommendComponentForContext for disclosure/content FAQ
+  const recFaq = recommendComponentForContext({ family: "disclosure", intent: "faq" });
+  assert.equal(recFaq.component, "accordion");
+
+  // validateExportableComponents on valid list
+  const validExport = validateExportableComponents(["button", "hero", "card", "accordion"]);
+  assert.equal(validExport.valid, true);
+  assert.equal(validExport.nonExportable.length, 0);
+  assert.equal(validExport.exportableCount, 4);
+
+  // validateExportableComponents on invalid list
+  const invalidExport = validateExportableComponents(["button", "nonExistentComponentXYZ"]);
+  assert.equal(invalidExport.valid, false);
+  assert.ok(invalidExport.nonExportable.includes("nonExistentComponentXYZ"));
+});
+
+test("Component Intelligence: Anti-Patterns All 6 Variants Detected", () => {
+  // 1. component-dumping
+  const dumping = detectAntiPatterns(new Array(16).fill("card"), { pageType: "landing" });
+  assert.ok(dumping.some(p => p.pattern === "component-dumping"));
+
+  // 2. modal-inflation
+  const modalInflation = detectAntiPatterns(["modal", "modal", "modal"], { pageType: "landing" });
+  assert.ok(modalInflation.some(p => p.pattern === "modal-inflation"));
+
+  // 3. fake-complexity
+  const fakeComplex = detectAntiPatterns(["hero", "table"], { pageType: "landing" });
+  assert.ok(fakeComplex.some(p => p.pattern === "fake-complexity"));
+
+  // 4. dead-action
+  const deadAction = detectAntiPatterns(["button"], { elements: [{ type: "button", content: {} }] });
+  assert.ok(deadAction.some(p => p.pattern === "dead-action"));
+
+  // 5. nested-drawers
+  const nestedDrawers = detectAntiPatterns(["drawer", "drawer"]);
+  assert.ok(nestedDrawers.some(p => p.pattern === "nested-drawers"));
+
+  // 6. low-contrast-chip
+  const lowContrast = detectAntiPatterns(["chip"], { elements: [{ type: "chip", contrastRatio: 3.1 }] });
+  assert.ok(lowContrast.some(p => p.pattern === "low-contrast-chip"));
+});
+
+test("Component Intelligence: Modal Segmented Tabs and 1-Click Insertion Catalog", () => {
+  const project = generateSite({ name: "Jardins de France", tradeId: "paysagiste" });
+
+  // 1. Sections tab default view
+  const modalHtmlSections = renderAddSectionModal(project, "sections");
+  assert.ok(modalHtmlSections.includes("tab-add-sections"));
+  assert.ok(modalHtmlSections.includes("tab-add-components"));
+  assert.ok(modalHtmlSections.includes("is-active"));
+  assert.ok(modalHtmlSections.includes("Sections Complètes"));
+
+  // 2. Components tab view
+  const modalHtmlComponents = renderAddSectionModal(project, "components");
+  assert.ok(modalHtmlComponents.includes("Composants Individuels"));
+  assert.ok(modalHtmlComponents.includes("+ Insérer ce composant"));
+  assert.ok(COMPONENT_CATALOG_ITEMS.length >= 8, "Le catalogue doit contenir au moins 8 composants add-on majeurs");
+
+  // Verify key families are present
+  const families = COMPONENT_CATALOG_ITEMS.map(c => c.family);
+  assert.ok(families.includes("action"));
+  assert.ok(families.includes("status"));
+  assert.ok(families.includes("content"));
+  assert.ok(families.includes("media"));
+  assert.ok(families.includes("disclosure"));
+  assert.ok(families.includes("feedback"));
+  assert.ok(families.includes("navigation"));
+  assert.ok(families.includes("input"));
+});
+
+test("Component Intelligence: Inspector Animation Suite and Quick Component Inserter", () => {
+  const site = generateSite({ name: "Plomberie Express", tradeId: "plombier" });
+  const heroSec = site.sections.find(s => s.type === "hero");
+  const inspectorHtml = renderInspector(heroSec, site, {});
+
+  // 1. Animation suite
+  assert.ok(inspectorHtml.includes("Animation du Bloc (60fps)"));
+  assert.ok(inspectorHtml.includes("Tester l'animation en direct"));
+  assert.ok(inspectorHtml.includes("fade-in"));
+  assert.ok(inspectorHtml.includes("slide-up"));
+  assert.ok(inspectorHtml.includes("spring"));
+  assert.ok(inspectorHtml.includes("pulse"));
+
+  // 2. Quick element adder
+  assert.ok(inspectorHtml.includes("+ Ajouter un élément"));
+  assert.ok(inspectorHtml.includes("Bouton CTA"));
+  assert.ok(inspectorHtml.includes("Badge Confiance"));
+  assert.ok(inspectorHtml.includes("Citation Avis"));
+  assert.ok(inspectorHtml.includes("Séparateur"));
+});
+
+test("Component Intelligence: Editor Floating Text Toolbar and Canva Dock", () => {
+  const site = generateSite({ name: "Artisite Demo", tradeId: "paysagiste" });
+  state.currentProject = site;
+  state.selectedSectionId = site.sections[0].id;
+  state.activeSidebarTab = "sections";
+  state.viewportMode = "desktop";
+  state.editorMode = "conception";
+
+  const editorHtml = renderEditor(state);
+
+  // 1. Floating text toolbar with continuous slider and animation menu
+  assert.ok(editorHtml.includes("floating-text-toolbar"));
+  assert.ok(editorHtml.includes("ftb-font-slider"));
+  assert.ok(editorHtml.includes("ftb-bold"));
+  assert.ok(editorHtml.includes("ftb-italic"));
+  assert.ok(editorHtml.includes("ftb-underline"));
+  assert.ok(editorHtml.includes("ftb-anim-btn"));
+  assert.ok(editorHtml.includes("ftb-anim-menu"));
+
+  // 2. Canva dock with direct add-on components and full sections links
+  assert.ok(editorHtml.includes("canva-floating-dock"));
+  assert.ok(editorHtml.includes("Bandeau promo"));
+  assert.ok(editorHtml.includes("Badge réassurance"));
+  assert.ok(editorHtml.includes("Composants Add-on..."));
+  assert.ok(editorHtml.includes("Sections..."));
+});
+
+
