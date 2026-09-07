@@ -598,7 +598,7 @@ body {
   position: absolute !important;
   top: 10px !important;
   right: 16px !important;
-  z-index: 45 !important;
+  z-index: 65 !important;
   display: flex !important;
   flex-direction: row !important;
   align-items: center !important;
@@ -616,23 +616,34 @@ body {
   transition: opacity 0.15s ease, transform 0.15s ease !important;
 }
 
-.editor-section-wrapper:hover .editor-section-toolbar {
+.editor-section-wrapper:hover .editor-section-toolbar,
+.editor-section-wrapper.is-active-section .editor-section-toolbar {
   opacity: 1 !important;
   pointer-events: auto !important;
   transform: translateY(0) !important;
+}
+
+/* Ensure editor section containers never clip floating toolbars or popovers */
+.editor-section-wrapper,
+.editor-section-wrapper .overflow-hidden,
+.editor-section-wrapper [class*="overflow-hidden"] {
+  overflow: visible !important;
 }
 
 .btn-sec-ctrl {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
+  width: auto;
+  min-width: 26px;
   height: 26px;
+  padding: 0 6px;
   border-radius: 6px;
   background: transparent;
   color: #a1a1aa;
   border: 1px solid transparent;
   cursor: pointer;
+  font-size: 11px;
   transition: all 0.12s ease;
 }
 .btn-sec-ctrl:hover {
@@ -650,11 +661,19 @@ body {
   border-color: #ef4444;
   box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
 }
+.sec-ctrl-text {
+  margin-left: 2px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
 
 /* Hide all editor toolbars & chrome in Live Client Preview mode */
 .client-preview-mode .editor-section-toolbar,
 .client-preview-mode .canva-dock,
 .client-preview-mode .cta-context-popover,
+.client-preview-mode .cta-direct-badge,
+.client-preview-mode .floating-text-toolbar,
 .client-preview-mode .btn-sec-ctrl {
   display: none !important;
 }
@@ -1128,6 +1147,111 @@ input, textarea, select, [contenteditable] {
   color: #ffffff;
   border-color: #ef4444;
   box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+}
+
+/* Direct Action Badge on Every CTA (Tactile, immediate, never clipped) */
+.cta-direct-badge {
+  position: absolute;
+  top: -12px;
+  right: -8px;
+  z-index: 70;
+  display: inline-flex;
+  align-items: center;
+  gap: 2.5px;
+  padding: 2.5px 5px;
+  background: #18181b;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 9999px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  pointer-events: auto;
+  opacity: 0.9;
+  transition: all 0.15s ease;
+}
+
+.cta-button-wrapper:hover .cta-direct-badge,
+.cta-button-wrapper:focus-within .cta-direct-badge,
+.cta-button-wrapper.is-active .cta-direct-badge {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+.cta-direct-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 4px;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 700;
+  background: #27272a;
+  color: #f4f4f5;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  line-height: 1;
+  transition: all 0.12s ease;
+}
+
+.cta-direct-btn:hover {
+  background: #3f3f46;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.cta-direct-btn.cta-direct-del {
+  color: #f87171;
+  font-size: 11px;
+}
+
+.cta-direct-btn.cta-direct-del:hover {
+  background: #dc2626;
+  color: #ffffff;
+  border-color: #ef4444;
+}
+
+/* Floating In-Canvas Text Toolbar ("Monter / Agrandir les textes") */
+.floating-text-toolbar {
+  position: absolute;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 4px 8px;
+  background: #18181b;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 9999px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.2);
+  font-size: 11px;
+  pointer-events: auto;
+  white-space: nowrap;
+}
+
+.ftb-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 7px;
+  border-radius: 6px;
+  background: #27272a;
+  color: #e4e4e7;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.ftb-btn:hover {
+  background: #3f3f46;
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-0.5px);
+}
+
+.ftb-btn:active {
+  transform: translateY(1px);
 }
 
 /* Floating Toast Notification (Undo/Redo / Feedback) */

@@ -325,6 +325,29 @@ export function renderEditor(state) {
             </div>
           `}
 
+          <!-- In-Canvas Floating Text Toolbar ("Monter / Descendre les textes & Tailles") -->
+          <div id="floating-text-toolbar" class="floating-text-toolbar" style="display: none;" role="toolbar" aria-label="Formatage du texte" onclick="event.stopPropagation();">
+            <div class="flex items-center gap-1">
+              <button type="button" id="ftb-move-up" class="ftb-btn" title="Monter cette section (↑)">
+                ${getIcon("chevronUp", "w-3 h-3")}
+                <span>Monter</span>
+              </button>
+              <button type="button" id="ftb-move-down" class="ftb-btn" title="Descendre cette section (↓)">
+                ${getIcon("chevronDown", "w-3 h-3")}
+                <span>Descendre</span>
+              </button>
+            </div>
+            <div class="h-3.5 w-[1px] bg-zinc-700 mx-0.5"></div>
+            <div class="flex items-center gap-1">
+              <span class="text-[9px] uppercase font-bold text-zinc-400 mr-0.5">Texte:</span>
+              <button type="button" id="ftb-font-down" class="ftb-btn font-bold" title="Réduire taille texte">A-</button>
+              <button type="button" id="ftb-font-up" class="ftb-btn font-bold" title="Agrandir taille texte">A+</button>
+              <button type="button" id="ftb-bold" class="ftb-btn font-bold" title="Gras / Normal">B</button>
+            </div>
+            <div class="h-3.5 w-[1px] bg-zinc-700 mx-0.5"></div>
+            <button type="button" id="ftb-close" class="ftb-btn text-zinc-400 hover:text-white px-1.5" title="Fermer">✕</button>
+          </div>
+
           <div class="transition-all duration-300 ${viewportWidthClass} ${isLivePreview ? 'client-preview-mode' : ''} bg-white min-h-full mt-3" id="canvas-container">
             ${websiteHTML}
           </div>
@@ -387,6 +410,31 @@ function renderSectionAccordionContent(sec, project, variants) {
   return `
     <div class="space-y-3">
 
+      <!-- Section Quick Action Bar: Monter, Descendre, Masquer, Dupliquer, Supprimer -->
+      <div class="flex items-center justify-between gap-1.5 p-1.5 bg-zinc-100/90 rounded-lg border border-zinc-200">
+        <div class="flex items-center gap-1">
+          <button type="button" onclick="window.app.moveSection('${sectionId}', 'up')" class="btn-keycap btn-keycap-light py-1 px-2.5 text-[10.5px] font-bold text-zinc-800 rounded flex items-center gap-1 border border-zinc-200 shadow-2xs" title="Monter cette section (↑)">
+            ${getIcon("chevronUp", "w-3.5 h-3.5")}
+            <span>Monter</span>
+          </button>
+          <button type="button" onclick="window.app.moveSection('${sectionId}', 'down')" class="btn-keycap btn-keycap-light py-1 px-2.5 text-[10.5px] font-bold text-zinc-800 rounded flex items-center gap-1 border border-zinc-200 shadow-2xs" title="Descendre cette section (↓)">
+            ${getIcon("chevronDown", "w-3.5 h-3.5")}
+            <span>Descendre</span>
+          </button>
+        </div>
+        <div class="flex items-center gap-1">
+          <button type="button" onclick="window.app.toggleSectionVisibility('${sectionId}')" class="btn-keycap btn-keycap-light p-1.5 text-zinc-700 rounded border border-zinc-200 shadow-2xs" title="${sec.visibility !== false ? 'Masquer la section' : 'Afficher la section'}">
+            ${getIcon(sec.visibility !== false ? "eye" : "eyeOff", "w-3.5 h-3.5")}
+          </button>
+          <button type="button" onclick="window.app.duplicateSection('${sectionId}')" class="btn-keycap btn-keycap-light p-1.5 text-zinc-700 rounded border border-zinc-200 shadow-2xs" title="Dupliquer la section">
+            ${getIcon("copy", "w-3.5 h-3.5")}
+          </button>
+          <button type="button" onclick="window.app.deleteSection('${sectionId}')" class="btn-keycap btn-keycap-danger p-1.5 text-red-600 rounded border border-red-200 shadow-2xs" title="Supprimer la section">
+            ${getIcon("trash", "w-3.5 h-3.5")}
+          </button>
+        </div>
+      </div>
+
       <!-- Variant Selector if available -->
       ${variants.length > 1 ? `
         <div>
@@ -413,8 +461,15 @@ function renderSectionAccordionContent(sec, project, variants) {
 
       <!-- Titre principal -->
       ${c.title !== undefined ? `
-        <div>
-          <label class="block text-[10px] font-medium text-zinc-500 mb-1">Titre principal :</label>
+        <div class="space-y-1">
+          <div class="flex items-center justify-between">
+            <label class="block text-[10px] font-medium text-zinc-500">Titre principal :</label>
+            <div class="flex items-center gap-1">
+              <span class="text-[9.5px] text-zinc-400 font-bold uppercase">Taille:</span>
+              <button type="button" onclick="window.app.adjustFieldFontSize('${sectionId}', 'title', -2)" class="text-zinc-700 hover:text-zinc-900 font-bold text-[10px] bg-zinc-100 hover:bg-zinc-200 px-1.5 py-0.5 rounded border border-zinc-200" title="Réduire la taille du titre">A-</button>
+              <button type="button" onclick="window.app.adjustFieldFontSize('${sectionId}', 'title', 2)" class="text-zinc-700 hover:text-zinc-900 font-bold text-[10px] bg-zinc-100 hover:bg-zinc-200 px-1.5 py-0.5 rounded border border-zinc-200" title="Agrandir la taille du titre">A+</button>
+            </div>
+          </div>
           <textarea rows="2"
                     data-field="title"
                     oninput="window.app.liveUpdateField('${sectionId}', 'title', this.value)"
@@ -425,8 +480,15 @@ function renderSectionAccordionContent(sec, project, variants) {
 
       <!-- Sous-titre / Descriptif -->
       ${c.subtitle !== undefined ? `
-        <div>
-          <label class="block text-[10px] font-medium text-zinc-500 mb-1">Sous-titre :</label>
+        <div class="space-y-1">
+          <div class="flex items-center justify-between">
+            <label class="block text-[10px] font-medium text-zinc-500">Sous-titre :</label>
+            <div class="flex items-center gap-1">
+              <span class="text-[9.5px] text-zinc-400 font-bold uppercase">Taille:</span>
+              <button type="button" onclick="window.app.adjustFieldFontSize('${sectionId}', 'subtitle', -1.5)" class="text-zinc-700 hover:text-zinc-900 font-bold text-[10px] bg-zinc-100 hover:bg-zinc-200 px-1.5 py-0.5 rounded border border-zinc-200" title="Réduire la taille du sous-titre">A-</button>
+              <button type="button" onclick="window.app.adjustFieldFontSize('${sectionId}', 'subtitle', 1.5)" class="text-zinc-700 hover:text-zinc-900 font-bold text-[10px] bg-zinc-100 hover:bg-zinc-200 px-1.5 py-0.5 rounded border border-zinc-200" title="Agrandir la taille du sous-titre">A+</button>
+            </div>
+          </div>
           <textarea rows="2"
                     data-field="subtitle"
                     oninput="window.app.liveUpdateField('${sectionId}', 'subtitle', this.value)"
@@ -519,27 +581,91 @@ function renderSectionAccordionContent(sec, project, variants) {
         </div>
       ` : ''}
 
-      <!-- CTA Buttons -->
-      ${c.ctaPrimary !== undefined ? `
-        <div class="grid grid-cols-2 gap-2 pt-1 border-t border-zinc-200/60">
-          <div>
-            <label class="block text-[10px] text-zinc-500 mb-1">Bouton 1 :</label>
-            <input type="text" value="${escapeHtml(c.ctaPrimary)}"
-                   data-field="ctaPrimary"
-                   oninput="window.app.liveUpdateField('${sectionId}', 'ctaPrimary', this.value)"
-                   onchange="window.app.commitFieldUpdate('${sectionId}', 'ctaPrimary', this.value)"
-                   class="w-full bg-white border border-zinc-200 rounded-md px-2 py-1 text-xs text-zinc-900 focus:border-zinc-900 focus:outline-none">
-          </div>
-          ${c.ctaSecondary !== undefined ? `
-            <div>
-              <label class="block text-[10px] text-zinc-500 mb-1">Bouton 2 :</label>
-              <input type="text" value="${escapeHtml(c.ctaSecondary)}"
-                     data-field="ctaSecondary"
-                     oninput="window.app.liveUpdateField('${sectionId}', 'ctaSecondary', this.value)"
-                     onchange="window.app.commitFieldUpdate('${sectionId}', 'ctaSecondary', this.value)"
-                     class="w-full bg-white border border-zinc-200 rounded-md px-2 py-1 text-xs text-zinc-900 focus:border-zinc-900 focus:outline-none">
-            </div>
-          ` : ''}
+      <!-- CTA Buttons Management (Edit, Delete, Restore) -->
+      ${c.ctaPrimary !== undefined || c.ctaSecondary !== undefined ? `
+        <div class="space-y-2 pt-2 border-t border-zinc-200/60">
+          <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Boutons d'Appel à l'Action :</label>
+
+          ${c.ctaPrimary !== undefined ? (() => {
+            const isPrimaryHidden = sec.settings && (
+              sec.settings["primary-visible"] === false ||
+              sec.settings["btn-primary-visible"] === false ||
+              sec.settings["ctaPrimary-visible"] === false ||
+              sec.settings["btn-hero-primary-visible"] === false ||
+              (Array.isArray(sec.settings.hiddenButtons) && sec.settings.hiddenButtons.includes("primary"))
+            );
+            return `
+              <div class="p-2 rounded-lg bg-zinc-50 border border-zinc-200 space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-bold text-zinc-700 uppercase">Bouton Principal</span>
+                  ${isPrimaryHidden ? `
+                    <button type="button" onclick="window.app.restoreButton('${sectionId}', 'primary')" class="text-emerald-700 hover:text-emerald-800 font-semibold text-[10.5px] bg-emerald-50 hover:bg-emerald-100 px-2 py-0.5 rounded border border-emerald-300 flex items-center gap-1 transition-colors">
+                      <span>🔄 Restaurer</span>
+                    </button>
+                  ` : `
+                    <div class="flex items-center gap-1">
+                      <button type="button" onclick="window.app.adjustButtonFontSize(-1)" class="text-zinc-600 hover:text-zinc-900 font-bold text-[10px] bg-white px-1.5 py-0.5 rounded border border-zinc-200" title="Réduire taille texte bouton">A-</button>
+                      <button type="button" onclick="window.app.adjustButtonFontSize(1)" class="text-zinc-600 hover:text-zinc-900 font-bold text-[10px] bg-white px-1.5 py-0.5 rounded border border-zinc-200" title="Agrandir taille texte bouton">A+</button>
+                      <button type="button" onclick="window.app.deleteButton('${sectionId}', 'primary')" class="text-red-600 hover:text-red-700 font-semibold text-[10px] bg-red-50 hover:bg-red-100 px-2 py-0.5 rounded border border-red-200 flex items-center gap-0.5 transition-colors" title="Supprimer ce bouton">
+                        <span>🗑️ Supprimer</span>
+                      </button>
+                    </div>
+                  `}
+                </div>
+                ${isPrimaryHidden ? `
+                  <div class="text-[11px] text-zinc-400 italic py-0.5">Ce bouton est actuellement masqué sur la page.</div>
+                ` : `
+                  <input type="text" value="${escapeHtml(c.ctaPrimary)}"
+                         data-field="ctaPrimary"
+                         placeholder="Texte du bouton principal"
+                         oninput="window.app.liveUpdateField('${sectionId}', 'ctaPrimary', this.value)"
+                         onchange="window.app.commitFieldUpdate('${sectionId}', 'ctaPrimary', this.value)"
+                         class="w-full bg-white border border-zinc-200 rounded-md px-2 py-1 text-xs text-zinc-900 focus:border-zinc-900 focus:outline-none">
+                `}
+              </div>
+            `;
+          })() : ''}
+
+          ${c.ctaSecondary !== undefined ? (() => {
+            const isSecondaryHidden = sec.settings && (
+              sec.settings["phone-visible"] === false ||
+              sec.settings["secondary-visible"] === false ||
+              sec.settings["btn-phone-visible"] === false ||
+              sec.settings["ctaSecondary-visible"] === false ||
+              sec.settings["btn-hero-phone-visible"] === false ||
+              (Array.isArray(sec.settings.hiddenButtons) && sec.settings.hiddenButtons.includes("phone"))
+            );
+            return `
+              <div class="p-2 rounded-lg bg-zinc-50 border border-zinc-200 space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-bold text-zinc-700 uppercase">Bouton Secondaire</span>
+                  ${isSecondaryHidden ? `
+                    <button type="button" onclick="window.app.restoreButton('${sectionId}', 'phone')" class="text-emerald-700 hover:text-emerald-800 font-semibold text-[10.5px] bg-emerald-50 hover:bg-emerald-100 px-2 py-0.5 rounded border border-emerald-300 flex items-center gap-1 transition-colors">
+                      <span>🔄 Restaurer</span>
+                    </button>
+                  ` : `
+                    <div class="flex items-center gap-1">
+                      <button type="button" onclick="window.app.adjustButtonFontSize(-1)" class="text-zinc-600 hover:text-zinc-900 font-bold text-[10px] bg-white px-1.5 py-0.5 rounded border border-zinc-200" title="Réduire taille texte bouton">A-</button>
+                      <button type="button" onclick="window.app.adjustButtonFontSize(1)" class="text-zinc-600 hover:text-zinc-900 font-bold text-[10px] bg-white px-1.5 py-0.5 rounded border border-zinc-200" title="Agrandir taille texte bouton">A+</button>
+                      <button type="button" onclick="window.app.deleteButton('${sectionId}', 'phone')" class="text-red-600 hover:text-red-700 font-semibold text-[10px] bg-red-50 hover:bg-red-100 px-2 py-0.5 rounded border border-red-200 flex items-center gap-0.5 transition-colors" title="Supprimer ce bouton">
+                        <span>🗑️ Supprimer</span>
+                      </button>
+                    </div>
+                  `}
+                </div>
+                ${isSecondaryHidden ? `
+                  <div class="text-[11px] text-zinc-400 italic py-0.5">Ce bouton est actuellement masqué sur la page.</div>
+                ` : `
+                  <input type="text" value="${escapeHtml(c.ctaSecondary)}"
+                         data-field="ctaSecondary"
+                         placeholder="Texte du bouton secondaire"
+                         oninput="window.app.liveUpdateField('${sectionId}', 'ctaSecondary', this.value)"
+                         onchange="window.app.commitFieldUpdate('${sectionId}', 'ctaSecondary', this.value)"
+                         class="w-full bg-white border border-zinc-200 rounded-md px-2 py-1 text-xs text-zinc-900 focus:border-zinc-900 focus:outline-none">
+                `}
+              </div>
+            `;
+          })() : ''}
         </div>
       ` : ''}
 
@@ -795,8 +921,8 @@ function renderSettingsAccordions(project) {
         <div class="section-accordion-body hidden space-y-2.5" id="settings-body-typography">
           <div class="space-y-1.5 max-h-72 overflow-y-auto pr-1">
             <div class="grid grid-cols-2 gap-1.5 mb-2">
-              <button type="button" onclick="window.app.setTypographyTarget('heading')" class="py-1.5 rounded border text-[11px] ${window.app?.typographyTarget !== 'body' ? 'border-zinc-900 bg-zinc-900 text-white' : 'border-zinc-200 bg-white text-zinc-600'}">Titres</button>
-              <button type="button" onclick="window.app.setTypographyTarget('body')" class="py-1.5 rounded border text-[11px] ${window.app?.typographyTarget === 'body' ? 'border-zinc-900 bg-zinc-900 text-white' : 'border-zinc-200 bg-white text-zinc-600'}">Texte</button>
+              <button type="button" onclick="window.app.setTypographyTarget('heading')" class="py-1.5 rounded border text-[11px] ${(typeof window !== 'undefined' && window.app?.typographyTarget === 'body') ? 'border-zinc-200 bg-white text-zinc-600' : 'border-zinc-900 bg-zinc-900 text-white'}">Titres</button>
+              <button type="button" onclick="window.app.setTypographyTarget('body')" class="py-1.5 rounded border text-[11px] ${(typeof window !== 'undefined' && window.app?.typographyTarget === 'body') ? 'border-zinc-900 bg-zinc-900 text-white' : 'border-zinc-200 bg-white text-zinc-600'}">Texte</button>
             </div>
             ${FONT_CATALOG.map(font => `
               <button type="button" aria-label="Utiliser ${font.name}" onclick="window.app.applyTypographyFont('${font.name}')" class="font-option w-full text-left p-2 rounded-lg border bg-white hover:border-zinc-400 text-xs ${(project.branding.headingFont === font.name || project.branding.bodyFont === font.name) ? 'is-active' : ''}" style="font-family: '${font.name}', sans-serif">

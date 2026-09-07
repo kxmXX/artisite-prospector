@@ -12,10 +12,23 @@ function getInitialSiteTheme(project) {
 
 function decorateEditableMarkup(markup, project, section) {
   return markup.replace(/<([a-z][\w-]*)(\s[^>]*data-editable="([^"]+)"[^>]*)>/gi, (full, tag, attrs, fieldPath) => {
-    if (attrs.includes("data-ui-id=")) return full;
+    const fontSizeDelta = section?.settings?.[`fontSize_${fieldPath}`] || 0;
+    const isBold = section?.settings?.[`bold_${fieldPath}`];
+    let customStyles = [];
+    if (fontSizeDelta) customStyles.push(`font-size: calc(1em + ${fontSizeDelta}px) !important;`);
+    if (isBold === true) customStyles.push(`font-weight: 800 !important;`);
+    if (isBold === false) customStyles.push(`font-weight: 400 !important;`);
+    const styleAttr = customStyles.length ? ` style="${customStyles.join(' ')}"` : "";
+
+    if (attrs.includes("data-ui-id=")) {
+      if (styleAttr && !attrs.includes("style=")) {
+        return `<${tag}${attrs}${styleAttr}>`;
+      }
+      return full;
+    }
     const targetId = getUiId(project, section, `field-${fieldPath}`);
     const code = getUiCode(project?.id, section?.id, fieldPath);
-    return `<${tag}${attrs} data-ui-id="${targetId}" data-ui-code="${code}" data-ui-type="field" data-ui-target="true">`;
+    return `<${tag}${attrs} data-ui-id="${targetId}" data-ui-code="${code}" data-ui-type="field" data-ui-target="true"${styleAttr}>`;
   });
 }
 
@@ -268,9 +281,11 @@ function renderSection(sec, project, options) {
 
         <button type="button" class="btn-sec-ctrl btn-sec-up" title="Monter cette section (↑)" data-action="move-up" data-id="${sec.id}">
           ${getIcon("chevronUp", "w-3.5 h-3.5")}
+          <span class="sec-ctrl-text">Monter</span>
         </button>
         <button type="button" class="btn-sec-ctrl btn-sec-down" title="Descendre cette section (↓)" data-action="move-down" data-id="${sec.id}">
           ${getIcon("chevronDown", "w-3.5 h-3.5")}
+          <span class="sec-ctrl-text">Descendre</span>
         </button>
         <button type="button" class="btn-sec-ctrl btn-sec-bg" title="Changer le style de fond" data-action="toggle-bg" data-id="${sec.id}">
           ${getIcon("palette", "w-3.5 h-3.5")}
@@ -324,10 +339,16 @@ function renderHeader(sec, project, options = {}) {
             <span class="site-theme-icon site-theme-icon-dark hidden">${getIcon("sun", "w-4 h-4")}</span>
             <span class="site-theme-label">Mode nuit</span>
           </button>
-          <a href="#simulateur" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5" style="background-color: var(--primary);">
-            ${getIcon("sparkles", "w-4 h-4")}
-            <span data-editable="ctaText">${c.ctaText || "Demander un devis"}</span>
-          </a>
+          ${isButtonHidden(sec, 'ctaText') || isButtonHidden(sec, 'primary') ? '' : `
+            <div class="cta-button-wrapper group/cta relative" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-ctaText" data-cta-popover-wrapper data-section-id="${sec.id}" data-button-type="ctaText">
+              ${renderButtonActionBadge(sec, 'ctaText', options, project)}
+              <a href="#simulateur" class="btn-cta inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5" style="background-color: var(--primary);">
+                ${getIcon("sparkles", "w-4 h-4")}
+                <span data-editable="ctaText">${c.ctaText || "Demander un devis"}</span>
+              </a>
+              ${renderButtonPopover(sec, 'ctaText', options, project)}
+            </div>
+          `}
         </div>
       </div>
     </header>
@@ -342,6 +363,18 @@ function isButtonHidden(sec, buttonType, specificKey = null) {
   if (sec.settings[`btn-${sec.type}-${buttonType}-visible`] === false) return true;
   if (Array.isArray(sec.settings.hiddenButtons) && sec.settings.hiddenButtons.includes(buttonType)) return true;
   return false;
+}
+
+function renderButtonActionBadge(sec, buttonType, options = {}, project = {}) {
+  if (!options.isEditor) return "";
+  return `
+    <div class="cta-direct-badge" onclick="event.stopPropagation();" role="toolbar" aria-label="Commandes directes du bouton">
+      <button type="button" onclick="event.preventDefault(); event.stopPropagation(); window.app.adjustButtonFontSize(-1)" class="cta-direct-btn" title="Réduire la taille du texte">A-</button>
+      <button type="button" onclick="event.preventDefault(); event.stopPropagation(); window.app.adjustButtonFontSize(1)" class="cta-direct-btn" title="Agrandir la taille du texte">A+</button>
+      <button type="button" onclick="event.preventDefault(); event.stopPropagation(); window.app.toggleButtonPopover('${sec.id}', '${buttonType}')" class="cta-direct-btn cta-direct-gear" title="Réglages du bouton (Taille, Bords, Style)">⚙️</button>
+      <button type="button" onclick="event.preventDefault(); event.stopPropagation(); window.app.deleteButton('${sec.id}', '${buttonType}')" class="cta-direct-btn cta-direct-del" title="Supprimer ce bouton">✕</button>
+    </div>
+  `;
 }
 
 function renderButtonPopover(sec, buttonType, options = {}, project = {}) {
@@ -437,7 +470,8 @@ function renderHero(sec, project, options = {}) {
 
           <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
             ${primaryHidden ? '' : `
-              <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-primary" data-cta-popover-wrapper data-ui-id="${heroButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
+              <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-primary" data-cta-popover-wrapper data-section-id="${sec.id}" data-button-type="primary" data-ui-id="${heroButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
+                ${renderButtonActionBadge(sec, 'primary', options, project)}
                 <a href="#simulateur" class="btn-cta btn-keycap${ctaPulseClass} w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full text-base font-bold text-white shadow-2xl transition-all" data-ui-id="${heroButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}" style="background-color: var(--primary);">
                   ${getIcon("sparkles", "w-5 h-5")}
                   <span data-editable="ctaPrimary">${c.ctaPrimary}</span>
@@ -447,7 +481,8 @@ function renderHero(sec, project, options = {}) {
             `}
 
             ${phoneHidden ? '' : `
-              <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-phone" data-cta-popover-wrapper data-ui-id="${heroPhoneId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
+              <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-phone" data-cta-popover-wrapper data-section-id="${sec.id}" data-button-type="phone" data-ui-id="${heroPhoneId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
+                ${renderButtonActionBadge(sec, 'phone', options, project)}
                 <a href="tel:${c.phone}" class="btn-cta btn-keycap${ctaPulseClass} w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-full text-base font-semibold text-white bg-white/15 backdrop-blur-md border border-white/30 hover:bg-white/25 transition-colors" data-ui-id="${heroPhoneId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
                   ${getIcon("phone", "w-5 h-5 text-emerald-400")}
                   <span data-editable="ctaSecondary">${c.ctaSecondary}</span>
@@ -493,7 +528,8 @@ function renderHero(sec, project, options = {}) {
 
               <div class="pt-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
                 ${primaryHidden ? '' : `
-                  <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-primary" data-cta-popover-wrapper data-ui-id="${heroButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
+                  <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-primary" data-cta-popover-wrapper data-section-id="${sec.id}" data-button-type="primary" data-ui-id="${heroButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
+                    ${renderButtonActionBadge(sec, 'primary', options, project)}
                     <a href="#simulateur" class="btn-cta btn-keycap${ctaPulseClass} inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-full text-base font-bold text-white shadow-xl hover:shadow-2xl transition-all transform hover:-translate-y-0.5" data-ui-id="${heroButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}" style="background-color: var(--primary);">
                       ${getIcon("sparkles", "w-5 h-5")}
                       <span data-editable="ctaPrimary">${c.ctaPrimary}</span>
@@ -503,7 +539,8 @@ function renderHero(sec, project, options = {}) {
                 `}
 
                 ${phoneHidden ? '' : `
-                  <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-phone" data-cta-popover-wrapper data-ui-id="${heroPhoneId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
+                  <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-phone" data-cta-popover-wrapper data-section-id="${sec.id}" data-button-type="phone" data-ui-id="${heroPhoneId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
+                    ${renderButtonActionBadge(sec, 'phone', options, project)}
                     <a href="tel:${c.phone}" class="btn-cta btn-keycap${ctaPulseClass} inline-flex items-center justify-center gap-2.5 px-6 py-4 rounded-full text-base font-semibold text-white bg-slate-900 border border-slate-700 hover:bg-slate-800 transition-colors" data-ui-id="${heroPhoneId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
                       ${getIcon("phone", "w-5 h-5 text-emerald-400")}
                       <span data-editable="ctaSecondary">${c.ctaSecondary}</span>
@@ -554,7 +591,8 @@ function renderHero(sec, project, options = {}) {
 
           <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
             ${primaryHidden ? '' : `
-              <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-primary" data-cta-popover-wrapper data-ui-id="${heroButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
+              <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-primary" data-cta-popover-wrapper data-section-id="${sec.id}" data-button-type="primary" data-ui-id="${heroButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
+                ${renderButtonActionBadge(sec, 'primary', options, project)}
                 <a href="#simulateur" class="btn-cta btn-keycap${ctaPulseClass} inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm font-bold text-white shadow-md hover:shadow-lg transition-all" data-ui-id="${heroButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}" style="background-color: var(--primary);">
                   ${getIcon("sparkles", "w-4 h-4")}
                   <span data-editable="ctaPrimary">${c.ctaPrimary}</span>
@@ -564,7 +602,8 @@ function renderHero(sec, project, options = {}) {
             `}
 
             ${phoneHidden ? '' : `
-              <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-phone" data-cta-popover-wrapper data-ui-id="${heroPhoneId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
+              <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-phone" data-cta-popover-wrapper data-section-id="${sec.id}" data-button-type="phone" data-ui-id="${heroPhoneId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
+                ${renderButtonActionBadge(sec, 'phone', options, project)}
                 <a href="tel:${c.phone}" class="btn-cta btn-keycap${ctaPulseClass} inline-flex items-center gap-2 px-7 py-3.5 rounded-full text-sm font-semibold text-gray-800 bg-white border border-gray-300 hover:bg-gray-50 transition-colors" data-ui-id="${heroPhoneId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
                   ${getIcon("phone", "w-4 h-4 text-emerald-600")}
                   <span data-editable="ctaSecondary">${c.ctaSecondary}</span>
@@ -604,7 +643,8 @@ function renderHero(sec, project, options = {}) {
 
             <div class="pt-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
               ${primaryHidden ? '' : `
-                <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-primary" data-cta-popover-wrapper data-ui-id="${heroButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
+                <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-primary" data-cta-popover-wrapper data-section-id="${sec.id}" data-button-type="primary" data-ui-id="${heroButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
+                  ${renderButtonActionBadge(sec, 'primary', options, project)}
                   <a href="#simulateur" class="btn-cta btn-keycap${ctaPulseClass} inline-flex items-center justify-center gap-2.5 shadow-xl transition-all" data-ui-id="${heroButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}"${heroButtonMotion ? ` data-motion="${heroButtonMotion}"` : ''} style="background-color: var(--primary); color: #ffffff;">
                     ${getIcon("sparkles", "w-5 h-5")}
                     <span data-editable="ctaPrimary">${c.ctaPrimary}</span>
@@ -613,7 +653,8 @@ function renderHero(sec, project, options = {}) {
                 </div>
               `}
               ${phoneHidden ? '' : `
-                <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-phone" data-cta-popover-wrapper data-ui-id="${heroPhoneId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
+                <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-phone" data-cta-popover-wrapper data-section-id="${sec.id}" data-button-type="phone" data-ui-id="${heroPhoneId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
+                  ${renderButtonActionBadge(sec, 'phone', options, project)}
                   <a href="tel:${c.phone}" class="btn-cta btn-keycap${ctaPulseClass} inline-flex items-center justify-center gap-2.5 shadow-sm transition-all" data-ui-id="${heroPhoneId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}"${heroPhoneMotion ? ` data-motion="${heroPhoneMotion}"` : ''} style="background-color: #ffffff; color: #18181b; border: 1px solid #e4e4e7;">
                     ${getIcon("phone", "w-5 h-5 text-emerald-600")}
                     <span data-editable="ctaSecondary">${c.ctaSecondary}</span>
@@ -1510,7 +1551,8 @@ function renderCta(sec, project, options = {}) {
         <p class="text-white/80 text-base sm:text-lg max-w-2xl mx-auto" data-editable="subtitle">${c.subtitle}</p>
         <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
           ${primaryHidden ? '' : `
-            <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-primary" data-cta-popover-wrapper data-ui-id="${primaryButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
+            <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-primary" data-cta-popover-wrapper data-section-id="${sec.id}" data-button-type="primary" data-ui-id="${primaryButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
+              ${renderButtonActionBadge(sec, 'primary', options, project)}
               <a href="#simulateur" class="btn-cta btn-keycap${ctaPulseClass} bg-white text-gray-900 shadow-xl hover:bg-gray-50" data-ui-id="${primaryButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}"${primaryButtonMotion ? ` data-motion="${primaryButtonMotion}"` : ''}>
                 ${getIcon("sparkles", "w-5 h-5 text-amber-500")}
                 <span data-editable="ctaPrimary">${c.ctaPrimary}</span>
@@ -1519,7 +1561,8 @@ function renderCta(sec, project, options = {}) {
             </div>
           `}
           ${phoneHidden ? '' : `
-            <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-phone" data-cta-popover-wrapper data-ui-id="${phoneButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
+            <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-phone" data-cta-popover-wrapper data-section-id="${sec.id}" data-button-type="phone" data-ui-id="${phoneButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
+              ${renderButtonActionBadge(sec, 'phone', options, project)}
               <a href="tel:${c.phone}" class="btn-cta btn-keycap${ctaPulseClass} border border-white/30 text-white hover:bg-white/10" data-ui-id="${phoneButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}"${phoneButtonMotion ? ` data-motion="${phoneButtonMotion}"` : ''}>
                 ${getIcon("phone", "w-5 h-5")}
                 <span data-editable="ctaSecondary">${c.ctaSecondary}</span>

@@ -1015,6 +1015,114 @@ class App {
     this.updateUndoRedoUI();
   }
 
+  toggleButtonPopover(sectionId, buttonType) {
+    const popover = document.getElementById(`cta-popover-${sectionId}-${buttonType}`);
+    const wrapper = popover?.closest("[data-cta-popover-wrapper]");
+    if (wrapper) {
+      const open = wrapper.classList.toggle("is-active");
+      wrapper.setAttribute("aria-expanded", String(open));
+    }
+  }
+
+  adjustFieldFontSize(sectionId, field, delta) {
+    if (!state.currentProject) return;
+    const sec = state.currentProject.sections.find(s => s.id === sectionId);
+    if (!sec) return;
+    sec.settings = sec.settings || {};
+    const key = `fontSize_${field}`;
+    const current = parseFloat(sec.settings[key]) || 0;
+    const next = Math.max(-10, Math.min(24, current + delta));
+    sec.settings[key] = next;
+
+    // Apply live to DOM element
+    const el = document.querySelector(`#section-${sectionId} [data-editable="${field}"]`);
+    if (el) {
+      el.style.fontSize = next === 0 ? "" : `calc(1em + ${next}px)`;
+    }
+
+    state.pushHistory(`Taille de texte ${field} (${next >= 0 ? '+' : ''}${next}px)`);
+    state.saveToStorage();
+    this.updateUndoRedoUI();
+    this.showToast(`Taille du texte : ${next >= 0 ? '+' : ''}${next}px`, "info");
+  }
+
+  adjustActiveTextFontSize(delta) {
+    if (!this._activeEditableEl) return;
+    const el = this._activeEditableEl;
+    const secWrapper = el.closest(".editor-section-wrapper");
+    const secId = secWrapper?.getAttribute("data-section-id");
+    const field = el.getAttribute("data-editable");
+    if (secId && field) {
+      this.adjustFieldFontSize(secId, field, delta);
+    } else {
+      const currentSize = parseFloat(window.getComputedStyle(el).fontSize) || 16;
+      const newSize = Math.max(10, Math.min(64, currentSize + delta * 2));
+      el.style.fontSize = `${newSize}px`;
+    }
+  }
+
+  toggleActiveTextBold() {
+    if (!this._activeEditableEl) return;
+    const el = this._activeEditableEl;
+    const secWrapper = el.closest(".editor-section-wrapper");
+    const secId = secWrapper?.getAttribute("data-section-id");
+    const field = el.getAttribute("data-editable");
+    if (secId && field && state.currentProject) {
+      const sec = state.currentProject.sections.find(s => s.id === secId);
+      if (sec) {
+        sec.settings = sec.settings || {};
+        const key = `bold_${field}`;
+        const isCurrentlyBold = sec.settings[key] === true || window.getComputedStyle(el).fontWeight >= 700;
+        sec.settings[key] = !isCurrentlyBold;
+        el.style.fontWeight = isCurrentlyBold ? "400" : "800";
+        state.pushHistory(`Style gras ${field}`);
+        state.saveToStorage();
+        this.updateUndoRedoUI();
+        this.showToast(isCurrentlyBold ? "Texte normal" : "Texte en gras", "info");
+      }
+    } else {
+      const isBold = window.getComputedStyle(el).fontWeight >= 700;
+      el.style.fontWeight = isBold ? "400" : "800";
+    }
+  }
+
+  showFloatingTextToolbar(el, secId) {
+    this._activeEditableEl = el;
+    const toolbar = document.getElementById("floating-text-toolbar");
+    if (!toolbar) return;
+
+    const rect = el.getBoundingClientRect();
+    const mainEl = document.querySelector("main");
+    const mainRect = mainEl?.getBoundingClientRect() || { top: 0, left: 0 };
+    const scrollTop = mainEl ? mainEl.scrollTop : window.scrollY;
+
+    const topPos = Math.max(8, rect.top - mainRect.top + scrollTop - 40);
+    const leftPos = Math.max(16, Math.min(window.innerWidth - 340, rect.left - mainRect.left));
+
+    toolbar.style.top = `${topPos}px`;
+    toolbar.style.left = `${leftPos}px`;
+    toolbar.style.display = "flex";
+
+    const btnUp = document.getElementById("ftb-move-up");
+    const btnDown = document.getElementById("ftb-move-down");
+    const btnFontDown = document.getElementById("ftb-font-down");
+    const btnFontUp = document.getElementById("ftb-font-up");
+    const btnBold = document.getElementById("ftb-bold");
+    const btnClose = document.getElementById("ftb-close");
+
+    if (btnUp) btnUp.onclick = (e) => { e.preventDefault(); e.stopPropagation(); this.moveSection(secId, "up"); };
+    if (btnDown) btnDown.onclick = (e) => { e.preventDefault(); e.stopPropagation(); this.moveSection(secId, "down"); };
+    if (btnFontDown) btnFontDown.onclick = (e) => { e.preventDefault(); e.stopPropagation(); this.adjustActiveTextFontSize(-1); };
+    if (btnFontUp) btnFontUp.onclick = (e) => { e.preventDefault(); e.stopPropagation(); this.adjustActiveTextFontSize(1); };
+    if (btnBold) btnBold.onclick = (e) => { e.preventDefault(); e.stopPropagation(); this.toggleActiveTextBold(); };
+    if (btnClose) btnClose.onclick = (e) => { e.preventDefault(); e.stopPropagation(); toolbar.style.display = "none"; };
+  }
+
+  hideFloatingTextToolbar() {
+    const toolbar = document.getElementById("floating-text-toolbar");
+    if (toolbar) toolbar.style.display = "none";
+  }
+
   addCanvaElement(blockType) {
     if (!state.currentProject) return;
     const project = state.currentProject;
@@ -2172,29 +2280,46 @@ class App {
       };
     }
 
-    // Accessible CTA popovers: hover remains a shortcut, while click/focus/Escape
-    // make the controls reliable for keyboard and pointer users.
+    // Accessible CTA popovers & Direct Buttons
     document.querySelectorAll("[data-cta-popover-wrapper]").forEach(wrapper => {
       const setOpen = (open) => wrapper.setAttribute("aria-expanded", String(open));
       wrapper.addEventListener("mouseenter", () => setOpen(true));
       wrapper.addEventListener("mouseleave", () => {
-        if (!wrapper.matches(":focus-within")) {
-          wrapper.classList.remove("is-active");
+        if (!wrapper.matches(":focus-within") && !wrapper.classList.contains("is-active")) {
           setOpen(false);
         }
       });
       wrapper.addEventListener("focusin", () => setOpen(true));
       wrapper.addEventListener("focusout", () => {
         requestAnimationFrame(() => {
-          if (!wrapper.matches(":focus-within")) setOpen(false);
+          if (!wrapper.matches(":focus-within") && !wrapper.classList.contains("is-active")) setOpen(false);
         });
       });
       wrapper.addEventListener("click", event => {
-        if (event.target.closest(".cta-context-popover") || event.target.closest("a")) return;
+        if (event.target.closest(".cta-context-popover") || event.target.closest(".cta-direct-badge")) return;
+        event.preventDefault();
+
+        // If clicking on the editable label inside the button, focus it for inline typing
+        const editableSpan = event.target.closest("[data-editable]");
+        if (editableSpan) {
+          editableSpan.focus();
+          return;
+        }
+
         const open = wrapper.classList.toggle("is-active");
         setOpen(open);
       });
     });
+
+    // Intercept clicks on links inside editor to prevent accidental page jumps or tel: popups
+    document.querySelectorAll(".editor-section-wrapper a").forEach(link => {
+      link.addEventListener("click", (e) => {
+        if (!e.target.closest("[data-editable]")) {
+          e.preventDefault();
+        }
+      });
+    });
+
     if (!this._popoverEscapeBound) {
       document.addEventListener("keydown", event => {
         if (event.key !== "Escape") return;
@@ -2202,8 +2327,18 @@ class App {
           wrapper.classList.remove("is-active");
           wrapper.setAttribute("aria-expanded", "false");
         });
+        this.hideFloatingTextToolbar();
       });
       this._popoverEscapeBound = true;
+    }
+
+    if (!this._floatingTextDocClickBound) {
+      document.addEventListener("click", (e) => {
+        if (!e.target.closest("[data-editable]") && !e.target.closest("#floating-text-toolbar") && !e.target.closest(".cta-direct-badge")) {
+          this.hideFloatingTextToolbar();
+        }
+      });
+      this._floatingTextDocClickBound = true;
     }
   }
 
@@ -2243,7 +2378,20 @@ class App {
       el.classList.add("hover:outline", "hover:outline-1", "hover:outline-dashed", "hover:outline-zinc-400", "rounded", "transition-all", "cursor-text");
 
       el.addEventListener("click", (e) => {
-        e.stopPropagation();
+        const secWrapper = el.closest(".editor-section-wrapper");
+        const secId = secWrapper?.getAttribute("data-section-id");
+        if (secId && state.selectedSectionId !== secId) {
+          state.setSelectedSection(secId);
+        }
+        this.showFloatingTextToolbar(el, secId);
+      });
+
+      el.addEventListener("focus", () => {
+        const secWrapper = el.closest(".editor-section-wrapper");
+        const secId = secWrapper?.getAttribute("data-section-id");
+        if (secId) {
+          this.showFloatingTextToolbar(el, secId);
+        }
       });
 
       el.oninput = () => {

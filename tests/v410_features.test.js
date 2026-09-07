@@ -159,3 +159,62 @@ test("v4.1.0: Expanded section catalog (process, certifications, pricing, custom
   assert.ok(html.includes('id="tarifs"'), "Rendered HTML must contain pricing section");
 });
 
+test("v4.1.0: Direct button action badge rendering & preview isolation", () => {
+  const p = generateSite({ name: "Jardin Déco", tradeId: "paysagiste" });
+  state.addProject(p, true);
+
+  // Editor mode HTML
+  const editorHTML = renderWebsiteHTML(state.currentProject, { isEditor: true });
+  assert.ok(editorHTML.includes('class="cta-direct-badge"'), "Editor mode must render cta-direct-badge");
+  assert.ok(editorHTML.includes('cta-direct-del'), "Editor mode must include direct delete button (✕)");
+  assert.ok(editorHTML.includes('cta-direct-gear'), "Editor mode must include direct settings button (⚙️)");
+  assert.ok(editorHTML.includes('window.app.adjustButtonFontSize'), "Editor mode must include A-/A+ button font adjusters");
+
+  // Client preview mode HTML (isEditor: false)
+  const previewHTML = renderWebsiteHTML(state.currentProject, { isEditor: false, isStandalone: true });
+  assert.ok(!previewHTML.includes('cta-direct-badge'), "Preview mode must NOT contain any cta-direct-badge");
+  assert.ok(!previewHTML.includes('cta-direct-del'), "Preview mode must NOT contain any cta-direct-del");
+});
+
+test("v4.1.0: Section canvas toolbar and sidebar accordion have prominent 'Monter' and 'Descendre' controls", async () => {
+  const { renderEditor } = await import("../public/js/components/editor.js");
+  const p = generateSite({ name: "Maçonnerie Générale", tradeId: "macon" });
+  state.addProject(p, true);
+
+  // 1. Canvas Toolbar labels
+  const canvasHTML = renderWebsiteHTML(state.currentProject, { isEditor: true });
+  assert.ok(canvasHTML.includes('<span class="sec-ctrl-text">Monter</span>'), "Canvas toolbar must show text label 'Monter'");
+  assert.ok(canvasHTML.includes('<span class="sec-ctrl-text">Descendre</span>'), "Canvas toolbar must show text label 'Descendre'");
+
+  // 2. Sidebar Accordion Quick Action Bar
+  const editorFullHTML = renderEditor(state);
+  assert.ok(editorFullHTML.includes("window.app.moveSection"), "Sidebar editor must include window.app.moveSection");
+  assert.ok(editorFullHTML.includes("Monter cette section (↑)"), "Sidebar editor must include top Quick Action Bar with 'Monter'");
+  assert.ok(editorFullHTML.includes("Descendre cette section (↓)"), "Sidebar editor must include top Quick Action Bar with 'Descendre'");
+  assert.ok(editorFullHTML.includes('id="floating-text-toolbar"'), "Editor must render the floating text toolbar container");
+});
+
+test("v4.1.0: Typography inline font-size and weight deltas are applied to data-editable markup", () => {
+  const p = generateSite({ name: "Peinture Design", tradeId: "peintre" });
+  state.addProject(p, true);
+
+  const hero = p.sections.find(s => s.type === "hero");
+  assert.ok(hero, "Hero section must exist");
+
+  // Apply typography modifiers
+  hero.settings = hero.settings || {};
+  hero.settings.fontSize_title = 6;
+  hero.settings.bold_title = true;
+
+  const editorHTML = renderWebsiteHTML(p, { isEditor: true });
+  assert.ok(
+    editorHTML.includes("font-size: calc(1em + 6px) !important;"),
+    "Decorated editable markup must include font-size delta style"
+  );
+  assert.ok(
+    editorHTML.includes("font-weight: 800 !important;"),
+    "Decorated editable markup must include bold font-weight style"
+  );
+});
+
+
