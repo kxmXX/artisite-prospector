@@ -100,6 +100,7 @@ class App {
       } else if (e.key === "Escape") {
         this.closeModals();
         this.toggleExportMenu(false);
+        this.closeAllButtonPopovers();
       }
     });
 
@@ -109,6 +110,9 @@ class App {
       const btn = document.getElementById("export-menu-button");
       if (menu && menu.dataset.open === "true" && !menu.contains(e.target) && !btn?.contains(e.target)) {
         this.toggleExportMenu(false);
+      }
+      if (!e.target.closest("[data-cta-popover-wrapper]")) {
+        this.closeAllButtonPopovers();
       }
       document.querySelectorAll(".sec-motion-popover:not(.hidden)").forEach(pop => {
         const secId = pop.dataset.sectionId;
@@ -638,6 +642,15 @@ class App {
     const tradeId = document.getElementById("quick-gen-trade")?.value || "paysagiste";
     const city = document.getElementById("quick-gen-city")?.value?.trim() || "Lyon";
 
+    const submitBtn = e?.target?.querySelector?.("button[type='submit']") || document.querySelector("#quick-gen-form button[type='submit']");
+    const originalText = submitBtn ? submitBtn.innerHTML : "";
+    if (submitBtn) {
+      submitBtn.innerHTML = `<span>⏳ Création...</span>`;
+      submitBtn.disabled = true;
+    }
+
+    this.showToast(`Génération du site pour ${name}...`, "info");
+
     const newProject = generateSite({
       name,
       tradeId,
@@ -646,6 +659,22 @@ class App {
     });
 
     state.addProject(newProject, true);
+    this.showToast(`✨ Site prêt pour ${name} !`, "success");
+
+    if (submitBtn) {
+      submitBtn.innerHTML = originalText;
+      submitBtn.disabled = false;
+    }
+  }
+
+  fillQuickGen(name, tradeId, city) {
+    const nameInput = document.getElementById("quick-gen-name");
+    const tradeSelect = document.getElementById("quick-gen-trade");
+    const cityInput = document.getElementById("quick-gen-city");
+    if (nameInput) nameInput.value = name;
+    if (tradeSelect) tradeSelect.value = tradeId;
+    if (cityInput) cityInput.value = city;
+    this.handleQuickGenerate();
   }
 
   // Actions on Sections
@@ -738,16 +767,17 @@ class App {
     const canvas = document.getElementById("canvas-container");
     const canvasSec = canvas?.querySelector(`[data-section-id="${sectionId}"]`) ||
       document.getElementById(`section-${sectionId}`) ||
-      document.querySelector(`.editor-section-wrapper[data-section-id="${sectionId}"]`);
+      document.querySelector(`.editor-section-wrapper[data-section-id="${sectionId}"]`) ||
+      document.getElementById(sectionId);
 
     if (!canvasSec) return false;
 
-    const scrollHost = canvas?.closest("main") || canvas?.parentElement;
+    const scrollHost = document.getElementById("editor-main-canvas") || canvas?.closest("main") || canvas?.parentElement || document.querySelector("main");
     if (scrollHost && typeof scrollHost.scrollTo === "function") {
       const hostRect = scrollHost.getBoundingClientRect();
       const targetRect = canvasSec.getBoundingClientRect();
-      const targetTop = scrollHost.scrollTop + targetRect.top - hostRect.top -
-        (scrollHost.clientHeight - canvasSec.offsetHeight) / 2;
+      const targetTop = scrollHost.scrollTop + (targetRect.top - hostRect.top) -
+        Math.max(20, (scrollHost.clientHeight - canvasSec.offsetHeight) / 2);
 
       scrollHost.scrollTo({
         top: Math.max(0, targetTop),
@@ -777,9 +807,12 @@ class App {
     this.selectSection(sectionId);
     const run = () => this.scrollToSection(sectionId);
     if (typeof window !== "undefined" && typeof window.requestAnimationFrame === "function") {
-      window.requestAnimationFrame(run);
+      window.requestAnimationFrame(() => {
+        run();
+        setTimeout(run, 120);
+      });
     } else {
-      setTimeout(run, 0);
+      setTimeout(run, 50);
     }
   }
 
@@ -1147,9 +1180,20 @@ class App {
     const popover = document.getElementById(`cta-popover-${sectionId}-${buttonType}`);
     const wrapper = popover?.closest("[data-cta-popover-wrapper]");
     if (wrapper) {
-      const open = wrapper.classList.toggle("is-active");
-      wrapper.setAttribute("aria-expanded", String(open));
+      const willOpen = !wrapper.classList.contains("is-active");
+      this.closeAllButtonPopovers();
+      if (willOpen) {
+        wrapper.classList.add("is-active");
+        wrapper.setAttribute("aria-expanded", "true");
+      }
     }
+  }
+
+  closeAllButtonPopovers() {
+    document.querySelectorAll("[data-cta-popover-wrapper].is-active").forEach(w => {
+      w.classList.remove("is-active");
+      w.setAttribute("aria-expanded", "false");
+    });
   }
 
   adjustFieldFontSize(sectionId, field, delta) {
@@ -2424,17 +2468,16 @@ class App {
         if (json.success && json.data) {
           const d = json.data;
           const updated = JSON.parse(JSON.stringify(state.currentProject));
-          if (Array.isArray(d.operations)) {
+          if (Array.isArray(d.operations) && d.operations.length > 0) {
             const targeted = applyCopilotOperations(updated, d.operations);
-            if (!targeted.applied.length) {
-              if (feedback) feedback.textContent = `⚠️ ${d.summary || "Aucune opération valide n’a été appliquée."}`;
+            if (targeted.applied.length > 0) {
+              renderApprovalCard(d.summary || "Modification ciblée prête à être appliquée.", () => {
+                state.updateProject(targeted.project, true, `Copilot ciblé: ${promptText}`);
+              });
               return;
             }
-            renderApprovalCard(d.summary || "Modification ciblée prête à être appliquée.", () => {
-              state.updateProject(targeted.project, true, `Copilot ciblé: ${promptText}`);
-            });
-            return;
           }
+          let hasDirectChanges = false;
           if (d.suggestedPreset) {
             const p = getStylePresetById(d.suggestedPreset);
             if (p) {
@@ -2443,20 +2486,23 @@ class App {
               updated.branding.secondaryColor = p.secondaryColor;
               updated.branding.bgColor = p.bgColor;
               updated.branding.textColor = p.textColor;
+              hasDirectChanges = true;
             }
           }
-          if (d.borderRadius) updated.branding.borderRadius = d.borderRadius;
-          if (d.buttonRadius) updated.branding.buttonRadius = d.buttonRadius;
+          if (d.borderRadius) { updated.branding.borderRadius = d.borderRadius; hasDirectChanges = true; }
+          if (d.buttonRadius) { updated.branding.buttonRadius = d.buttonRadius; hasDirectChanges = true; }
           const hero = updated.sections.find(s => s.type === "hero");
           if (hero && hero.content) {
-            if (d.updatedTitle) hero.content.title = d.updatedTitle;
-            if (d.updatedSubtitle) hero.content.subtitle = d.updatedSubtitle;
-            if (d.updatedBadge) hero.content.badge = d.updatedBadge;
+            if (d.updatedTitle) { hero.content.title = d.updatedTitle; hasDirectChanges = true; }
+            if (d.updatedSubtitle) { hero.content.subtitle = d.updatedSubtitle; hasDirectChanges = true; }
+            if (d.updatedBadge) { hero.content.badge = d.updatedBadge; hasDirectChanges = true; }
           }
-          renderApprovalCard(d.summary || "Modifications prêtes à être appliquées par Gemini !", () => {
-            state.updateProject(updated, true, `Copilot AI: ${promptText}`);
-          });
-          return;
+          if (hasDirectChanges) {
+            renderApprovalCard(d.summary || "Modifications prêtes à être appliquées par Gemini !", () => {
+              state.updateProject(updated, true, `Copilot AI: ${promptText}`);
+            });
+            return;
+          }
         }
       }
     } catch (err) {

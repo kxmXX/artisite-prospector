@@ -327,6 +327,23 @@ export function renderInspector(section, project, state) {
                         onchange="window.app.commitTextUpdate('${sectionId}', 'story', this.value)" 
                         class="w-full bg-white border border-zinc-200 rounded-md px-2.5 py-1.5 text-xs leading-relaxed">${escapeHtml(c.story || '')}</textarea>
             </div>
+            ${Array.isArray(c.points) && c.points.length > 0 ? `
+              <div>
+                <label class="block text-[10px] text-zinc-500 mb-1">Points forts & Savoir-faire :</label>
+                <div class="space-y-1.5">
+                  ${c.points.map((pt, pIdx) => `
+                    <div class="flex items-center gap-1.5">
+                      <span class="text-[10px] text-zinc-400 font-mono w-4">${pIdx + 1}.</span>
+                      <input type="text" value="${escapeHtml(pt || '')}"
+                             data-field="points.${pIdx}"
+                             oninput="window.app.liveUpdateText('${sectionId}', 'points.${pIdx}', this.value)"
+                             onchange="window.app.commitTextUpdate('${sectionId}', 'points.${pIdx}', this.value)"
+                             class="flex-1 bg-white border border-zinc-200 rounded-md px-2 py-1 text-xs">
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            ` : ''}
             <div class="space-y-1">
               <div class="flex items-center justify-between">
                 <label class="block text-[10px] text-zinc-500">Photo Portrait :</label>

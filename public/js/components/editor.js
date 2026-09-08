@@ -223,7 +223,7 @@ export function renderEditor(state) {
       </header>
 
       <!-- MAIN WORKSPACE: SIDEBAR + CANVAS + INSPECTOR -->
-      <div class="flex-1 flex overflow-hidden">
+      <div class="flex-1 flex overflow-hidden editor-workspace-layout min-h-0">
 
         <!-- LEFT SIDEBAR: SEGMENTED PILL TABS [SECTIONS] / [PARAMÈTRES] -->
         <aside class="w-84 xl:w-96 bg-white border-r border-zinc-200 flex flex-col flex-shrink-0 z-20 overflow-hidden pc-sidebar ${isLivePreview ? 'hidden' : ''}">
@@ -313,7 +313,7 @@ export function renderEditor(state) {
         </aside>
 
         <!-- CENTRAL CANVAS: WEBPAGE PREVIEW / LIVE EDIT WITH CANVA DOCK -->
-        <main class="flex-1 bg-[#F4F5F7] overflow-y-auto relative flex flex-col items-center">
+        <main id="editor-main-canvas" class="flex-1 bg-[#F4F5F7] overflow-y-auto relative flex flex-col items-center editor-canvas-scroll-host min-h-0 h-full w-full">
 
           <!-- In-situ Live Preview Client Floating Pill -->
           ${isLivePreview ? `
@@ -391,7 +391,7 @@ export function renderEditor(state) {
             <button type="button" id="ftb-close" class="ftb-btn text-zinc-400 hover:text-white px-1.5" title="Fermer">✕</button>
           </div>
 
-          <div class="transition-all duration-300 ${viewportWidthClass} ${isLivePreview ? 'client-preview-mode' : ''} min-h-full mt-3 rounded-t-xl overflow-hidden shadow-sm" id="canvas-container" style="background-color: ${project.branding?.bgColor || '#ffffff'}; color: ${project.branding?.textColor || '#18181b'};">
+          <div class="transition-all duration-300 ${viewportWidthClass} ${isLivePreview ? 'client-preview-mode' : ''} min-h-full mt-3 rounded-t-xl overflow-visible shadow-sm" id="canvas-container" style="background-color: ${project.branding?.bgColor || '#ffffff'}; color: ${project.branding?.textColor || '#18181b'};">
             ${websiteHTML}
           </div>
         </main>

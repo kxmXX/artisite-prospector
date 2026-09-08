@@ -425,6 +425,7 @@ class AppStateManager {
       sec.settings[`btn-${buttonType}-motion`] = motionPreset;
       sec.settings[`${heroId}-motion`] = motionPreset;
       sec.settings[`${ctaId}-motion`] = motionPreset;
+      sec.settings[`btn-motion`] = motionPreset;
       this.updateProject(project, false);
     }
   }
@@ -440,6 +441,9 @@ class AppStateManager {
         document.documentElement.style.setProperty("--cta-scale", String(factor));
         const canvas = document.getElementById("canvas-container") || document.getElementById("site-canvas");
         if (canvas) canvas.style.setProperty("--cta-scale", String(factor));
+        document.querySelectorAll(".artisite-root, .btn-cta, .cta-button-wrapper").forEach(el => {
+          el.style.setProperty("--cta-scale", String(factor));
+        });
       }
       return;
     }

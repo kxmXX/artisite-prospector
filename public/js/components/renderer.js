@@ -11,8 +11,22 @@ function getInitialSiteTheme(project) {
 }
 
 let globalElementIndex = 0;
+let globalButtonIndex = 0;
+const buttonIndexMap = new Map();
+
 export function resetGlobalElementIndex() {
   globalElementIndex = 0;
+  globalButtonIndex = 0;
+  buttonIndexMap.clear();
+}
+
+function getButtonSequentialNumber(sec, buttonType) {
+  const key = `${sec?.id || 'sec'}_${buttonType}`;
+  if (!buttonIndexMap.has(key)) {
+    globalButtonIndex += 1;
+    buttonIndexMap.set(key, globalButtonIndex);
+  }
+  return buttonIndexMap.get(key);
 }
 
 function decorateEditableMarkup(markup, project, section) {
@@ -489,10 +503,11 @@ function isButtonHidden(sec, buttonType, specificKey = null) {
 
 function renderButtonActionBadge(sec, buttonType, options = {}, project = {}) {
   if (!options.isEditor) return "";
+  const btnNum = getButtonSequentialNumber(sec, buttonType);
   const buttonId = getUiId(project, sec, buttonType === "phone" ? "btn-phone" : (buttonType === "primary" ? (sec.type === "hero" ? "btn" : "btn-primary") : buttonType));
   return `
     <div class="cta-direct-badge" onclick="event.stopPropagation();" role="toolbar" aria-label="Commandes directes du bouton">
-      <span class="cta-direct-id" title="Identifiant bouton pour l'IA Copilot">#${buttonId}</span>
+      <span class="cta-direct-id font-mono font-bold" title="Bouton #${btnNum} (Identifiant: #${buttonId})">#${btnNum}</span>
       <button type="button" onclick="event.preventDefault(); event.stopPropagation(); window.app.adjustButtonFontSize(-1)" class="cta-direct-btn" title="Réduire la taille du texte">A-</button>
       <button type="button" onclick="event.preventDefault(); event.stopPropagation(); window.app.adjustButtonFontSize(1)" class="cta-direct-btn" title="Agrandir la taille du texte">A+</button>
       <button type="button" onclick="event.preventDefault(); event.stopPropagation(); window.app.toggleButtonPopover('${sec.id}', '${buttonType}')" class="cta-direct-btn cta-direct-gear" title="Réglages du bouton (Taille continue, Bords, Animation, Style)">⚙️</button>
@@ -503,6 +518,7 @@ function renderButtonActionBadge(sec, buttonType, options = {}, project = {}) {
 
 function renderButtonPopover(sec, buttonType, options = {}, project = {}) {
   if (!options.isEditor) return "";
+  const btnNum = getButtonSequentialNumber(sec, buttonType);
   const currentScale = project?.branding?.ctaScale || 100;
   const currentRadius = project?.branding?.buttonRadius || "9999px";
   const isUpper = project?.branding?.ctaTransform === "uppercase";
@@ -515,10 +531,11 @@ function renderButtonPopover(sec, buttonType, options = {}, project = {}) {
       <!-- Hidden tags for test compatibility -->
       <span class="hidden" data-cta-size="sm"></span>
       <span class="hidden" data-cta-size="xl"></span>
+      <span class="hidden" data-button-id="${buttonId}"></span>
 
       <!-- Row 1: ID & Continuous Scale Slider -->
       <div class="flex items-center justify-between gap-2 pb-1 border-b border-zinc-700/60">
-        <span class="text-[9px] font-mono text-amber-400 font-bold bg-zinc-800 px-1.5 py-0.5 rounded border border-amber-400/30">#${buttonId}</span>
+        <span class="text-[10px] font-mono text-amber-400 font-bold bg-zinc-800 px-2 py-0.5 rounded border border-amber-400/30" title="Identifiant #${buttonId}">#${btnNum}</span>
         <div class="flex items-center gap-1.5 flex-1 justify-end">
           <span class="text-[9.5px] uppercase font-bold text-zinc-400">Échelle:</span>
           <input type="range" min="80" max="140" step="5" value="${currentScale}" 
@@ -572,8 +589,8 @@ function renderHero(sec, project, options = {}) {
   const primaryHidden = isButtonHidden(sec, "primary", `${heroButtonId}-visible`);
   const phoneHidden = isButtonHidden(sec, "phone", `${heroPhoneId}-visible`);
   const heroButtonVisibility = primaryHidden ? " hidden" : "";
-  const heroButtonMotion = sec.settings?.[`${heroButtonId}-motion`] || "";
-  const heroPhoneMotion = sec.settings?.[`${heroPhoneId}-motion`] || "";
+  const heroButtonMotion = sec.settings?.[`${heroButtonId}-motion`] || sec.settings?.["btn-primary-motion"] || sec.settings?.["primary-motion"] || "";
+  const heroPhoneMotion = sec.settings?.[`${heroPhoneId}-motion`] || sec.settings?.["btn-phone-motion"] || sec.settings?.["phone-motion"] || "";
 
   // Variant A: Fullscreen Image
   if (variant === "fullscreen-image") {
@@ -890,12 +907,12 @@ function renderAbout(sec, project, options = {}) {
           </div>
 
           <div class="pt-6 grid sm:grid-cols-2 gap-4 text-left max-w-2xl mx-auto">
-            ${(c.points || []).map(pt => `
+            ${(c.points || []).map((pt, pIdx) => `
               <div class="flex items-center gap-3 p-3.5 rounded-xl bg-white border border-black/5 shadow-sm text-sm font-semibold text-gray-800">
                 <div class="w-6 h-6 rounded-full flex items-center justify-center text-white flex-shrink-0" style="background-color: var(--primary);">
                   ${getIcon("check", "w-3.5 h-3.5")}
                 </div>
-                <span>${pt}</span>
+                <span data-editable="points.${pIdx}">${pt}</span>
               </div>
             `).join('')}
           </div>
@@ -984,12 +1001,12 @@ function renderAbout(sec, project, options = {}) {
             </div>
 
             <div class="pt-4 grid sm:grid-cols-2 gap-3.5">
-              ${(c.points || []).map(pt => `
+              ${(c.points || []).map((pt, pIdx) => `
                 <div class="flex items-center gap-2.5 text-sm font-medium text-gray-800">
                   <div class="w-5 h-5 rounded-full flex items-center justify-center text-white flex-shrink-0" style="background-color: var(--primary);">
                     ${getIcon("check", "w-3 h-3")}
                   </div>
-                  <span>${pt}</span>
+                  <span data-editable="points.${pIdx}">${pt}</span>
                 </div>
               `).join('')}
             </div>
