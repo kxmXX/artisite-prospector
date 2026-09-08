@@ -675,6 +675,91 @@ function renderSectionAccordionContent(sec, project, variants) {
         </div>
       ` : ''}
 
+      <!-- Specific: ROI CALCULATOR SETTINGS -->
+      ${sec.type === 'roiCalculator' ? `
+        <div class="space-y-3 pt-2 border-t border-zinc-200/60">
+          <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Paramètres Simulateur ROI :</label>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[10px] text-zinc-500 mb-0.5">Panier moyen (€) :</label>
+              <input type="number" step="50" value="${c.defaultTicket || 1200}"
+                     data-field="defaultTicket"
+                     oninput="window.app.liveUpdateField('${sectionId}', 'defaultTicket', Number(this.value))"
+                     onchange="window.app.commitFieldUpdate('${sectionId}', 'defaultTicket', Number(this.value))"
+                     class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-xs text-zinc-900 font-mono">
+            </div>
+            <div>
+              <label class="block text-[10px] text-zinc-500 mb-0.5">Coût du site (€) :</label>
+              <input type="number" step="50" value="${c.siteCost || 990}"
+                     data-field="siteCost"
+                     oninput="window.app.liveUpdateField('${sectionId}', 'siteCost', Number(this.value))"
+                     onchange="window.app.commitFieldUpdate('${sectionId}', 'siteCost', Number(this.value))"
+                     class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-xs text-zinc-900 font-mono">
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[10px] text-zinc-500 mb-0.5">Leads / mois :</label>
+              <input type="number" min="1" max="50" value="${c.defaultLeads || 4}"
+                     data-field="defaultLeads"
+                     oninput="window.app.liveUpdateField('${sectionId}', 'defaultLeads', Number(this.value))"
+                     onchange="window.app.commitFieldUpdate('${sectionId}', 'defaultLeads', Number(this.value))"
+                     class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-xs text-zinc-900 font-mono">
+            </div>
+            <div>
+              <label class="block text-[10px] text-zinc-500 mb-0.5">Taux Closing (%) :</label>
+              <input type="number" min="5" max="100" value="${c.defaultConv || 50}"
+                     data-field="defaultConv"
+                     oninput="window.app.liveUpdateField('${sectionId}', 'defaultConv', Number(this.value))"
+                     onchange="window.app.commitFieldUpdate('${sectionId}', 'defaultConv', Number(this.value))"
+                     class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-xs text-zinc-900 font-mono">
+            </div>
+          </div>
+          <div>
+            <label class="block text-[10px] text-zinc-500 mb-0.5">Texte Bouton CTA :</label>
+            <input type="text" value="${escapeHtml(c.ctaText || 'Réserver ce retour sur investissement')}"
+                   data-field="ctaText"
+                   oninput="window.app.liveUpdateField('${sectionId}', 'ctaText', this.value)"
+                   onchange="window.app.commitFieldUpdate('${sectionId}', 'ctaText', this.value)"
+                   class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-xs text-zinc-900">
+          </div>
+        </div>
+      ` : ''}
+
+      <!-- Specific: BOOKING BLOCK SETTINGS -->
+      ${sec.type === 'bookingBlock' ? `
+        <div class="space-y-3 pt-2 border-t border-zinc-200/60">
+          <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Paramètres Prise de Rendez-vous :</label>
+          <div>
+            <label class="block text-[10px] text-zinc-500 mb-0.5">Téléphone d'urgence / SMS :</label>
+            <input type="text" value="${escapeHtml(c.phone || '')}"
+                   data-field="phone"
+                   placeholder="Ex: 06 12 34 56 78"
+                   oninput="window.app.liveUpdateField('${sectionId}', 'phone', this.value)"
+                   onchange="window.app.commitFieldUpdate('${sectionId}', 'phone', this.value)"
+                   class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-xs text-zinc-900 font-mono">
+          </div>
+          <div>
+            <label class="block text-[10px] text-zinc-500 mb-0.5">Libellé Confirmation CTA :</label>
+            <input type="text" value="${escapeHtml(c.ctaConfirm || 'Valider la réservation du créneau')}"
+                   data-field="ctaConfirm"
+                   oninput="window.app.liveUpdateField('${sectionId}', 'ctaConfirm', this.value)"
+                   onchange="window.app.commitFieldUpdate('${sectionId}', 'ctaConfirm', this.value)"
+                   class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-xs text-zinc-900">
+          </div>
+          <div class="space-y-1.5">
+            <label class="block text-[10px] font-medium text-zinc-500">Types de prestations proposées :</label>
+            ${(c.services || []).map((srv, idx) => `
+              <input type="text" value="${escapeHtml(srv)}"
+                     data-field="services.${idx}"
+                     oninput="window.app.liveUpdateField('${sectionId}', 'services.${idx}', this.value)"
+                     onchange="window.app.commitFieldUpdate('${sectionId}', 'services.${idx}', this.value)"
+                     class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-xs text-zinc-800">
+            `).join('')}
+          </div>
+        </div>
+      ` : ''}
+
       <!-- Hero photo with Replace & Trash -->
       ${c.heroImage !== undefined ? `
         <div class="space-y-1.5 pt-1 border-t border-zinc-200/60">
@@ -1386,7 +1471,10 @@ function getHarmonyColors(hex) {
 
 export function calculateContrast(hex1, hex2) {
   const getLuminance = (hex) => {
-    const clean = String(hex || '').replace('#', '');
+    let clean = String(hex || '').trim().replace('#', '');
+    if (clean.length === 3 && /^[0-9a-f]{3}$/i.test(clean)) {
+      clean = clean.split('').map(c => c + c).join('');
+    }
     if (!/^[0-9a-f]{6}$/i.test(clean)) return 0.5;
     const rgb = [0, 2, 4].map(idx => {
       const c = parseInt(clean.slice(idx, idx + 2), 16) / 255;

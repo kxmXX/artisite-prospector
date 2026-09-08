@@ -493,6 +493,74 @@ ${UTILITY_CSS}
       }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
       document.querySelectorAll('[data-motion]:not([data-motion="none"])').forEach(el => obs.observe(el));
     })();
+
+    // 8. Virtual Multi-Page Navigation Mode (Standalone)
+    (function initVirtualNavigation() {
+      const isMultiTab = ${project.branding?.navigationMode === "multi-tab"};
+      if (!isMultiTab) return;
+      const pageMap = {
+        home: ["header", "hero", "trust", "about", "quoteBlock", "certifications", "stats", "cta", "footer"],
+        services: ["header", "services", "customBlock", "process", "stepperBlock", "tabsBlock", "tableBlock", "sliderBlock", "certifications", "cta", "footer"],
+        realisations: ["header", "beforeAfter", "realisations", "gallery", "videoBlock", "reviews", "cta", "footer"],
+        devis: ["header", "quoteSimulator", "pricing", "roiCalculator", "cta", "footer"],
+        contact: ["header", "bookingBlock", "hours", "location", "faq", "cta", "footer"]
+      };
+
+      window.artisiteSwitchPage = function(pageId) {
+        const allowed = pageMap[pageId] || pageMap.home;
+        document.querySelectorAll('[data-section-type]').forEach(el => {
+          const type = el.getAttribute('data-section-type');
+          if (type === 'header' || type === 'footer') {
+            el.style.display = '';
+          } else if (allowed.includes(type)) {
+            el.style.display = '';
+          } else {
+            el.style.display = 'none';
+          }
+        });
+        document.querySelectorAll('.tab-nav-btn').forEach(btn => {
+          const isCurrent = btn.getAttribute('data-tab-nav') === pageId;
+          if (isCurrent) {
+            btn.className = 'tab-nav-btn px-3 py-1 rounded-full text-xs font-semibold transition-all bg-white text-zinc-950 shadow-xs font-bold';
+          } else {
+            btn.className = 'tab-nav-btn px-3 py-1 rounded-full text-xs font-semibold transition-all text-zinc-600 hover:text-zinc-900';
+          }
+        });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      };
+
+      window.artisiteSwitchPage('home');
+    })();
+
+    // 9. Rotating Social Proof Toast (Standalone)
+    (function initSocialProof() {
+      const toast = document.getElementById('social-proof-toast');
+      if (!toast) return;
+      const textEl = toast.querySelector('#sp-toast-text');
+      const timeEl = toast.querySelector('#sp-toast-time');
+      if (!textEl || !timeEl) return;
+      const city = toast.getAttribute('data-city') || ${JSON.stringify(project.business?.city || "votre commune")};
+      const trade = toast.getAttribute('data-trade') || ${JSON.stringify(project.business?.tradeLabel || "artisan")};
+      const messages = [
+        { text: 'Demande de devis reçue à ' + city, time: 'Il y a 6 min' },
+        { text: 'Nouveau créneau réservé (' + trade + ')', time: 'Il y a 14 min' },
+        { text: 'Rappel téléphonique confirmé à ' + city, time: 'Il y a 28 min' },
+        { text: "Intervention d'urgence validée", time: 'Il y a 42 min' }
+      ];
+      let idx = 0;
+      setInterval(() => {
+        if (!toast.isConnected) return;
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        setTimeout(() => {
+          idx = (idx + 1) % messages.length;
+          textEl.textContent = messages[idx].text;
+          timeEl.textContent = messages[idx].time;
+          toast.style.opacity = '1';
+          toast.style.transform = 'translateY(0)';
+        }, 400);
+      }, 7000);
+    })();
   </script>
 </body>
 </html>`;
@@ -575,18 +643,147 @@ export function generateProductionPackage(project, baseUrl = "https://artisite-p
   };
 }
 
+/**
+ * Pure Vanilla JS In-Memory ZIP Archive Generator (PKWARE Store format)
+ */
+function makeCrcTable() {
+  const table = new Uint32Array(256);
+  for (let i = 0; i < 256; i++) {
+    let c = i;
+    for (let k = 0; k < 8; k++) {
+      c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+    }
+    table[i] = c >>> 0;
+  }
+  return table;
+}
+
+const CRC_TABLE = makeCrcTable();
+
+export function calculateCRC32(bytes) {
+  let crc = 0xFFFFFFFF;
+  for (let i = 0; i < bytes.length; i++) {
+    crc = CRC_TABLE[(crc ^ bytes[i]) & 0xFF] ^ (crc >>> 8);
+  }
+  return (crc ^ 0xFFFFFFFF) >>> 0;
+}
+
+export function createZipArchive(files) {
+  const encoder = new TextEncoder();
+  const entries = [];
+  let offset = 0;
+
+  for (const [filename, content] of Object.entries(files)) {
+    const nameBytes = encoder.encode(filename);
+    const dataBytes = typeof content === "string" ? encoder.encode(content) : content;
+    const crc = calculateCRC32(dataBytes);
+    const size = dataBytes.length;
+
+    const localHeader = new Uint8Array(30 + nameBytes.length);
+    const view = new DataView(localHeader.buffer);
+    view.setUint32(0, 0x04034b50, true);
+    view.setUint16(4, 20, true);
+    view.setUint16(6, 0, true);
+    view.setUint16(8, 0, true);
+    view.setUint16(10, 0, true);
+    view.setUint16(12, 0, true);
+    view.setUint32(14, crc, true);
+    view.setUint32(18, size, true);
+    view.setUint32(22, size, true);
+    view.setUint16(26, nameBytes.length, true);
+    view.setUint16(28, 0, true);
+    localHeader.set(nameBytes, 30);
+
+    entries.push({
+      filename,
+      nameBytes,
+      dataBytes,
+      crc,
+      size,
+      offset,
+      localHeader
+    });
+
+    offset += localHeader.length + size;
+  }
+
+  const centralParts = [];
+  let centralDirSize = 0;
+  for (const entry of entries) {
+    const cdHeader = new Uint8Array(46 + entry.nameBytes.length);
+    const view = new DataView(cdHeader.buffer);
+    view.setUint32(0, 0x02014b50, true);
+    view.setUint16(4, 20, true);
+    view.setUint16(6, 20, true);
+    view.setUint16(8, 0, true);
+    view.setUint16(10, 0, true);
+    view.setUint16(12, 0, true);
+    view.setUint16(14, 0, true);
+    view.setUint32(16, entry.crc, true);
+    view.setUint32(20, entry.size, true);
+    view.setUint32(24, entry.size, true);
+    view.setUint16(28, entry.nameBytes.length, true);
+    view.setUint16(30, 0, true);
+    view.setUint16(32, 0, true);
+    view.setUint16(34, 0, true);
+    view.setUint16(36, 0, true);
+    view.setUint32(38, 0, true);
+    view.setUint32(42, entry.offset, true);
+    cdHeader.set(entry.nameBytes, 46);
+
+    centralParts.push(cdHeader);
+    centralDirSize += cdHeader.length;
+  }
+
+  const eocd = new Uint8Array(22);
+  const eocdView = new DataView(eocd.buffer);
+  eocdView.setUint32(0, 0x06054b50, true);
+  eocdView.setUint16(4, 0, true);
+  eocdView.setUint16(6, 0, true);
+  eocdView.setUint16(8, entries.length, true);
+  eocdView.setUint16(10, entries.length, true);
+  eocdView.setUint32(12, centralDirSize, true);
+  eocdView.setUint32(16, offset, true);
+  eocdView.setUint16(20, 0, true);
+
+  const totalLength = offset + centralDirSize + eocd.length;
+  const zipBuffer = new Uint8Array(totalLength);
+  let pos = 0;
+  for (const entry of entries) {
+    zipBuffer.set(entry.localHeader, pos);
+    pos += entry.localHeader.length;
+    zipBuffer.set(entry.dataBytes, pos);
+    pos += entry.dataBytes.length;
+  }
+  for (const cd of centralParts) {
+    zipBuffer.set(cd, pos);
+    pos += cd.length;
+  }
+  zipBuffer.set(eocd, pos);
+
+  return new Blob([zipBuffer], { type: "application/zip" });
+}
+
+export function generateProductionZip(project, baseUrl = "https://artisite-prospector.vercel.app") {
+  const pkg = generateProductionPackage(project, baseUrl);
+  return createZipArchive(pkg);
+}
+
 export function downloadProductionPackage(project) {
-  const pkg = generateProductionPackage(project);
-  downloadHTML(project);
-
-  const sitemapBlob = new Blob([pkg["sitemap.xml"]], { type: "application/xml" });
-  triggerDownload(sitemapBlob, "sitemap.xml");
-
-  const robotsBlob = new Blob([pkg["robots.txt"]], { type: "text/plain" });
-  triggerDownload(robotsBlob, "robots.txt");
-
-  const manifestBlob = new Blob([pkg["site.webmanifest"]], { type: "application/manifest+json" });
-  triggerDownload(manifestBlob, "site.webmanifest");
+  try {
+    const slug = slugify(project.business?.name || project.name || "artisan");
+    const zipBlob = generateProductionZip(project);
+    triggerDownload(zipBlob, `pack-production-${slug}.zip`);
+  } catch {
+    const pkg = generateProductionPackage(project);
+    downloadHTML(project);
+    const sitemapBlob = new Blob([pkg["sitemap.xml"]], { type: "application/xml" });
+    triggerDownload(sitemapBlob, "sitemap.xml");
+    const robotsBlob = new Blob([pkg["robots.txt"]], { type: "text/plain" });
+    triggerDownload(robotsBlob, "robots.txt");
+    const manifestBlob = new Blob([pkg["site.webmanifest"]], { type: "application/manifest+json" });
+    triggerDownload(manifestBlob, "site.webmanifest");
+  }
 }
 
 function triggerDownload(blob, filename) {

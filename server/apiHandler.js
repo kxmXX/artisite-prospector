@@ -28,12 +28,13 @@ export function getCachedAiResult(cacheKey) {
   return entry.data;
 }
 
-export function setCachedAiResult(cacheKey, data) {
+export function setCachedAiResult(cacheKey, data, ttlMs = CACHE_TTL_MS) {
   if (aiResponseCache.size >= 300) {
     const oldestKey = aiResponseCache.keys().next().value;
     if (oldestKey) aiResponseCache.delete(oldestKey);
   }
-  aiResponseCache.set(cacheKey, { data, expiresAt: Date.now() + CACHE_TTL_MS });
+  const effectiveTtl = typeof ttlMs === "number" && ttlMs > 0 ? ttlMs : CACHE_TTL_MS;
+  aiResponseCache.set(cacheKey, { data, expiresAt: Date.now() + effectiveTtl });
 }
 
 export function clearAiCache() {
@@ -84,13 +85,15 @@ export function readBodyJSON(req) {
 export function sendJSON(res, statusCode, data) {
   if (typeof res.status === "function" && typeof res.json === "function") {
     res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, If-None-Match, Accept");
     return res.status(statusCode).json(data);
   }
   res.writeHead(statusCode, {
     "Content-Type": "application/json; charset=utf-8",
     "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "Content-Type"
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization, If-None-Match, Accept"
   });
   res.end(JSON.stringify(data));
 }
@@ -101,13 +104,13 @@ export async function handleApiRequest(req, res) {
     if (typeof res.status === "function") {
       res.setHeader("Access-Control-Allow-Origin", "*");
       res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-      res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+      res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, If-None-Match, Accept");
       return res.status(204).end();
     }
     res.writeHead(204, {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type"
+      "Access-Control-Allow-Headers": "Content-Type, Authorization, If-None-Match, Accept"
     });
     res.end();
     return;

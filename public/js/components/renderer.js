@@ -2,6 +2,16 @@ import { getIcon } from "./icons.js";
 import { getTradeFallbackDataUrl } from "../data/imageFallbacks.js";
 import { getUiId, getSectionUiId, getUiCode } from "../data/uiIds.js";
 
+function escapeHtml(str) {
+  if (!str) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 function getInitialSiteTheme(project) {
   const color = project?.branding?.bgColor || "#ffffff";
   const hex = color.replace("#", "");
@@ -170,8 +180,8 @@ export function renderWebsiteHTML(project, options = { isEditor: false, isStanda
 
   const activePage = options.activeVirtualPage || project._activeVirtualPage || null;
   const PAGE_SECTIONS_MAP = {
-    home: ["header", "hero", "trust", "about", "stats", "cta", "footer"],
-    services: ["header", "services", "customBlock", "process", "stepperBlock", "tabsBlock", "tableBlock", "sliderBlock", "cta", "footer"],
+    home: ["header", "hero", "trust", "about", "quoteBlock", "certifications", "stats", "cta", "footer"],
+    services: ["header", "services", "customBlock", "process", "stepperBlock", "tabsBlock", "tableBlock", "sliderBlock", "certifications", "cta", "footer"],
     realisations: ["header", "beforeAfter", "realisations", "gallery", "videoBlock", "reviews", "cta", "footer"],
     devis: ["header", "quoteSimulator", "pricing", "roiCalculator", "cta", "footer"],
     contact: ["header", "bookingBlock", "hours", "location", "faq", "cta", "footer"]
@@ -181,9 +191,16 @@ export function renderWebsiteHTML(project, options = { isEditor: false, isStanda
     .filter(sec => {
       if (options.isEditor) return true;
       if (sec.visibility === false) return false;
+      if (options.isStandalone && project.branding?.navigationMode === "multi-tab") {
+        return true;
+      }
       if (activePage && project.branding?.navigationMode === "multi-tab") {
         const allowed = PAGE_SECTIONS_MAP[activePage] || PAGE_SECTIONS_MAP.home;
-        return allowed.includes(sec.type);
+        if (sec.page) return sec.page === activePage;
+        if (allowed.includes(sec.type)) return true;
+        const isMappedAnywhere = Object.values(PAGE_SECTIONS_MAP).some(types => types.includes(sec.type));
+        if (!isMappedAnywhere && activePage === "home") return true;
+        return false;
       }
       return true;
     })
@@ -356,7 +373,7 @@ function renderSection(sec, project, options) {
     : "";
 
   if (!isEditor) {
-    return `<section id="${sec.type}" class="site-section ${bgTheme} ${isHidden ? 'hidden' : ''}" style="--section-bg: ${themeColor}; ${customBackground}" data-section-bg="${sectionTheme}" data-ui-id="${getSectionUiId(sec)}" data-ui-type="section"${motionPreset ? ` data-motion="${motionPreset}"` : ''}>${innerHTML}</section>`;
+    return `<section id="${sec.type}" class="site-section ${bgTheme} ${isHidden ? 'hidden' : ''}" style="--section-bg: ${themeColor}; ${customBackground}" data-section-type="${sec.type}" data-section-bg="${sectionTheme}" data-ui-id="${getSectionUiId(sec)}" data-ui-type="section"${motionPreset ? ` data-motion="${motionPreset}"` : ''}>${innerHTML}</section>`;
   }
 
   // Editor Wrapper with Controls
@@ -494,12 +511,12 @@ function renderHeader(sec, project, options = {}) {
 
         <nav class="hidden md:flex items-center gap-7 text-sm font-medium text-gray-600">
           ${project.branding?.navigationMode === "multi-tab" ? `
-            <div class="flex items-center gap-1.5 bg-zinc-100/90 p-1 rounded-full border border-zinc-200/80">
-              <button type="button" onclick="window.app?.setVirtualPage?.('home')" class="px-3 py-1 rounded-full text-xs font-semibold transition-all ${(options.activeVirtualPage || project._activeVirtualPage || 'home') === 'home' ? 'bg-white text-zinc-950 shadow-xs font-bold' : 'text-zinc-600 hover:text-zinc-900'}">Accueil</button>
-              <button type="button" onclick="window.app?.setVirtualPage?.('services')" class="px-3 py-1 rounded-full text-xs font-semibold transition-all ${(options.activeVirtualPage || project._activeVirtualPage) === 'services' ? 'bg-white text-zinc-950 shadow-xs font-bold' : 'text-zinc-600 hover:text-zinc-900'}">Services</button>
-              <button type="button" onclick="window.app?.setVirtualPage?.('realisations')" class="px-3 py-1 rounded-full text-xs font-semibold transition-all ${(options.activeVirtualPage || project._activeVirtualPage) === 'realisations' ? 'bg-white text-zinc-950 shadow-xs font-bold' : 'text-zinc-600 hover:text-zinc-900'}">Réalisations</button>
-              <button type="button" onclick="window.app?.setVirtualPage?.('devis')" class="px-3 py-1 rounded-full text-xs font-semibold transition-all ${(options.activeVirtualPage || project._activeVirtualPage) === 'devis' ? 'bg-white text-zinc-950 shadow-xs font-bold' : 'text-zinc-600 hover:text-zinc-900'}">Devis</button>
-              <button type="button" onclick="window.app?.setVirtualPage?.('contact')" class="px-3 py-1 rounded-full text-xs font-semibold transition-all ${(options.activeVirtualPage || project._activeVirtualPage) === 'contact' ? 'bg-white text-zinc-950 shadow-xs font-bold' : 'text-zinc-600 hover:text-zinc-900'}">Contact & RDV</button>
+            <div class="flex items-center gap-1.5 bg-zinc-100/90 p-1 rounded-full border border-zinc-200/80" data-navigation-mode="multi-tab">
+              <button type="button" onclick="(window.app?.setVirtualPage ? window.app.setVirtualPage('home') : window.artisiteSwitchPage?.('home'))" data-tab-nav="home" class="tab-nav-btn px-3 py-1 rounded-full text-xs font-semibold transition-all ${(options.activeVirtualPage || project._activeVirtualPage || 'home') === 'home' ? 'bg-white text-zinc-950 shadow-xs font-bold' : 'text-zinc-600 hover:text-zinc-900'}">Accueil</button>
+              <button type="button" onclick="(window.app?.setVirtualPage ? window.app.setVirtualPage('services') : window.artisiteSwitchPage?.('services'))" data-tab-nav="services" class="tab-nav-btn px-3 py-1 rounded-full text-xs font-semibold transition-all ${(options.activeVirtualPage || project._activeVirtualPage) === 'services' ? 'bg-white text-zinc-950 shadow-xs font-bold' : 'text-zinc-600 hover:text-zinc-900'}">Services</button>
+              <button type="button" onclick="(window.app?.setVirtualPage ? window.app.setVirtualPage('realisations') : window.artisiteSwitchPage?.('realisations'))" data-tab-nav="realisations" class="tab-nav-btn px-3 py-1 rounded-full text-xs font-semibold transition-all ${(options.activeVirtualPage || project._activeVirtualPage) === 'realisations' ? 'bg-white text-zinc-950 shadow-xs font-bold' : 'text-zinc-600 hover:text-zinc-900'}">Réalisations</button>
+              <button type="button" onclick="(window.app?.setVirtualPage ? window.app.setVirtualPage('devis') : window.artisiteSwitchPage?.('devis'))" data-tab-nav="devis" class="tab-nav-btn px-3 py-1 rounded-full text-xs font-semibold transition-all ${(options.activeVirtualPage || project._activeVirtualPage) === 'devis' ? 'bg-white text-zinc-950 shadow-xs font-bold' : 'text-zinc-600 hover:text-zinc-900'}">Devis</button>
+              <button type="button" onclick="(window.app?.setVirtualPage ? window.app.setVirtualPage('contact') : window.artisiteSwitchPage?.('contact'))" data-tab-nav="contact" class="tab-nav-btn px-3 py-1 rounded-full text-xs font-semibold transition-all ${(options.activeVirtualPage || project._activeVirtualPage) === 'contact' ? 'bg-white text-zinc-950 shadow-xs font-bold' : 'text-zinc-600 hover:text-zinc-900'}">Contact & RDV</button>
             </div>
           ` : (c.links || []).map(l => `<a href="${l.target}" class="hover:text-gray-900 transition-colors">${l.label}</a>`).join('')}
         </nav>
@@ -2733,9 +2750,10 @@ function renderBookingBlock(sec, project, options = {}) {
 function renderSocialProofToast(project, options = {}) {
   if (options.isEditor || project.branding?.socialProofEnabled === false) return "";
   const city = project.business?.city || "votre commune";
+  const trade = project.business?.tradeLabel || "artisan";
 
   return `
-    <div id="social-proof-toast" class="social-proof-toast fixed bottom-4 left-4 z-40 bg-white/95 backdrop-blur-md border border-zinc-200/90 rounded-2xl p-3 shadow-lg flex items-center gap-3 transition-all duration-500 max-w-sm" role="status" aria-live="polite">
+    <div id="social-proof-toast" class="social-proof-toast fixed bottom-4 left-4 z-40 bg-white/95 backdrop-blur-md border border-zinc-200/90 rounded-2xl p-3 shadow-lg flex items-center gap-3 transition-all duration-500 max-w-sm" role="status" aria-live="polite" data-city="${escapeHtml(city)}" data-trade="${escapeHtml(trade)}">
       <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-base flex-shrink-0 border border-emerald-200">
         ⚡
       </div>
@@ -2744,8 +2762,8 @@ function renderSocialProofToast(project, options = {}) {
           Demande de devis reçue à ${city}
         </div>
         <div class="flex items-center gap-1.5 text-[10.5px] text-zinc-500 font-medium">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-          <span id="sp-toast-time">Il y a 14 min</span>
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span id="sp-toast-time">Il y a 6 min</span>
           <span>•</span>
           <span class="text-emerald-700 font-semibold">Vérifié ✓</span>
         </div>

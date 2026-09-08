@@ -18,6 +18,16 @@ import { getTradeFallbackDataUrl } from "./data/imageFallbacks.js";
 import { ensureFontCatalog } from "./data/fonts.js";
 import { getIcon } from "./components/icons.js";
 
+function escapeHtml(str) {
+  if (!str) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 class App {
   constructor() {
     this.rootEl = document.getElementById("app");
@@ -506,6 +516,7 @@ class App {
     const canvas = document.getElementById("closer-signature-pad");
     if (!canvas || canvas._signaturePadInitialized) return;
     canvas._signaturePadInitialized = true;
+    canvas._hasSigned = false;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     ctx.lineWidth = 2.5;
@@ -521,8 +532,8 @@ class App {
       const rect = canvas.getBoundingClientRect();
       const scaleX = canvas.width / (rect.width || 1);
       const scaleY = canvas.height / (rect.height || 1);
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      const clientX = e.touches && e.touches.length > 0 ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches && e.touches.length > 0 ? e.touches[0].clientY : e.clientY;
       return {
         x: (clientX - rect.left) * scaleX,
         y: (clientY - rect.top) * scaleY
@@ -530,7 +541,12 @@ class App {
     };
 
     const startDraw = (e) => {
+      if (e.cancelable) e.preventDefault();
       drawing = true;
+      canvas._hasSigned = true;
+      if (e.pointerId && typeof canvas.setPointerCapture === "function") {
+        try { canvas.setPointerCapture(e.pointerId); } catch {}
+      }
       const pos = getPos(e);
       lastX = pos.x;
       lastY = pos.y;
@@ -542,28 +558,41 @@ class App {
       const pos = getPos(e);
       ctx.beginPath();
       ctx.moveTo(lastX, lastY);
+      const midX = (lastX + pos.x) / 2;
+      const midY = (lastY + pos.y) / 2;
+      ctx.quadraticCurveTo(lastX, lastY, midX, midY);
       ctx.lineTo(pos.x, pos.y);
       ctx.stroke();
       lastX = pos.x;
       lastY = pos.y;
     };
 
-    const stopDraw = () => {
+    const stopDraw = (e) => {
       drawing = false;
+      if (e && e.pointerId && typeof canvas.releasePointerCapture === "function") {
+        try { canvas.releasePointerCapture(e.pointerId); } catch {}
+      }
     };
 
-    canvas.addEventListener("mousedown", startDraw);
-    canvas.addEventListener("mousemove", draw);
-    window.addEventListener("mouseup", stopDraw);
-
-    canvas.addEventListener("touchstart", startDraw, { passive: false });
-    canvas.addEventListener("touchmove", draw, { passive: false });
-    window.addEventListener("touchend", stopDraw);
+    if (typeof window !== "undefined" && window.PointerEvent) {
+      canvas.addEventListener("pointerdown", startDraw);
+      canvas.addEventListener("pointermove", draw);
+      canvas.addEventListener("pointerup", stopDraw);
+      canvas.addEventListener("pointercancel", stopDraw);
+    } else {
+      canvas.addEventListener("mousedown", startDraw);
+      canvas.addEventListener("mousemove", draw);
+      window.addEventListener("mouseup", stopDraw);
+      canvas.addEventListener("touchstart", startDraw, { passive: false });
+      canvas.addEventListener("touchmove", draw, { passive: false });
+      window.addEventListener("touchend", stopDraw);
+    }
   }
 
   clearSignaturePad() {
     const canvas = document.getElementById("closer-signature-pad");
     if (canvas) {
+      canvas._hasSigned = false;
       const ctx = canvas.getContext("2d");
       if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
@@ -573,7 +602,8 @@ class App {
     const project = state.currentProject;
     if (!project) return;
     const canvas = document.getElementById("closer-signature-pad");
-    const sigDataUrl = canvas ? canvas.toDataURL("image/png") : "";
+    const hasSigned = Boolean(canvas && canvas._hasSigned);
+    const sigDataUrl = hasSigned ? canvas.toDataURL("image/png") : "";
     const b = project.business || {};
     const today = new Date().toLocaleDateString("fr-FR", { year: "numeric", month: "long", day: "numeric" });
     const printWin = typeof window !== "undefined" ? window.open("", "_blank") : null;
@@ -586,7 +616,7 @@ class App {
       <html lang="fr">
       <head>
         <meta charset="UTF-8">
-        <title>Bon de Commande — ${b.name || "Client"}</title>
+        <title>Bon de Commande — ${escapeHtml(b.name || "Client")}</title>
         <style>
           body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 40px; color: #18181b; max-width: 800px; margin: 0 auto; line-height: 1.5; }
           .header { display: flex; justify-content: space-between; border-bottom: 2px solid #18181b; padding-bottom: 20px; margin-bottom: 30px; }
@@ -614,15 +644,15 @@ class App {
         <div class="grid">
           <div class="card">
             <strong>Bénéficiaire :</strong><br>
-            ${b.name || "Artisan"}<br>
-            ${b.tradeLabel || "Artisan"} — ${b.city || ""}<br>
-            Tél: ${b.phone || "Non renseigné"}<br>
-            Email: ${b.email || "Non renseigné"}
+            ${escapeHtml(b.name || "Artisan")}<br>
+            ${escapeHtml(b.tradeLabel || "Artisan")} — ${escapeHtml(b.city || "")}<br>
+            Tél: ${escapeHtml(b.phone || "Non renseigné")}<br>
+            Email: ${escapeHtml(b.email || "Non renseigné")}
           </div>
           <div class="card">
             <strong>Prestation Clé-en-Main :</strong><br>
             Site Vitrine Ultra-Rapide Artisite + Hébergement 1 an<br>
-            Montant TTC : <strong>${project.settings?.packPrice || "990 €"}</strong><br>
+            Montant TTC : <strong>${escapeHtml(project.settings?.packPrice || "990 €")}</strong><br>
             Délai de mise en ligne : <strong>48 heures ouvrées</strong>
           </div>
         </div>
@@ -644,8 +674,8 @@ class App {
           </div>
           <div style="flex: 1;">
             <div style="font-size: 12px; font-weight: 700; margin-bottom: 5px;">Signature & Accord du Client :</div>
-            <div class="sig-box">
-              ${sigDataUrl ? `<img src="${sigDataUrl}" class="sig-img" alt="Signature client">` : '<span style="color:#a1a1aa;font-size:12px;line-height:120px;">Signature électronique</span>'}
+            <div class="sig-box" style="display:flex;align-items:center;justify-content:center;">
+              ${sigDataUrl ? `<img src="${sigDataUrl}" class="sig-img" alt="Signature client">` : '<span style="color:#71717a;font-size:12px;font-style:italic;">En attente de signature client lors de la remise</span>'}
             </div>
           </div>
         </div>
@@ -656,6 +686,96 @@ class App {
       </html>
     `);
     printWin.document.close();
+  }
+
+  // Live AI Audit fetcher (MVP Feature 5)
+  async fetchLiveAudit(projectId) {
+    const project = projectId ? (state.projects.find(p => p.id === projectId) || state.currentProject) : state.currentProject;
+    if (!project) return;
+    const b = project.business || {};
+    const btn = document.getElementById("btn-fetch-live-audit");
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = `<span>⏳ Analyse IA en cours...</span>`;
+    }
+
+    try {
+      const res = await fetch("/api/ai/audit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: b.name || "Artisan",
+          trade: b.tradeLabel || "artisan",
+          city: b.city || "France"
+        })
+      });
+      const data = await res.json();
+      if (data.success && data.data) {
+        const audit = data.data;
+        const gapsEl = document.getElementById("closer-audit-gaps");
+        if (gapsEl && Array.isArray(audit.competitorGaps)) {
+          gapsEl.innerHTML = `
+            <div class="text-[10.5px] uppercase font-bold text-emerald-700">Gaps Concurrentiels Détectés (${escapeHtml(audit.city)}) :</div>
+            ${audit.competitorGaps.map(g => `<p>• ${escapeHtml(g)}</p>`).join('')}
+          `;
+        }
+        const hookEl = document.getElementById("closer-audit-hook");
+        if (hookEl && audit.closerHook) {
+          hookEl.innerHTML = `
+            <div class="text-xs font-bold text-amber-900">Accroche IA Choc pour Michel :</div>
+            <p class="text-xs text-amber-800 italic leading-relaxed font-medium">« ${escapeHtml(audit.closerHook)} »</p>
+          `;
+        }
+        this.showToast("Audit 360° actualisé avec l'IA locale !", "success");
+      }
+    } catch {
+      this.showToast("Mode hors-ligne : benchmark local prêt à l'emploi conservé", "info");
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = `<span>⚡ Actualiser IA Locale</span>`;
+      }
+    }
+  }
+
+  // Rotating Social Proof Notifications (MVP Feature 2)
+  initSocialProofRotation() {
+    if (this._socialProofInterval) {
+      clearInterval(this._socialProofInterval);
+      this._socialProofInterval = null;
+    }
+    const toast = document.getElementById("social-proof-toast");
+    if (!toast) return;
+    const textEl = toast.querySelector("#sp-toast-text");
+    const timeEl = toast.querySelector("#sp-toast-time");
+    if (!textEl || !timeEl) return;
+
+    const city = toast.getAttribute("data-city") || state.currentProject?.business?.city || "secteur";
+    const trade = toast.getAttribute("data-trade") || state.currentProject?.business?.tradeLabel || "artisan";
+
+    const messages = [
+      { text: `Demande de devis reçue à ${city}`, time: "Il y a 6 min" },
+      { text: `Nouveau créneau réservé (${trade})`, time: "Il y a 14 min" },
+      { text: `Rappel téléphonique confirmé à ${city}`, time: "Il y a 28 min" },
+      { text: `Intervention d'urgence validée`, time: "Il y a 42 min" }
+    ];
+
+    let currentIdx = 0;
+    this._socialProofInterval = setInterval(() => {
+      const el = document.getElementById("social-proof-toast");
+      if (!el) {
+        clearInterval(this._socialProofInterval);
+        this._socialProofInterval = null;
+        return;
+      }
+      el.classList.add("opacity-0", "translate-y-2");
+      setTimeout(() => {
+        currentIdx = (currentIdx + 1) % messages.length;
+        textEl.textContent = messages[currentIdx].text;
+        timeEl.textContent = messages[currentIdx].time;
+        el.classList.remove("opacity-0", "translate-y-2");
+      }, 400);
+    }, 7000);
   }
 
   // 2. Call Teleprompter Timer (MVP Feature 6)
@@ -2931,9 +3051,45 @@ class App {
   // Fullscreen Presentation Mode (for cold calling / screen sharing)
   renderFullscreenPreview() {
     const project = state.currentProject;
-    const siteHTML = renderWebsiteHTML(project, { isEditor: false, isStandalone: false });
+    const isClientDemo = typeof window !== "undefined" && window.location && window.location.search.includes("demo=");
 
-    const isClientDemo = window.location.search.includes("demo=");
+    // White-Label Client PIN Gate (MVP Feature 10)
+    if (isClientDemo && project?.settings?.clientDemoPin && !this._clientUnlocked) {
+      const bus = project.business || {};
+      const trade = bus.tradeLabel || "Artisan";
+      this.rootEl.innerHTML = `
+        <div class="min-h-screen bg-zinc-950 flex items-center justify-center p-4 font-sans text-zinc-100">
+          <div class="max-w-md w-full bg-zinc-900 border border-zinc-800 rounded-3xl p-8 shadow-2xl space-y-6 text-center animate-fade-in">
+            <div class="w-16 h-16 rounded-2xl bg-zinc-800/80 border border-zinc-700 flex items-center justify-center mx-auto text-2xl text-emerald-400">
+              🔒
+            </div>
+            <div class="space-y-2">
+              <span class="px-3 py-1 rounded-full text-[10.5px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Présentation Privée</span>
+              <h1 class="text-xl font-bold text-white tracking-tight">${escapeHtml(bus.name || "Espace Client")}</h1>
+              <p class="text-xs text-zinc-400 leading-relaxed">
+                Cette démonstration interactive pour vos prestations de <strong>${escapeHtml(trade)}</strong> est protégée par un code confidentiel remis par votre conseiller.
+              </p>
+            </div>
+
+            <form onsubmit="event.preventDefault(); const pin = this.querySelector('#client-pin-input').value; window.app.unlockClientDemo(pin);" class="space-y-4">
+              <div class="space-y-1">
+                <input type="password" id="client-pin-input" maxlength="6" inputmode="numeric" autofocus placeholder="• • • •" class="w-full bg-zinc-950 border border-zinc-700 focus:border-emerald-500 rounded-2xl py-3.5 text-center text-2xl tracking-[0.4em] font-mono text-white focus:outline-none transition-colors">
+              </div>
+              <button type="submit" class="w-full btn-cta bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 px-6 rounded-2xl text-xs uppercase tracking-wider shadow-lg transition-all">
+                Déverrouiller l'accès démo
+              </button>
+            </form>
+
+            <div class="text-[11px] text-zinc-500 pt-2 border-t border-zinc-800/60">
+              Besoin d'assistance ? Contactez directement votre conseiller Michel.
+            </div>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    const siteHTML = renderWebsiteHTML(project, { isEditor: false, isStandalone: false });
 
     this.rootEl.innerHTML = `
       <div class="relative min-h-screen bg-zinc-950">
@@ -2943,7 +3099,7 @@ class App {
         <div class="fixed top-3 left-1/2 transform -translate-x-1/2 z-50 bg-zinc-950/90 text-white px-4 py-2 rounded-full shadow-lg backdrop-blur-md border border-zinc-800 flex items-center gap-3.5 text-xs">
           <div class="flex items-center gap-2 font-medium text-zinc-300">
             <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-            <span>Proposition : <strong class="text-white">${project.business.name}</strong></span>
+            <span>Proposition : <strong class="text-white">${escapeHtml(project.business?.name || '')}</strong></span>
           </div>
 
           <div class="h-3.5 w-[1px] bg-zinc-800"></div>
@@ -2971,6 +3127,7 @@ class App {
     this.initCanvasInteractivity();
     this.syncSiteThemeToggle();
     this.hydrateImageFallbacks();
+    this.initSocialProofRotation();
   }
 
   // Interactive hooks for the canvas

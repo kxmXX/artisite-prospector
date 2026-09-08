@@ -163,10 +163,24 @@ export function renderCloserModal(project) {
 
           <!-- TAB 3: AUDIT 360° & BENCHMARK LOCAL (MVP Feature 5) -->
           <div id="closer-panel-audit" class="space-y-4 hidden">
-            <div class="p-4 rounded-2xl bg-zinc-950 text-white space-y-1">
-              <div class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Benchmark Visibilité Locale</div>
-              <h3 class="text-sm sm:text-base font-extrabold text-white">${audit.title}</h3>
+            <div class="p-4 rounded-2xl bg-zinc-950 text-white space-y-2">
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Benchmark Visibilité Locale</div>
+                  <h3 class="text-sm sm:text-base font-extrabold text-white">${audit.title}</h3>
+                </div>
+                <button type="button" id="btn-fetch-live-audit" onclick="window.app?.fetchLiveAudit?.('${project.id}')" class="btn-keycap btn-keycap-light text-[11px] font-bold px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-sm text-zinc-900 bg-white hover:bg-zinc-100 transition-all">
+                  <span>⚡ Actualiser IA Locale</span>
+                </button>
+              </div>
               <p class="text-[11px] text-zinc-400">Montrez ces écarts techniques en direct à l'artisan pour démolir ses réticences.</p>
+            </div>
+
+            <div id="closer-audit-gaps" class="space-y-1.5 p-3 rounded-2xl bg-zinc-100 border border-zinc-200 text-[11.5px] text-zinc-800">
+              <div class="text-[10.5px] uppercase font-bold text-emerald-700">Gaps Concurrentiels Détectés (${audit.city}) :</div>
+              <p>• 82% des artisans ${audit.trade} à ${audit.city} n'ont pas de module Avant / Après interactif</p>
+              <p>• Moins de 1 sur 4 propose un devis instantané ou appel direct 1-clic sur smartphone</p>
+              <p>• Forte opportunité de positionnement sur Google Maps et requêtes locales urgentes</p>
             </div>
 
             <div class="space-y-2.5">
@@ -184,8 +198,8 @@ export function renderCloserModal(project) {
               `).join('')}
             </div>
 
-            <div class="bg-amber-50 border border-amber-200 p-3.5 rounded-2xl space-y-1.5">
-              <div class="text-xs font-bold text-amber-900">Argument Choc pour Michel :</div>
+            <div id="closer-audit-hook" class="bg-amber-50 border border-amber-200 p-3.5 rounded-2xl space-y-1.5">
+              <div class="text-xs font-bold text-amber-900">Accroche Choc pour Michel :</div>
               ${audit.talkingPoints.map(tp => `<p class="text-xs text-amber-800 italic leading-relaxed font-medium">${tp}</p>`).join('')}
             </div>
           </div>
@@ -279,29 +293,68 @@ export function renderCloserModal(project) {
           <!-- TAB 7: SIMULATEUR ROI (MVP Feature 1) -->
           <div id="closer-panel-roi" class="space-y-4 hidden">
             <div class="bg-zinc-50 p-5 rounded-2xl border border-zinc-200 space-y-4">
-              <div class="font-bold text-xs text-zinc-900 uppercase tracking-wider">Argument Rentabilité : 1 Seul Chantier Rembourse le Site</div>
+              <div class="flex items-center justify-between">
+                <div class="font-bold text-xs text-zinc-900 uppercase tracking-wider">Calculateur de Rentabilité Réelle en Appel</div>
+                <span class="text-[10.5px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">Interactif en direct</span>
+              </div>
               <p class="text-xs text-zinc-600 leading-relaxed">
-                Quand l'artisan hésite sur le prix, posez-lui cette question :
-                <em>« Combien vous rapporte en moyenne un seul chantier complet ? »</em>
+                Quand l'artisan hésite sur le prix, ajustez son panier moyen en direct au téléphone :
               </p>
               
+              <div class="grid sm:grid-cols-2 gap-3 p-3 bg-white border border-zinc-200 rounded-xl">
+                <div>
+                  <div class="flex justify-between text-[11px] font-bold text-zinc-700 mb-1">
+                    <span>Panier moyen chantier :</span>
+                    <span id="closer-roi-ticket-val" class="font-mono text-zinc-950">${roi.ticketMoyen} €</span>
+                  </div>
+                  <input type="range" min="300" max="5000" step="100" value="${roi.ticketMoyen}"
+                         oninput="(function(el){
+                           const t = Number(el.value);
+                           const cost = Number(document.getElementById('closer-roi-cost').value);
+                           document.getElementById('closer-roi-ticket-val').textContent = t + ' €';
+                           document.getElementById('closer-roi-kpi-ticket').textContent = t + ' €';
+                           const breakEven = (cost / t).toFixed(1);
+                           document.getElementById('closer-roi-kpi-break').textContent = breakEven + ' chantier' + (breakEven > 1 ? 's' : '');
+                           const yearly = (t * 12) - cost;
+                           document.getElementById('closer-roi-kpi-gain').textContent = '+' + yearly.toLocaleString('fr-FR') + ' € net';
+                         })(this)" id="closer-roi-ticket" class="w-full h-1.5 bg-zinc-200 rounded-lg appearance-none cursor-pointer accent-emerald-600">
+                </div>
+                <div>
+                  <div class="flex justify-between text-[11px] font-bold text-zinc-700 mb-1">
+                    <span>Prix du site vitrine :</span>
+                    <span id="closer-roi-cost-val" class="font-mono text-zinc-950">${roi.siteCost} €</span>
+                  </div>
+                  <input type="range" min="500" max="2500" step="50" value="${roi.siteCost}"
+                         oninput="(function(el){
+                           const cost = Number(el.value);
+                           const t = Number(document.getElementById('closer-roi-ticket').value);
+                           document.getElementById('closer-roi-cost-val').textContent = cost + ' €';
+                           document.getElementById('closer-roi-kpi-cost').textContent = cost + ' €';
+                           const breakEven = (cost / t).toFixed(1);
+                           document.getElementById('closer-roi-kpi-break').textContent = breakEven + ' chantier' + (breakEven > 1 ? 's' : '');
+                           const yearly = (t * 12) - cost;
+                           document.getElementById('closer-roi-kpi-gain').textContent = '+' + yearly.toLocaleString('fr-FR') + ' € net';
+                         })(this)" id="closer-roi-cost" class="w-full h-1.5 bg-zinc-200 rounded-lg appearance-none cursor-pointer accent-emerald-600">
+                </div>
+              </div>
+
               <div class="grid grid-cols-3 gap-3 pt-1">
                 <div class="bg-white p-3.5 rounded-xl border border-zinc-200 text-center shadow-2xs">
                   <div class="text-[10px] uppercase font-bold text-zinc-400">Panier Moyen</div>
-                  <div class="text-lg font-extrabold text-zinc-900 mt-0.5 font-mono">${roi.ticketMoyen} €</div>
+                  <div class="text-lg font-extrabold text-zinc-900 mt-0.5 font-mono" id="closer-roi-kpi-ticket">${roi.ticketMoyen} €</div>
                 </div>
                 <div class="bg-white p-3.5 rounded-xl border border-zinc-200 text-center shadow-2xs">
                   <div class="text-[10px] uppercase font-bold text-zinc-400">Prix du Site</div>
-                  <div class="text-lg font-extrabold text-zinc-900 mt-0.5 font-mono">${roi.siteCost} €</div>
+                  <div class="text-lg font-extrabold text-zinc-900 mt-0.5 font-mono" id="closer-roi-kpi-cost">${roi.siteCost} €</div>
                 </div>
                 <div class="bg-emerald-50 border border-emerald-200 p-3.5 rounded-xl text-center shadow-2xs">
-                  <div class="text-[10px] uppercase font-bold text-emerald-700">Rentabilité à</div>
-                  <div class="text-lg font-extrabold text-emerald-700 mt-0.5 font-mono">${roi.chantiersToBreakEven} chantier</div>
+                  <div class="text-[10px] uppercase font-bold text-emerald-700">Amorti à</div>
+                  <div class="text-lg font-extrabold text-emerald-700 mt-0.5 font-mono" id="closer-roi-kpi-break">${roi.chantiersToBreakEven} chantier</div>
                 </div>
               </div>
 
               <div class="text-xs text-zinc-800 bg-white p-4 rounded-xl border border-zinc-200 leading-relaxed">
-                <strong>Phrase clé :</strong> <em>« Dès le premier appel signé grâce au site ce mois-ci, votre vitrine est 100% rentabilisée. Le reste de l'année, c'est du bénéfice net pur pour votre entreprise. »</em>
+                <strong>Phrase clé :</strong> <em>« Dès le premier appel signé grâce au site ce mois-ci, votre vitrine est 100% rentabilisée. Ensuite, avec seulement 1 chantier par mois, vous dégagez <span id="closer-roi-kpi-gain" class="font-bold text-emerald-700">+${roi.yearlyGainOnePerMonth.toLocaleString('fr-FR')} € net</span> par an ! »</em>
               </div>
             </div>
           </div>

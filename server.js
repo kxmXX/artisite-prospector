@@ -48,14 +48,10 @@ const server = http.createServer(async (req, res) => {
   const resolved = path.resolve(PUBLIC_DIR, "." + reqPath);
   let filePath = resolved.startsWith(PUBLIC_DIR) ? resolved : path.join(PUBLIC_DIR, "index.html");
 
-  fs.stat(filePath, (err, stats) => {
-    if (err || !stats.isFile()) {
-      filePath = path.join(PUBLIC_DIR, "index.html");
-    }
-
-    const ext = path.extname(filePath).toLowerCase();
+  const serveStaticFile = (targetPath, targetStats) => {
+    const ext = path.extname(targetPath).toLowerCase();
     const contentType = MIME_TYPES[ext] || "application/octet-stream";
-    const etag = `W/"${stats?.size || 0}-${stats?.mtimeMs || 0}"`;
+    const etag = `W/"${targetStats?.size || 0}-${targetStats?.mtimeMs || 0}"`;
 
     if (req.headers["if-none-match"] === etag) {
       res.writeHead(304, {
@@ -66,7 +62,7 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    fs.readFile(filePath, (readErr, content) => {
+    fs.readFile(targetPath, (readErr, content) => {
       if (readErr) {
         res.writeHead(500, { "Content-Type": "text/plain" });
         res.end("Internal Server Error: " + readErr.message);
@@ -80,6 +76,23 @@ const server = http.createServer(async (req, res) => {
       });
       res.end(content);
     });
+  };
+
+  fs.stat(filePath, (err, stats) => {
+    if (err || !stats.isFile()) {
+      const fallbackPath = path.join(PUBLIC_DIR, "index.html");
+      fs.stat(fallbackPath, (fallbackErr, fallbackStats) => {
+        if (fallbackErr) {
+          res.writeHead(404, { "Content-Type": "text/plain" });
+          res.end("Not Found");
+          return;
+        }
+        serveStaticFile(fallbackPath, fallbackStats);
+      });
+      return;
+    }
+
+    serveStaticFile(filePath, stats);
   });
 });
 

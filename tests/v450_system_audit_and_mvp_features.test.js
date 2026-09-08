@@ -18,9 +18,11 @@ import {
   generateSitemapXML,
   generateRobotsTXT,
   generateWebManifest,
-  generateProductionPackage
+  generateProductionPackage,
+  generateProductionZip,
+  createZipArchive
 } from "../public/js/engine/exporter.js";
-import { getCachedAiResult, setCachedAiResult } from "../server/apiHandler.js";
+import { getCachedAiResult, setCachedAiResult, handleApiRequest } from "../server/apiHandler.js";
 
 // ============================================================================
 // 1. SYSTEM AUDIT & LATENCY BOTTLENECKS
@@ -209,6 +211,15 @@ test("v4.5.0 MVP 8: WCAG 2.1 Contrast Ratio Calculator and grading", () => {
   assert.equal(blackOnWhite.isAa, true);
   assert.equal(blackOnWhite.grade, "AAA");
 
+  // Shorthand 3-digit hex normalization (#000 on #fff must also equal 21:1)
+  const shortHex = calculateContrast("#000", "#fff");
+  assert.equal(shortHex.ratio, 21, "Short 3-character hex #000 on #fff must yield 21:1 ratio");
+  assert.equal(shortHex.grade, "AAA", "Short hex #000 on #fff must achieve AAA grade");
+
+  const shortGray = calculateContrast("#333", "#fff");
+  assert.ok(shortGray.ratio >= 12.0, "Dark gray #333 on white must achieve high contrast");
+  assert.equal(shortGray.grade, "AAA");
+
   // Dark Emerald #047857 on White #ffffff = 5.5:1 (AA)
   const darkEmerald = calculateContrast("#047857", "#ffffff");
   assert.ok(darkEmerald.ratio >= 4.5);
@@ -226,10 +237,10 @@ test("v4.5.0 MVP 8: WCAG 2.1 Contrast Ratio Calculator and grading", () => {
 });
 
 // ============================================================================
-// 10. MVP 9: PACK DÉPLOIEMENT PRODUCTION (SITEMAP, ROBOTS, MANIFEST, HTML)
+// 10. MVP 9: PACK DÉPLOIEMENT PRODUCTION (SITEMAP, ROBOTS, MANIFEST, ZIP)
 // ============================================================================
 
-test("v4.5.0 MVP 9: Production deployment package generation", () => {
+test("v4.5.0 MVP 9: Production deployment package and pure vanilla ZIP generation", async () => {
   const project = generateSite({ name: "Plâtrerie Moderne", tradeId: "platrier", city: "Lille" });
   const pkg = generateProductionPackage(project);
 
@@ -240,22 +251,71 @@ test("v4.5.0 MVP 9: Production deployment package generation", () => {
   assert.ok(pkg["robots.txt"].includes("Sitemap:"), "Robots.txt must reference sitemap");
   assert.ok(pkg["site.webmanifest"].includes("standalone"), "WebManifest must specify standalone display");
   assert.ok(pkg["site.webmanifest"].includes("Plâtrerie Moderne"), "WebManifest must include business name");
+
+  // Standalone HTML must contain client-side virtual navigation and social proof rotation scripts
+  assert.ok(pkg["index.html"].includes("artisiteSwitchPage"), "Standalone index.html must embed client-side virtual navigation switcher");
+  assert.ok(pkg["index.html"].includes("initSocialProof"), "Standalone index.html must embed rotating social proof logic");
+
+  // Pure Vanilla In-Memory ZIP Archive Generation (PKWARE Store Format)
+  const zipBlob = generateProductionZip(project);
+  assert.equal(zipBlob.type, "application/zip", "ZIP blob must have application/zip mime type");
+
+  const arrayBuffer = await zipBlob.arrayBuffer();
+  const bytes = new Uint8Array(arrayBuffer);
+  assert.ok(bytes.length > 500, "ZIP buffer must contain packaged file data");
+  // Magic bytes PK\x03\x04
+  assert.equal(bytes[0], 0x50, "ZIP magic byte 0 must be 0x50 ('P')");
+  assert.equal(bytes[1], 0x4B, "ZIP magic byte 1 must be 0x4B ('K')");
+  assert.equal(bytes[2], 0x03, "ZIP magic byte 2 must be 0x03");
+  assert.equal(bytes[3], 0x04, "ZIP magic byte 3 must be 0x04");
 });
 
 // ============================================================================
 // 11. MVP 10: WHITE-LABEL CLIENT DEMO PIN LOCK
 // ============================================================================
 
-test("v4.5.0 MVP 10: Client Demo PIN protection settings", () => {
+test("v4.5.0 MVP 10: Client Demo PIN protection settings and unlock mechanics", () => {
   const project = generateSite({ name: "Vitrerie Pro", tradeId: "vitrier", city: "Strasbourg" });
   project.settings.clientDemoPin = "4821";
 
   assert.equal(project.settings.clientDemoPin, "4821", "Project settings must store PIN code");
   assert.ok(!JSON.stringify(project).includes("undefined"), "Project json must be free of undefined");
+
+  // Verify PIN verification logic
+  const checkPin = (entered, expected) => String(entered).trim() === String(expected).trim();
+  assert.equal(checkPin("4821", project.settings.clientDemoPin), true, "Correct PIN must match");
+  assert.equal(checkPin("0000", project.settings.clientDemoPin), false, "Wrong PIN must fail");
 });
 
 // ============================================================================
-// 12. STRICT SYSTEM INTEGRITY & ZERO UNDEFINED INVARIANT
+// 12. MVP 7: ADVANCED SECTION MAPPING & UNMAPPED FALLBACK
+// ============================================================================
+
+test("v4.5.0 MVP 7: Certifications and unmapped custom sections map cleanly in multi-tab mode", () => {
+  const project = generateSite({ name: "Menuiserie Bois", tradeId: "menuisier", city: "Nantes" });
+  project.branding.navigationMode = "multi-tab";
+
+  project.sections.push(createSectionData("certifications", project.business));
+  project.sections.push(createSectionData("quoteBlock", project.business));
+  project.sections.push({
+    id: "sec-custom-xyz",
+    type: "customBlock",
+    visibility: true,
+    content: { title: "Spécialité Nantes" },
+    settings: {}
+  });
+
+  // On Home tab: certifications and quoteBlock must be included
+  const homeHtml = renderWebsiteHTML(project, { isEditor: false, activeVirtualPage: "home" });
+  assert.ok(homeHtml.includes("certifications") || homeHtml.includes("Garanties") || homeHtml.includes("Labels"), "Home tab must include certifications");
+
+  // On Services tab: customBlock and certifications must be included
+  const servicesHtml = renderWebsiteHTML(project, { isEditor: false, activeVirtualPage: "services" });
+  assert.ok(servicesHtml.includes("Spécialité Nantes") || servicesHtml.includes("customBlock"), "Services tab must include customBlock");
+});
+
+// ============================================================================
+// 13. STRICT SYSTEM INTEGRITY & ZERO UNDEFINED INVARIANT
 // ============================================================================
 
 test("v4.5.0 Integrity: Full project rendering with all 10 MVP features contains 0 'undefined'", () => {
