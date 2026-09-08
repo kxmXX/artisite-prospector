@@ -1,9 +1,18 @@
 import { getIcon } from "./icons.js";
-import { generateColdCallScript, generateWhatsappPitch, generateEmailPitch, calculateROI } from "../engine/closer.js";
+import {
+  generateColdCallScript,
+  generateWhatsappPitch,
+  generateEmailPitch,
+  calculateROI,
+  generateCompetitiveAudit,
+  generateOrderContract,
+  getObjectionBattlecards
+} from "../engine/closer.js";
 
 /**
  * Michel's Closer Cockpit Drawer / Modal.
- * Contains cold-call scripts, objection handlers, copyable messages, and ROI justification.
+ * Contains cold-call teleprompter, objection battlecards, competitive audit,
+ * digital order form with canvas e-signature, copyable messages, and ROI simulator.
  */
 
 export function renderCloserModal(project) {
@@ -16,150 +25,282 @@ export function renderCloserModal(project) {
   const script = generateColdCallScript(project);
   const whatsappText = generateWhatsappPitch(project, demoUrl);
   const emailData = generateEmailPitch(project, demoUrl);
-  const roi = calculateROI(850, 1200);
+  const roi = calculateROI(1200, 990);
+  const audit = generateCompetitiveAudit(project);
+  const contract = generateOrderContract(project);
+  const battlecards = getObjectionBattlecards(project);
 
   return `
-    <div id="closer-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-      <div class="bg-white rounded-2xl shadow-xl max-w-2xl w-full border border-zinc-200 overflow-hidden flex flex-col max-h-[90vh]">
+    <div id="closer-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+      <div class="bg-white rounded-3xl shadow-2xl max-w-3xl w-full border border-zinc-200 overflow-hidden flex flex-col max-h-[92vh]">
         
-        <!-- Header -->
-        <div class="px-6 py-4 bg-white border-b border-zinc-200 text-zinc-900 flex items-center justify-between flex-shrink-0">
+        <!-- Header with Live Call Teleprompter Status -->
+        <div class="px-6 py-3.5 bg-zinc-950 text-white flex items-center justify-between flex-shrink-0">
           <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-zinc-100 border border-zinc-200 flex items-center justify-center text-sm">
+            <div class="w-8 h-8 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-sm">
               🎯
             </div>
             <div>
-              <h2 class="font-semibold text-sm text-zinc-900">Kit Closer & Pitch Commercial</h2>
-              <p class="text-xs text-zinc-500 font-normal">Argumentaire pour <strong>${project.business.name}</strong> (${project.business.city})</p>
+              <div class="flex items-center gap-2">
+                <h2 class="font-bold text-xs sm:text-sm text-white tracking-tight">Cockpit de Closing & Vente</h2>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Michel Closer Pro</span>
+              </div>
+              <p class="text-[11px] text-zinc-400 font-normal">Prospect : <strong>${project.business.name}</strong> (${project.business.tradeLabel} • ${project.business.city})</p>
             </div>
           </div>
-          <button type="button" onclick="window.app.closeCloserModal()" class="p-1.5 text-zinc-400 hover:text-zinc-800 rounded-lg hover:bg-zinc-100 transition-colors">
-            ${getIcon("x", "w-4 h-4")}
-          </button>
+
+          <!-- Active Call Stopwatch Widget -->
+          <div class="flex items-center gap-3">
+            <div class="flex items-center gap-1.5 bg-zinc-900 border border-zinc-800 px-2.5 py-1 rounded-lg text-xs font-mono text-zinc-200" id="call-timer-box">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span id="call-timer-display">00:00</span>
+              <button type="button" onclick="window.app?.toggleCallTimer?.()" class="ml-1 text-[10px] text-zinc-400 hover:text-white" title="Démarrer / Mettre en pause le chronomètre d'appel">
+                ⏯️
+              </button>
+            </div>
+
+            <button type="button" onclick="window.app.closeCloserModal()" class="p-1.5 text-zinc-400 hover:text-white rounded-lg hover:bg-zinc-900 transition-colors">
+              ${getIcon("x", "w-4 h-4")}
+            </button>
+          </div>
         </div>
 
-        <!-- Cockpit Navigation Tabs -->
-        <div class="px-6 py-2.5 bg-zinc-50 border-b border-zinc-200 flex gap-2 text-xs flex-shrink-0">
-          <button type="button" onclick="window.app.switchCloserTab('script')" id="tab-closer-script" class="px-3 py-1.5 rounded-md font-medium text-zinc-900 bg-white shadow-xs border border-zinc-200">
-            Script Appel
+        <!-- Cockpit Navigation Tabs (7 Power Tabs) -->
+        <div class="px-6 py-2 bg-zinc-100/80 border-b border-zinc-200 flex gap-1.5 text-xs overflow-x-auto flex-shrink-0">
+          <button type="button" onclick="window.app.switchCloserTab('script')" id="tab-closer-script" class="px-3 py-1.5 rounded-lg font-bold text-zinc-900 bg-white shadow-xs border border-zinc-200 whitespace-nowrap">
+            📞 Script Appel
           </button>
-          <button type="button" onclick="window.app.switchCloserTab('whatsapp')" id="tab-closer-whatsapp" class="px-3 py-1.5 rounded-md font-medium text-zinc-600 hover:text-zinc-900 border border-transparent">
-            WhatsApp / SMS
+          <button type="button" onclick="window.app.switchCloserTab('objections')" id="tab-closer-objections" class="px-3 py-1.5 rounded-lg font-medium text-zinc-600 hover:text-zinc-900 border border-transparent whitespace-nowrap">
+            🛡️ Objections
           </button>
-          <button type="button" onclick="window.app.switchCloserTab('email')" id="tab-closer-email" class="px-3 py-1.5 rounded-md font-medium text-zinc-600 hover:text-zinc-900 border border-transparent">
-            Email B2B
+          <button type="button" onclick="window.app.switchCloserTab('audit')" id="tab-closer-audit" class="px-3 py-1.5 rounded-lg font-medium text-zinc-600 hover:text-zinc-900 border border-transparent whitespace-nowrap">
+            📊 Audit 360°
           </button>
-          <button type="button" onclick="window.app.switchCloserTab('roi')" id="tab-closer-roi" class="px-3 py-1.5 rounded-md font-medium text-zinc-600 hover:text-zinc-900 border border-transparent">
-            Simulateur ROI
+          <button type="button" onclick="window.app.switchCloserTab('contract')" id="tab-closer-contract" class="px-3 py-1.5 rounded-lg font-medium text-zinc-600 hover:text-zinc-900 border border-transparent whitespace-nowrap">
+            ✍️ Bon de Commande
+          </button>
+          <button type="button" onclick="window.app.switchCloserTab('whatsapp')" id="tab-closer-whatsapp" class="px-3 py-1.5 rounded-lg font-medium text-zinc-600 hover:text-zinc-900 border border-transparent whitespace-nowrap">
+            💬 WhatsApp
+          </button>
+          <button type="button" onclick="window.app.switchCloserTab('email')" id="tab-closer-email" class="px-3 py-1.5 rounded-lg font-medium text-zinc-600 hover:text-zinc-900 border border-transparent whitespace-nowrap">
+            ✉️ Email B2B
+          </button>
+          <button type="button" onclick="window.app.switchCloserTab('roi')" id="tab-closer-roi" class="px-3 py-1.5 rounded-lg font-medium text-zinc-600 hover:text-zinc-900 border border-transparent whitespace-nowrap">
+            💰 Rentabilité ROI
           </button>
         </div>
 
         <!-- Cockpit Body -->
         <div class="p-6 overflow-y-auto space-y-5 flex-1 text-zinc-800 text-xs">
           
-          <!-- TAB 1: COLD CALL SCRIPT -->
+          <!-- TAB 1: COLD CALL SCRIPT WITH TELEPROMPTER CHECKLIST -->
           <div id="closer-panel-script" class="space-y-4">
+            <!-- Step Checklist -->
+            <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-2xl flex items-center justify-between gap-2">
+              <span class="text-[11px] font-bold text-zinc-700">Déroulement de l'Appel :</span>
+              <div class="flex items-center gap-3 text-[11px]">
+                <label class="inline-flex items-center gap-1 cursor-pointer"><input type="checkbox" onchange="window.app?.updateCallProgress?.(this)" class="rounded text-zinc-900"> <span>1. Accroche</span></label>
+                <label class="inline-flex items-center gap-1 cursor-pointer"><input type="checkbox" onchange="window.app?.updateCallProgress?.(this)" class="rounded text-zinc-900"> <span>2. Envoi WhatsApp</span></label>
+                <label class="inline-flex items-center gap-1 cursor-pointer"><input type="checkbox" onchange="window.app?.updateCallProgress?.(this)" class="rounded text-zinc-900"> <span>3. Visite du Site</span></label>
+                <label class="inline-flex items-center gap-1 cursor-pointer"><input type="checkbox" onchange="window.app?.updateCallProgress?.(this)" class="rounded text-zinc-900"> <span>4. Closing Offre</span></label>
+              </div>
+            </div>
             
             <!-- Step 1: Accroche -->
-            <div class="bg-zinc-50 border border-zinc-200 rounded-xl p-3.5 space-y-2">
-              <div class="flex items-center justify-between font-semibold text-zinc-800">
+            <div class="bg-zinc-50 border border-zinc-200 rounded-2xl p-4 space-y-2">
+              <div class="flex items-center justify-between font-bold text-zinc-900">
                 <span>${script.intro.step}</span>
-                <span class="text-[10px] bg-zinc-200/70 px-2 py-0.5 rounded text-zinc-700">15 secondes</span>
+                <span class="text-[10px] bg-zinc-200 px-2 py-0.5 rounded-full text-zinc-700 font-mono">15 secondes</span>
               </div>
-              <p class="text-xs text-zinc-900 leading-relaxed bg-white p-3 rounded-lg border border-zinc-200 italic">
+              <p class="text-xs text-zinc-900 leading-relaxed bg-white p-3.5 rounded-xl border border-zinc-200 italic font-medium">
                 « ${script.intro.speech} »
               </p>
             </div>
 
             <!-- Step 2: La Démo -->
-            <div class="bg-zinc-50 border border-zinc-200 rounded-xl p-3.5 space-y-2">
-              <div class="flex items-center justify-between font-semibold text-zinc-800">
+            <div class="bg-zinc-50 border border-zinc-200 rounded-2xl p-4 space-y-2">
+              <div class="flex items-center justify-between font-bold text-zinc-900">
                 <span>${script.pitch.step}</span>
-                <span class="text-[10px] bg-zinc-200/70 px-2 py-0.5 rounded text-zinc-700">Moment Clé</span>
+                <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">Moment Clé</span>
               </div>
-              <p class="text-xs text-zinc-900 leading-relaxed bg-white p-3 rounded-lg border border-zinc-200 italic">
+              <p class="text-xs text-zinc-900 leading-relaxed bg-white p-3.5 rounded-xl border border-zinc-200 italic font-medium">
                 « ${script.pitch.speech} »
               </p>
-            </div>
-
-            <!-- Step 3: Traitement des Objections -->
-            <div class="space-y-2 pt-2">
-              <div class="font-medium text-[11px] uppercase tracking-wider text-zinc-400">Parades aux Objections Fréquentes</div>
-              <div class="space-y-2">
-                ${script.objections.map(obj => `
-                  <div class="border border-zinc-200 rounded-xl p-3 bg-zinc-50/50 hover:bg-white transition-colors space-y-1">
-                    <div class="font-medium text-xs text-zinc-900">${obj.objection}</div>
-                    <div class="text-xs text-zinc-600 leading-relaxed pl-2.5 border-l-2 border-zinc-400">
-                      ${obj.response}
-                    </div>
-                  </div>
-                `).join('')}
+              <div class="flex items-center gap-2 pt-1">
+                <button type="button" onclick="window.app.copyShareUrl()" class="btn-keycap btn-keycap-dark px-3 py-1.5 rounded-lg text-xs font-bold text-white flex items-center gap-1.5 shadow-xs">
+                  ${getIcon("share", "w-3.5 h-3.5")}
+                  <span>Copier le lien démo mobile pour WhatsApp</span>
+                </button>
               </div>
             </div>
 
-            <!-- Step 4: Closing -->
-            <div class="bg-zinc-50 border border-zinc-200 rounded-xl p-3.5 space-y-2">
-              <div class="font-semibold text-zinc-800">${script.closing.step}</div>
-              <p class="text-xs text-zinc-900 leading-relaxed bg-white p-3 rounded-lg border border-zinc-200 italic">
+            <!-- Step 3: Conclusion -->
+            <div class="bg-zinc-50 border border-zinc-200 rounded-2xl p-4 space-y-2">
+              <div class="font-bold text-zinc-900">${script.closing.step}</div>
+              <p class="text-xs text-zinc-900 leading-relaxed bg-white p-3.5 rounded-xl border border-zinc-200 italic font-medium">
                 « ${script.closing.speech} »
               </p>
             </div>
-
           </div>
 
-          <!-- TAB 2: WHATSAPP / SMS -->
+          <!-- TAB 2: OBJECTION BATTLECARDS (MVP Feature 6) -->
+          <div id="closer-panel-objections" class="space-y-3 hidden">
+            <div class="text-[11px] font-bold uppercase tracking-wider text-zinc-400">Cartes d'attaque pour neutraliser toute hésitation :</div>
+            <div class="grid gap-3">
+              ${battlecards.map(b => `
+                <div class="border border-zinc-200 rounded-2xl p-4 bg-zinc-50 hover:bg-white transition-all space-y-2 shadow-2xs">
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold text-xs text-zinc-900">${b.title}</span>
+                    <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Taux de succès ${b.confidence}</span>
+                  </div>
+                  <div class="text-xs text-zinc-700 bg-white p-3 rounded-xl border border-zinc-200 leading-relaxed font-medium">
+                    ${b.counter}
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- TAB 3: AUDIT 360° & BENCHMARK LOCAL (MVP Feature 5) -->
+          <div id="closer-panel-audit" class="space-y-4 hidden">
+            <div class="p-4 rounded-2xl bg-zinc-950 text-white space-y-1">
+              <div class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Benchmark Visibilité Locale</div>
+              <h3 class="text-sm sm:text-base font-extrabold text-white">${audit.title}</h3>
+              <p class="text-[11px] text-zinc-400">Montrez ces écarts techniques en direct à l'artisan pour démolir ses réticences.</p>
+            </div>
+
+            <div class="space-y-2.5">
+              ${audit.pillars.map(p => `
+                <div class="border border-zinc-200 rounded-2xl p-3.5 bg-zinc-50 space-y-2">
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold text-xs text-zinc-900">${p.name}</span>
+                    <div class="flex items-center gap-2">
+                      <span class="text-[10px] font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded border border-red-200">Actuel : ${p.currentScore}/100</span>
+                      <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Nouveau : ${p.prospectorScore}/100 ⚡</span>
+                    </div>
+                  </div>
+                  <p class="text-[11px] text-zinc-600 leading-relaxed">${p.impact}</p>
+                </div>
+              `).join('')}
+            </div>
+
+            <div class="bg-amber-50 border border-amber-200 p-3.5 rounded-2xl space-y-1.5">
+              <div class="text-xs font-bold text-amber-900">Argument Choc pour Michel :</div>
+              ${audit.talkingPoints.map(tp => `<p class="text-xs text-amber-800 italic leading-relaxed font-medium">${tp}</p>`).join('')}
+            </div>
+          </div>
+
+          <!-- TAB 4: BON DE COMMANDE ET E-SIGNATURE (MVP Feature 4) -->
+          <div id="closer-panel-contract" class="space-y-4 hidden">
+            <div class="border border-zinc-200 rounded-2xl p-5 bg-zinc-50 space-y-4">
+              <div class="flex items-center justify-between border-b border-zinc-200 pb-3">
+                <div>
+                  <h3 class="font-bold text-xs text-zinc-900 uppercase tracking-wider">Bon de Commande & Cession de Droits</h3>
+                  <div class="text-[11px] text-zinc-500">Réf : <strong class="font-mono text-zinc-800">${contract.contractNumber}</strong> • Date : ${contract.date}</div>
+                </div>
+                <div class="text-right">
+                  <span class="px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-800 text-xs font-bold">Prêt pour Signature</span>
+                </div>
+              </div>
+
+              <!-- Parties -->
+              <div class="grid grid-cols-2 gap-3 text-xs">
+                <div class="bg-white p-3 rounded-xl border border-zinc-200">
+                  <div class="text-[10px] font-bold text-zinc-400 uppercase">Bénéficiaire</div>
+                  <div class="font-bold text-zinc-900 mt-0.5">${contract.client.name}</div>
+                  <div class="text-[11px] text-zinc-600">${contract.client.trade} à ${contract.client.city}</div>
+                  <div class="text-[11px] text-zinc-500 font-mono mt-0.5">${contract.client.phone}</div>
+                </div>
+                <div class="bg-white p-3 rounded-xl border border-zinc-200">
+                  <div class="text-[10px] font-bold text-zinc-400 uppercase">Prestation & Prix</div>
+                  <div class="font-bold text-emerald-700 mt-0.5">${contract.service.price}</div>
+                  <div class="text-[11px] text-zinc-600">${contract.service.deliveryTime}</div>
+                  <div class="text-[10.5px] text-zinc-400 mt-0.5">${contract.guarantee}</div>
+                </div>
+              </div>
+
+              <!-- Inclusions -->
+              <div class="bg-white p-3.5 rounded-xl border border-zinc-200 space-y-1.5">
+                <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Inclus dans la commande</div>
+                <ul class="grid sm:grid-cols-2 gap-1 text-[11px] text-zinc-700">
+                  ${contract.service.inclusions.map(inc => `<li class="flex items-center gap-1.5"><span>✓</span> <span>${inc}</span></li>`).join('')}
+                </ul>
+              </div>
+
+              <!-- HTML5 Interactive Signature Pad -->
+              <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                  <label class="text-xs font-bold text-zinc-800">Signature électronique du client :</label>
+                  <button type="button" onclick="window.app?.clearSignaturePad?.()" class="text-[11px] text-zinc-500 hover:text-red-600 underline">
+                    Effacer la signature
+                  </button>
+                </div>
+                <canvas id="closer-signature-pad" width="560" height="140" class="w-full h-32 border-2 border-dashed border-zinc-300 rounded-xl bg-white cursor-crosshair touch-none shadow-inner"></canvas>
+                <div class="text-[10.5px] text-zinc-400 text-center">Signez à l'aide de votre souris, pavé tactile ou directement au doigt sur smartphone.</div>
+              </div>
+
+              <div class="pt-2 flex gap-2">
+                <button type="button" onclick="window.app?.printSignedContract?.()" class="flex-1 btn-keycap btn-keycap-dark py-2.5 rounded-xl text-xs font-bold text-white flex items-center justify-center gap-2 shadow-sm">
+                  ${getIcon("printer", "w-3.5 h-3.5")}
+                  <span>Télécharger & Imprimer le Bon de Commande Signé (PDF)</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 5: WHATSAPP / SMS -->
           <div id="closer-panel-whatsapp" class="space-y-3 hidden">
-            <p class="text-xs text-zinc-500">Message prêt à l'emploi à envoyer directement sur le téléphone du prospect :</p>
+            <p class="text-xs text-zinc-500">Message prêt à l'emploi à envoyer directement sur le smartphone du prospect :</p>
             <div class="relative">
-              <textarea id="whatsapp-content" rows="8" readonly class="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-3.5 font-mono text-xs text-zinc-800 leading-relaxed focus:outline-none">${whatsappText}</textarea>
-              <button type="button" onclick="window.app.copyText('whatsapp-content')" class="absolute top-2.5 right-2.5 px-2.5 py-1.5 rounded-lg bg-zinc-900 text-white text-xs font-medium hover:bg-black flex items-center gap-1 shadow-xs transition-colors">
-                ${getIcon("copy", "w-3 h-3")}
+              <textarea id="whatsapp-content" rows="8" readonly class="w-full bg-zinc-50 border border-zinc-200 rounded-2xl p-4 font-mono text-xs text-zinc-800 leading-relaxed focus:outline-none">${whatsappText}</textarea>
+              <button type="button" onclick="window.app.copyText('whatsapp-content')" class="absolute top-3 right-3 px-3 py-1.5 rounded-xl bg-zinc-900 text-white text-xs font-medium hover:bg-black flex items-center gap-1.5 shadow-xs transition-colors">
+                ${getIcon("copy", "w-3.5 h-3.5")}
                 <span>Copier</span>
               </button>
             </div>
           </div>
 
-          <!-- TAB 3: EMAIL B2B -->
+          <!-- TAB 6: EMAIL B2B -->
           <div id="closer-panel-email" class="space-y-3 hidden">
             <div>
               <label class="block text-[11px] font-medium text-zinc-500 mb-1">Objet :</label>
-              <input type="text" id="email-subject" readonly value="${emailData.subject}" class="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-1.5 text-xs font-medium text-zinc-900">
+              <input type="text" id="email-subject" readonly value="${emailData.subject}" class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2 text-xs font-semibold text-zinc-900">
             </div>
             <div class="relative">
               <label class="block text-[11px] font-medium text-zinc-500 mb-1">Corps du message :</label>
-              <textarea id="email-body" rows="9" readonly class="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-3.5 font-mono text-xs text-zinc-800 leading-relaxed focus:outline-none">${emailData.body}</textarea>
-              <button type="button" onclick="window.app.copyText('email-body')" class="absolute top-7 right-2.5 px-2.5 py-1.5 rounded-lg bg-zinc-900 text-white text-xs font-medium hover:bg-black flex items-center gap-1 shadow-xs transition-colors">
-                ${getIcon("copy", "w-3 h-3")}
+              <textarea id="email-body" rows="9" readonly class="w-full bg-zinc-50 border border-zinc-200 rounded-2xl p-4 font-mono text-xs text-zinc-800 leading-relaxed focus:outline-none">${emailData.body}</textarea>
+              <button type="button" onclick="window.app.copyText('email-body')" class="absolute top-8 right-3 px-3 py-1.5 rounded-xl bg-zinc-900 text-white text-xs font-medium hover:bg-black flex items-center gap-1.5 shadow-xs transition-colors">
+                ${getIcon("copy", "w-3.5 h-3.5")}
                 <span>Copier</span>
               </button>
             </div>
           </div>
 
-          <!-- TAB 4: SIMULATEUR ROI -->
+          <!-- TAB 7: SIMULATEUR ROI (MVP Feature 1) -->
           <div id="closer-panel-roi" class="space-y-4 hidden">
-            <div class="bg-zinc-50 p-4 rounded-xl border border-zinc-200 space-y-3">
-              <div class="font-semibold text-xs text-zinc-900">Argument Rentabilité : 1 Seul Chantier Rembourse le Site</div>
+            <div class="bg-zinc-50 p-5 rounded-2xl border border-zinc-200 space-y-4">
+              <div class="font-bold text-xs text-zinc-900 uppercase tracking-wider">Argument Rentabilité : 1 Seul Chantier Rembourse le Site</div>
               <p class="text-xs text-zinc-600 leading-relaxed">
                 Quand l'artisan hésite sur le prix, posez-lui cette question :
                 <em>« Combien vous rapporte en moyenne un seul chantier complet ? »</em>
               </p>
               
-              <div class="grid grid-cols-3 gap-2.5 pt-1">
-                <div class="bg-white p-3 rounded-lg border border-zinc-200 text-center">
-                  <div class="text-[10px] uppercase font-medium text-zinc-400">Panier Moyen</div>
-                  <div class="text-base font-semibold text-zinc-900 mt-0.5">${roi.ticketMoyen} €</div>
+              <div class="grid grid-cols-3 gap-3 pt-1">
+                <div class="bg-white p-3.5 rounded-xl border border-zinc-200 text-center shadow-2xs">
+                  <div class="text-[10px] uppercase font-bold text-zinc-400">Panier Moyen</div>
+                  <div class="text-lg font-extrabold text-zinc-900 mt-0.5 font-mono">${roi.ticketMoyen} €</div>
                 </div>
-                <div class="bg-white p-3 rounded-lg border border-zinc-200 text-center">
-                  <div class="text-[10px] uppercase font-medium text-zinc-400">Prix du Site</div>
-                  <div class="text-base font-semibold text-zinc-900 mt-0.5">${roi.siteCost} €</div>
+                <div class="bg-white p-3.5 rounded-xl border border-zinc-200 text-center shadow-2xs">
+                  <div class="text-[10px] uppercase font-bold text-zinc-400">Prix du Site</div>
+                  <div class="text-lg font-extrabold text-zinc-900 mt-0.5 font-mono">${roi.siteCost} €</div>
                 </div>
-                <div class="bg-white border border-zinc-200 p-3 rounded-lg text-center">
-                  <div class="text-[10px] uppercase font-medium text-emerald-600">Rentabilité à</div>
-                  <div class="text-base font-semibold text-emerald-600 mt-0.5">${roi.chantiersToBreakEven} chantier</div>
+                <div class="bg-emerald-50 border border-emerald-200 p-3.5 rounded-xl text-center shadow-2xs">
+                  <div class="text-[10px] uppercase font-bold text-emerald-700">Rentabilité à</div>
+                  <div class="text-lg font-extrabold text-emerald-700 mt-0.5 font-mono">${roi.chantiersToBreakEven} chantier</div>
                 </div>
               </div>
 
-              <div class="text-xs text-zinc-700 bg-white p-3 rounded-lg border border-zinc-200 leading-relaxed">
+              <div class="text-xs text-zinc-800 bg-white p-4 rounded-xl border border-zinc-200 leading-relaxed">
                 <strong>Phrase clé :</strong> <em>« Dès le premier appel signé grâce au site ce mois-ci, votre vitrine est 100% rentabilisée. Le reste de l'année, c'est du bénéfice net pur pour votre entreprise. »</em>
               </div>
             </div>
@@ -167,15 +308,15 @@ export function renderCloserModal(project) {
 
         </div>
 
-        <!-- Footer -->
-        <div class="px-6 py-3 bg-zinc-50 border-t border-zinc-200 flex items-center justify-between flex-shrink-0 text-xs">
-          <span class="text-zinc-500">Statut CRM : <strong class="text-zinc-800">${project.pipelineStatus}</strong></span>
+        <!-- Footer with Pipeline CRM Status Update -->
+        <div class="px-6 py-3.5 bg-zinc-50 border-t border-zinc-200 flex items-center justify-between flex-shrink-0 text-xs">
+          <span class="text-zinc-500">Statut CRM : <strong class="text-zinc-900 font-bold">${project.pipelineStatus || 'prospect'}</strong></span>
           <div class="flex items-center gap-2">
-            <button type="button" onclick="window.app.updateStatus('${project.id}', 'demo_sent')" class="px-3 py-1.5 rounded-lg bg-zinc-200 hover:bg-zinc-300 text-zinc-800 font-medium transition-colors">
-              Démo Envoyée
+            <button type="button" onclick="window.app.updateStatus('${project.id}', 'demo_sent')" class="btn-keycap btn-keycap-light px-3.5 py-1.5 rounded-xl text-xs font-semibold text-zinc-700 border border-zinc-200 hover:bg-zinc-100 transition-colors">
+              Démo Partagée
             </button>
-            <button type="button" onclick="window.app.updateStatus('${project.id}', 'won')" class="px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-black text-white font-medium shadow-xs transition-colors">
-              Signé ✓
+            <button type="button" onclick="window.app.updateStatus('${project.id}', 'won')" class="btn-keycap btn-keycap-dark px-4 py-1.5 rounded-xl text-xs font-bold text-white shadow-xs transition-colors">
+              ✓ Client Signé !
             </button>
           </div>
         </div>

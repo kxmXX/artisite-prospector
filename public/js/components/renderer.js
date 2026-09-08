@@ -168,8 +168,25 @@ export function renderWebsiteHTML(project, options = { isEditor: false, isStanda
     return `<div class="p-12 text-center text-gray-500">Aucun projet chargé</div>`;
   }
 
+  const activePage = options.activeVirtualPage || project._activeVirtualPage || null;
+  const PAGE_SECTIONS_MAP = {
+    home: ["header", "hero", "trust", "about", "stats", "cta", "footer"],
+    services: ["header", "services", "customBlock", "process", "stepperBlock", "tabsBlock", "tableBlock", "sliderBlock", "cta", "footer"],
+    realisations: ["header", "beforeAfter", "realisations", "gallery", "videoBlock", "reviews", "cta", "footer"],
+    devis: ["header", "quoteSimulator", "pricing", "roiCalculator", "cta", "footer"],
+    contact: ["header", "bookingBlock", "hours", "location", "faq", "cta", "footer"]
+  };
+
   const sectionsHTML = project.sections
-    .filter(sec => options.isEditor ? true : sec.visibility !== false)
+    .filter(sec => {
+      if (options.isEditor) return true;
+      if (sec.visibility === false) return false;
+      if (activePage && project.branding?.navigationMode === "multi-tab") {
+        const allowed = PAGE_SECTIONS_MAP[activePage] || PAGE_SECTIONS_MAP.home;
+        return allowed.includes(sec.type);
+      }
+      return true;
+    })
     .map(sec => renderSection(sec, project, options))
     .join("\n");
 
@@ -197,6 +214,7 @@ export function renderWebsiteHTML(project, options = { isEditor: false, isStanda
   const stickyBarHTML = options.includeStickyBar === false ? "" : renderStickyCallBar(project, options);
   const initialSiteTheme = project.siteTheme || getInitialSiteTheme(project);
   const isPaperGrain = !!(project.branding?.paperGrain || project.branding?.stylePreset === 'editorial-terroir' || project.branding?.stylePreset === 'papercraft-mineral');
+  const socialProofHTML = renderSocialProofToast(project, options);
 
   return `
     <div class="artisite-root font-body text-main bg-site min-h-screen ${isPaperGrain ? 'texture-paper-grain' : ''}" data-site-theme="${initialSiteTheme}" data-paper-grain="${isPaperGrain ? 'true' : 'false'}" style="
@@ -222,11 +240,16 @@ export function renderWebsiteHTML(project, options = { isEditor: false, isStanda
       ${sectionsHTML}
       ${stickyBarHTML}
       ${lightboxHTML}
+      ${socialProofHTML}
     </div>
   `;
 }
 
 function renderSection(sec, project, options) {
+  if (!sec) return "";
+  if (!sec.id) {
+    sec.id = `sec-${sec.type || 'block'}-${Math.random().toString(36).substr(2, 6)}`;
+  }
   const isEditor = options.isEditor;
   const isHidden = sec.visibility === false;
 
@@ -310,6 +333,12 @@ function renderSection(sec, project, options) {
     case "tabsBlock":
       innerHTML = renderTabsBlock(sec, project, options);
       break;
+    case "roiCalculator":
+      innerHTML = renderRoiCalculator(sec, project, options);
+      break;
+    case "bookingBlock":
+      innerHTML = renderBookingBlock(sec, project, options);
+      break;
     default:
       innerHTML = `<div class="p-8 text-center text-gray-400">Section ${sec.type}</div>`;
   }
@@ -358,7 +387,9 @@ function renderSection(sec, project, options) {
     stepperBlock: "Étapes de Chantier",
     tableBlock: "Tableau Comparatif",
     sliderBlock: "Curseur Surface",
-    tabsBlock: "Onglets Prestations"
+    tabsBlock: "Onglets Prestations",
+    roiCalculator: "Simulateur ROI",
+    bookingBlock: "Prise Rendez-vous"
   };
 
   const hasCustomBg = !!sec?.settings?.customBackground;
@@ -462,7 +493,15 @@ function renderHeader(sec, project, options = {}) {
         </a>
 
         <nav class="hidden md:flex items-center gap-7 text-sm font-medium text-gray-600">
-          ${(c.links || []).map(l => `<a href="${l.target}" class="hover:text-gray-900 transition-colors">${l.label}</a>`).join('')}
+          ${project.branding?.navigationMode === "multi-tab" ? `
+            <div class="flex items-center gap-1.5 bg-zinc-100/90 p-1 rounded-full border border-zinc-200/80">
+              <button type="button" onclick="window.app?.setVirtualPage?.('home')" class="px-3 py-1 rounded-full text-xs font-semibold transition-all ${(options.activeVirtualPage || project._activeVirtualPage || 'home') === 'home' ? 'bg-white text-zinc-950 shadow-xs font-bold' : 'text-zinc-600 hover:text-zinc-900'}">Accueil</button>
+              <button type="button" onclick="window.app?.setVirtualPage?.('services')" class="px-3 py-1 rounded-full text-xs font-semibold transition-all ${(options.activeVirtualPage || project._activeVirtualPage) === 'services' ? 'bg-white text-zinc-950 shadow-xs font-bold' : 'text-zinc-600 hover:text-zinc-900'}">Services</button>
+              <button type="button" onclick="window.app?.setVirtualPage?.('realisations')" class="px-3 py-1 rounded-full text-xs font-semibold transition-all ${(options.activeVirtualPage || project._activeVirtualPage) === 'realisations' ? 'bg-white text-zinc-950 shadow-xs font-bold' : 'text-zinc-600 hover:text-zinc-900'}">Réalisations</button>
+              <button type="button" onclick="window.app?.setVirtualPage?.('devis')" class="px-3 py-1 rounded-full text-xs font-semibold transition-all ${(options.activeVirtualPage || project._activeVirtualPage) === 'devis' ? 'bg-white text-zinc-950 shadow-xs font-bold' : 'text-zinc-600 hover:text-zinc-900'}">Devis</button>
+              <button type="button" onclick="window.app?.setVirtualPage?.('contact')" class="px-3 py-1 rounded-full text-xs font-semibold transition-all ${(options.activeVirtualPage || project._activeVirtualPage) === 'contact' ? 'bg-white text-zinc-950 shadow-xs font-bold' : 'text-zinc-600 hover:text-zinc-900'}">Contact & RDV</button>
+            </div>
+          ` : (c.links || []).map(l => `<a href="${l.target}" class="hover:text-gray-900 transition-colors">${l.label}</a>`).join('')}
         </nav>
 
         <div class="flex items-center gap-3">
@@ -2419,6 +2458,301 @@ function renderTabsBlock(sec, project, options = {}) {
           </div>
         </div>
       </div>
+    </div>
+  `;
+}
+
+// 27. Interactive ROI & Payback Calculator (MVP Feature 1)
+function renderRoiCalculator(sec, project, options = {}) {
+  const c = sec.content || {};
+  const ticket = Number(c.defaultTicket) || 1200;
+  const leads = Number(c.defaultLeads) || 4;
+  const conv = Number(c.defaultConv) || 50;
+  const siteCost = Number(c.siteCost) || 990;
+
+  const wonDeals = Math.max(1, Math.round((leads * conv) / 100));
+  const yearlyRev = wonDeals * ticket * 12;
+  const yearlyProfit = yearlyRev - siteCost;
+  const paybackDays = Math.max(1, Math.round((siteCost / (wonDeals * ticket)) * 30));
+
+  return `
+    <div class="py-16 sm:py-24 component-roi-calculator bg-zinc-50/50" id="roi-calculator-${sec.id}">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6">
+        <div class="text-center max-w-2xl mx-auto mb-12 space-y-2">
+          <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800" data-editable="badge">
+            ${c.badge || "Rentabilité Immédiate"}
+          </span>
+          <h2 class="font-heading text-2xl sm:text-4xl font-extrabold text-zinc-900" data-editable="title">
+            ${c.title || "Calculez la Rentabilité Réelle de Votre Futur Site"}
+          </h2>
+          <p class="text-sm text-zinc-600 leading-relaxed" data-editable="subtitle">
+            ${c.subtitle || "Ajustez les curseurs ci-dessous selon votre activité pour estimer vos gains annuels."}
+          </p>
+        </div>
+
+        <div class="grid lg:grid-cols-12 gap-8 items-stretch">
+          <!-- Sliders Box -->
+          <div class="lg:col-span-7 bg-white p-6 sm:p-8 rounded-3xl border border-zinc-200 shadow-sm space-y-6">
+            <div class="space-y-2">
+              <div class="flex justify-between items-center text-xs font-semibold">
+                <span class="text-zinc-700">Panier moyen d'un chantier :</span>
+                <span id="roi-ticket-val-${sec.id}" class="text-sm font-bold text-zinc-950 font-mono">${ticket} €</span>
+              </div>
+              <input type="range" min="300" max="6000" step="100" value="${ticket}"
+                     class="simulateur-roi-slider w-full h-2 bg-zinc-100 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                     oninput="(function(el){
+                       const root = el.closest('.component-roi-calculator');
+                       if (!root) return;
+                       const t = Number(el.value);
+                       const l = Number(root.querySelector('[data-roi-leads]').value);
+                       const c = Number(root.querySelector('[data-roi-conv]').value);
+                       const cost = ${siteCost};
+                       root.querySelector('#roi-ticket-val-${sec.id}').textContent = t + ' €';
+                       const won = Math.max(1, Math.round((l * c) / 100));
+                       const yRev = won * t * 12;
+                       const yNet = yRev - cost;
+                       const days = Math.max(1, Math.round((cost / (won * t)) * 30));
+                       root.querySelector('[data-roi-rev]').textContent = yRev.toLocaleString('fr-FR') + ' € / an';
+                       root.querySelector('[data-roi-profit]').textContent = '+' + yNet.toLocaleString('fr-FR') + ' € net';
+                       root.querySelector('[data-roi-payback]').textContent = days + ' jours';
+                     })(this)" data-roi-ticket>
+              <div class="flex justify-between text-[10px] text-zinc-400 font-mono">
+                <span>300 €</span>
+                <span>3 000 €</span>
+                <span>6 000 €</span>
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <div class="flex justify-between items-center text-xs font-semibold">
+                <span class="text-zinc-700">Demandes de devis générées / mois :</span>
+                <span id="roi-leads-val-${sec.id}" class="text-sm font-bold text-zinc-950 font-mono">${leads} contacts</span>
+              </div>
+              <input type="range" min="1" max="15" step="1" value="${leads}"
+                     class="simulateur-roi-slider w-full h-2 bg-zinc-100 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                     oninput="(function(el){
+                       const root = el.closest('.component-roi-calculator');
+                       if (!root) return;
+                       const t = Number(root.querySelector('[data-roi-ticket]').value);
+                       const l = Number(el.value);
+                       const c = Number(root.querySelector('[data-roi-conv]').value);
+                       const cost = ${siteCost};
+                       root.querySelector('#roi-leads-val-${sec.id}').textContent = l + ' contacts';
+                       const won = Math.max(1, Math.round((l * c) / 100));
+                       const yRev = won * t * 12;
+                       const yNet = yRev - cost;
+                       const days = Math.max(1, Math.round((cost / (won * t)) * 30));
+                       root.querySelector('[data-roi-rev]').textContent = yRev.toLocaleString('fr-FR') + ' € / an';
+                       root.querySelector('[data-roi-profit]').textContent = '+' + yNet.toLocaleString('fr-FR') + ' € net';
+                       root.querySelector('[data-roi-payback]').textContent = days + ' jours';
+                     })(this)" data-roi-leads>
+              <div class="flex justify-between text-[10px] text-zinc-400 font-mono">
+                <span>1</span>
+                <span>7</span>
+                <span>15</span>
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <div class="flex justify-between items-center text-xs font-semibold">
+                <span class="text-zinc-700">Taux de closing / conversion :</span>
+                <span id="roi-conv-val-${sec.id}" class="text-sm font-bold text-zinc-950 font-mono">${conv} %</span>
+              </div>
+              <input type="range" min="20" max="80" step="5" value="${conv}"
+                     class="simulateur-roi-slider w-full h-2 bg-zinc-100 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                     oninput="(function(el){
+                       const root = el.closest('.component-roi-calculator');
+                       if (!root) return;
+                       const t = Number(root.querySelector('[data-roi-ticket]').value);
+                       const l = Number(root.querySelector('[data-roi-leads]').value);
+                       const c = Number(el.value);
+                       const cost = ${siteCost};
+                       root.querySelector('#roi-conv-val-${sec.id}').textContent = c + ' %';
+                       const won = Math.max(1, Math.round((l * c) / 100));
+                       const yRev = won * t * 12;
+                       const yNet = yRev - cost;
+                       const days = Math.max(1, Math.round((cost / (won * t)) * 30));
+                       root.querySelector('[data-roi-rev]').textContent = yRev.toLocaleString('fr-FR') + ' € / an';
+                       root.querySelector('[data-roi-profit]').textContent = '+' + yNet.toLocaleString('fr-FR') + ' € net';
+                       root.querySelector('[data-roi-payback]').textContent = days + ' jours';
+                     })(this)" data-roi-conv>
+              <div class="flex justify-between text-[10px] text-zinc-400 font-mono">
+                <span>20 %</span>
+                <span>50 %</span>
+                <span>80 %</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Result Display Cards -->
+          <div class="lg:col-span-5 bg-zinc-900 text-white p-6 sm:p-8 rounded-3xl flex flex-col justify-between space-y-6 shadow-xl relative overflow-hidden">
+            <div class="space-y-1">
+              <div class="text-[11px] uppercase tracking-wider text-emerald-400 font-bold">Chiffre d'Affaires Estimé</div>
+              <div class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight font-mono" data-roi-rev>
+                ${yearlyRev.toLocaleString('fr-FR')} € / an
+              </div>
+              <div class="text-xs text-zinc-400 font-medium">Dont <span class="text-emerald-300 font-bold" data-roi-profit>+${yearlyProfit.toLocaleString('fr-FR')} € net</span> après amortissement du site.</div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 pt-4 border-t border-zinc-800">
+              <div class="bg-zinc-800/80 p-3 rounded-2xl">
+                <div class="text-[10px] text-zinc-400 font-medium uppercase">Rentabilité en</div>
+                <div class="text-lg font-bold text-white font-mono mt-0.5" data-roi-payback>${paybackDays} jours</div>
+                <div class="text-[10px] text-emerald-400 font-medium">Dès le 1er chantier</div>
+              </div>
+              <div class="bg-zinc-800/80 p-3 rounded-2xl">
+                <div class="text-[10px] text-zinc-400 font-medium uppercase">Coût du Site</div>
+                <div class="text-lg font-bold text-white font-mono mt-0.5">${siteCost} €</div>
+                <div class="text-[10px] text-zinc-400">Paiement unique ou 89€/m</div>
+              </div>
+            </div>
+
+            <a href="${c.ctaLink || '#contact'}" class="btn-cta text-white py-3.5 px-6 rounded-2xl text-xs font-bold text-center shadow-lg transition-transform hover:scale-105" style="background-color: var(--primary);">
+              ${c.ctaText || "Activer mon site rentable"}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// 28. Interactive Intervention & Appointment Booking (MVP Feature 3)
+function renderBookingBlock(sec, project, options = {}) {
+  const c = sec.content || {};
+  const phone = c.phone || project.business?.phone || "07 00 00 00 00";
+  const slots = Array.isArray(c.slots) && c.slots.length > 0 ? c.slots : [
+    { id: "slot-1", label: "Aujourd'hui", time: "14h00 - 16h30", status: "urgent" },
+    { id: "slot-2", label: "Demain Matin", time: "08h30 - 11h30", status: "available" },
+    { id: "slot-3", label: "Demain Après-midi", time: "14h00 - 17h00", status: "available" },
+    { id: "slot-4", label: "Cette semaine", time: "Créneau flexible", status: "available" }
+  ];
+  const services = Array.isArray(c.services) && c.services.length > 0 ? c.services : [
+    "Diagnostic & Devis Gratuit",
+    "Intervention d'Urgence",
+    "Rénovation Complète",
+    "Entretien & Dépannage"
+  ];
+
+  return `
+    <div class="py-16 sm:py-24 bg-white component-booking-block" id="booking-block-${sec.id}">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6">
+        <div class="text-center max-w-2xl mx-auto mb-10 space-y-2">
+          <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-black/5 text-zinc-800" data-editable="badge">
+            ${c.badge || "Disponibilités en Direct"}
+          </span>
+          <h2 class="font-heading text-2xl sm:text-3xl font-extrabold text-zinc-900" data-editable="title">
+            ${c.title || "Réservez Votre Créneau d'Intervention ou Devis"}
+          </h2>
+          <p class="text-sm text-zinc-600" data-editable="subtitle">
+            ${c.subtitle || "Sélectionnez une prestation et un créneau d'intervention sans engagement."}
+          </p>
+        </div>
+
+        <form onsubmit="(function(e, form){
+          e.preventDefault();
+          const confirmBox = form.querySelector('[data-booking-success]');
+          const contentBox = form.querySelector('[data-booking-form-body]');
+          if (confirmBox && contentBox) {
+            contentBox.classList.add('hidden');
+            confirmBox.classList.remove('hidden');
+          }
+        })(event, this)" class="bg-zinc-50 border border-zinc-200/90 rounded-3xl p-6 sm:p-8 shadow-xs space-y-6">
+          <div data-booking-form-body class="space-y-6">
+            <!-- Service Choice -->
+            <div class="space-y-2">
+              <label class="block text-xs font-bold text-zinc-700 uppercase tracking-wider">1. Type d'intervention</label>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                ${services.map((srv, idx) => `
+                  <button type="button" onclick="(function(btn){
+                    const parent = btn.closest('.component-booking-block');
+                    parent.querySelectorAll('[data-srv-pill]').forEach(b => b.classList.remove('bg-zinc-900', 'text-white', 'border-zinc-900'));
+                    parent.querySelectorAll('[data-srv-pill]').forEach(b => b.classList.add('bg-white', 'text-zinc-700', 'border-zinc-200'));
+                    btn.classList.add('bg-zinc-900', 'text-white', 'border-zinc-900');
+                    btn.classList.remove('bg-white', 'text-zinc-700', 'border-zinc-200');
+                  })(this)" data-srv-pill class="px-3 py-2 rounded-xl text-xs font-semibold border text-center transition-all ${idx === 0 ? 'bg-zinc-900 text-white border-zinc-900 shadow-xs' : 'bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-100'}">
+                    ${srv}
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+
+            <!-- Slots Selection -->
+            <div class="space-y-2">
+              <label class="block text-xs font-bold text-zinc-700 uppercase tracking-wider">2. Créneau souhaité</label>
+              <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                ${slots.map((s, idx) => `
+                  <div onclick="(function(card){
+                    const root = card.closest('.component-booking-block');
+                    root.querySelectorAll('[data-slot-card]').forEach(c => c.classList.remove('border-emerald-600', 'bg-emerald-50/60', 'ring-2', 'ring-emerald-600'));
+                    root.querySelectorAll('[data-slot-card]').forEach(c => c.classList.add('border-zinc-200', 'bg-white'));
+                    card.classList.add('border-emerald-600', 'bg-emerald-50/60', 'ring-2', 'ring-emerald-600');
+                    card.classList.remove('border-zinc-200', 'bg-white');
+                  })(this)" data-slot-card class="booking-slot-card p-3.5 rounded-2xl border cursor-pointer transition-all ${idx === 0 ? 'border-emerald-600 bg-emerald-50/60 ring-2 ring-emerald-600 shadow-xs' : 'border-zinc-200 bg-white hover:border-zinc-400'}">
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs font-bold text-zinc-900">${s.label}</span>
+                      ${s.status === 'urgent' ? '<span class="text-[9.5px] font-bold bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded">Urgent</span>' : '<span class="text-[9.5px] font-bold bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded">Libre</span>'}
+                    </div>
+                    <div class="text-xs font-medium text-zinc-600 mt-1">${s.time}</div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+
+            <!-- Contact & Submit -->
+            <div class="pt-3 border-t border-zinc-200/80 flex flex-col sm:flex-row items-center gap-3">
+              <input type="tel" data-booking-phone required placeholder="Votre numéro de téléphone (ex: 06 12 34 56 78)" class="w-full sm:flex-1 bg-white border border-zinc-200 rounded-xl px-3.5 py-3 text-xs font-semibold text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-zinc-900">
+              <button type="submit" class="w-full sm:w-auto btn-cta text-white px-6 py-3 rounded-xl text-xs font-bold shadow-sm hover:opacity-95 transition-all whitespace-nowrap" style="background-color: var(--primary);">
+                ${c.ctaConfirm || "Valider la réservation du créneau"}
+              </button>
+            </div>
+          </div>
+
+          <!-- Confirmation Success Box -->
+          <div data-booking-success class="hidden py-8 text-center space-y-3">
+            <div class="w-12 h-12 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto text-xl font-bold">
+              ✓
+            </div>
+            <h3 class="text-lg font-bold text-zinc-900">Créneau pré-réservé avec succès !</h3>
+            <p class="text-xs text-zinc-600 max-w-md mx-auto">
+              Notre artisan a bien reçu votre demande d'intervention. Vous serez contacté par SMS ou appel sous 15 minutes pour confirmer les détails.
+            </p>
+            <div class="pt-2">
+              <a href="tel:${phone}" class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 hover:text-emerald-800 underline">
+                📞 Besoin immédiat ? Appelez directement le ${phone}
+              </a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  `;
+}
+
+// 29. Live Social Proof Toast Simulator (MVP Feature 2)
+function renderSocialProofToast(project, options = {}) {
+  if (options.isEditor || project.branding?.socialProofEnabled === false) return "";
+  const city = project.business?.city || "votre commune";
+
+  return `
+    <div id="social-proof-toast" class="social-proof-toast fixed bottom-4 left-4 z-40 bg-white/95 backdrop-blur-md border border-zinc-200/90 rounded-2xl p-3 shadow-lg flex items-center gap-3 transition-all duration-500 max-w-sm" role="status" aria-live="polite">
+      <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-base flex-shrink-0 border border-emerald-200">
+        ⚡
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="text-xs font-bold text-zinc-900 truncate" id="sp-toast-text">
+          Demande de devis reçue à ${city}
+        </div>
+        <div class="flex items-center gap-1.5 text-[10.5px] text-zinc-500 font-medium">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+          <span id="sp-toast-time">Il y a 14 min</span>
+          <span>•</span>
+          <span class="text-emerald-700 font-semibold">Vérifié ✓</span>
+        </div>
+      </div>
+      <button type="button" onclick="this.closest('#social-proof-toast').remove()" class="text-zinc-400 hover:text-zinc-700 p-1 text-xs" aria-label="Fermer la notification">
+        ✕
+      </button>
     </div>
   `;
 }

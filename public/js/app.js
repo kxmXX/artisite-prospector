@@ -11,7 +11,7 @@ import { renderInspector } from "./components/inspector.js";
 import { renderWebsiteHTML, generateLocalBusinessSchema } from "./components/renderer.js";
 import { generateSite, createSectionData } from "./engine/generator.js";
 import { processCopilotPrompt, applyCopilotOperations } from "./engine/copilot.js";
-import { downloadHTML, downloadJSON } from "./engine/exporter.js";
+import { downloadHTML, downloadJSON, generateProductionPackage, downloadProductionPackage } from "./engine/exporter.js";
 import { getStylePresetById } from "./data/styles.js";
 import { getTradeById } from "./data/trades.js";
 import { getTradeFallbackDataUrl } from "./data/imageFallbacks.js";
@@ -227,9 +227,18 @@ class App {
   openCloserModal(projectId) {
     if (projectId) state.setCurrentProject(projectId);
     state.setDrawer("closer");
+    setTimeout(() => {
+      if (this.closerTab === "contract") {
+        this.initSignaturePad();
+      }
+    }, 50);
   }
 
   closeCloserModal() {
+    if (this._callTimerInterval) {
+      clearInterval(this._callTimerInterval);
+      this._callTimerInterval = null;
+    }
     state.closeDrawer();
   }
 
@@ -473,19 +482,272 @@ class App {
 
   switchCloserTab(tab) {
     this.closerTab = tab;
-    ["script", "whatsapp", "email", "roi"].forEach(t => {
+    const allTabs = ["script", "objections", "audit", "contract", "whatsapp", "email", "roi"];
+    allTabs.forEach(t => {
       const btn = document.getElementById(`tab-closer-${t}`);
       const panel = document.getElementById(`closer-panel-${t}`);
       if (btn && panel) {
         if (t === tab) {
-          btn.className = "px-3 py-1.5 rounded-md font-medium text-zinc-900 bg-white shadow-xs border border-zinc-200";
+          btn.className = "px-3 py-1.5 rounded-lg font-bold text-zinc-900 bg-white shadow-xs border border-zinc-200 whitespace-nowrap";
           panel.classList.remove("hidden");
         } else {
-          btn.className = "px-3 py-1.5 rounded-md font-medium text-zinc-600 hover:text-zinc-900 border border-transparent";
+          btn.className = "px-3 py-1.5 rounded-lg font-medium text-zinc-600 hover:text-zinc-900 border border-transparent whitespace-nowrap";
           panel.classList.add("hidden");
         }
       }
     });
+    if (tab === "contract") {
+      setTimeout(() => this.initSignaturePad(), 50);
+    }
+  }
+
+  // 1. Signature Pad Logic (MVP Feature 4)
+  initSignaturePad() {
+    const canvas = document.getElementById("closer-signature-pad");
+    if (!canvas || canvas._signaturePadInitialized) return;
+    canvas._signaturePadInitialized = true;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.strokeStyle = "#18181b";
+
+    let drawing = false;
+    let lastX = 0;
+    let lastY = 0;
+
+    const getPos = (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / (rect.width || 1);
+      const scaleY = canvas.height / (rect.height || 1);
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      return {
+        x: (clientX - rect.left) * scaleX,
+        y: (clientY - rect.top) * scaleY
+      };
+    };
+
+    const startDraw = (e) => {
+      drawing = true;
+      const pos = getPos(e);
+      lastX = pos.x;
+      lastY = pos.y;
+    };
+
+    const draw = (e) => {
+      if (!drawing) return;
+      if (e.cancelable) e.preventDefault();
+      const pos = getPos(e);
+      ctx.beginPath();
+      ctx.moveTo(lastX, lastY);
+      ctx.lineTo(pos.x, pos.y);
+      ctx.stroke();
+      lastX = pos.x;
+      lastY = pos.y;
+    };
+
+    const stopDraw = () => {
+      drawing = false;
+    };
+
+    canvas.addEventListener("mousedown", startDraw);
+    canvas.addEventListener("mousemove", draw);
+    window.addEventListener("mouseup", stopDraw);
+
+    canvas.addEventListener("touchstart", startDraw, { passive: false });
+    canvas.addEventListener("touchmove", draw, { passive: false });
+    window.addEventListener("touchend", stopDraw);
+  }
+
+  clearSignaturePad() {
+    const canvas = document.getElementById("closer-signature-pad");
+    if (canvas) {
+      const ctx = canvas.getContext("2d");
+      if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  }
+
+  printSignedContract() {
+    const project = state.currentProject;
+    if (!project) return;
+    const canvas = document.getElementById("closer-signature-pad");
+    const sigDataUrl = canvas ? canvas.toDataURL("image/png") : "";
+    const b = project.business || {};
+    const today = new Date().toLocaleDateString("fr-FR", { year: "numeric", month: "long", day: "numeric" });
+    const printWin = typeof window !== "undefined" ? window.open("", "_blank") : null;
+    if (!printWin) {
+      if (typeof window !== "undefined" && window.print) window.print();
+      return;
+    }
+    printWin.document.write(`
+      <!DOCTYPE html>
+      <html lang="fr">
+      <head>
+        <meta charset="UTF-8">
+        <title>Bon de Commande — ${b.name || "Client"}</title>
+        <style>
+          body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 40px; color: #18181b; max-width: 800px; margin: 0 auto; line-height: 1.5; }
+          .header { display: flex; justify-content: space-between; border-bottom: 2px solid #18181b; padding-bottom: 20px; margin-bottom: 30px; }
+          .title { font-size: 22px; font-weight: 800; text-transform: uppercase; }
+          .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
+          .card { background: #f4f4f5; padding: 18px; border-radius: 8px; font-size: 13px; }
+          .inclusions { margin-bottom: 30px; font-size: 13px; }
+          .inclusions ul { margin: 10px 0 0 20px; }
+          .sig-box { border: 1px dashed #a1a1aa; border-radius: 8px; padding: 15px; text-align: center; height: 140px; }
+          .sig-img { max-height: 110px; max-width: 100%; object-fit: contain; }
+          @media print { body { padding: 0; } }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <div>
+            <div class="title">Bon de Commande & Cession de Droits</div>
+            <div style="font-size: 12px; color: #71717a;">Réf: BDC-${(b.name || "ART").slice(0, 3).toUpperCase()}-${Date.now().toString().slice(-6)}</div>
+          </div>
+          <div style="text-align: right; font-size: 13px;">
+            <div>Date: ${today}</div>
+            <div style="font-weight: 700; color: #047857;">Offre Découverte Validée</div>
+          </div>
+        </div>
+        <div class="grid">
+          <div class="card">
+            <strong>Bénéficiaire :</strong><br>
+            ${b.name || "Artisan"}<br>
+            ${b.tradeLabel || "Artisan"} — ${b.city || ""}<br>
+            Tél: ${b.phone || "Non renseigné"}<br>
+            Email: ${b.email || "Non renseigné"}
+          </div>
+          <div class="card">
+            <strong>Prestation Clé-en-Main :</strong><br>
+            Site Vitrine Ultra-Rapide Artisite + Hébergement 1 an<br>
+            Montant TTC : <strong>${project.settings?.packPrice || "990 €"}</strong><br>
+            Délai de mise en ligne : <strong>48 heures ouvrées</strong>
+          </div>
+        </div>
+        <div class="inclusions">
+          <strong>Prestations incluses et garanties contractuelles :</strong>
+          <ul>
+            <li>Design mobile-first sur mesure optimisé pour smartphones (92% du trafic local)</li>
+            <li>Bandeau d'appel rapide 1-clic et devis WhatsApp direct</li>
+            <li>Optimisation Google Référencement Local (Schema.org LocalBusiness)</li>
+            <li>Garantie 0 panne et certificat SSL HTTPS inclus</li>
+          </ul>
+        </div>
+        <div style="display: flex; justify-content: space-between; gap: 30px; margin-top: 40px;">
+          <div style="flex: 1;">
+            <div style="font-size: 12px; font-weight: 700; margin-bottom: 5px;">Pour le Prestataire (Michel / Artisite) :</div>
+            <div class="sig-box" style="display:flex;align-items:center;justify-content:center;color:#71717a;font-size:12px;">
+              « Bon pour accord et livraison sous 48h »
+            </div>
+          </div>
+          <div style="flex: 1;">
+            <div style="font-size: 12px; font-weight: 700; margin-bottom: 5px;">Signature & Accord du Client :</div>
+            <div class="sig-box">
+              ${sigDataUrl ? `<img src="${sigDataUrl}" class="sig-img" alt="Signature client">` : '<span style="color:#a1a1aa;font-size:12px;line-height:120px;">Signature électronique</span>'}
+            </div>
+          </div>
+        </div>
+        <script>
+          window.onload = () => { window.print(); };
+        </script>
+      </body>
+      </html>
+    `);
+    printWin.document.close();
+  }
+
+  // 2. Call Teleprompter Timer (MVP Feature 6)
+  toggleCallTimer() {
+    if (this._callTimerInterval) {
+      clearInterval(this._callTimerInterval);
+      this._callTimerInterval = null;
+      return;
+    }
+    if (typeof this._callSeconds !== "number") {
+      this._callSeconds = 0;
+    }
+    const updateDisplay = () => {
+      const min = String(Math.floor(this._callSeconds / 60)).padStart(2, "0");
+      const sec = String(this._callSeconds % 60).padStart(2, "0");
+      const el = document.getElementById("call-timer-display");
+      if (el) el.textContent = `${min}:${sec}`;
+    };
+    this._callTimerInterval = setInterval(() => {
+      this._callSeconds++;
+      updateDisplay();
+    }, 1000);
+    updateDisplay();
+  }
+
+  updateCallProgress(checkbox) {
+    if (!checkbox) return;
+    const label = checkbox.closest("label");
+    if (label) {
+      if (checkbox.checked) {
+        label.classList.add("text-emerald-600", "font-bold");
+      } else {
+        label.classList.remove("text-emerald-600", "font-bold");
+      }
+    }
+  }
+
+  // 3. Virtual Multi-Page Navigation Mode (MVP Feature 7)
+  setVirtualPage(pageId) {
+    if (!state.currentProject) return;
+    state.currentProject._activeVirtualPage = pageId;
+    this.render();
+  }
+
+  setNavigationMode(mode) {
+    if (!state.currentProject) return;
+    if (!state.currentProject.branding) state.currentProject.branding = {};
+    state.currentProject.branding.navigationMode = mode;
+    state.currentProject._activeVirtualPage = "home";
+    state.save();
+    this.render();
+    this.showToast(`Mode navigation mis à jour : ${mode === "multi-tab" ? "Multi-Pages" : "One-Page"}`, "success");
+  }
+
+  // 4. Live Social Proof Toast Toggle (MVP Feature 2)
+  toggleSocialProof(enabled) {
+    if (!state.currentProject) return;
+    if (!state.currentProject.branding) state.currentProject.branding = {};
+    state.currentProject.branding.socialProofEnabled = Boolean(enabled);
+    state.save();
+    this.render();
+    this.showToast(`Preuve sociale en direct ${enabled ? "activée" : "désactivée"}`, "info");
+  }
+
+  // 5. White-Label Client PIN Protection (MVP Feature 10)
+  setClientDemoPin(pin) {
+    if (!state.currentProject) return;
+    if (!state.currentProject.settings) state.currentProject.settings = {};
+    state.currentProject.settings.clientDemoPin = pin ? String(pin).trim() : null;
+    state.save();
+    this.showToast(pin ? `Code PIN client défini : ${pin}` : "Code PIN désactivé", "info");
+  }
+
+  unlockClientDemo(enteredPin) {
+    const project = state.currentProject;
+    const requiredPin = project?.settings?.clientDemoPin || "1234";
+    if (String(enteredPin).trim() === String(requiredPin).trim()) {
+      this._clientUnlocked = true;
+      this.showToast("Accès démo déverrouillé !", "success");
+      this.render();
+      return true;
+    } else {
+      this.showToast("Code PIN incorrect", "error");
+      return false;
+    }
+  }
+
+  // 6. Production Package Downloader (MVP Feature 9)
+  exportProductionPackage() {
+    if (!state.currentProject) return;
+    downloadProductionPackage(state.currentProject);
+    this.showToast("Pack complet de production téléchargé (HTML, Sitemap, Robots, Manifest) !", "success");
   }
 
   // Wizard Generation Submission with Animated Terminal & AI Call

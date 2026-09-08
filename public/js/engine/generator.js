@@ -37,7 +37,9 @@ export function generateSite(input = {}) {
     bodyFont: input.bodyFont || preset.bodyFont,
     borderRadius: preset.borderRadius || "0.75rem",
     buttonRadius: preset.buttonRadius || "9999px",
-    cardStyle: preset.cardStyle || "bordered"
+    cardStyle: preset.cardStyle || "bordered",
+    socialProofEnabled: input.socialProofEnabled !== undefined ? Boolean(input.socialProofEnabled) : true,
+    navigationMode: input.navigationMode || "one-page"
   };
 
   const business = {
@@ -498,6 +500,7 @@ export function generateSite(input = {}) {
     branding,
     siteTheme: input.siteTheme || ((preset.bgColor || "#ffffff").toLowerCase() === "#0f0f11" ? "dark" : "light"),
     closerTips: trade.closerTips || {},
+    settings: input.settings || { stickyBarEnabled: true, clientDemoPin: null },
     sections,
     componentAudit: {
       evaluatedAt: new Date().toISOString(),
@@ -540,7 +543,8 @@ export function createSectionData(type, variant, trade, business = {}) {
   const email = business.email || `contact@artisan.fr`;
   const address = business.address || `Zone Artisanale, ${city}`;
 
-  switch (type) {
+  const sec = (() => {
+    switch (type) {
     case "header":
       return {
         type: "header",
@@ -1066,6 +1070,51 @@ export function createSectionData(type, variant, trade, business = {}) {
         settings: {}
       };
 
+    case "roiCalculator":
+      return {
+        type: "roiCalculator",
+        variant: variant || "interactive-calculator",
+        content: {
+          badge: "Rentabilité Immédiate",
+          title: "Calculez la Rentabilité Réelle de Votre Futur Site",
+          subtitle: `Voyez exactement combien de nouveaux chantiers à ${city} suffisent pour rentabiliser votre investissement.`,
+          defaultTicket: 1200,
+          defaultLeads: 4,
+          defaultConv: 50,
+          siteCost: 990,
+          ctaText: "Réserver ce retour sur investissement",
+          ctaLink: `tel:${phone}`
+        },
+        settings: { bgTheme: "mineral" }
+      };
+
+    case "bookingBlock":
+      return {
+        type: "bookingBlock",
+        variant: variant || "slot-picker",
+        content: {
+          badge: "Disponibilités en Direct",
+          title: "Réservez Votre Créneau d'Intervention ou Devis",
+          subtitle: `Sélectionnez un créneau disponible cette semaine à ${city} pour une prise en charge rapide.`,
+          services: [
+            "Diagnostic & Devis Gratuit",
+            "Intervention d'Urgence",
+            "Rénovation Complète",
+            "Entretien & Dépannage"
+          ],
+          slots: [
+            { id: "slot-1", label: "Aujourd'hui", time: "14h00 - 16h30", status: "urgent" },
+            { id: "slot-2", label: "Demain Matin", time: "08h30 - 11h30", status: "available" },
+            { id: "slot-3", label: "Demain Après-midi", time: "14h00 - 17h00", status: "available" },
+            { id: "slot-4", label: "Cette semaine", time: "Créneau flexible", status: "available" }
+          ],
+          phonePrompt: "Confirmation immédiate par SMS ou WhatsApp",
+          phone,
+          ctaConfirm: "Valider la réservation du créneau"
+        },
+        settings: { bgTheme: "white" }
+      };
+
     default:
       return {
         type,
@@ -1077,5 +1126,11 @@ export function createSectionData(type, variant, trade, business = {}) {
         },
         settings: {}
       };
+    }
+  })();
+
+  if (sec && !sec.id) {
+    sec.id = `sec-${type}-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
   }
+  return sec;
 }

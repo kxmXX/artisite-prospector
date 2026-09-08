@@ -234,6 +234,24 @@ export const SECTION_DEFINITIONS = [
     variants: [
       { id: "segmented-tabs", label: "Onglets Segmentés de Spécialités", desc: "Boutons d'onglets épurés avec carte active correspondante." }
     ]
+  },
+  {
+    type: "roiCalculator",
+    title: "Simulateur de Rentabilité & ROI (Calculateur)",
+    description: "Calculateur en direct pour prouver qu'un seul chantier supplémentaire rentabilise le site.",
+    icon: "dollarSign",
+    variants: [
+      { id: "interactive-calculator", label: "Calculateur de Rentabilité Réelle", desc: "Curseurs dynamiques du panier moyen et demandes mensuelles avec calcul de gain annuel." }
+    ]
+  },
+  {
+    type: "bookingBlock",
+    title: "Prise de Rendez-vous & Créneaux d'Urgence",
+    description: "Sélecteur de créneau d'intervention avec confirmation directe par SMS ou WhatsApp.",
+    icon: "calendar",
+    variants: [
+      { id: "slot-picker", label: "Sélecteur de Créneaux d'Intervention", desc: "Grille de créneaux disponibles sous 24h avec choix du type de prestation." }
+    ]
   }
 ];
 

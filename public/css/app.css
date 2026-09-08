@@ -2868,4 +2868,67 @@ body.dark-theme #right-inspector-panel select { background: #202027 !important; 
   transition: all 0.2s ease;
 }
 
+/* ============================================================
+   MVP FEATURES 2026 STYLES:
+   1. Social Proof Toast
+   2. ROI Calculator & Slider
+   3. Booking Block & Slot Cards
+   4. E-Signature Canvas & Teleprompter
+   5. WCAG Accessibility Box
+   ============================================================ */
 
+/* 1. Live Social Proof Toast */
+.social-proof-toast {
+  animation: toastSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  box-shadow: 0 12px 30px -4px rgba(0, 0, 0, 0.12), 0 4px 12px -2px rgba(0, 0, 0, 0.06);
+}
+
+@keyframes toastSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 2. ROI Calculator Interactive Cards */
+.component-roi-calculator {
+  position: relative;
+}
+
+.component-roi-calculator input[type="range"] {
+  accent-color: var(--primary, #059669);
+  cursor: pointer;
+}
+
+/* 3. Booking Block Service Pills & Slots */
+.component-booking-block {
+  position: relative;
+}
+
+.component-booking-block .booking-slot-card {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.component-booking-block .booking-slot-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--primary, #059669);
+}
+
+/* 4. Signature Pad & Teleprompter */
+#closer-signature-pad {
+  touch-action: none;
+  background-color: #ffffff;
+}
+
+#call-timer-box {
+  user-select: none;
+}
+
+/* 5. WCAG Contrast Box */
+.wcag-contrast-box {
+  transition: border-color 0.2s ease;
+}

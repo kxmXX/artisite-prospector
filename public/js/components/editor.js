@@ -46,7 +46,9 @@ export function getSectionFriendlyTitle(sec) {
     stepperBlock: "Étapes de Chantier",
     tableBlock: "Tableau Comparatif",
     sliderBlock: "Curseur de Surface",
-    tabsBlock: "Onglets Prestations"
+    tabsBlock: "Onglets Prestations",
+    roiCalculator: "Simulateur Rentabilité ROI",
+    bookingBlock: "Créneaux & Rendez-vous"
   };
   return titles[sec.type] || sec.type;
 }
@@ -1018,6 +1020,36 @@ function renderSettingsAccordions(project) {
                 </div>
               `;
             }).join('')}
+
+            <!-- WCAG AAA Contrast Accessibility Audit (MVP Feature 8) -->
+            ${(() => {
+              const primary = project.branding?.primaryColor || '#059669';
+              const bg = project.branding?.bgColor || '#ffffff';
+              const text = project.branding?.textColor || '#18181b';
+              const primaryContrast = calculateContrast(primary, bg);
+              const textContrast = calculateContrast(text, bg);
+              return `
+                <div class="wcag-contrast-box p-3 rounded-xl bg-zinc-50 border border-zinc-200 mt-3 space-y-2">
+                  <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-600">Accessibilité Contraste WCAG 2.1</span>
+                    <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded ${primaryContrast.isAaa ? 'bg-emerald-100 text-emerald-800' : (primaryContrast.isAa ? 'bg-blue-100 text-blue-800' : 'bg-amber-100 text-amber-800')}">
+                      ${primaryContrast.ratio}:1 • ${primaryContrast.grade}
+                    </span>
+                  </div>
+                  <div class="grid grid-cols-2 gap-2 text-[10.5px]">
+                    <div class="bg-white p-2 rounded-lg border border-zinc-200">
+                      <div class="text-zinc-400 text-[9.5px] uppercase">Bouton Primaire / Fond</div>
+                      <div class="font-bold text-zinc-900 mt-0.5">${primaryContrast.ratio}:1 (${primaryContrast.grade})</div>
+                    </div>
+                    <div class="bg-white p-2 rounded-lg border border-zinc-200">
+                      <div class="text-zinc-400 text-[9.5px] uppercase">Texte Courant / Fond</div>
+                      <div class="font-bold text-zinc-900 mt-0.5">${textContrast.ratio}:1 (${textContrast.grade})</div>
+                    </div>
+                  </div>
+                  <p class="text-[10px] text-zinc-500 italic">Un ratio ≥ 4.5:1 (AA) ou ≥ 7.0:1 (AAA) garantit une lisibilité irréprochable sous le soleil sur smartphone.</p>
+                </div>
+              `;
+            })()}
           </div>
         </div>
       </div>
@@ -1165,6 +1197,10 @@ function renderSettingsAccordions(project) {
           <span class="text-zinc-400">${getIcon("chevronDown", "w-3.5 h-3.5")}</span>
         </div>
         <div class="section-accordion-body hidden space-y-2" id="settings-body-export">
+          <button type="button" onclick="window.app.exportProductionPackage()" class="w-full py-2 px-2.5 rounded-lg bg-zinc-950 hover:bg-black text-white flex items-center justify-between text-xs font-semibold transition-colors shadow-xs">
+            <span>📦 Télécharger Pack Production (HTML, Sitemap, Robots, Manifest)</span>
+            ${getIcon("download", "w-3.5 h-3.5 text-white")}
+          </button>
           <button type="button" onclick="window.app.exportHTML()" class="w-full py-2 px-2.5 rounded-lg bg-white hover:bg-zinc-50 border border-zinc-200 flex items-center justify-between text-xs font-medium text-zinc-900 transition-colors">
             <span>Télécharger site autonome (.HTML)</span>
             ${getIcon("code", "w-3.5 h-3.5 text-zinc-500")}
@@ -1237,6 +1273,76 @@ function renderSettingsAccordions(project) {
         </button>
       </div>
 
+      <!-- 9. Navigation & Mode Multi-Pages (MVP Feature 7) -->
+      <div class="section-card">
+        <div class="section-card-header" onclick="window.app.toggleSettingsItem('navigation')">
+          <div class="flex items-center gap-2 text-xs font-medium text-zinc-900">
+            ${getIcon("compass", "w-4 h-4 text-zinc-500")}
+            <span>Navigation & Mode Multi-Pages</span>
+          </div>
+          <span class="text-zinc-400">${getIcon("chevronDown", "w-3.5 h-3.5")}</span>
+        </div>
+        <div class="section-accordion-body hidden space-y-2.5" id="settings-body-navigation">
+          <label class="block text-[10px] font-medium text-zinc-400 uppercase tracking-wider">Architecture du Site</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" onclick="window.app.setNavigationMode('one-page')" class="p-2.5 border rounded-xl text-left transition-all ${project.branding?.navigationMode !== 'multi-tab' ? 'border-zinc-900 bg-white font-semibold shadow-xs text-zinc-950' : 'border-zinc-200 bg-zinc-50 hover:bg-white text-zinc-600'}">
+              <div class="text-xs font-bold">📜 One-Page</div>
+              <div class="text-[10px] text-zinc-400 mt-0.5">Défilement continu fluide classique.</div>
+            </button>
+            <button type="button" onclick="window.app.setNavigationMode('multi-tab')" class="p-2.5 border rounded-xl text-left transition-all ${project.branding?.navigationMode === 'multi-tab' ? 'border-zinc-900 bg-white font-semibold shadow-xs text-zinc-950' : 'border-zinc-200 bg-zinc-50 hover:bg-white text-zinc-600'}">
+              <div class="text-xs font-bold">📑 Multi-Pages</div>
+              <div class="text-[10px] text-zinc-400 mt-0.5">Onglets thématiques (Services, Réalisations, Devis, Contact).</div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 10. Preuve Sociale en Direct (MVP Feature 2) -->
+      <div class="section-card">
+        <div class="section-card-header" onclick="window.app.toggleSettingsItem('socialProof')">
+          <div class="flex items-center gap-2 text-xs font-medium text-zinc-900">
+            ${getIcon("bell", "w-4 h-4 text-zinc-500")}
+            <span>Preuve Sociale (Notifications Leads)</span>
+          </div>
+          <span class="text-zinc-400">${getIcon("chevronDown", "w-3.5 h-3.5")}</span>
+        </div>
+        <div class="section-accordion-body hidden space-y-2.5" id="settings-body-socialProof">
+          <div class="flex items-center justify-between">
+            <div>
+              <label class="block text-[11px] font-semibold text-zinc-900">Toasts de Demandes Récentes</label>
+              <p class="text-[10px] text-zinc-500">Affiche des alertes en direct de devis demandés dans la zone d'intervention.</p>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" ${project.branding?.socialProofEnabled !== false ? 'checked' : ''}
+                     onchange="window.app.toggleSocialProof(this.checked)" class="sr-only peer">
+              <div class="w-8 h-4 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3 after:w-3.5 after:transition-all peer-checked:bg-zinc-900"></div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- 11. Protection & PIN Démo Client (MVP Feature 10) -->
+      <div class="section-card">
+        <div class="section-card-header" onclick="window.app.toggleSettingsItem('pinLock')">
+          <div class="flex items-center gap-2 text-xs font-medium text-zinc-900">
+            ${getIcon("lock", "w-4 h-4 text-zinc-500")}
+            <span>Protection Démo Client (Code PIN)</span>
+          </div>
+          <span class="text-zinc-400">${getIcon("chevronDown", "w-3.5 h-3.5")}</span>
+        </div>
+        <div class="section-accordion-body hidden space-y-2.5" id="settings-body-pinLock">
+          <p class="text-[11px] text-zinc-600">Verrouillez l'édition de la démo client avec un code PIN secret pour Michel :</p>
+          <div class="flex items-center gap-2">
+            <input type="text" id="setting-client-pin" maxlength="6" placeholder="Ex: 1234" value="${escapeHtml(project.settings?.clientDemoPin || '')}"
+                   onchange="window.app.setClientDemoPin(this.value)"
+                   class="w-32 bg-white border border-zinc-200 rounded-lg px-3 py-1.5 text-xs font-mono font-bold tracking-widest text-zinc-900 focus:border-zinc-900 focus:outline-none">
+            <button type="button" onclick="window.app.setClientDemoPin(document.getElementById('setting-client-pin')?.value)" class="btn-keycap btn-keycap-dark px-3 py-1.5 text-xs font-medium text-white rounded-lg">
+              Enregistrer
+            </button>
+          </div>
+        </div>
+      </div>
+
     </div>
   `;
 }
@@ -1276,4 +1382,28 @@ function getHarmonyColors(hex) {
     return `#${parts.map(channel => Math.round((channel + m) * 255).toString(16).padStart(2, '0')).join('')}`;
   };
   return [hex, toHex((h + 180) % 360), toHex((h + 30) % 360)];
+}
+
+export function calculateContrast(hex1, hex2) {
+  const getLuminance = (hex) => {
+    const clean = String(hex || '').replace('#', '');
+    if (!/^[0-9a-f]{6}$/i.test(clean)) return 0.5;
+    const rgb = [0, 2, 4].map(idx => {
+      const c = parseInt(clean.slice(idx, idx + 2), 16) / 255;
+      return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    });
+    return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
+  };
+  const l1 = getLuminance(hex1);
+  const l2 = getLuminance(hex2);
+  const lighter = Math.max(l1, l2);
+  const darker = Math.min(l1, l2);
+  const ratio = (lighter + 0.05) / (darker + 0.05);
+  const rounded = Math.round(ratio * 10) / 10;
+  return {
+    ratio: rounded,
+    isAaa: ratio >= 7.0,
+    isAa: ratio >= 4.5,
+    grade: ratio >= 7.0 ? 'AAA' : (ratio >= 4.5 ? 'AA' : 'Contraste faible')
+  };
 }

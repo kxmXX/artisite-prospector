@@ -98,3 +98,133 @@ export function calculateROI(ticketMoyen = 800, siteCost = 1200) {
     yearlyGainOnePerMonth
   };
 }
+
+export function generateCompetitiveAudit(project) {
+  const b = project?.business || {};
+  const city = b.city || "Secteur";
+  const trade = b.tradeLabel || "Artisan";
+
+  return {
+    title: `Audit de Visibilité & Benchmark Local — ${b.name}`,
+    city,
+    trade,
+    pillars: [
+      {
+        name: "Vitesse de chargement & Mobile First",
+        currentStatus: "28 / 100 (Critique)",
+        currentScore: 28,
+        prospectorScore: 99,
+        prospectorStatus: "99 / 100 (Éclair)",
+        impact: "74% des visiteurs sur mobile quittent un site qui met plus de 3 secondes à charger."
+      },
+      {
+        name: "Module Avant / Après Interactif",
+        currentStatus: "Inexistant (0 visuel)",
+        currentScore: 0,
+        prospectorScore: 100,
+        prospectorStatus: "Curseur SplitReveal 4K",
+        impact: "Le module avant/après multiplie par 3 le taux de conversion sur les chantiers locaux."
+      },
+      {
+        name: "Bouton d'Appel Direct & WhatsApp Flottant",
+        currentStatus: "Numéro masqué ou introuvable",
+        currentScore: 15,
+        prospectorScore: 100,
+        prospectorStatus: "Bandeau d'Urgence 1-Clic",
+        impact: "Permet au client de joindre l'artisan immédiatement sans chercher le numéro."
+      },
+      {
+        name: "Réassurance & Labels Décennaux",
+        currentStatus: "Mentions non vérifiées",
+        currentScore: 30,
+        prospectorScore: 95,
+        prospectorStatus: "Badges de Garantie Officiels",
+        impact: "Rassure immédiatement les propriétaires face aux prestataires non déclarés."
+      },
+      {
+        name: "Simulateur de Devis & Réservation de Créneau",
+        currentStatus: "Formulaire basique ou absent",
+        currentScore: 10,
+        prospectorScore: 96,
+        prospectorStatus: "Chiffrage Express en 3 Clics",
+        impact: "Capte les leads qualifiés même en dehors des heures ouvrées."
+      }
+    ],
+    talkingPoints: [
+      `« Sur ${city}, vos concurrents n'ont pas encore ce niveau d'interactivité. C'est l'opportunité de capter les chantiers les plus rentables. »`,
+      `« 8 particuliers sur 10 à ${city} comparent plusieurs artisans sur leur smartphone : avec ce site, vous gagnez la comparaison systématiquement. »`
+    ]
+  };
+}
+
+export function generateOrderContract(project, options = {}) {
+  const b = project?.business || {};
+  const dateStr = new Date().toLocaleDateString("fr-FR");
+  const priceMode = options.priceMode || "unique";
+  const priceLabel = priceMode === "mensuel" ? "89 € H.T. / mois (engagement 12 mois)" : "990 € H.T. (paiement unique clé en main)";
+
+  return {
+    contractNumber: `BDC-${Date.now().toString().slice(-6)}`,
+    date: dateStr,
+    client: {
+      name: b.name || "Artisan & Co",
+      trade: b.tradeLabel || "Artisan",
+      city: b.city || "France",
+      phone: b.phone || "Non renseigné",
+      email: b.email || `contact@${(b.name || "artisan").toLowerCase().replace(/[^a-z0-9]/g, "")}.fr`
+    },
+    service: {
+      title: "Création, Déploiement & Cession du Site Vitrine Professionnel",
+      inclusions: [
+        "Site web complet responsive optimisé mobile/tablette/PC",
+        "Module interactif Avant / Après chantiers avec images haute définition",
+        "Bandeau d'appel téléphonique et contact WhatsApp direct",
+        "Simulateur de devis express en ligne et créneaux d'urgence",
+        "Intégration des avis Google vérifiés et note 4.9/5",
+        "Mise en conformité RGPD, mentions légales et balisage LocalBusiness JSON-LD",
+        "Propriété intégrale du code source et des fichiers délivrés"
+      ],
+      price: priceLabel,
+      deliveryTime: "Sous 24 à 48 heures ouvrées"
+    },
+    guarantee: "Garantie 'Satisfait ou Remboursé' 14 jours & Accompagnement technique personnalisé."
+  };
+}
+
+export function getObjectionBattlecards(project) {
+  const b = project?.business || {};
+  const city = b.city || "votre commune";
+
+  return [
+    {
+      id: "fb",
+      title: "« J'ai déjà Facebook / Instagram »",
+      counter: `« C'est super pour vos proches, mais quand un particulier a une urgence ou un budget travaux à ${city}, il tape sur Google. Sans site officiel, 100% de ces chantiers partent chez vos concurrents. »`,
+      confidence: "98%"
+    },
+    {
+      id: "price",
+      title: "« C'est trop cher / Pas le budget »",
+      counter: `« Les agences facturent 3 000 € pour commencer de zéro. Ici le site est déjà développé et prêt : un seul chantier signé ce mois-ci vous rembourse intégralement. Le reste de l'année, c'est du bénéfice net pur. »`,
+      confidence: "95%"
+    },
+    {
+      id: "neveu",
+      title: "« Mon neveu / un ami va me le faire »",
+      counter: `« Beaucoup d'artisans m'ont dit ça et 6 mois plus tard rien n'est en ligne. Ici le site existe déjà, il est sur mon écran, testé et prêt à générer des appels dès cette semaine. »`,
+      confidence: "92%"
+    },
+    {
+      id: "temps",
+      title: "« Je n'ai pas le temps »",
+      counter: `« Vous n'avez strictement rien à faire : j'ai rédigé les textes, configuré les photos et réglé la technique. Vous me validez juste le rendu et je gère 100% de la mise en ligne. »`,
+      confidence: "97%"
+    },
+    {
+      id: "bouche",
+      title: "« Le bouche-à-oreille me suffit »",
+      counter: `« C'est le signe que votre travail est impeccable ! Mais le site ne sert pas seulement à avoir plus de clients, il sert à trier les chantiers les plus rentables et justifier des tarifs plus élevés. »`,
+      confidence: "94%"
+    }
+  ];
+}

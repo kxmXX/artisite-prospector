@@ -36,7 +36,12 @@ const server = http.createServer(async (req, res) => {
   }
 
   // ==================== STATIC FILES ====================
-  let reqPath = decodeURI(rawUrl);
+  let reqPath = "/";
+  try {
+    reqPath = decodeURI(rawUrl);
+  } catch (err) {
+    reqPath = rawUrl;
+  }
   if (reqPath === "/") reqPath = "/index.html";
 
   // Prevent directory traversal
@@ -50,6 +55,16 @@ const server = http.createServer(async (req, res) => {
 
     const ext = path.extname(filePath).toLowerCase();
     const contentType = MIME_TYPES[ext] || "application/octet-stream";
+    const etag = `W/"${stats?.size || 0}-${stats?.mtimeMs || 0}"`;
+
+    if (req.headers["if-none-match"] === etag) {
+      res.writeHead(304, {
+        "ETag": etag,
+        "Cache-Control": ext === ".html" ? "no-cache" : "public, max-age=3600, stale-while-revalidate=86400"
+      });
+      res.end();
+      return;
+    }
 
     fs.readFile(filePath, (readErr, content) => {
       if (readErr) {
@@ -60,7 +75,8 @@ const server = http.createServer(async (req, res) => {
 
       res.writeHead(200, {
         "Content-Type": contentType,
-        "Cache-Control": "no-cache"
+        "ETag": etag,
+        "Cache-Control": ext === ".html" ? "no-cache" : "public, max-age=3600, stale-while-revalidate=86400"
       });
       res.end(content);
     });

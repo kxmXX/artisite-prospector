@@ -511,6 +511,84 @@ export function downloadHTML(project) {
   triggerDownload(blob, filename);
 }
 
+/**
+ * MVP Feature 9: Production Package Generator
+ * Generates XML Sitemap, Robots.txt, PWA WebManifest, and Standalone HTML.
+ */
+export function generateSitemapXML(project, baseUrl = "https://artisite-prospector.vercel.app") {
+  const cleanBase = baseUrl.replace(/\/$/, "");
+  const today = new Date().toISOString().split("T")[0];
+  const pages = [
+    { path: "", priority: "1.0", changefreq: "weekly" },
+    { path: "#services", priority: "0.9", changefreq: "monthly" },
+    { path: "#realisations", priority: "0.8", changefreq: "weekly" },
+    { path: "#contact", priority: "0.8", changefreq: "monthly" },
+    { path: "#simulateur", priority: "0.7", changefreq: "monthly" }
+  ];
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${pages.map(p => `  <url>
+    <loc>${cleanBase}/${p.path}</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>${p.changefreq}</changefreq>
+    <priority>${p.priority}</priority>
+  </url>`).join('\n')}
+</urlset>`;
+}
+
+export function generateRobotsTXT(project, baseUrl = "https://artisite-prospector.vercel.app") {
+  const cleanBase = baseUrl.replace(/\/$/, "");
+  return `# Robots.txt pour ${project?.business?.name || "Artisan"}
+User-agent: *
+Allow: /
+Sitemap: ${cleanBase}/sitemap.xml
+`;
+}
+
+export function generateWebManifest(project) {
+  const b = project?.business || {};
+  const brand = project?.branding || {};
+  return JSON.stringify({
+    name: `${b.name || "Artisan"} — ${b.tradeLabel || "Artisan"}`,
+    short_name: b.name || "Artisan",
+    description: `Site officiel de ${b.name || "Artisan"} à ${b.city || ""}`,
+    start_url: "/",
+    display: "standalone",
+    background_color: brand.bgColor || "#ffffff",
+    theme_color: brand.primaryColor || "#059669",
+    icons: [
+      {
+        src: "/favicon.ico",
+        sizes: "64x64 32x32 24x24 16x16",
+        type: "image/x-icon"
+      }
+    ]
+  }, null, 2);
+}
+
+export function generateProductionPackage(project, baseUrl = "https://artisite-prospector.vercel.app") {
+  return {
+    "index.html": exportStandaloneHTML(project),
+    "sitemap.xml": generateSitemapXML(project, baseUrl),
+    "robots.txt": generateRobotsTXT(project, baseUrl),
+    "site.webmanifest": generateWebManifest(project)
+  };
+}
+
+export function downloadProductionPackage(project) {
+  const pkg = generateProductionPackage(project);
+  downloadHTML(project);
+
+  const sitemapBlob = new Blob([pkg["sitemap.xml"]], { type: "application/xml" });
+  triggerDownload(sitemapBlob, "sitemap.xml");
+
+  const robotsBlob = new Blob([pkg["robots.txt"]], { type: "text/plain" });
+  triggerDownload(robotsBlob, "robots.txt");
+
+  const manifestBlob = new Blob([pkg["site.webmanifest"]], { type: "application/manifest+json" });
+  triggerDownload(manifestBlob, "site.webmanifest");
+}
+
 function triggerDownload(blob, filename) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
