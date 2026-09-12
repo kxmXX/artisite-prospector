@@ -219,6 +219,12 @@ class App {
     } else {
       modalContainer.innerHTML = "";
     }
+
+    const canvaDock = document.getElementById("canva-floating-dock");
+    if (canvaDock) {
+      canvaDock.style.display = state.activeDrawer ? "none" : "";
+    }
+    document.body.classList.toggle("modal-open", Boolean(state.activeDrawer));
   }
 
   // Navigation methods
@@ -430,12 +436,61 @@ class App {
 
   closeAddSectionModal() {
     state.closeDrawer();
+    const canvaDock = document.getElementById("canva-floating-dock");
+    if (canvaDock) canvaDock.style.display = "";
+    document.body.classList.remove("modal-open");
   }
 
   closeModals() {
     state.closeDrawer();
+    const canvaDock = document.getElementById("canva-floating-dock");
+    if (canvaDock) canvaDock.style.display = "";
+    document.body.classList.remove("modal-open");
     const lightbox = document.getElementById("lightbox-modal");
     if (lightbox) lightbox.classList.remove("open");
+  }
+
+  filterCatalogItems(query) {
+    const q = (query || "").trim().toLowerCase();
+    const cards = document.querySelectorAll("#modal-container .catalog-card");
+    cards.forEach(card => {
+      if (!q) {
+        card.style.display = "";
+        return;
+      }
+      const text = (card.textContent || "").toLowerCase();
+      const match = text.includes(q);
+      card.style.display = match ? "" : "none";
+    });
+  }
+
+  filterCatalogCategory(category, btnEl) {
+    if (btnEl) {
+      document.querySelectorAll(".catalog-filter-btn").forEach(b => {
+        b.classList.remove("is-active", "bg-zinc-900", "text-white");
+        b.classList.add("bg-zinc-100", "text-zinc-700");
+      });
+      btnEl.classList.add("is-active", "bg-zinc-900", "text-white");
+      btnEl.classList.remove("bg-zinc-100", "text-zinc-700");
+    }
+
+    const cards = document.querySelectorAll("#modal-container .catalog-card");
+    cards.forEach(card => {
+      if (!category || category === "all") {
+        card.style.display = "";
+      } else {
+        const cat = (card.getAttribute("data-category") || "").toLowerCase();
+        let match = false;
+        if (category === "content") {
+          match = ["hero", "about", "services", "faq", "stats", "process", "content", "customblock", "disclosure"].includes(cat);
+        } else if (category === "media") {
+          match = ["gallery", "beforeafter", "media"].includes(cat);
+        } else if (category === "action") {
+          match = ["cta", "contact", "reviews", "pricing", "location", "hours", "certifications", "action", "status", "feedback", "input", "navigation"].includes(cat);
+        }
+        card.style.display = match ? "" : "none";
+      }
+    });
   }
 
   setViewport(vp) {
@@ -851,6 +906,7 @@ class App {
     if (!state.currentProject.branding) state.currentProject.branding = {};
     state.currentProject.branding.navigationMode = mode;
     state.currentProject._activeVirtualPage = "home";
+    state._openSettingsItem = "navigation";
     state.save();
     this.render();
     this.showToast(`Mode navigation mis à jour : ${mode === "multi-tab" ? "Multi-Pages" : "One-Page"}`, "success");
@@ -861,6 +917,7 @@ class App {
     if (!state.currentProject) return;
     if (!state.currentProject.branding) state.currentProject.branding = {};
     state.currentProject.branding.socialProofEnabled = Boolean(enabled);
+    state._openSettingsItem = "socialProof";
     state.save();
     this.render();
     this.showToast(`Preuve sociale en direct ${enabled ? "activée" : "désactivée"}`, "info");
@@ -871,6 +928,7 @@ class App {
     if (!state.currentProject) return;
     if (!state.currentProject.settings) state.currentProject.settings = {};
     state.currentProject.settings.clientDemoPin = pin ? String(pin).trim() : null;
+    state._openSettingsItem = "pinLock";
     state.save();
     this.showToast(pin ? `Code PIN client défini : ${pin}` : "Code PIN désactivé", "info");
   }
@@ -1336,9 +1394,13 @@ class App {
     if (isHidden) {
       body.classList.remove("hidden");
       chevron?.classList.add("rotate-180");
+      state._openSettingsItem = itemId;
     } else {
       body.classList.add("hidden");
       chevron?.classList.remove("rotate-180");
+      if (state._openSettingsItem === itemId) {
+        state._openSettingsItem = null;
+      }
     }
   }
 
@@ -2830,29 +2892,28 @@ class App {
   }
 
   initScrollObserver() {
-    const motionElements = document.querySelectorAll("[data-motion]:not([data-motion='none'])");
+    const motionElements = document.querySelectorAll("[data-motion]:not([data-motion='none']), [data-scroll-fx]");
     if (!motionElements.length) return;
-
-    if (state.currentView === "editor") {
-      motionElements.forEach(el => el.classList.add("is-revealed"));
-      return;
-    }
-
-    if (typeof IntersectionObserver === "undefined") {
-      motionElements.forEach(el => el.classList.add("is-revealed"));
-      return;
-    }
 
     if (this._scrollObserver) {
       this._scrollObserver.disconnect();
     }
 
-    const scrollContainer = document.querySelector("main.overflow-y-auto") || document.querySelector("main") || null;
+    const scrollContainer = document.getElementById("editor-main-canvas") || document.querySelector("main.overflow-y-auto") || document.querySelector("main") || null;
+
+    if (typeof IntersectionObserver === "undefined") {
+      motionElements.forEach(el => {
+        el.classList.add("is-revealed");
+        el.classList.add("fx-active");
+      });
+      return;
+    }
 
     this._scrollObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.classList.add("is-revealed");
+          entry.target.classList.add("fx-active");
         }
       });
     }, {
@@ -2863,15 +2924,30 @@ class App {
 
     motionElements.forEach(el => {
       this._scrollObserver.observe(el);
+      if (scrollContainer) {
+        const cRect = scrollContainer.getBoundingClientRect();
+        const r = el.getBoundingClientRect();
+        if (r.top < cRect.bottom + 80 && r.bottom > cRect.top - 80) {
+          el.classList.add("is-revealed");
+          el.classList.add("fx-active");
+        }
+      } else {
+        const r = el.getBoundingClientRect();
+        if (r.top < (window.innerHeight || 800) + 80 && r.bottom > -80) {
+          el.classList.add("is-revealed");
+          el.classList.add("fx-active");
+        }
+      }
     });
 
     if (scrollContainer && !this._mainScrollBound) {
       scrollContainer.addEventListener("scroll", () => {
         const containerRect = scrollContainer.getBoundingClientRect();
-        document.querySelectorAll("[data-motion]:not([data-motion='none']):not(.is-revealed)").forEach(el => {
+        document.querySelectorAll("[data-motion]:not([data-motion='none']):not(.is-revealed), [data-scroll-fx]:not(.fx-active)").forEach(el => {
           const r = el.getBoundingClientRect();
-          if (r.top < containerRect.bottom + 60 && r.bottom > containerRect.top - 60) {
+          if (r.top < containerRect.bottom + 80 && r.bottom > containerRect.top - 80) {
             el.classList.add("is-revealed");
+            el.classList.add("fx-active");
           }
         });
       }, { passive: true });

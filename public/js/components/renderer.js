@@ -265,8 +265,10 @@ export function renderWebsiteHTML(project, options = { isEditor: false, isStanda
   const isPaperGrain = !!(project.branding?.paperGrain || project.branding?.stylePreset === 'editorial-terroir' || project.branding?.stylePreset === 'papercraft-mineral');
   const socialProofHTML = renderSocialProofToast(project, options);
 
+  const isAppleScrollFx = project.branding?.appleScrollFx !== false;
+
   return `
-    <div class="artisite-root font-body text-main bg-site min-h-screen ${isPaperGrain ? 'texture-paper-grain' : ''}" data-site-theme="${initialSiteTheme}" data-paper-grain="${isPaperGrain ? 'true' : 'false'}" style="
+    <div class="artisite-root font-body text-main bg-site min-h-screen ${isPaperGrain ? 'texture-paper-grain' : ''} ${isAppleScrollFx ? 'apple-scrollfx-enabled' : ''}" data-site-theme="${initialSiteTheme}" data-paper-grain="${isPaperGrain ? 'true' : 'false'}" style="
       --primary: ${project.branding?.primaryColor || '#059669'};
       --secondary: ${project.branding?.secondaryColor || '#065f46'};
       --accent: ${project.branding?.accentColor || '#f59e0b'};
@@ -406,7 +408,7 @@ function renderSection(sec, project, options) {
     : "";
 
   if (!isEditor) {
-    return `<section id="${sec.type}" class="site-section ${bgTheme} ${isHidden ? 'hidden' : ''}" style="--section-bg: ${themeColor}; ${customBackground}" data-section-type="${sec.type}" data-section-bg="${sectionTheme}" data-ui-id="${getSectionUiId(sec)}" data-ui-type="section"${motionPreset ? ` data-motion="${motionPreset}"` : ''}>${innerHTML}</section>`;
+    return `<section id="${sec.type}" class="site-section ${bgTheme} ${isHidden ? 'hidden' : ''}" style="--section-bg: ${themeColor}; ${customBackground}" data-section-type="${sec.type}" data-section-bg="${sectionTheme}" data-scroll-fx="zoom" data-ui-id="${getSectionUiId(sec)}" data-ui-type="section"${motionPreset ? ` data-motion="${motionPreset}"` : ''}>${innerHTML}</section>`;
   }
 
   // Editor Wrapper with Controls
@@ -449,6 +451,7 @@ function renderSection(sec, project, options) {
          class="editor-section-wrapper relative group ${bgTheme} ${isSelected ? 'is-active-section' : ''} ${isHidden ? 'opacity-40 grayscale' : ''}"
          data-section-id="${sec.id}"
          data-section-type="${sec.type}"
+         data-scroll-fx="zoom"
          data-ui-id="section-${sec.id}"
          data-ui-code="${getUiCode(project?.id, sec?.id, 'section')}"
          data-ui-type="section"
@@ -581,7 +584,7 @@ function renderHeader(sec, project, options = {}) {
             ${getIcon("phone", "w-4 h-4 text-emerald-600")}
             <span data-editable="phone">${c.phone || project.business?.phone || ''}</span>
           </a>
-          <button type="button" class="site-theme-toggle inline-flex items-center gap-2 px-3.5 py-2.5 rounded-full text-sm font-semibold text-gray-800 border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all" data-site-theme-toggle aria-label="Activer le mode sombre du site">
+          <button type="button" onclick="event.stopPropagation(); window.app ? window.app.toggleSiteTheme() : null;" class="site-theme-toggle inline-flex items-center gap-2 px-3.5 py-2.5 rounded-full text-sm font-semibold text-gray-800 border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all" data-site-theme-toggle aria-label="Activer le mode sombre du site">
             <span class="site-theme-icon site-theme-icon-light">${getIcon("moon", "w-4 h-4")}</span>
             <span class="site-theme-icon site-theme-icon-dark hidden">${getIcon("sun", "w-4 h-4")}</span>
             <span class="site-theme-label">Mode nuit</span>
@@ -694,13 +697,14 @@ function renderButtonPopover(sec, buttonType, options = {}, project = {}) {
 function renderHero(sec, project, options = {}) {
   const c = sec.content;
   const variant = sec.variant || "split-image";
-  const ctaPulseClass = project?.branding?.ctaPulse ? " btn-cta-pulse" : "";
+  const isGlobalPulse = project?.branding?.motionPreset === "pulse";
+  const ctaPulseClass = (project?.branding?.ctaPulse || isGlobalPulse) ? " btn-cta-pulse" : "";
   const heroButtonId = getUiId(project, sec, "btn");
   const heroPhoneId = getUiId(project, sec, "btn-phone");
   const primaryHidden = isButtonHidden(sec, "primary", `${heroButtonId}-visible`);
   const phoneHidden = isButtonHidden(sec, "phone", `${heroPhoneId}-visible`);
   const heroButtonVisibility = primaryHidden ? " hidden" : "";
-  const heroButtonMotion = sec.settings?.[`${heroButtonId}-motion`] || sec.settings?.["btn-primary-motion"] || sec.settings?.["primary-motion"] || "";
+  const heroButtonMotion = sec.settings?.[`${heroButtonId}-motion`] || sec.settings?.["btn-primary-motion"] || sec.settings?.["primary-motion"] || (isGlobalPulse ? "pulse" : "");
   const heroPhoneMotion = sec.settings?.[`${heroPhoneId}-motion`] || sec.settings?.["btn-phone-motion"] || sec.settings?.["phone-motion"] || "";
 
   // Variant A: Fullscreen Image
@@ -1860,9 +1864,10 @@ function renderCta(sec, project, options = {}) {
   const phoneButtonId = getUiId(project, sec, "btn-phone");
   const primaryHidden = isButtonHidden(sec, "primary", `${primaryButtonId}-visible`);
   const phoneHidden = isButtonHidden(sec, "phone", `${phoneButtonId}-visible`);
-  const primaryButtonMotion = sec.settings?.[`${primaryButtonId}-motion`] || sec.settings?.["btn-primary-motion"] || sec.settings?.["primary-motion"] || "";
+  const isGlobalPulse = project?.branding?.motionPreset === "pulse";
+  const primaryButtonMotion = sec.settings?.[`${primaryButtonId}-motion`] || sec.settings?.["btn-primary-motion"] || sec.settings?.["primary-motion"] || (isGlobalPulse ? "pulse" : "");
   const phoneButtonMotion = sec.settings?.[`${phoneButtonId}-motion`] || sec.settings?.["btn-phone-motion"] || sec.settings?.["phone-motion"] || "";
-  const ctaPulseClass = project?.branding?.ctaPulse ? " btn-cta-pulse" : "";
+  const ctaPulseClass = (project?.branding?.ctaPulse || isGlobalPulse) ? " btn-cta-pulse" : "";
 
   const sectionTheme = sec.settings?.bgTheme || "primary";
   const customBg = sec.settings?.customBackground || "";

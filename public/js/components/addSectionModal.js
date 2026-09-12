@@ -502,7 +502,7 @@ export function renderAddSectionModal(project, activeTab = "sections") {
   const sections = project?.sections || [];
 
   return `
-    <div id="add-section-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm animate-fade-in">
+    <div id="add-section-modal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm animate-fade-in">
       <div class="bg-white rounded-2xl shadow-2xl max-w-4xl lg:max-w-5xl w-full border border-zinc-200 overflow-hidden flex flex-col max-h-[90vh]">
         
         <!-- Header -->
@@ -536,18 +536,34 @@ export function renderAddSectionModal(project, activeTab = "sections") {
           </div>
         </div>
 
+        <!-- Live Instant Filter & Search Bar -->
+        <div class="px-6 py-2.5 bg-white border-b border-zinc-200/80 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-shrink-0">
+          <div class="relative flex-1">
+            <span class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-zinc-400">
+              ${getIcon("search", "w-3.5 h-3.5")}
+            </span>
+            <input type="text" id="catalog-search" oninput="window.app.filterCatalogItems(this.value)" placeholder="Rechercher un composant (ex: Stepper, Canva, Vidéo, Devis...)" class="w-full bg-zinc-100/80 hover:bg-zinc-100 focus:bg-white border border-zinc-200 rounded-xl pl-8 pr-3 py-1.5 text-xs text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 transition-all">
+          </div>
+          <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 text-[11px]">
+            <button type="button" onclick="window.app.filterCatalogCategory('all', this)" class="catalog-filter-btn is-active px-2.5 py-1 rounded-lg font-semibold bg-zinc-900 text-white transition-all">Tous</button>
+            <button type="button" onclick="window.app.filterCatalogCategory('content', this)" class="catalog-filter-btn px-2.5 py-1 rounded-lg font-medium bg-zinc-100 text-zinc-700 hover:bg-zinc-200 transition-all">Contenus</button>
+            <button type="button" onclick="window.app.filterCatalogCategory('media', this)" class="catalog-filter-btn px-2.5 py-1 rounded-lg font-medium bg-zinc-100 text-zinc-700 hover:bg-zinc-200 transition-all">Médias</button>
+            <button type="button" onclick="window.app.filterCatalogCategory('action', this)" class="catalog-filter-btn px-2.5 py-1 rounded-lg font-medium bg-zinc-100 text-zinc-700 hover:bg-zinc-200 transition-all">Actions & Devis</button>
+          </div>
+        </div>
+
         <!-- Tab 1: Full Sections List -->
         <div id="add-modal-sections-view" class="p-6 overflow-y-auto space-y-4 flex-1 text-xs ${activeTab === 'sections' ? '' : 'hidden'}">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-1 border-b border-zinc-100 text-zinc-500">
             <span>Sélectionnez une section et sa variante pour enrichir le site de <strong>${project?.business?.tradeLabel || 'votre artisan'}</strong>.</span>
           </div>
 
-          <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4" id="catalog-sections-grid">
             ${SECTION_DEFINITIONS.map(secDef => {
               const existingSec = sections.find(s => s.type === secDef.type);
 
               return `
-                <div class="bg-zinc-50/80 hover:bg-white border ${existingSec ? 'border-zinc-300 shadow-2xs' : 'border-zinc-200'} hover:border-zinc-400 rounded-2xl p-4 transition-all space-y-3.5 flex flex-col justify-between group">
+                <div class="catalog-card bg-zinc-50/80 hover:bg-white border ${existingSec ? 'border-zinc-300 shadow-2xs' : 'border-zinc-200'} hover:border-zinc-400 rounded-2xl p-4 transition-all space-y-3 flex flex-col justify-between group" data-category="${secDef.type}">
                   <div>
                     <div class="flex items-start gap-3">
                       <div class="w-8 h-8 rounded-xl bg-white border border-zinc-200 text-zinc-800 flex items-center justify-center flex-shrink-0 shadow-2xs">
@@ -555,7 +571,7 @@ export function renderAddSectionModal(project, activeTab = "sections") {
                       </div>
                       <div class="min-w-0 flex-1">
                         <div class="flex items-center gap-1.5">
-                          <h4 class="font-bold text-xs sm:text-sm text-zinc-900 truncate">${secDef.title}</h4>
+                          <h4 class="font-bold text-xs sm:text-sm text-zinc-900 leading-snug break-words">${secDef.title}</h4>
                         </div>
                         <p class="text-[11px] text-zinc-500 line-clamp-2 mt-0.5 leading-relaxed">${secDef.description}</p>
                       </div>
@@ -602,20 +618,20 @@ export function renderAddSectionModal(project, activeTab = "sections") {
             <span>Composants certifiés conformes au cahier des charges Add-on Intelligence (Actions, Médias, Divulgation, Statuts).</span>
           </div>
 
-          <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4" id="catalog-components-grid">
             ${COMPONENT_CATALOG_ITEMS.map(comp => `
-              <div class="bg-zinc-50/80 hover:bg-white border border-zinc-200 hover:border-zinc-400 rounded-2xl p-4 transition-all space-y-3 flex flex-col justify-between group">
+              <div class="catalog-card bg-zinc-50/80 hover:bg-white border border-zinc-200 hover:border-zinc-400 rounded-2xl p-4 transition-all space-y-3 flex flex-col justify-between group" data-category="${comp.family}">
                 <div>
-                  <div class="flex items-center justify-between gap-2 mb-2">
-                    <span class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">${comp.familyName}</span>
-                    <span class="text-[9.5px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold">${comp.badge}</span>
+                  <div class="flex flex-wrap items-center justify-between gap-1.5 mb-2">
+                    <span class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">${comp.familyName}</span>
+                    <span class="text-[9.5px] font-mono px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold whitespace-nowrap">${comp.badge}</span>
                   </div>
                   <div class="flex items-start gap-3">
                     <div class="w-8 h-8 rounded-xl bg-white border border-zinc-200 text-zinc-800 flex items-center justify-center flex-shrink-0 shadow-2xs">
                       ${getIcon(comp.icon, "w-4 h-4 text-zinc-700")}
                     </div>
                     <div class="min-w-0 flex-1">
-                      <h4 class="font-bold text-xs sm:text-sm text-zinc-900">${comp.name}</h4>
+                      <h4 class="font-bold text-xs sm:text-sm text-zinc-900 leading-snug break-words">${comp.name}</h4>
                       <p class="text-[11px] text-zinc-500 mt-1 leading-relaxed">${comp.description}</p>
                     </div>
                   </div>

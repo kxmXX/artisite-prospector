@@ -164,16 +164,16 @@ export function renderDashboard(state) {
             </p>
           </div>
 
-          <!-- Instant Inline Quick Generator Form -->
+          <!-- Instant Inline Quick Generator Form (Immunized against flex squash) -->
           <div class="mt-6 pt-6 border-t border-zinc-200/70 relative z-10">
-            <form id="quick-gen-form" onsubmit="event.preventDefault(); window.app.handleQuickGenerate(event);" class="quick-gen-bar">
-              <div class="quick-gen-field-name flex items-center gap-2 px-2.5 py-1">
-                <span class="text-zinc-400 select-none">${getIcon("edit", "w-3.5 h-3.5 text-zinc-400")}</span>
-                <input type="text" id="quick-gen-name" required placeholder="Raison sociale (ex: Esprit Nature, Peinture Pro...)" class="w-full bg-transparent border-0 py-2 text-xs font-semibold text-zinc-900 placeholder:text-zinc-400 placeholder:font-normal focus:outline-none">
+            <form id="quick-gen-form" onsubmit="event.preventDefault(); window.app.handleQuickGenerate(event);" class="quick-gen-bar flex flex-col md:flex-row items-stretch md:items-center gap-2 p-2 bg-white rounded-2xl border border-zinc-200/90 shadow-sm">
+              <div class="quick-gen-field-name flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-zinc-50/90 hover:bg-zinc-100/80 focus-within:bg-white border border-zinc-200/80 focus-within:border-zinc-900 transition-all flex-1 min-w-[240px]">
+                <span class="text-zinc-400 select-none flex-shrink-0">${getIcon("edit", "w-4 h-4 text-zinc-400")}</span>
+                <input type="text" id="quick-gen-name" required placeholder="Raison sociale (ex: Esprit Nature, Peinture Pro...)" class="w-full min-w-0 bg-transparent border-0 py-1.5 text-xs sm:text-sm font-semibold text-zinc-900 placeholder:text-zinc-400 placeholder:font-normal focus:outline-none">
               </div>
-              <div class="hidden md:block w-px h-6 bg-zinc-200 flex-shrink-0"></div>
-              <div class="quick-gen-field-trade flex items-center gap-1.5 px-2.5 py-1">
-                <select id="quick-gen-trade" class="w-full bg-transparent border-0 py-2 text-xs font-semibold text-zinc-800 focus:outline-none cursor-pointer">
+              
+              <div class="quick-gen-field-trade flex items-center gap-2 px-3 py-1.5 rounded-xl bg-zinc-50/90 hover:bg-zinc-100/80 focus-within:bg-white border border-zinc-200/80 focus-within:border-zinc-900 transition-all w-full md:w-64 min-w-[210px]">
+                <select id="quick-gen-trade" class="w-full min-w-0 bg-transparent border-0 py-1.5 text-xs sm:text-sm font-semibold text-zinc-800 focus:outline-none cursor-pointer">
                   <option value="paysagiste">🌿 Paysagiste / Jardinier</option>
                   <option value="peintre" selected>🎨 Peintre en Bâtiment</option>
                   <option value="plombier">🔧 Plombier Chauffagiste</option>
@@ -185,13 +185,14 @@ export function renderDashboard(state) {
                   <option value="coiffeur">✂️ Salon de Coiffure</option>
                 </select>
               </div>
-              <div class="hidden md:block w-px h-6 bg-zinc-200 flex-shrink-0"></div>
-              <div class="quick-gen-field-city flex items-center gap-2 px-2.5 py-1">
-                <span class="text-zinc-400 select-none">${getIcon("mapPin", "w-3.5 h-3.5 text-zinc-400")}</span>
-                <input type="text" id="quick-gen-city" required placeholder="Ville (ex: Paris)" value="Paris" class="w-full bg-transparent border-0 py-2 text-xs font-semibold text-zinc-900 placeholder:text-zinc-400 focus:outline-none">
+
+              <div class="quick-gen-field-city flex items-center gap-2 px-3 py-1.5 rounded-xl bg-zinc-50/90 hover:bg-zinc-100/80 focus-within:bg-white border border-zinc-200/80 focus-within:border-zinc-900 transition-all w-full md:w-44 min-w-[140px]">
+                <span class="text-zinc-400 select-none flex-shrink-0">${getIcon("mapPin", "w-4 h-4 text-zinc-400")}</span>
+                <input type="text" id="quick-gen-city" required placeholder="Ville (ex: Paris)" value="Paris" class="w-full min-w-0 bg-transparent border-0 py-1.5 text-xs sm:text-sm font-semibold text-zinc-900 placeholder:text-zinc-400 focus:outline-none">
               </div>
-              <div class="quick-gen-field-btn">
-                <button type="submit" class="btn-keycap btn-keycap-dark px-6 py-3 rounded-xl text-xs font-bold text-white whitespace-nowrap flex items-center justify-center gap-2 shadow-sm hover:bg-black transition-colors w-full sm:w-auto">
+
+              <div class="quick-gen-field-btn flex-shrink-0">
+                <button type="submit" class="btn-keycap btn-keycap-dark px-6 py-3 rounded-xl text-xs sm:text-sm font-bold text-white whitespace-nowrap flex items-center justify-center gap-2 shadow-sm hover:bg-black transition-colors w-full md:w-auto cursor-pointer">
                   <span>⚡ Générer en 3s</span>
                 </button>
               </div>

@@ -309,7 +309,7 @@ export function renderEditor(state) {
 
           <!-- TAB 2: PARAMÈTRES (MATCHING SENDPAGE SCREENSHOT WITH ACCORDIONS) -->
           <div id="sidebar-tab-settings" class="flex-1 overflow-y-auto p-3 space-y-2 ${state.activeSidebarTab !== 'settings' ? 'hidden' : ''}">
-            ${renderSettingsAccordions(project)}
+            ${renderSettingsAccordions(project, state)}
           </div>
 
         </aside>
@@ -962,7 +962,8 @@ function renderSectionAccordionContent(sec, project, variants) {
 /**
  * Settings Tab Accordions matching Image 2 (Sendpage style).
  */
-function renderSettingsAccordions(project) {
+function renderSettingsAccordions(project, state = {}) {
+  const isOpen = (id) => (state?._openSettingsItem ? state._openSettingsItem === id : id === 'business');
   return `
     <div class="space-y-2" id="settings-accordion-group">
 
@@ -973,9 +974,9 @@ function renderSettingsAccordions(project) {
             ${getIcon("mapPin", "w-4 h-4 text-zinc-500")}
             <span>Informations entreprise</span>
           </div>
-          <span class="text-zinc-400">${getIcon("chevronDown", "w-3.5 h-3.5")}</span>
+          <span class="text-zinc-400 ${isOpen('business') ? 'rotate-180' : ''}">${getIcon("chevronDown", "w-3.5 h-3.5")}</span>
         </div>
-        <div class="section-accordion-body space-y-2.5" id="settings-body-business">
+        <div class="section-accordion-body ${isOpen('business') ? '' : 'hidden'} space-y-2.5" id="settings-body-business">
           <div>
             <label class="block text-[10px] text-zinc-500 mb-1">Nom entreprise :</label>
             <input type="text" value="${escapeHtml(project.business.name)}"
@@ -1025,9 +1026,9 @@ function renderSettingsAccordions(project) {
             ${getIcon("tag", "w-4 h-4 text-zinc-500")}
             <span>Favicon & Identité</span>
           </div>
-          <span class="text-zinc-400">${getIcon("chevronDown", "w-3.5 h-3.5")}</span>
+          <span class="text-zinc-400 ${isOpen('favicon') ? 'rotate-180' : ''}">${getIcon("chevronDown", "w-3.5 h-3.5")}</span>
         </div>
-        <div class="section-accordion-body hidden space-y-2.5" id="settings-body-favicon">
+        <div class="section-accordion-body ${isOpen('favicon') ? '' : 'hidden'} space-y-2.5" id="settings-body-favicon">
           <div class="text-[11px] text-zinc-600 leading-relaxed">
             Le favicon et le logo sont générés automatiquement aux couleurs de votre thème.
           </div>
@@ -1050,9 +1051,9 @@ function renderSettingsAccordions(project) {
             ${getIcon("palette", "w-4 h-4 text-zinc-500")}
             <span>Couleurs & Thème graphique</span>
           </div>
-          <span class="text-zinc-400">${getIcon("chevronDown", "w-3.5 h-3.5")}</span>
+          <span class="text-zinc-400 ${isOpen('colors') ? 'rotate-180' : ''}">${getIcon("chevronDown", "w-3.5 h-3.5")}</span>
         </div>
-        <div class="section-accordion-body space-y-3" id="settings-body-colors">
+        <div class="section-accordion-body ${isOpen('colors') ? '' : 'hidden'} space-y-3" id="settings-body-colors">
           <!-- Ambiance Globale 1-Clic (Typedream & Framer Inspired) -->
           <div>
             <label class="block text-[10px] font-medium text-zinc-400 uppercase tracking-wider mb-1.5">Ambiance Globale 1-Clic</label>
@@ -1171,9 +1172,9 @@ function renderSettingsAccordions(project) {
             ${getIcon("edit", "w-4 h-4 text-zinc-500")}
             <span>Typographie</span>
           </div>
-          <span class="text-zinc-400">${getIcon("chevronDown", "w-3.5 h-3.5")}</span>
+          <span class="text-zinc-400 ${isOpen('typography') ? 'rotate-180' : ''}">${getIcon("chevronDown", "w-3.5 h-3.5")}</span>
         </div>
-        <div class="section-accordion-body hidden space-y-2.5" id="settings-body-typography">
+        <div class="section-accordion-body ${isOpen('typography') ? '' : 'hidden'} space-y-2.5" id="settings-body-typography">
           <div class="space-y-1.5 max-h-72 overflow-y-auto pr-1">
             <div class="grid grid-cols-2 gap-1.5 mb-2">
               <button type="button" onclick="window.app.setTypographyTarget('heading')" class="py-1.5 rounded border text-[11px] ${(typeof window !== 'undefined' && window.app?.typographyTarget === 'body') ? 'border-zinc-200 bg-white text-zinc-600' : 'border-zinc-900 bg-zinc-900 text-white'}">Titres</button>
@@ -1196,9 +1197,9 @@ function renderSettingsAccordions(project) {
             ${getIcon("sparkles", "w-4 h-4 text-zinc-500")}
             <span>Boutons & Call to Action</span>
           </div>
-          <span class="text-zinc-400">${getIcon("chevronDown", "w-3.5 h-3.5")}</span>
+          <span class="text-zinc-400 ${isOpen('buttons') ? 'rotate-180' : ''}">${getIcon("chevronDown", "w-3.5 h-3.5")}</span>
         </div>
-        <div class="section-accordion-body space-y-3" id="settings-body-buttons">
+        <div class="section-accordion-body ${isOpen('buttons') ? '' : 'hidden'} space-y-3" id="settings-body-buttons">
           <div>
             <div class="flex items-center justify-between mb-1.5">
               <label class="block text-[10px] font-medium text-zinc-400 uppercase tracking-wider">Taille du bouton</label>
@@ -1327,9 +1328,9 @@ function renderSettingsAccordions(project) {
             ${getIcon("download", "w-4 h-4 text-zinc-500")}
             <span>Domaines & Export</span>
           </div>
-          <span class="text-zinc-400">${getIcon("chevronDown", "w-3.5 h-3.5")}</span>
+          <span class="text-zinc-400 ${isOpen('export') ? 'rotate-180' : ''}">${getIcon("chevronDown", "w-3.5 h-3.5")}</span>
         </div>
-        <div class="section-accordion-body hidden space-y-2" id="settings-body-export">
+        <div class="section-accordion-body ${isOpen('export') ? '' : 'hidden'} space-y-2" id="settings-body-export">
           <button type="button" onclick="window.app.exportProductionPackage()" class="w-full py-2 px-2.5 rounded-lg bg-zinc-950 hover:bg-black text-white flex items-center justify-between text-xs font-semibold transition-colors shadow-xs">
             <span>📦 Télécharger Pack Production (HTML, Sitemap, Robots, Manifest)</span>
             ${getIcon("download", "w-3.5 h-3.5 text-white")}
@@ -1352,9 +1353,9 @@ function renderSettingsAccordions(project) {
             ${getIcon("badgeCheck", "w-4 h-4 text-zinc-500")}
             <span>Google & Référencement local</span>
           </div>
-          <span class="text-zinc-400">${getIcon("chevronDown", "w-3.5 h-3.5")}</span>
+          <span class="text-zinc-400 ${isOpen('seo') ? 'rotate-180' : ''}">${getIcon("chevronDown", "w-3.5 h-3.5")}</span>
         </div>
-        <div class="section-accordion-body hidden space-y-2" id="settings-body-seo">
+        <div class="section-accordion-body ${isOpen('seo') ? '' : 'hidden'} space-y-2" id="settings-body-seo">
           <div>
             <label class="block text-[10px] text-zinc-500 mb-1">Titre SEO (Balise Title) :</label>
             <input type="text" value="${escapeHtml(project.business.name)} — ${escapeHtml(project.business.tradeLabel)} à ${escapeHtml(project.business.city)}" class="w-full bg-white border border-zinc-200 rounded px-2.5 py-1 text-xs text-zinc-900">
@@ -1413,9 +1414,9 @@ function renderSettingsAccordions(project) {
             ${getIcon("compass", "w-4 h-4 text-zinc-500")}
             <span>Navigation & Mode Multi-Pages</span>
           </div>
-          <span class="text-zinc-400">${getIcon("chevronDown", "w-3.5 h-3.5")}</span>
+          <span class="text-zinc-400 ${isOpen('navigation') ? 'rotate-180' : ''}">${getIcon("chevronDown", "w-3.5 h-3.5")}</span>
         </div>
-        <div class="section-accordion-body hidden space-y-2.5" id="settings-body-navigation">
+        <div class="section-accordion-body ${isOpen('navigation') ? '' : 'hidden'} space-y-2.5" id="settings-body-navigation">
           <label class="block text-[10px] font-medium text-zinc-400 uppercase tracking-wider">Architecture du Site</label>
           <div class="grid grid-cols-2 gap-2">
             <button type="button" onclick="window.app.setNavigationMode('one-page')" class="p-2.5 border rounded-xl text-left transition-all ${project.branding?.navigationMode !== 'multi-tab' ? 'border-zinc-900 bg-white font-semibold shadow-xs text-zinc-950 ring-1 ring-zinc-900' : 'border-zinc-200 bg-zinc-50 hover:bg-white text-zinc-600'}">
@@ -1443,9 +1444,9 @@ function renderSettingsAccordions(project) {
             ${getIcon("bell", "w-4 h-4 text-zinc-500")}
             <span>Preuve Sociale (Notifications Leads)</span>
           </div>
-          <span class="text-zinc-400">${getIcon("chevronDown", "w-3.5 h-3.5")}</span>
+          <span class="text-zinc-400 ${isOpen('socialProof') ? 'rotate-180' : ''}">${getIcon("chevronDown", "w-3.5 h-3.5")}</span>
         </div>
-        <div class="section-accordion-body hidden space-y-2.5" id="settings-body-socialProof">
+        <div class="section-accordion-body ${isOpen('socialProof') ? '' : 'hidden'} space-y-2.5" id="settings-body-socialProof">
           <div class="flex items-center justify-between">
             <div>
               <label class="block text-[11px] font-semibold text-zinc-900">Toasts de Demandes Récentes</label>
@@ -1467,9 +1468,9 @@ function renderSettingsAccordions(project) {
             ${getIcon("lock", "w-4 h-4 text-zinc-500")}
             <span>Protection Démo Client (Anti-modification)</span>
           </div>
-          <span class="text-zinc-400">${getIcon("chevronDown", "w-3.5 h-3.5")}</span>
+          <span class="text-zinc-400 ${isOpen('pinLock') ? 'rotate-180' : ''}">${getIcon("chevronDown", "w-3.5 h-3.5")}</span>
         </div>
-        <div class="section-accordion-body hidden space-y-2.5" id="settings-body-pinLock">
+        <div class="section-accordion-body ${isOpen('pinLock') ? '' : 'hidden'} space-y-2.5" id="settings-body-pinLock">
           <p class="text-[11px] text-zinc-600 leading-relaxed">
             <strong>À quoi ça sert ?</strong> Quand vous partagez le lien de démo au prospect, ce code PIN empêche l'artisan de modifier ou dégrader votre maquette. Seul votre code déverrouille l'éditeur.
           </p>
