@@ -45,6 +45,9 @@ function decorateEditableMarkup(markup, project, section) {
     const isBold = section?.settings?.[`bold_${fieldPath}`];
     const isItalic = section?.settings?.[`italic_${fieldPath}`];
     const isUnderline = section?.settings?.[`underline_${fieldPath}`];
+    const textColor = section?.settings?.[`color_${fieldPath}`];
+    const textMotion = section?.settings?.[`motion_${fieldPath}`] || section?.settings?.elementMotions?.[fieldPath];
+
     let customStyles = [];
     if (fontSizeDelta) customStyles.push(`font-size: calc(1em + ${fontSizeDelta}px) !important;`);
     if (isBold === true) customStyles.push(`font-weight: 800 !important;`);
@@ -53,6 +56,16 @@ function decorateEditableMarkup(markup, project, section) {
     if (isItalic === false) customStyles.push(`font-style: normal !important;`);
     if (isUnderline === true) customStyles.push(`text-decoration: underline !important;`);
     if (isUnderline === false) customStyles.push(`text-decoration: none !important;`);
+    if (textColor) customStyles.push(`color: ${textColor} !important;`);
+
+    let motionAttrs = "";
+    if (textMotion && textMotion !== "none") {
+      motionAttrs = ` data-motion="${textMotion}"`;
+      if (textMotion === "pulse") {
+        motionAttrs += ` data-btn-motion="pulse"`;
+      }
+    }
+
     const styleAttr = customStyles.length ? ` style="${customStyles.join(' ')}"` : "";
 
     globalElementIndex++;
@@ -67,13 +80,13 @@ function decorateEditableMarkup(markup, project, section) {
 
     if (attrs.includes("data-ui-id=")) {
       if (styleAttr && !attrs.includes("style=")) {
-        return `<${tag}${attrs}${styleAttr} data-ui-index="${elementIndex}" data-ui-index-size="${badgeSize}">`;
+        return `<${tag}${attrs}${motionAttrs}${styleAttr} data-ui-index="${elementIndex}" data-ui-index-size="${badgeSize}">`;
       }
-      return full.replace(/data-ui-target="true"/, `data-ui-target="true" data-ui-index="${elementIndex}" data-ui-index-size="${badgeSize}"`);
+      return full.replace(/data-ui-target="true"/, `data-ui-target="true" data-ui-index="${elementIndex}" data-ui-index-size="${badgeSize}"${motionAttrs}`);
     }
     const targetId = getUiId(project, section, `field-${fieldPath}`);
     const code = getUiCode(project?.id, section?.id, fieldPath);
-    return `<${tag}${attrs} data-ui-id="${targetId}" data-ui-code="${code}" data-ui-type="field" data-ui-target="true" data-ui-index="${elementIndex}" data-ui-index-size="${badgeSize}"${styleAttr}>`;
+    return `<${tag}${attrs} data-ui-id="${targetId}" data-ui-code="${code}" data-ui-type="field" data-ui-target="true" data-ui-index="${elementIndex}" data-ui-index-size="${badgeSize}"${motionAttrs}${styleAttr}>`;
   });
 }
 
@@ -116,18 +129,25 @@ export function renderEditableImage(url, { sectionId = "", fieldPath = "", alt =
     ? `loading="eager" fetchpriority="high" decoding="async"`
     : `loading="lazy" decoding="async"`;
 
-  if (!isEditor) {
-    return `<img src="${displayUrl}" data-fallback-src="${fallbackSvg}" alt="${alt}" class="${className}" ${perfAttrs} ${onErrorAttr}>`;
-  }
-
   const indexParam = itemIndex !== null && itemIndex !== undefined ? itemIndex : 'null';
+  const idx = (itemIndex !== null && itemIndex !== undefined && itemIndex !== "null") ? itemIndex : 0;
+  const project = options?.project || (typeof state !== "undefined" ? state.currentProject : null);
+  const sec = project?.sections?.find(s => s.id === sectionId);
+  const imgKey = `${fieldPath}_${idx}`;
+  const imgMotion = sec?.settings?.imageMotions?.[imgKey] || sec?.settings?.[`motion_${fieldPath}`] || sec?.settings?.motion_image || "";
+  const motionAttr = imgMotion && imgMotion !== "none" ? ` data-motion="${imgMotion}"` : "";
+  const motionClass = imgMotion && imgMotion !== "none" ? ` motion-preset-${imgMotion.replace('-in', '')}${imgMotion === 'pulse' ? ' btn-pulse-active' : ''}` : "";
+
+  if (!isEditor) {
+    return `<img src="${displayUrl}" data-fallback-src="${fallbackSvg}" alt="${alt}" class="${className}${motionClass}" ${perfAttrs} ${onErrorAttr}${motionAttr}>`;
+  }
 
   return `
     <div class="relative group/img w-full h-full"
          ondragover="event.preventDefault(); this.classList.add('ring-2', 'ring-zinc-900');"
          ondragleave="this.classList.remove('ring-2', 'ring-zinc-900');"
          ondrop="event.preventDefault(); this.classList.remove('ring-2', 'ring-zinc-900'); window.app.handleImageElementDrop(event, '${sectionId}', '${fieldPath}', ${indexParam});">
-      <img src="${displayUrl}" data-fallback-src="${fallbackSvg}" alt="${alt}" class="${className}" ${perfAttrs} ${onErrorAttr}>
+      <img src="${displayUrl}" data-fallback-src="${fallbackSvg}" alt="${alt}" class="${className}${motionClass}" ${perfAttrs} ${onErrorAttr}${motionAttr}>
 
       <div class="absolute inset-0 bg-zinc-950/60 backdrop-blur-[2px] opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center gap-2 z-20 pointer-events-auto p-2">
         <button type="button"
@@ -145,14 +165,25 @@ export function renderEditableImage(url, { sectionId = "", fieldPath = "", alt =
             ${getIcon("sparkles", "w-3.5 h-3.5 text-amber-500")}
             <span>Anim</span>
           </button>
-          <div id="img-motion-menu-${sectionId}-${String(fieldPath).replace(/\./g, '-')}-${indexParam !== 'null' ? indexParam : '0'}" class="hidden absolute left-0 bottom-full mb-2 w-48 bg-zinc-900/95 backdrop-blur-md border border-white/20 rounded-xl p-2 shadow-2xl z-50 text-white text-[11px]">
-            <div class="text-[9px] font-bold uppercase tracking-wider text-zinc-400 mb-1">Animation Image</div>
-            <div class="grid grid-cols-2 gap-1">
-              <button type="button" onclick="event.stopPropagation(); window.app.setImageMotion('${sectionId}', '${fieldPath}', ${indexParam}, 'zoom-in')" class="motion-chip">Zoom</button>
-              <button type="button" onclick="event.stopPropagation(); window.app.setImageMotion('${sectionId}', '${fieldPath}', ${indexParam}, 'fade-in')" class="motion-chip">Fade</button>
-              <button type="button" onclick="event.stopPropagation(); window.app.setImageMotion('${sectionId}', '${fieldPath}', ${indexParam}, 'spring')" class="motion-chip">Spring</button>
-              <button type="button" onclick="event.stopPropagation(); window.app.setImageMotion('${sectionId}', '${fieldPath}', ${indexParam}, 'shimmer')" class="motion-chip">Shimmer</button>
-              <button type="button" onclick="event.stopPropagation(); window.app.setImageMotion('${sectionId}', '${fieldPath}', ${indexParam}, 'none')" class="motion-chip col-span-2 text-zinc-400">Aucune</button>
+          <div id="img-motion-menu-${sectionId}-${String(fieldPath).replace(/\./g, '-')}-${indexParam !== 'null' ? indexParam : '0'}" class="hidden absolute left-0 bottom-full mb-2 w-56 bg-zinc-900/95 backdrop-blur-md border border-white/20 rounded-xl p-2.5 shadow-2xl z-50 text-white text-[11px]">
+            <div class="text-[9px] font-bold uppercase tracking-wider text-zinc-400 mb-1.5 flex items-center justify-between">
+              <span>Animation Image</span>
+              <span class="text-amber-400 font-mono">${imgMotion || 'aucune'}</span>
+            </div>
+            <div class="grid grid-cols-2 gap-1.5">
+              ${[
+                ['pulse', 'Pulse ✨'],
+                ['zoom-in', 'Zoom'],
+                ['fade-in', 'Fondu'],
+                ['spring', 'Spring 🍏'],
+                ['shimmer', 'Shimmer'],
+                ['none', 'Aucune']
+              ].map(([mPreset, mLabel]) => `
+                <button type="button" onclick="event.stopPropagation(); window.app.setImageMotion('${sectionId}', '${fieldPath}', ${indexParam}, '${mPreset}')"
+                        class="motion-chip ${((imgMotion || 'none') === mPreset) ? 'is-active' : ''} ${mPreset === 'none' ? 'col-span-2 text-zinc-400' : ''}">
+                  ${mLabel}${((imgMotion || 'none') === mPreset && mPreset !== 'none') ? ' ✓' : ''}
+                </button>
+              `).join('')}
             </div>
           </div>
         </div>
@@ -177,6 +208,7 @@ export function renderWebsiteHTML(project, options = { isEditor: false, isStanda
   if (!project || !project.sections) {
     return `<div class="p-12 text-center text-gray-500">Aucun projet chargé</div>`;
   }
+  options = { ...options, project };
 
   const activePage = options.activeVirtualPage || project._activeVirtualPage || null;
   const PAGE_SECTIONS_MAP = {
@@ -338,6 +370,7 @@ function renderSection(sec, project, options) {
     case "videoBlock":
       innerHTML = renderVideoBlock(sec, project, options);
       break;
+    case "stepper":
     case "stepperBlock":
       innerHTML = renderStepperBlock(sec, project, options);
       break;
@@ -438,34 +471,56 @@ function renderSection(sec, project, options) {
           ${getIcon("chevronDown", "w-3.5 h-3.5")}
           <span class="sec-ctrl-text">Descendre</span>
         </button>
-        <button type="button" class="btn-sec-ctrl btn-sec-bg" title="Changer le style de fond" data-action="toggle-bg" data-id="${sec.id}">
-          ${getIcon("palette", "w-3.5 h-3.5")}
-        </button>
+        <div class="relative inline-block">
+          <button type="button" class="btn-sec-ctrl btn-sec-bg" title="Changer le style de fond" onclick="event.stopPropagation(); window.app.toggleSectionBgMenu('${sec.id}')" data-action="toggle-bg" data-id="${sec.id}">
+            ${getIcon("palette", "w-3.5 h-3.5")}
+          </button>
+          <div id="sec-bg-popover-${sec.id}" data-section-id="${sec.id}" class="sec-bg-popover hidden absolute left-0 top-full mt-2 w-56 bg-zinc-900/95 backdrop-blur-md border border-white/20 rounded-xl p-2.5 shadow-2xl z-50 text-white text-xs">
+            <div class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 mb-2 flex items-center justify-between">
+              <span>Couleur de Fond</span>
+              <span class="text-amber-400 font-mono">${sec.settings?.bgTheme || 'white'}</span>
+            </div>
+            <div class="grid grid-cols-5 gap-1.5 mb-2">
+              <button type="button" onclick="event.stopPropagation(); window.app.setSectionBg('${sec.id}', 'white')" class="w-8 h-8 rounded-lg border ${sec.settings?.bgTheme === 'white' ? 'border-amber-400 ring-2 ring-amber-400/50 font-bold' : 'border-white/20'} bg-white text-zinc-900 text-[10px] font-bold flex items-center justify-center shadow-xs" title="Blanc Lumineux">⚪</button>
+              <button type="button" onclick="event.stopPropagation(); window.app.setSectionBg('${sec.id}', 'mineral')" class="w-8 h-8 rounded-lg border ${sec.settings?.bgTheme === 'mineral' ? 'border-amber-400 ring-2 ring-amber-400/50 font-bold' : 'border-white/20'} bg-slate-100 text-zinc-900 text-[10px] font-bold flex items-center justify-center shadow-xs" title="Minéral Doux">◻️</button>
+              <button type="button" onclick="event.stopPropagation(); window.app.setSectionBg('${sec.id}', 'warm')" class="w-8 h-8 rounded-lg border ${sec.settings?.bgTheme === 'warm' ? 'border-amber-400 ring-2 ring-amber-400/50 font-bold' : 'border-white/20'} bg-amber-50 text-zinc-900 text-[10px] font-bold flex items-center justify-center shadow-xs" title="Chaleureux">☀️</button>
+              <button type="button" onclick="event.stopPropagation(); window.app.setSectionBg('${sec.id}', 'dark')" class="w-8 h-8 rounded-lg border ${sec.settings?.bgTheme === 'dark' ? 'border-amber-400 ring-2 ring-amber-400/50 font-bold' : 'border-white/20'} bg-zinc-950 text-white text-[10px] font-bold flex items-center justify-center shadow-xs" title="Sombre Anthracite">◼️</button>
+              <button type="button" onclick="event.stopPropagation(); window.app.setSectionBg('${sec.id}', 'navy')" class="w-8 h-8 rounded-lg border ${sec.settings?.bgTheme === 'navy' ? 'border-amber-400 ring-2 ring-amber-400/50 font-bold' : 'border-white/20'} bg-slate-900 text-white text-[10px] font-bold flex items-center justify-center shadow-xs" title="Bleu Nuit">🌑</button>
+            </div>
+            <div class="pt-2 border-t border-white/10 flex items-center justify-between text-[11px]">
+              <label class="flex items-center gap-1.5 cursor-pointer text-zinc-300 hover:text-white">
+                <input type="color" value="${sec.settings?.customBackground || '#ffffff'}" onchange="event.stopPropagation(); window.app.setSectionCustomBg('${sec.id}', this.value)" class="w-5 h-5 rounded border-0 cursor-pointer bg-transparent">
+                <span>Personnalisée</span>
+              </label>
+              <button type="button" onclick="event.stopPropagation(); window.app.setSectionBg('${sec.id}', 'white')" class="text-[10px] text-zinc-400 hover:text-amber-400">Reset</button>
+            </div>
+          </div>
+        </div>
         <div class="relative inline-block">
           <button type="button" class="btn-sec-ctrl btn-sec-anim" title="Animations 60fps" data-action="toggle-motion-menu" data-id="${sec.id}" data-motion-trigger="${sec.id}">
             ${getIcon("sparkles", "w-3.5 h-3.5 text-amber-400")}
             <span class="sec-ctrl-text">Anim</span>
           </button>
-          <div id="sec-motion-popover-${sec.id}" data-section-id="${sec.id}" class="sec-motion-popover hidden absolute left-0 top-full mt-2 w-52 bg-zinc-900/95 backdrop-blur-md border border-white/20 rounded-xl p-2.5 shadow-2xl z-50 text-white text-xs">
+          <div id="sec-motion-popover-${sec.id}" data-section-id="${sec.id}" class="sec-motion-popover hidden absolute left-0 top-full mt-2 w-56 bg-zinc-900/95 backdrop-blur-md border border-white/20 rounded-xl p-2.5 shadow-2xl z-50 text-white text-xs">
             <div class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 mb-2 flex items-center justify-between">
               <span>Preset 60fps</span>
-              <span class="text-amber-400 font-mono">${sec.settings?.motionPreset || sec.motionPreset || 'défaut'}</span>
+              <span class="text-amber-400 font-mono font-bold">${sec.settings?.motionPreset || sec.motionPreset || 'défaut'}</span>
             </div>
             <div class="grid grid-cols-2 gap-1.5">
               ${[
                 ['reveal', 'Reveal'],
                 ['stagger', 'Stagger'],
-                ['spring', 'Spring'],
+                ['spring', 'Spring 🍏'],
                 ['magnetic', 'Magnetic'],
                 ['shimmer', 'Shimmer'],
-                ['pulse', 'Pulse'],
+                ['pulse', 'Pulse ✨'],
                 ['none', 'Aucun']
               ].map(([mPreset, mLabel]) => `
                 <button type="button" 
                         onmouseenter="window.app.previewSectionMotion('${sec.id}', '${mPreset}')"
                         onclick="event.stopPropagation(); window.app.setSectionMotion('${sec.id}', '${mPreset}')"
-                        class="motion-chip ${((sec.settings?.motionPreset || sec.motionPreset || 'none') === mPreset) ? 'is-active' : ''}">
-                  ${mLabel}
+                        class="motion-chip ${((sec.settings?.motionPreset || sec.motionPreset || 'none') === mPreset) ? 'is-active' : ''} ${mPreset === 'none' ? 'col-span-2 text-zinc-400' : ''}">
+                  ${mLabel}${((sec.settings?.motionPreset || sec.motionPreset || 'none') === mPreset && mPreset !== 'none') ? ' ✓' : ''}
                 </button>
               `).join('')}
             </div>
@@ -625,10 +680,10 @@ function renderButtonPopover(sec, buttonType, options = {}, project = {}) {
       <div class="flex items-center gap-1 pt-1 border-t border-zinc-700/60 text-[9.5px]">
         <span class="uppercase font-bold text-zinc-400 mr-0.5">Anim:</span>
         <button type="button" onclick="event.preventDefault(); window.app.setButtonMotion('${sec.id}', '${buttonType}', 'none')" class="cta-context-btn ${!btnMotion || btnMotion === 'none' ? 'is-selected' : ''}" title="Aucune animation">Ø</button>
-        <button type="button" onclick="event.preventDefault(); window.app.setButtonMotion('${sec.id}', '${buttonType}', 'pulse')" class="cta-context-btn ${btnMotion === 'pulse' ? 'is-selected' : ''}" title="Pulsation continue">✨ Pulse</button>
-        <button type="button" onclick="event.preventDefault(); window.app.setButtonMotion('${sec.id}', '${buttonType}', 'shimmer')" class="cta-context-btn ${btnMotion === 'shimmer' ? 'is-selected' : ''}" title="Reflet lumineux">⚡ Shimmer</button>
-        <button type="button" onclick="event.preventDefault(); window.app.setButtonMotion('${sec.id}', '${buttonType}', 'bounce')" class="cta-context-btn ${btnMotion === 'bounce' ? 'is-selected' : ''}" title="Rebond dynamique">↗ Rebond</button>
-        <button type="button" onclick="event.preventDefault(); window.app.setButtonMotion('${sec.id}', '${buttonType}', 'glow')" class="cta-context-btn ${btnMotion === 'glow' ? 'is-selected' : ''}" title="Halo lumineux">🔆 Glow</button>
+        <button type="button" onclick="event.preventDefault(); window.app.setButtonMotion('${sec.id}', '${buttonType}', 'pulse')" class="cta-context-btn ${btnMotion === 'pulse' ? 'is-selected' : ''}" title="Pulsation continue">✨ Pulse${btnMotion === 'pulse' ? ' ✓' : ''}</button>
+        <button type="button" onclick="event.preventDefault(); window.app.setButtonMotion('${sec.id}', '${buttonType}', 'shimmer')" class="cta-context-btn ${btnMotion === 'shimmer' ? 'is-selected' : ''}" title="Reflet lumineux">⚡ Shimmer${btnMotion === 'shimmer' ? ' ✓' : ''}</button>
+        <button type="button" onclick="event.preventDefault(); window.app.setButtonMotion('${sec.id}', '${buttonType}', 'bounce')" class="cta-context-btn ${btnMotion === 'bounce' ? 'is-selected' : ''}" title="Rebond dynamique">↗ Rebond${btnMotion === 'bounce' ? ' ✓' : ''}</button>
+        <button type="button" onclick="event.preventDefault(); window.app.setButtonMotion('${sec.id}', '${buttonType}', 'glow')" class="cta-context-btn ${btnMotion === 'glow' ? 'is-selected' : ''}" title="Halo lumineux">🔆 Glow${btnMotion === 'glow' ? ' ✓' : ''}</button>
         <button type="button" onclick="event.preventDefault(); window.app.deleteButton('${sec.id}', '${buttonType}')" class="cta-context-btn cta-btn-delete ml-auto" title="Supprimer ce bouton (Annuler ⌘Z)">🗑️</button>
       </div>
     </div>
@@ -1745,13 +1800,13 @@ function renderLocation(sec, project) {
                   src="https://maps.google.com/maps?q=${encodeURIComponent(c.address || (c.city ? c.city + ', France' : 'France'))}&t=&z=12&ie=UTF8&iwloc=&output=embed">
                 </iframe>
 
-                <!-- Floating Glass Overlay with Info & Route -->
-                <div class="absolute top-3 left-3 right-3 sm:right-auto sm:max-w-xs z-10 bg-zinc-950/85 backdrop-blur-md border border-white/20 p-3 rounded-2xl shadow-xl text-white space-y-1.5 pointer-events-auto">
+                <!-- Clean Route Badge (High Clarity, No heavy frosted blur) -->
+                <div class="absolute bottom-3 left-3 z-10 map-clean-overlay p-3 text-white space-y-1.5 pointer-events-auto">
                   <div class="flex items-center gap-2">
                     <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                     <span class="text-xs font-bold text-emerald-300">Zone d'intervention garantie</span>
                   </div>
-                  <div class="text-xs font-semibold text-white truncate">${c.city} & alentours (35 km)</div>
+                  <div class="text-xs font-semibold text-white truncate">${c.city || project.business?.city || 'Intervention locale'} & alentours (35 km)</div>
                   <div class="text-[10px] text-zinc-300">Déplacement rapide & diagnostic offert</div>
                   <a href="https://maps.google.com/?q=${encodeURIComponent(c.address || (c.city ? c.city + ', France' : 'France'))}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-[11px] font-bold text-amber-400 hover:text-amber-300 underline pt-1">
                     <span>${c.ctaRoute || "Ouvrir dans Google Maps"}</span>
@@ -2274,12 +2329,28 @@ function renderVideoBlock(sec, project, options = {}) {
 // 23. Stepper / Processus Chantier (Component Gallery: Stepper)
 function renderStepperBlock(sec, project, options = {}) {
   const c = sec.content || {};
-  const steps = Array.isArray(c.steps) ? c.steps : [
+  const rawSteps = (c.steps && Array.isArray(c.steps)) ? c.steps : (Array.isArray(sec.steps) ? sec.steps : null);
+  const steps = rawSteps && rawSteps.length >= 2 ? rawSteps : [
     { step: "1", title: "Diagnostic & Devis Gratuit", desc: "Visite technique offerte à domicile sous 24h avec chiffrage sans engagement." },
     { step: "2", title: "Planification & Préparation", desc: "Validation des matériaux, calendrier d'intervention et protection des lieux." },
     { step: "3", title: "Exécution des Travaux", desc: "Réalisation rigoureuse dans les règles de l'art par nos artisans qualifiés." },
     { step: "4", title: "Réception & Nettoyage", desc: "Contrôle qualité contradictoire, remise de garantie et chantier rendu impeccable." }
   ];
+
+  const colClass = steps.length === 2
+    ? "sm:grid-cols-2 lg:grid-cols-2 stepper-cols-2"
+    : (steps.length === 3
+      ? "sm:grid-cols-2 lg:grid-cols-3 stepper-cols-3"
+      : "sm:grid-cols-2 lg:grid-cols-4");
+
+  const addStepBtn = options.isEditor ? `
+    <div class="mt-8 flex justify-center">
+      <button type="button" onclick="event.stopPropagation(); window.app.addStepperStep('${sec.id}')" class="btn-keycap btn-keycap-light px-4 py-2 text-xs font-bold text-zinc-900 rounded-xl shadow-xs flex items-center gap-2 hover:bg-zinc-100 transition-all border border-zinc-200">
+        ${getIcon("plus", "w-3.5 h-3.5 text-zinc-700")}
+        <span>Ajouter une étape (${steps.length + 1})</span>
+      </button>
+    </div>
+  ` : '';
 
   return `
     <div class="py-16 sm:py-24 bg-zinc-50 border-y border-zinc-200/60">
@@ -2293,9 +2364,14 @@ function renderStepperBlock(sec, project, options = {}) {
           </h2>
         </div>
 
-        <div class="component-stepper grid sm:grid-cols-2 lg:grid-cols-4 gap-6 relative">
+        <div class="component-stepper grid ${colClass} gap-6 relative">
           ${steps.map((st, idx) => `
-            <div class="bg-white p-6 rounded-2xl border border-zinc-200/80 shadow-xs flex flex-col justify-between space-y-4 relative">
+            <div class="bg-white p-6 rounded-2xl border border-zinc-200/80 shadow-xs flex flex-col justify-between space-y-4 relative group/step">
+              ${options.isEditor && steps.length > 2 ? `
+                <button type="button" onclick="event.stopPropagation(); window.app.removeStepperStep('${sec.id}', ${idx})" class="absolute top-3 right-3 opacity-0 group-hover/step:opacity-100 transition-opacity p-1 text-zinc-400 hover:text-red-500 rounded" title="Supprimer cette étape">
+                  ${getIcon("trash", "w-3.5 h-3.5")}
+                </button>
+              ` : ''}
               <div class="flex items-center justify-between">
                 <span class="w-9 h-9 rounded-full bg-zinc-900 text-white font-mono text-sm font-bold flex items-center justify-center">
                   ${st.step || idx + 1}
@@ -2309,6 +2385,7 @@ function renderStepperBlock(sec, project, options = {}) {
             </div>
           `).join('')}
         </div>
+        ${addStepBtn}
       </div>
     </div>
   `;

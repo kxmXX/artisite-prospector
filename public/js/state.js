@@ -86,6 +86,10 @@ class AppStateManager {
     }
   }
 
+  save() {
+    this.saveToStorage();
+  }
+
   // View management
   setView(view) {
     this.currentView = view;

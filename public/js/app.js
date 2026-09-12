@@ -130,14 +130,24 @@ class App {
           pop.classList.add("hidden");
         }
       });
+      document.querySelectorAll(".sec-bg-popover:not(.hidden)").forEach(pop => {
+        const secId = pop.dataset.sectionId;
+        if (!pop.contains(e.target) && !e.target.closest(`[data-action="toggle-bg"][data-id="${secId}"]`)) {
+          pop.classList.add("hidden");
+        }
+      });
       document.querySelectorAll("[id^='img-motion-menu-']:not(.hidden)").forEach(m => {
         if (!m.contains(e.target) && !e.target.closest("[onclick*='toggleImageMotionMenu']")) {
           m.classList.add("hidden");
         }
       });
-      const ftbMenu = document.getElementById("ftb-anim-menu");
-      if (ftbMenu && !ftbMenu.classList.contains("hidden") && !ftbMenu.contains(e.target) && !e.target.closest("#ftb-anim-btn")) {
-        ftbMenu.classList.add("hidden");
+      const ftbAnimMenu = document.getElementById("ftb-anim-menu");
+      if (ftbAnimMenu && !ftbAnimMenu.classList.contains("hidden") && !ftbAnimMenu.contains(e.target) && !e.target.closest("#ftb-anim-btn")) {
+        ftbAnimMenu.classList.add("hidden");
+      }
+      const ftbColorMenu = document.getElementById("ftb-color-menu");
+      if (ftbColorMenu && !ftbColorMenu.classList.contains("hidden") && !ftbColorMenu.contains(e.target) && !e.target.closest("#ftb-color-btn")) {
+        ftbColorMenu.classList.add("hidden");
       }
     });
 
@@ -817,6 +827,22 @@ class App {
   setVirtualPage(pageId) {
     if (!state.currentProject) return;
     state.currentProject._activeVirtualPage = pageId;
+    if (state.currentView === "editor" && state.editorMode !== "preview") {
+      const PAGE_SECTIONS_MAP = {
+        home: "hero",
+        services: "services",
+        realisations: "realisations",
+        devis: "quoteSimulator",
+        contact: "location"
+      };
+      const targetType = PAGE_SECTIONS_MAP[pageId] || "hero";
+      const targetSec = state.currentProject.sections.find(s => s.type === targetType) || state.currentProject.sections[0];
+      if (targetSec) {
+        this.selectSection(targetSec.id, { scroll: true });
+        this.showToast(`Navigation : ${pageId.toUpperCase()}`, "info");
+      }
+      return;
+    }
     this.render();
   }
 
@@ -1316,6 +1342,14 @@ class App {
     }
   }
 
+  toggleSectionBgMenu(secId) {
+    const pop = document.getElementById(`sec-bg-popover-${secId}`);
+    if (!pop) return;
+    const isClosed = pop.classList.contains("hidden");
+    document.querySelectorAll(".sec-bg-popover:not(.hidden)").forEach(p => p.classList.add("hidden"));
+    if (isClosed) pop.classList.remove("hidden");
+  }
+
   cycleSectionBg(sectionId) {
     if (!state.currentProject) return;
     const sec = state.currentProject.sections.find(s => s.id === sectionId);
@@ -1330,15 +1364,31 @@ class App {
   setSectionBg(sectionId, theme) {
     if (!state.currentProject) return;
     if (!["white", "mineral", "dark", "warm", "navy"].includes(theme)) return;
+    const mainEl = document.querySelector("main");
+    const savedScrollTop = mainEl ? mainEl.scrollTop : 0;
+
     const updated = JSON.parse(JSON.stringify(state.currentProject));
     const sec = updated.sections.find(s => s.id === sectionId);
     if (!sec) return;
     sec.settings = { ...(sec.settings || {}), bgTheme: theme, customBackground: "" };
     state.updateProject(updated, true, `Changement fond (${theme})`);
+
+    const pop = document.getElementById(`sec-bg-popover-${sectionId}`);
+    if (pop) pop.classList.add("hidden");
+
+    if (mainEl && savedScrollTop > 0) {
+      requestAnimationFrame(() => {
+        const m = document.querySelector("main");
+        if (m) m.scrollTop = savedScrollTop;
+      });
+    }
   }
 
   setSectionCustomBg(sectionId, hexColor) {
     if (!state.currentProject) return;
+    const mainEl = document.querySelector("main");
+    const savedScrollTop = mainEl ? mainEl.scrollTop : 0;
+
     const updated = JSON.parse(JSON.stringify(state.currentProject));
     const sec = updated.sections.find(s => s.id === sectionId);
     if (!sec) return;
@@ -1349,6 +1399,13 @@ class App {
       sec.settings.bgTheme = "custom";
     }
     state.updateProject(updated, true, hexColor ? `Fond personnalisé : ${hexColor}` : "Réinitialisation fond");
+
+    if (mainEl && savedScrollTop > 0) {
+      requestAnimationFrame(() => {
+        const m = document.querySelector("main");
+        if (m) m.scrollTop = savedScrollTop;
+      });
+    }
   }
 
   applyInspirationPattern(sectionId, patternId) {
@@ -1749,30 +1806,154 @@ class App {
     const scrollTop = mainEl ? mainEl.scrollTop : window.scrollY;
 
     const topPos = Math.max(8, rect.top - mainRect.top + scrollTop - 40);
-    const leftPos = Math.max(16, Math.min(window.innerWidth - 340, rect.left - mainRect.left));
+    const leftPos = Math.max(16, Math.min(window.innerWidth - 380, rect.left - mainRect.left));
 
     toolbar.style.top = `${topPos}px`;
     toolbar.style.left = `${leftPos}px`;
     toolbar.style.display = "flex";
 
-    const btnFontDown = document.getElementById("ftb-font-down");
-    const btnFontUp = document.getElementById("ftb-font-up");
+    const secWrapper = el.closest(".editor-section-wrapper");
+    const sid = secId || secWrapper?.getAttribute("data-section-id");
+    const field = el.getAttribute("data-editable");
+    const sec = state.currentProject?.sections?.find(s => s.id === sid);
+
+    // Sync font size slider
+    const existingDelta = sec?.settings?.[`fontSize_${field}`] || 0;
+    const fontSlider = document.getElementById("ftb-font-slider");
+    const fontVal = document.getElementById("ftb-font-val");
+    if (fontSlider) fontSlider.value = existingDelta;
+    if (fontVal) fontVal.textContent = `${existingDelta >= 0 ? '+' : ''}${existingDelta}`;
+
+    // Sync color indicator
+    const existingColor = sec?.settings?.[`color_${field}`] || el.style.color || "#ffffff";
+    const colorIndicator = document.getElementById("ftb-color-indicator");
+    if (colorIndicator) colorIndicator.style.backgroundColor = existingColor;
+
+    // Sync B/I/U button states
     const btnBold = document.getElementById("ftb-bold");
     const btnItalic = document.getElementById("ftb-italic");
     const btnUnderline = document.getElementById("ftb-underline");
     const btnClose = document.getElementById("ftb-close");
 
-    if (btnFontDown) btnFontDown.onclick = (e) => { e.preventDefault(); e.stopPropagation(); this.adjustActiveTextFontSize(-1); };
-    if (btnFontUp) btnFontUp.onclick = (e) => { e.preventDefault(); e.stopPropagation(); this.adjustActiveTextFontSize(1); };
-    if (btnBold) btnBold.onclick = (e) => { e.preventDefault(); e.stopPropagation(); this.toggleActiveTextBold(); };
-    if (btnItalic) btnItalic.onclick = (e) => { e.preventDefault(); e.stopPropagation(); this.toggleActiveTextItalic(); };
-    if (btnUnderline) btnUnderline.onclick = (e) => { e.preventDefault(); e.stopPropagation(); this.toggleActiveTextUnderline(); };
-    if (btnClose) btnClose.onclick = (e) => { e.preventDefault(); e.stopPropagation(); toolbar.style.display = "none"; };
+    if (btnBold) {
+      const isBold = sec?.settings?.[`bold_${field}`] === true || window.getComputedStyle(el).fontWeight >= 700;
+      btnBold.classList.toggle("is-active", isBold);
+      btnBold.onclick = (e) => { e.preventDefault(); e.stopPropagation(); this.toggleActiveTextBold(); };
+    }
+    if (btnItalic) {
+      const isItalic = sec?.settings?.[`italic_${field}`] === true || window.getComputedStyle(el).fontStyle === "italic";
+      btnItalic.classList.toggle("is-active", isItalic);
+      btnItalic.onclick = (e) => { e.preventDefault(); e.stopPropagation(); this.toggleActiveTextItalic(); };
+    }
+    if (btnUnderline) {
+      const isUnderline = sec?.settings?.[`underline_${field}`] === true || window.getComputedStyle(el).textDecorationLine?.includes("underline");
+      btnUnderline.classList.toggle("is-active", isUnderline);
+      btnUnderline.onclick = (e) => { e.preventDefault(); e.stopPropagation(); this.toggleActiveTextUnderline(); };
+    }
+    if (btnClose) {
+      btnClose.onclick = (e) => { e.preventDefault(); e.stopPropagation(); toolbar.style.display = "none"; };
+    }
+
+    // Dismiss open submenus
+    document.getElementById("ftb-color-menu")?.classList.add("hidden");
+    document.getElementById("ftb-anim-menu")?.classList.add("hidden");
   }
 
   hideFloatingTextToolbar() {
     const toolbar = document.getElementById("floating-text-toolbar");
     if (toolbar) toolbar.style.display = "none";
+  }
+
+  toggleTextColorMenu() {
+    const menu = document.getElementById("ftb-color-menu");
+    if (menu) menu.classList.toggle("hidden");
+  }
+
+  setActiveTextColor(color) {
+    if (!this._activeEditableEl) return;
+    const el = this._activeEditableEl;
+    const secWrapper = el.closest(".editor-section-wrapper");
+    const secId = secWrapper?.getAttribute("data-section-id");
+    const field = el.getAttribute("data-editable");
+
+    if (secId && field && state.currentProject) {
+      const updated = JSON.parse(JSON.stringify(state.currentProject));
+      const sec = updated.sections.find(s => s.id === secId);
+      if (sec) {
+        sec.settings = sec.settings || {};
+        if (color) {
+          sec.settings[`color_${field}`] = color;
+        } else {
+          delete sec.settings[`color_${field}`];
+        }
+        state.updateProject(updated, false);
+      }
+    }
+    el.style.color = color || "";
+    const indicator = document.getElementById("ftb-color-indicator");
+    if (indicator) indicator.style.backgroundColor = color || "#ffffff";
+    const menu = document.getElementById("ftb-color-menu");
+    if (menu) menu.classList.add("hidden");
+    this.showToast(color ? `Couleur appliquée : ${color}` : "Couleur par défaut réinitialisée", "info");
+  }
+
+  setAnimationSpeed(speed) {
+    if (!state.currentProject) return;
+    if (!state.currentProject.branding) state.currentProject.branding = {};
+    state.currentProject.branding.animationSpeed = speed;
+    state.save();
+    const multiplier = speed === "fast" ? "0.6" : (speed === "slow" ? "1.5" : "1.0");
+    document.documentElement.style.setProperty("--anim-duration-multiplier", multiplier);
+    this.render();
+    this.showToast(`Rythme des animations : ${speed === 'fast' ? 'Rapide (0.5s)' : (speed === 'slow' ? 'Posé (1.4s)' : 'Naturel (0.9s)')}`, "info");
+  }
+
+  toggleAppleScrollFx(enabled) {
+    if (!state.currentProject) return;
+    if (!state.currentProject.branding) state.currentProject.branding = {};
+    state.currentProject.branding.appleScrollFx = Boolean(enabled);
+    state.save();
+    const root = document.querySelector(".artisite-root") || document.getElementById("canvas-container");
+    if (root) {
+      root.classList.toggle("apple-scrollfx-enabled", Boolean(enabled));
+    }
+    this.render();
+    this.showToast(enabled ? "⚡ Animations au Scroll Apple activées" : "Animations au scroll désactivées", "info");
+  }
+
+  addStepperStep(secId) {
+    if (!state.currentProject) return;
+    const updated = JSON.parse(JSON.stringify(state.currentProject));
+    const sec = updated.sections.find(s => s.id === secId);
+    if (!sec) return;
+    sec.content = sec.content || {};
+    sec.content.steps = Array.isArray(sec.content.steps) ? sec.content.steps : [
+      { step: "1", title: "Diagnostic & Devis Gratuit", desc: "Visite technique offerte à domicile sous 24h avec chiffrage sans engagement." },
+      { step: "2", title: "Planification & Préparation", desc: "Validation des matériaux, calendrier d'intervention et protection des lieux." },
+      { step: "3", title: "Exécution des Travaux", desc: "Réalisation rigoureuse dans les règles de l'art par nos artisans qualifiés." },
+      { step: "4", title: "Réception & Nettoyage", desc: "Contrôle qualité contradictoire, remise de garantie et chantier rendu impeccable." }
+    ];
+    const newIdx = sec.content.steps.length + 1;
+    sec.content.steps.push({
+      step: String(newIdx),
+      title: `Étape 0${newIdx} : Suivi Personnalisé`,
+      desc: "Accompagnement continu et validation à chaque étape de votre projet."
+    });
+    state.updateProject(updated, true, `Ajout étape stepper (${newIdx})`);
+    this.showToast(`Étape 0${newIdx} ajoutée`, "success");
+  }
+
+  removeStepperStep(secId, stepIdx) {
+    if (!state.currentProject) return;
+    const updated = JSON.parse(JSON.stringify(state.currentProject));
+    const sec = updated.sections.find(s => s.id === secId);
+    if (!sec || !Array.isArray(sec.content?.steps) || sec.content.steps.length <= 2) return;
+    sec.content.steps.splice(stepIdx, 1);
+    sec.content.steps.forEach((st, idx) => {
+      st.step = String(idx + 1);
+    });
+    state.updateProject(updated, true, `Suppression étape stepper (${stepIdx + 1})`);
+    this.showToast("Étape supprimée", "info");
   }
 
   addCanvaElement(blockType) {
@@ -2178,7 +2359,9 @@ class App {
     if (pop) pop.classList.add("hidden");
 
     // Immediate live replay on canvas element
-    this.previewSectionMotion(secId, preset);
+    setTimeout(() => {
+      this.previewSectionMotion(secId, preset);
+    }, 30);
     this.showToast(`Animation : ${preset === 'none' ? 'Aucune' : preset}`, "info");
   }
 
@@ -2211,14 +2394,13 @@ class App {
     sec.settings.imageMotions[imgKey] = preset === "none" ? "" : preset;
     state.updateProject(updated, false);
 
-    const secEl = document.getElementById(`section-${secId}`) || document.querySelector(`.editor-section-wrapper[data-section-id="${secId}"]`);
-    const imgEl = secEl?.querySelector(`[data-image-field="${fieldPath}"][data-image-index="${idx}"]`) || secEl?.querySelector("img");
-    if (imgEl) {
-      const motion = preset === "none" ? "" : preset;
-      if (motion) imgEl.setAttribute("data-motion", motion);
-      else imgEl.removeAttribute("data-motion");
-      this.previewElementMotion(imgEl, preset);
-    }
+    setTimeout(() => {
+      const secEl = document.getElementById(`section-${secId}`) || document.querySelector(`.editor-section-wrapper[data-section-id="${secId}"]`);
+      const imgEl = secEl?.querySelector(`[data-image-field="${fieldPath}"][data-image-index="${idx}"]`) || secEl?.querySelector("img");
+      if (imgEl) {
+        this.previewElementMotion(imgEl, preset);
+      }
+    }, 30);
     this.showToast(`Animation image : ${preset === 'none' ? 'Aucune' : preset}`, "info");
   }
 
@@ -2234,12 +2416,6 @@ class App {
     if (!el) return;
 
     const motion = preset === "none" ? "" : preset;
-    if (motion) {
-      el.setAttribute("data-motion", motion);
-    } else {
-      el.removeAttribute("data-motion");
-    }
-
     const field = el.getAttribute("data-editable");
     const secWrapper = el.closest(".editor-section-wrapper");
     const secId = secWrapper?.getAttribute("data-section-id");
@@ -2255,7 +2431,15 @@ class App {
       }
     }
 
-    this.previewElementMotion(el, preset);
+    setTimeout(() => {
+      const freshEl = (secId && field)
+        ? document.querySelector(`.editor-section-wrapper[data-section-id="${secId}"] [data-editable="${field}"]`)
+        : el;
+      if (freshEl) {
+        this._activeEditableEl = freshEl;
+        this.previewElementMotion(freshEl, preset);
+      }
+    }, 30);
     this.showToast(`Animation texte : ${preset === 'none' ? 'Aucune' : preset}`, "info");
   }
 
@@ -2263,14 +2447,23 @@ class App {
     if (!el) return;
     const motion = preset === "none" ? "" : preset;
     if (motion) el.setAttribute("data-motion", motion);
+    else el.removeAttribute("data-motion");
+
     el.classList.remove("is-revealed");
     el.classList.add("motion-preview");
+    if (preset === "pulse") {
+      el.classList.add("btn-pulse-active");
+    } else {
+      el.classList.remove("btn-pulse-active");
+    }
     void el.offsetWidth;
     el.classList.add("is-revealed");
-    setTimeout(() => {
-      el.classList.remove("motion-preview");
-      el.classList.add("is-revealed");
-    }, 600);
+    if (preset !== "pulse") {
+      setTimeout(() => {
+        el.classList.remove("motion-preview");
+        el.classList.add("is-revealed");
+      }, 1100);
+    }
   }
 
   insertQuickComponent(secId, compType) {

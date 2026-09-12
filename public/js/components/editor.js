@@ -317,22 +317,22 @@ export function renderEditor(state) {
         <!-- CENTRAL CANVAS: WEBPAGE PREVIEW / LIVE EDIT WITH CANVA DOCK -->
         <main id="editor-main-canvas" class="flex-1 bg-[#F4F5F7] overflow-y-auto relative flex flex-col items-center editor-canvas-scroll-host min-h-0 h-full w-full">
 
-          <!-- In-situ Live Preview Client Floating Pill -->
+          <!-- In-situ Live Preview Client Floating Pill (Docked at bottom so header and theme toggles remain completely accessible) -->
           ${isLivePreview ? `
-            <div class="fixed top-3.5 left-1/2 transform -translate-x-1/2 z-50 bg-zinc-950/95 text-white px-5 py-2.5 rounded-full shadow-2xl border border-zinc-700 flex items-center gap-4 text-xs backdrop-blur animate-fade-in">
+            <div class="fixed bottom-5 left-1/2 transform -translate-x-1/2 z-50 bg-zinc-950/95 text-white px-5 py-2.5 rounded-full shadow-2xl border border-zinc-700 flex items-center gap-4 text-xs backdrop-blur animate-fade-in">
               <span class="flex items-center gap-2 font-bold text-zinc-200">
                 <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
                 <span>Aperçu Client Démo en direct</span>
               </span>
               <div class="h-4 w-[1px] bg-zinc-700"></div>
-          <button type="button" aria-pressed="true" onclick="window.app.setEditorMode('conception')" class="btn-keycap btn-keycap-light px-3 py-1 rounded-full text-xs font-bold text-zinc-950 flex items-center gap-1.5 shadow-sm">
+              <button type="button" aria-pressed="true" onclick="window.app.setEditorMode('conception')" class="btn-keycap btn-keycap-light px-3 py-1 rounded-full text-xs font-bold text-zinc-950 flex items-center gap-1.5 shadow-sm">
                 ${getIcon("edit", "w-3.5 h-3.5")}
                 <span>Retour Conception</span>
               </button>
             </div>
           ` : `
             <!-- Canva-like Quick Element Adder Dock -->
-            <div class="canva-dock" id="canva-floating-dock">
+            <div class="canva-dock ${state.activeDrawer ? 'hidden' : ''}" id="canva-floating-dock">
               <span class="text-[11px] font-bold text-zinc-500 px-1.5 flex items-center gap-1">
                 ${getIcon("plus", "w-3 h-3 text-zinc-400")}
                 <span>Ajouter un bloc :</span>
@@ -355,7 +355,7 @@ export function renderEditor(state) {
             </div>
           `}
 
-          <!-- In-Canvas Floating Text Toolbar (Curseur de taille, Gras, Italique, Souligné) -->
+          <!-- In-Canvas Floating Text Toolbar (Curseur de taille, Gras, Italique, Souligné, Couleur, Anim) -->
           <div id="floating-text-toolbar" class="floating-text-toolbar" style="display: none;" role="toolbar" aria-label="Formatage du texte" onclick="event.stopPropagation();">
             <div class="flex items-center gap-1.5">
               <span class="text-[9px] uppercase font-bold text-zinc-400 mr-0.5">Taille:</span>
@@ -373,12 +373,37 @@ export function renderEditor(state) {
             </div>
             <div class="h-3.5 w-[1px] bg-zinc-700 mx-1"></div>
             <div class="relative inline-block">
+              <button type="button" id="ftb-color-btn" onclick="window.app.toggleTextColorMenu()" class="ftb-btn text-zinc-300 font-semibold flex items-center gap-1 px-1.5" title="Changer la couleur du texte">
+                <span id="ftb-color-indicator" class="w-2.5 h-2.5 rounded-full border border-white/40 bg-white"></span>
+                <span>Couleur</span>
+              </button>
+              <div id="ftb-color-menu" class="hidden absolute left-0 top-full mt-2 w-52 bg-zinc-900/95 backdrop-blur-md border border-white/20 rounded-xl p-2.5 shadow-2xl z-50 text-white text-[11px]">
+                <div class="text-[9px] font-bold uppercase tracking-wider text-zinc-400 mb-1.5">Nuancier Texte</div>
+                <div class="grid grid-cols-6 gap-1.5 mb-2">
+                  <button type="button" onclick="window.app.setActiveTextColor('#09090b')" class="w-6 h-6 rounded-md border border-white/30 bg-[#09090b]" title="Noir Profond"></button>
+                  <button type="button" onclick="window.app.setActiveTextColor('#18181b')" class="w-6 h-6 rounded-md border border-white/30 bg-[#18181b]" title="Anthracite"></button>
+                  <button type="button" onclick="window.app.setActiveTextColor('#ffffff')" class="w-6 h-6 rounded-md border border-white/30 bg-[#ffffff]" title="Blanc"></button>
+                  <button type="button" onclick="window.app.setActiveTextColor('#f59e0b')" class="w-6 h-6 rounded-md border border-white/30 bg-[#f59e0b]" title="Or Chaud"></button>
+                  <button type="button" onclick="window.app.setActiveTextColor('#059669')" class="w-6 h-6 rounded-md border border-white/30 bg-[#059669]" title="Émeraude"></button>
+                  <button type="button" onclick="window.app.setActiveTextColor('#2563eb')" class="w-6 h-6 rounded-md border border-white/30 bg-[#2563eb]" title="Bleu"></button>
+                </div>
+                <div class="flex items-center gap-2 pt-1.5 border-t border-white/10">
+                  <label class="text-[10px] text-zinc-300 flex items-center gap-1.5 cursor-pointer">
+                    <input type="color" id="ftb-custom-color" onchange="window.app.setActiveTextColor(this.value)" class="w-4 h-4 rounded border-0 cursor-pointer p-0 bg-transparent">
+                    <span>Sur-mesure</span>
+                  </label>
+                  <button type="button" onclick="window.app.setActiveTextColor('')" class="text-[10px] text-amber-400 hover:underline ml-auto">Par défaut</button>
+                </div>
+              </div>
+            </div>
+            <div class="h-3.5 w-[1px] bg-zinc-700 mx-1"></div>
+            <div class="relative inline-block">
               <button type="button" id="ftb-anim-btn" onclick="window.app.toggleTextMotionMenu()" class="ftb-btn text-amber-400 font-semibold flex items-center gap-1 px-1.5" title="Appliquer une animation à ce texte (60fps)">
                 <span>✨ Anim</span>
               </button>
-              <div id="ftb-anim-menu" class="hidden absolute left-0 top-full mt-2 w-48 bg-zinc-900/95 backdrop-blur-md border border-white/20 rounded-xl p-2 shadow-2xl z-50 text-white text-[11px]">
-                <div class="text-[9px] font-bold uppercase tracking-wider text-zinc-400 mb-1">Animation Texte</div>
-                <div class="grid grid-cols-2 gap-1">
+              <div id="ftb-anim-menu" class="hidden absolute left-0 top-full mt-2 w-56 bg-zinc-900/95 backdrop-blur-md border border-white/20 rounded-xl p-2.5 shadow-2xl z-50 text-white text-[11px]">
+                <div class="text-[9px] font-bold uppercase tracking-wider text-zinc-400 mb-1.5">Animation Texte 60fps</div>
+                <div class="grid grid-cols-2 gap-1.5">
                   <button type="button" onclick="window.app.setActiveTextMotion('fade-in')" class="motion-chip">Fade</button>
                   <button type="button" onclick="window.app.setActiveTextMotion('slide-up')" class="motion-chip">Slide</button>
                   <button type="button" onclick="window.app.setActiveTextMotion('spring')" class="motion-chip">Spring</button>
@@ -1036,13 +1061,13 @@ function renderSettingsAccordions(project) {
                 const curTheme = project.branding?.globalTheme || (project.branding?.bgColor === '#09090b' ? 'dark' : (project.branding?.bgColor === '#f4f4f5' ? 'mineral' : 'white'));
                 return `
                   <button type="button" onclick="window.app.switchGlobalTheme('white')" class="py-2 border rounded-lg text-center text-[11px] font-medium transition-all ${curTheme === 'white' ? 'border-zinc-950 bg-white ring-2 ring-zinc-950 font-bold text-zinc-950 shadow-sm' : 'border-zinc-200 bg-white hover:border-zinc-300 text-zinc-700 shadow-2xs'}">
-                    ☀️ Blanche
+                    ☀️ Blanche ${curTheme === 'white' ? '<span class="text-[10px] text-emerald-600 font-extrabold ml-0.5">✓</span>' : ''}
                   </button>
                   <button type="button" onclick="window.app.switchGlobalTheme('mineral')" class="py-2 border rounded-lg text-center text-[11px] font-medium transition-all ${curTheme === 'mineral' ? 'border-zinc-950 bg-zinc-100 ring-2 ring-zinc-950 font-bold text-zinc-950 shadow-sm' : 'border-zinc-200 bg-zinc-100 hover:border-zinc-300 text-zinc-700 shadow-2xs'}">
-                    🪨 Minérale
+                    🪨 Minérale ${curTheme === 'mineral' ? '<span class="text-[10px] text-emerald-600 font-extrabold ml-0.5">✓</span>' : ''}
                   </button>
                   <button type="button" onclick="window.app.switchGlobalTheme('dark')" class="py-2 border rounded-lg text-center text-[11px] font-medium transition-all ${curTheme === 'dark' ? 'border-amber-400 bg-zinc-900 ring-2 ring-amber-400 font-bold text-amber-300 shadow-sm' : 'border-zinc-800 bg-zinc-900 text-zinc-300 hover:text-white shadow-2xs'}">
-                    🌙 Sombre
+                    🌙 Sombre ${curTheme === 'dark' ? '<span class="text-[10px] text-amber-400 font-extrabold ml-0.5">✓</span>' : ''}
                   </button>
                 `;
               })()}
@@ -1221,21 +1246,44 @@ function renderSettingsAccordions(project) {
             </div>
           </div>
 
-          <div class="pt-3 border-t border-zinc-200/80 space-y-2">
-            <label class="block text-[10px] font-medium text-zinc-400 uppercase tracking-wider">Micro-interactions</label>
+          <div class="pt-3 border-t border-zinc-200/80 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <div>
+                <label class="block text-[11px] font-semibold text-zinc-900">⚡ Animations au Scroll (Style Apple)</label>
+                <p class="text-[10px] text-zinc-500">Apparitions progressives et zooms dynamiques lors du défilement</p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" ${project.branding?.appleScrollFx !== false ? 'checked' : ''}
+                       onchange="window.app.toggleAppleScrollFx(this.checked)" class="sr-only peer">
+                <div class="w-8 h-4 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3 after:w-3.5 after:transition-all peer-checked:bg-zinc-900"></div>
+              </label>
+            </div>
+            <label class="block text-[10px] font-medium text-zinc-400 uppercase tracking-wider">Mouvement global par défaut</label>
             <div class="grid grid-cols-3 gap-1.5 text-xs">
               ${[
                 ['none', 'Aucune'],
-                ['fade-in', 'Fade'],
-                ['slide-up', 'Slide'],
-                ['slide-in', 'Entrée'],
-                ['spring', 'Spring'],
-                ['progress-fill', 'Remplissage']
+                ['fade-in', 'Fondu'],
+                ['slide-up', 'Slide ↑'],
+                ['slide-in', 'Entrée →'],
+                ['spring', 'Spring 🍏'],
+                ['progress-fill', 'Jauge']
               ].map(([preset, label]) => `
-                <button type="button" onclick="window.app.setMotionPreset('${preset}')" class="py-1.5 border rounded-md text-center text-[11px] font-medium ${((project.branding.motionPreset || 'none') === preset) ? 'border-zinc-900 bg-white font-semibold text-zinc-950' : 'border-zinc-200 bg-white text-zinc-600'}">${label}</button>
+                <button type="button" onclick="window.app.setMotionPreset('${preset}')" class="py-1.5 border rounded-md text-center text-[11px] font-medium ${((project.branding.motionPreset || 'none') === preset) ? 'border-zinc-900 bg-white font-semibold text-zinc-950 ring-1 ring-zinc-900 shadow-xs' : 'border-zinc-200 bg-white text-zinc-600'}">${label}${((project.branding.motionPreset || 'none') === preset) ? ' ✓' : ''}</button>
               `).join('')}
             </div>
-            <p class="text-[10px] text-zinc-500">Les animations respectent automatiquement le réglage système « réduire les mouvements ».</p>
+            <label class="block text-[10px] font-medium text-zinc-400 uppercase tracking-wider pt-1">Rythme & Vitesse des animations</label>
+            <div class="grid grid-cols-3 gap-1.5 text-xs">
+              ${[
+                ['fast', '⚡ Rapide (0.5s)'],
+                ['normal', '🍎 Naturel (0.9s)'],
+                ['slow', '🎬 Posé (1.4s)']
+              ].map(([speed, label]) => `
+                <button type="button" onclick="window.app.setAnimationSpeed('${speed}')" class="py-1.5 border rounded-md text-center text-[10.5px] font-medium ${((project.branding.animationSpeed || 'normal') === speed) ? 'border-zinc-900 bg-white font-semibold text-zinc-950 ring-1 ring-zinc-900 shadow-xs' : 'border-zinc-200 bg-white text-zinc-600'}">
+                  ${label}${((project.branding.animationSpeed || 'normal') === speed) ? ' ✓' : ''}
+                </button>
+              `).join('')}
+            </div>
+            <p class="text-[10px] text-zinc-500">Effets fluides 60fps respectant le réglage système « réduire les mouvements ».</p>
           </div>
 
           <!-- Bandeau Flottant Fixe (Unbounce & Duda Inspired) -->
@@ -1370,12 +1418,18 @@ function renderSettingsAccordions(project) {
         <div class="section-accordion-body hidden space-y-2.5" id="settings-body-navigation">
           <label class="block text-[10px] font-medium text-zinc-400 uppercase tracking-wider">Architecture du Site</label>
           <div class="grid grid-cols-2 gap-2">
-            <button type="button" onclick="window.app.setNavigationMode('one-page')" class="p-2.5 border rounded-xl text-left transition-all ${project.branding?.navigationMode !== 'multi-tab' ? 'border-zinc-900 bg-white font-semibold shadow-xs text-zinc-950' : 'border-zinc-200 bg-zinc-50 hover:bg-white text-zinc-600'}">
-              <div class="text-xs font-bold">📜 One-Page</div>
+            <button type="button" onclick="window.app.setNavigationMode('one-page')" class="p-2.5 border rounded-xl text-left transition-all ${project.branding?.navigationMode !== 'multi-tab' ? 'border-zinc-900 bg-white font-semibold shadow-xs text-zinc-950 ring-1 ring-zinc-900' : 'border-zinc-200 bg-zinc-50 hover:bg-white text-zinc-600'}">
+              <div class="text-xs font-bold flex items-center justify-between">
+                <span>📜 One-Page</span>
+                ${project.branding?.navigationMode !== 'multi-tab' ? '<span class="text-[9.5px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">Actif</span>' : ''}
+              </div>
               <div class="text-[10px] text-zinc-400 mt-0.5">Défilement continu fluide classique.</div>
             </button>
-            <button type="button" onclick="window.app.setNavigationMode('multi-tab')" class="p-2.5 border rounded-xl text-left transition-all ${project.branding?.navigationMode === 'multi-tab' ? 'border-zinc-900 bg-white font-semibold shadow-xs text-zinc-950' : 'border-zinc-200 bg-zinc-50 hover:bg-white text-zinc-600'}">
-              <div class="text-xs font-bold">📑 Multi-Pages</div>
+            <button type="button" onclick="window.app.setNavigationMode('multi-tab')" class="p-2.5 border rounded-xl text-left transition-all ${project.branding?.navigationMode === 'multi-tab' ? 'border-zinc-900 bg-white font-semibold shadow-xs text-zinc-950 ring-1 ring-zinc-900' : 'border-zinc-200 bg-zinc-50 hover:bg-white text-zinc-600'}">
+              <div class="text-xs font-bold flex items-center justify-between">
+                <span>📑 Multi-Pages</span>
+                ${project.branding?.navigationMode === 'multi-tab' ? '<span class="text-[9.5px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">Actif</span>' : ''}
+              </div>
               <div class="text-[10px] text-zinc-400 mt-0.5">Onglets thématiques (Services, Réalisations, Devis, Contact).</div>
             </button>
           </div>
@@ -1411,12 +1465,14 @@ function renderSettingsAccordions(project) {
         <div class="section-card-header" onclick="window.app.toggleSettingsItem('pinLock')">
           <div class="flex items-center gap-2 text-xs font-medium text-zinc-900">
             ${getIcon("lock", "w-4 h-4 text-zinc-500")}
-            <span>Protection Démo Client (Code PIN)</span>
+            <span>Protection Démo Client (Anti-modification)</span>
           </div>
           <span class="text-zinc-400">${getIcon("chevronDown", "w-3.5 h-3.5")}</span>
         </div>
         <div class="section-accordion-body hidden space-y-2.5" id="settings-body-pinLock">
-          <p class="text-[11px] text-zinc-600">Verrouillez l'édition de la démo client avec un code PIN secret pour Michel :</p>
+          <p class="text-[11px] text-zinc-600 leading-relaxed">
+            <strong>À quoi ça sert ?</strong> Quand vous partagez le lien de démo au prospect, ce code PIN empêche l'artisan de modifier ou dégrader votre maquette. Seul votre code déverrouille l'éditeur.
+          </p>
           <div class="flex items-center gap-2">
             <input type="text" id="setting-client-pin" maxlength="6" placeholder="Ex: 1234" value="${escapeHtml(project.settings?.clientDemoPin || '')}"
                    onchange="window.app.setClientDemoPin(this.value)"

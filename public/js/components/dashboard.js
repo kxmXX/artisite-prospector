@@ -166,36 +166,43 @@ export function renderDashboard(state) {
 
           <!-- Instant Inline Quick Generator Form -->
           <div class="mt-6 pt-6 border-t border-zinc-200/70 relative z-10">
-            <form id="quick-gen-form" onsubmit="event.preventDefault(); window.app.handleQuickGenerate(event);" class="bg-white border border-zinc-200/90 rounded-2xl p-2.5 sm:p-3 flex flex-col md:flex-row items-stretch md:items-center gap-2.5 shadow-sm transition-all focus-within:border-zinc-900 focus-within:ring-1 focus-within:ring-zinc-900">
-              <div class="flex-1 min-w-[200px]">
-                <input type="text" id="quick-gen-name" required placeholder="Raison sociale (ex: Esprit Nature)" class="w-full bg-transparent border-0 px-3 py-2 text-xs font-semibold text-zinc-900 placeholder:text-zinc-400 placeholder:font-normal focus:outline-none">
+            <form id="quick-gen-form" onsubmit="event.preventDefault(); window.app.handleQuickGenerate(event);" class="quick-gen-bar">
+              <div class="quick-gen-field-name flex items-center gap-2 px-2.5 py-1">
+                <span class="text-zinc-400 select-none">${getIcon("edit", "w-3.5 h-3.5 text-zinc-400")}</span>
+                <input type="text" id="quick-gen-name" required placeholder="Raison sociale (ex: Esprit Nature, Peinture Pro...)" class="w-full bg-transparent border-0 py-2 text-xs font-semibold text-zinc-900 placeholder:text-zinc-400 placeholder:font-normal focus:outline-none">
               </div>
-              <div class="hidden md:block w-px h-6 bg-zinc-200"></div>
-              <div class="w-full md:w-56">
-                <select id="quick-gen-trade" class="w-full bg-transparent border-0 px-3 py-2 text-xs font-semibold text-zinc-800 focus:outline-none cursor-pointer">
+              <div class="hidden md:block w-px h-6 bg-zinc-200 flex-shrink-0"></div>
+              <div class="quick-gen-field-trade flex items-center gap-1.5 px-2.5 py-1">
+                <select id="quick-gen-trade" class="w-full bg-transparent border-0 py-2 text-xs font-semibold text-zinc-800 focus:outline-none cursor-pointer">
                   <option value="paysagiste">🌿 Paysagiste / Jardinier</option>
+                  <option value="peintre" selected>🎨 Peintre en Bâtiment</option>
                   <option value="plombier">🔧 Plombier Chauffagiste</option>
                   <option value="menuisier">🪚 Menuisier / Ébéniste</option>
                   <option value="electricien">⚡ Électricien</option>
                   <option value="couvreur">🏠 Couvreur / Zingueur</option>
                   <option value="macon">🧱 Maçon / Rénovation</option>
-                  <option value="peintre">🎨 Peintre en Bâtiment</option>
                   <option value="restaurateur">🍽️ Restaurant / Bistro</option>
                   <option value="coiffeur">✂️ Salon de Coiffure</option>
                 </select>
               </div>
-              <div class="hidden md:block w-px h-6 bg-zinc-200"></div>
-              <div class="w-full md:w-44">
-                <input type="text" id="quick-gen-city" required placeholder="Ville (ex: Montauban)" value="Montauban" class="w-full bg-transparent border-0 px-3 py-2 text-xs font-semibold text-zinc-900 placeholder:text-zinc-400 focus:outline-none">
+              <div class="hidden md:block w-px h-6 bg-zinc-200 flex-shrink-0"></div>
+              <div class="quick-gen-field-city flex items-center gap-2 px-2.5 py-1">
+                <span class="text-zinc-400 select-none">${getIcon("mapPin", "w-3.5 h-3.5 text-zinc-400")}</span>
+                <input type="text" id="quick-gen-city" required placeholder="Ville (ex: Paris)" value="Paris" class="w-full bg-transparent border-0 py-2 text-xs font-semibold text-zinc-900 placeholder:text-zinc-400 focus:outline-none">
               </div>
-              <button type="submit" class="btn-keycap btn-keycap-dark px-6 py-3 rounded-xl text-xs font-bold text-white whitespace-nowrap flex items-center justify-center gap-2 shadow-sm hover:bg-black transition-colors">
-                <span>⚡ Générer en 3s</span>
-              </button>
+              <div class="quick-gen-field-btn">
+                <button type="submit" class="btn-keycap btn-keycap-dark px-6 py-3 rounded-xl text-xs font-bold text-white whitespace-nowrap flex items-center justify-center gap-2 shadow-sm hover:bg-black transition-colors w-full sm:w-auto">
+                  <span>⚡ Générer en 3s</span>
+                </button>
+              </div>
             </form>
 
             <!-- 1-Click Suggestion Chips (Linear/Raycast style) -->
             <div class="mt-3.5 flex items-center gap-2 flex-wrap">
               <span class="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">Suggestions en 1 clic :</span>
+              <button type="button" onclick="window.app.fillQuickGen('Atelier Peinture Parisienne', 'peintre', 'Paris')" class="px-2.5 py-1 rounded-lg bg-zinc-100 hover:bg-zinc-200/80 text-[11px] font-medium text-zinc-800 transition-colors border border-zinc-200/80">
+                🎨 Atelier Peinture (Peintre • Paris)
+              </button>
               <button type="button" onclick="window.app.fillQuickGen('Esprit Nature', 'paysagiste', 'Montauban')" class="px-2.5 py-1 rounded-lg bg-zinc-100 hover:bg-zinc-200/80 text-[11px] font-medium text-zinc-700 transition-colors border border-zinc-200/80">
                 🌿 Esprit Nature (Paysagiste • Montauban)
               </button>
