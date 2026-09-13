@@ -49,10 +49,10 @@ Le style touches de clavier est conservé pour les commandes de l'éditeur, pas 
 
 | Lot | Action | Validation requise | État |
 |---|---|---|---|
-| 1 | Audit, contexte durable, version/changelog honnêtes | Base, captures, architecture et risques tracés | En cours |
-| 2 | Stabilité : validation API, cache, tâches async et sauvegarde | Tests entrées invalides / réponses obsolètes / isolation contexte | À faire |
-| 3 | Accueil, sombre, tokens et lisibilité des contrôles | Vrai champ nom utilisable, thèmes sans perte d'état, mobile sans overflow | À faire |
-| 4 | Génération métier et faits non inventés | Plusieurs métiers, téléphone vide conservé, pas de faux avis/certifications | À faire |
+| 1 | Audit, contexte durable, version/changelog honnêtes | Base, captures, architecture et risques tracés | Audit/plan terminés be8600c ; version alpha non intégrée |
+| 2 | Stabilité : validation API, cache, tâches async et sauvegarde | Tests entrées invalides / réponses obsolètes / isolation contexte | Sauvegarde/rechargement terminé 67465f5 ; API/async restent à faire |
+| 3 | Accueil, sombre, tokens et lisibilité des contrôles | Vrai champ nom utilisable, thèmes sans perte d'état, mobile sans overflow | Modifications partielles non commitées, non validées visuellement |
+| 4 | Génération métier et faits non inventés | Plusieurs métiers, téléphone vide conservé, pas de faux avis/certifications | Modifications partielles à intégrer ; 3 échecs de rendu à examiner |
 | 5 | Hero / portrait / overlay | Slider appliqué, contraste et proportions vérifiés dans le navigateur | À faire |
 | 6 | Galerie : tailles, médias et réorganisation | Vide/1/plusieurs, override indépendant, suppression et Undo | À faire |
 | 7 | Avant/après | Plusieurs instances, clavier, souris, gestes interrompus, export | À faire |
@@ -85,3 +85,17 @@ La souris, le clavier et les viewports émulés sont distingués d'un vrai test 
 - Ne pas inventer l'infrastructure absente ni annoncer « commercialisable » sur la seule base des tests locaux.
 
 Les états seront mis à jour avec les preuves effectives dans le rapport final, pas par anticipation.
+
+## Reprise contrôlée — 13 septembre 2026
+
+- Aucun nouvel audit ni agent relancé. Les quatre agents sont arrêtés sur erreur de quota ; aucun commit agent.
+- Résultats intermédiaires récupérés : cache incomplet, crash serveur sur chemin NUL,
+  limites du PIN/localStorage, défaut de remplacement automatique de la démo au chargement.
+- Sous-lot prioritaire terminé : ne plus remplacer un projet Esprit Nature personnalisé lors
+  du chargement ou de la migration v4/v5. Commit `67465f5`, fichiers state.js et state.test.js seulement.
+- Tests ciblés : **9/9**, syntaxe state.js et `git diff --check` réussis.
+- Une seule passe d'intégration sur le travail partiel : **137/141**, quatre échecs conservés
+  et détaillés dans [l'état d'exécution](codex-execution-state.md). Pas de validation globale revendiquée.
+- Prochaine action : intégrer le sous-lot génération déjà écrit en examinant les trois échecs de rendu,
+  sans remettre de faux faits dans les données pour satisfaire les anciennes assertions.
+- Les changements accueil/version restent séparés ; pas de publication ni push effectué.

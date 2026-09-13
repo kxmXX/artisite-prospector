@@ -63,4 +63,5 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 - Plan d'exécution et règles de projet établis avant correction sur la base `7caf557`.
 - 16 captures examinées, 136 tests existants réussis ; vérification fonctionnelle à compléter.
-- Aucune correction des lots suivants n'est annoncée comme livrée à ce stade.
+- Correctif intégré `67465f5` : les personnalisations existantes de la démo sont conservées au rechargement et en migration v4/v5 (9 tests state réussis).
+- Autres lots partiels non intégrés ; état et quatre échecs de tests restants dans `docs/codex-execution-state.md`.
