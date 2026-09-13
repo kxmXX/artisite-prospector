@@ -1,5 +1,29 @@
 # État de reprise Codex — 13 septembre 2026
 
+## Dernière mise à jour — cache génération corrigé
+
+- server/apiHandler.js : contexte canonique validé (name, trade, city, phone, region,
+  tone, ambiance), utilisé à la fois pour le modèle et la clé SHA-256 versionnée.
+  Casse préservée, pas de concaténation ambiguë ; configuration modèles/présence de clé prise en compte.
+- Validation locale au endpoint generate : objet, champs texte, limite500 caractères par champ.
+  Ce n'est pas encore une validation uniforme de tous les corps API.
+- tests/generation_cache.test.js simule fetch et vérifie identité/reordering JSON,
+  variation de chacun des sept champs, collisions underscore, rejet types/longueurs invalides,
+  et absence de réponse cachée si la clé IA est retirée.
+- **8/8 ciblés** : generation_cache, ai, server ; syntaxe et diff --check réussis.
+  Le nouveau test n'utilise pas le réseau. L'ancien test ai avec clé invalide a reçu des400 Gemini.
+  Pas de génération payante, pas de navigateur requis, suite globale non répétée.
+- Aucun agent, aucun push. TTL15min et limite300 entrées conservés. Cache mémoire partagé,
+  pas un mécanisme d'autorisation utilisateur ; aucun multi-tenant sécurisé revendiqué.
+- Le prompt Gemini ignore encore tone/ambiance et contient des exemples de faits non vérifiés :
+  sujet distinct, non corrigé ici. Les demandes simultanées ne sont pas encore dédupliquées.
+
+**Prochaine action exacte** : harmoniser readBodyJSON entre requêtes Node et corps pré-parsés
+serverless (JSON malformé rejeté, limite en octets, types acceptés explicites), avec tests simulés
+sans réseau. Conserver les périmètres et ne pas relancer l'audit.
+
+## Historique — chemins serveur
+
 ## Dernière mise à jour — P0 chemins serveur corrigé
 
 Cette section prévaut sur les états historiques ci-dessous.

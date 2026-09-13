@@ -61,6 +61,8 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 - Compatibilité de déploiement Vercel Serverless via fonctions API catch-all.
 # 4.8.0 — Consolidation (non publiée)
 
+- Cache de génération IA : contexte complet validé et clé hachée sans collisions de concaténation/casse ; téléphone/région distingués. 8 tests ciblés réussis.
+
 - Serveur local : chemins malformés/NUL et sorties du dossier public refusés sans crash ; erreurs de lecture génériques. Validation HTTP réelle et17 tests ciblés réussis.
 
 - Version de travail 4.8.0-alpha.1 alignée dans le titre, l'accueil et package.json.

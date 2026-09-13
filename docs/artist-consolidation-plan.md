@@ -131,3 +131,11 @@ Les états seront mis à jour avec les preuves effectives dans le rapport final,
 - Pas de relance de la suite globale ni de modification UI pour ce lot backend circonscrit.
 - Prochaine action : clé cache exacte de génération et tests de collisions téléphone/région,
   avec modèle simulé. Les autres durcissements restent ouverts.
+
+### Sous-lot cache génération terminé
+
+- Clé versionnée SHA-256 du contexte validé complet, casse préservée ; téléphone/région
+  et configuration modèles pris en compte. Le modèle reçoit le même contexte validé.
+- 8/8 tests ciblés réussis ; nouveau test cache simulé sans réseau. Pas de suite globale répétée.
+- Restent : parseur JSON commun, limites en octets, races/déduplication, prompt factuel et auth.
+- Prochaine action : harmoniser readBodyJSON Node/serverless et tester les erreurs de parsing/tailles.
