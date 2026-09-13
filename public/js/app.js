@@ -1734,6 +1734,21 @@ class App {
     state.saveToStorage();
   }
 
+  setHeroOverlayDarkening(sectionId, val) {
+    if (!state.currentProject) return;
+    const sec = state.currentProject.sections.find(s => s.id === sectionId);
+    if (!sec) return;
+    sec.settings = sec.settings || {};
+    const num = Math.max(0, Math.min(90, parseInt(val, 10) || 0));
+    sec.settings.overlayDarkening = num;
+
+    const overlay = document.querySelector(`#section-${sectionId} .hero-darkening-overlay`);
+    if (overlay) {
+      overlay.style.backgroundColor = `rgba(0, 0, 0, ${num / 100})`;
+    }
+    state.saveToStorage();
+  }
+
   adjustActiveTextFontSize(delta) {
     if (!this._activeEditableEl) return;
     const el = this._activeEditableEl;

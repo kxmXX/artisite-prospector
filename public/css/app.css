@@ -2877,6 +2877,34 @@ p[data-motion], div[data-motion], section[data-motion], h1[data-motion], h2[data
   50% { transform: scale(1.018); }
 }
 
+/* 2026 Liquid Glass Badge (Sendpage Benchmark) */
+.liquid-glass-badge {
+  background: rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: blur(14px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+  color: #ffffff !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.liquid-glass-badge:hover {
+  background: rgba(255, 255, 255, 0.18) !important;
+  border-color: rgba(255, 255, 255, 0.45) !important;
+  box-shadow: 0 6px 24px -2px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Hero Scroll Discover Link */
+.hero-scroll-discover {
+  letter-spacing: 0.18em;
+  opacity: 0.85;
+  transition: all 0.2s ease;
+}
+.hero-scroll-discover:hover {
+  opacity: 1;
+  transform: translateY(2px);
+}
+
 /* Performance: defer rendering for offscreen sections outside editor */
 .artisite-root:not(.editor-mode) .site-section:not(:first-child):not(:nth-child(2)) {
   content-visibility: auto;

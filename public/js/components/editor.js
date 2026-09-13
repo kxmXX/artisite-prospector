@@ -801,6 +801,26 @@ function renderSectionAccordionContent(sec, project, variants) {
         </div>
       ` : ''}
 
+      <!-- Hero Darkening Overlay Slider -->
+      ${sec.type === 'hero' ? `
+        <div class="space-y-1.5 pt-2 border-t border-zinc-200/60">
+          <div class="flex items-center justify-between">
+            <label class="block text-[10px] font-semibold text-zinc-600 uppercase tracking-wider">Voile d'assombrissement :</label>
+            <span id="hero-darkening-val-${sectionId}" class="text-[10px] font-mono font-bold text-zinc-700">${sec.settings?.overlayDarkening !== undefined ? sec.settings.overlayDarkening : 45}%</span>
+          </div>
+          <input type="range" min="0" max="90" step="5"
+                 value="${sec.settings?.overlayDarkening !== undefined ? sec.settings.overlayDarkening : 45}"
+                 oninput="window.app.setHeroOverlayDarkening('${sectionId}', this.value); const vEl = document.getElementById('hero-darkening-val-${sectionId}'); if (vEl) vEl.textContent = this.value + '%';"
+                 class="w-full h-1.5 bg-zinc-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                 title="Ajuster l'assombrissement pour garantir la lisibilité du texte">
+          <div class="flex justify-between text-[9px] text-zinc-400 font-medium">
+            <span>0% (Clair)</span>
+            <span>45% (Standard)</span>
+            <span>90% (Sombre)</span>
+          </div>
+        </div>
+      ` : ''}
+
       <!-- CTA Buttons Management (Edit, Delete, Restore) -->
       ${c.ctaPrimary !== undefined || c.ctaSecondary !== undefined ? `
         <div class="space-y-2 pt-2 border-t border-zinc-200/60">

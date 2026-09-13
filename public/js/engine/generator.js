@@ -164,10 +164,11 @@ export function generateSite(input = {}) {
   };
 
   // Section 2: Hero
+  const isFullscreenHero = trade.id === 'paysagiste';
   const heroSection = {
     id: "sec-hero",
     type: "hero",
-    variant: "split-image",
+    variant: isFullscreenHero ? "fullscreen-image" : "split-image",
     visibility: true,
     content: {
       badge: `${trade.badge} • ${city}`,
@@ -179,7 +180,10 @@ export function generateSite(input = {}) {
       heroImage: trade.heroImage,
       trustNote: isLiberal ? "✓ Déontologie et secret professionnel garantis" : isFoodTrade ? "✓ Produits frais cuisinés maison chaque jour" : "✓ Devis 100% gratuit sous 24h sans engagement"
     },
-    settings: { align: "left" }
+    settings: {
+      align: isFullscreenHero ? "center" : "left",
+      overlayDarkening: 45
+    }
   };
 
   // Section 3: Trust Badges

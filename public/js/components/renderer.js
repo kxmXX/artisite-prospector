@@ -707,37 +707,40 @@ function renderHero(sec, project, options = {}) {
   const heroButtonMotion = sec.settings?.[`${heroButtonId}-motion`] || sec.settings?.["btn-primary-motion"] || sec.settings?.["primary-motion"] || (isGlobalPulse ? "pulse" : "");
   const heroPhoneMotion = sec.settings?.[`${heroPhoneId}-motion`] || sec.settings?.["btn-phone-motion"] || sec.settings?.["phone-motion"] || "";
 
-  // Variant A: Fullscreen Image
+  // Variant A: Fullscreen Image (Sendpage Benchmark Grade)
   if (variant === "fullscreen-image") {
+    const darkening = typeof sec.settings?.overlayDarkening === 'number' ? sec.settings.overlayDarkening : 45;
+    const overlayOpacity = Math.max(0, Math.min(90, darkening)) / 100;
+
     const bgEditBtn = options.isEditor ? `
-      <div class="absolute top-4 left-4 z-30">
-        <button type="button" onclick="event.stopPropagation(); window.app.openImagePicker('${sec.id}', 'heroImage')" class="px-3 py-1.5 bg-slate-900/90 hover:bg-slate-900 text-white text-xs font-bold rounded-xl shadow-lg flex items-center gap-1.5 backdrop-blur">
+      <div class="absolute top-4 left-4 z-30 flex items-center gap-2">
+        <button type="button" onclick="event.stopPropagation(); window.app.openImagePicker('${sec.id}', 'heroImage')" class="px-3 py-1.5 bg-slate-900/90 hover:bg-slate-900 text-white text-xs font-bold rounded-xl shadow-lg flex items-center gap-1.5 backdrop-blur border border-white/20">
           ${getIcon("eye", "w-3.5 h-3.5 text-orange-400")}
-          <span>Changer l'image de fond</span>
+          <span>Changer l'image</span>
         </button>
       </div>
     ` : '';
 
     return `
-      <div class="relative overflow-hidden py-24 lg:py-36 text-white">
-        <img src="${c.heroImage || getTradeFallbackDataUrl(project.business.tradeId, 'hero', c.title)}"
+      <div class="relative overflow-hidden py-24 sm:py-32 lg:py-40 text-white min-h-[85vh] flex flex-col justify-between">
+        <img src="${c.heroImage || getTradeFallbackDataUrl(project.business?.tradeId, 'hero', c.title)}"
              alt="${c.title || 'Artisan local'}"
-             class="absolute inset-0 w-full h-full object-cover -z-10 brightness-[0.3]"
+             class="absolute inset-0 w-full h-full object-cover -z-10"
              loading="eager" fetchpriority="high" decoding="async"
-             onerror="if(!this.dataset.fallbackApplied){this.dataset.fallbackApplied='true';this.src='${getTradeFallbackDataUrl(project.business.tradeId, 'hero', c.title)}';}">
-        <div class="absolute inset-0 bg-slate-950/60 -z-10"></div>
+             onerror="if(!this.dataset.fallbackApplied){this.dataset.fallbackApplied='true';this.src='${getTradeFallbackDataUrl(project.business?.tradeId, 'hero', c.title)}';}">
+        <div class="hero-darkening-overlay absolute inset-0 -z-10 transition-colors pointer-events-none" style="background-color: rgba(0, 0, 0, ${overlayOpacity});"></div>
         ${bgEditBtn}
-        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-7">
-          <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-white/10 backdrop-blur-md border border-white/20 text-white mx-auto">
-            <span class="w-2 h-2 rounded-full animate-pulse" style="background-color: var(--accent);"></span>
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-7 my-auto">
+          <div class="liquid-glass-badge inline-flex items-center gap-2.5 px-5 py-2 rounded-full text-[11px] sm:text-xs font-semibold uppercase tracking-widest text-white shadow-lg mx-auto select-none">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-sm"></span>
             <span data-editable="badge">${c.badge}</span>
           </div>
 
-          <h1 class="font-heading text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.1] max-w-4xl mx-auto" data-editable="title">
+          <h1 class="font-heading text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.15] max-w-4xl mx-auto drop-shadow-sm" data-editable="title">
             ${c.title}
           </h1>
 
-          <p class="text-lg sm:text-xl text-slate-200 max-w-2xl mx-auto leading-relaxed" data-editable="subtitle">
+          <p class="text-base sm:text-xl text-white/90 max-w-2xl mx-auto leading-relaxed font-normal drop-shadow-xs" data-editable="subtitle">
             ${c.subtitle}
           </p>
 
@@ -745,7 +748,7 @@ function renderHero(sec, project, options = {}) {
             ${primaryHidden ? '' : `
               <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-primary" data-cta-popover-wrapper data-section-id="${sec.id}" data-button-type="primary" data-ui-id="${heroButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
                 ${renderButtonActionBadge(sec, 'primary', options, project)}
-                <a href="#simulateur" class="btn-cta btn-keycap${ctaPulseClass}${heroButtonMotion ? ` btn-motion-${heroButtonMotion}` : ''} w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 text-base font-bold text-white shadow-2xl transition-all" data-ui-id="${heroButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}"${heroButtonMotion ? ` data-motion="${heroButtonMotion}" data-btn-motion="${heroButtonMotion}"` : ''} style="background-color: var(--primary);">
+                <a href="#simulateur" class="btn-cta btn-keycap${ctaPulseClass}${heroButtonMotion ? ` btn-motion-${heroButtonMotion}` : ''} w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full text-base font-bold text-white shadow-2xl transition-all no-underline" data-ui-id="${heroButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}"${heroButtonMotion ? ` data-motion="${heroButtonMotion}" data-btn-motion="${heroButtonMotion}"` : ''} style="background-color: var(--primary);">
                   ${getIcon("sparkles", "w-5 h-5")}
                   <span data-editable="ctaPrimary">${c.ctaPrimary}</span>
                 </a>
@@ -756,7 +759,7 @@ function renderHero(sec, project, options = {}) {
             ${phoneHidden ? '' : `
               <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-phone" data-cta-popover-wrapper data-section-id="${sec.id}" data-button-type="phone" data-ui-id="${heroPhoneId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
                 ${renderButtonActionBadge(sec, 'phone', options, project)}
-                <a href="tel:${c.phone}" class="btn-cta btn-keycap${ctaPulseClass}${heroPhoneMotion ? ` btn-motion-${heroPhoneMotion}` : ''} w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-4 text-base font-semibold text-white bg-white/15 backdrop-blur-md border border-white/30 hover:bg-white/25 transition-colors" data-ui-id="${heroPhoneId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}"${heroPhoneMotion ? ` data-motion="${heroPhoneMotion}" data-btn-motion="${heroPhoneMotion}"` : ''}>
+                <a href="tel:${c.phone}" class="btn-cta btn-keycap${ctaPulseClass}${heroPhoneMotion ? ` btn-motion-${heroPhoneMotion}` : ''} w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-full text-base font-semibold text-white bg-white/15 backdrop-blur-md border border-white/30 hover:bg-white/25 transition-colors no-underline" data-ui-id="${heroPhoneId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}"${heroPhoneMotion ? ` data-motion="${heroPhoneMotion}" data-btn-motion="${heroPhoneMotion}"` : ''}>
                   ${getIcon("phone", "w-5 h-5 text-emerald-400")}
                   <span data-editable="ctaSecondary">${c.ctaSecondary}</span>
                 </a>
@@ -765,14 +768,22 @@ function renderHero(sec, project, options = {}) {
             `}
           </div>
 
-          <div class="pt-6 flex flex-wrap items-center justify-center gap-6 text-xs text-slate-300 font-medium">
+          <div class="pt-4 flex flex-wrap items-center justify-center gap-6 text-xs text-white/80 font-medium">
             <span class="flex items-center gap-1.5 text-emerald-400 font-bold">
               ${getIcon("checkCircle", "w-4 h-4")}
-              <span>Intervention garantie à ${project.business.city}</span>
+              <span>Intervention garantie à ${project.business?.city || 'proximité'}</span>
             </span>
             <span>•</span>
             <span data-editable="trustNote">${c.trustNote}</span>
           </div>
+        </div>
+
+        <!-- Sendpage Scroll Down Indicator -->
+        <div class="pt-8 pb-4 flex justify-center">
+          <a href="#services" class="hero-scroll-discover inline-flex flex-col items-center gap-1 text-[11px] font-bold tracking-widest uppercase text-white/80 hover:text-white transition-all transform hover:translate-y-1 no-underline">
+            <span>DÉCOUVRIR</span>
+            <span class="text-base animate-bounce">↓</span>
+          </a>
         </div>
       </div>
     `;
