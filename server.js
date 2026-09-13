@@ -29,6 +29,24 @@ const MIME_TYPES = {
 const server = http.createServer(async (req, res) => {
   const [rawUrl] = req.url.split("?");
 
+  const rejectPath = (status) => {
+    res.writeHead(status, { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" });
+    res.end(status === 400 ? "Bad Request" : "Forbidden");
+  };
+  let reqPath;
+  try {
+    reqPath = decodeURI(rawUrl);
+  } catch {
+    rejectPath(400);
+    return;
+  }
+  // Reject before routing or filesystem calls: NUL throws synchronously in fs.stat.
+  // Encoded separators must not be interpreted differently by a downstream handler.
+  if (!reqPath.startsWith("/") || /[\u0000-\u001f\u007f\\]/.test(reqPath) || /%2f|%5c/i.test(rawUrl)) {
+    rejectPath(400);
+    return;
+  }
+
   // ==================== API ROUTES ====================
   if (rawUrl.startsWith("/api/")) {
     await handleApiRequest(req, res);
@@ -36,17 +54,15 @@ const server = http.createServer(async (req, res) => {
   }
 
   // ==================== STATIC FILES ====================
-  let reqPath = "/";
-  try {
-    reqPath = decodeURI(rawUrl);
-  } catch (err) {
-    reqPath = rawUrl;
-  }
   if (reqPath === "/") reqPath = "/index.html";
 
   // Prevent directory traversal
   const resolved = path.resolve(PUBLIC_DIR, "." + reqPath);
-  let filePath = resolved.startsWith(PUBLIC_DIR) ? resolved : path.join(PUBLIC_DIR, "index.html");
+  if (resolved !== PUBLIC_DIR && !resolved.startsWith(PUBLIC_DIR + path.sep)) {
+    rejectPath(403);
+    return;
+  }
+  const filePath = resolved;
 
   const serveStaticFile = (targetPath, targetStats) => {
     const ext = path.extname(targetPath).toLowerCase();
@@ -65,7 +81,7 @@ const server = http.createServer(async (req, res) => {
     fs.readFile(targetPath, (readErr, content) => {
       if (readErr) {
         res.writeHead(500, { "Content-Type": "text/plain" });
-        res.end("Internal Server Error: " + readErr.message);
+        res.end("Internal Server Error");
         return;
       }
 
@@ -97,5 +113,5 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, HOST, () => {
-  console.log(`⚡ Artisite Prospector server running on http://${HOST}:${PORT}`);
+  console.log(`⚡ Artisite Prospector server running on http://${HOST}:${server.address().port}`);
 });
