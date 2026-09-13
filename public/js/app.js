@@ -370,7 +370,26 @@ class App {
       this.setViewport(arg);
     } else if (type === "switch-theme") {
       this.switchGlobalTheme(arg);
+    } else if (type === "reset-sendpage-demo") {
+      this.resetSendpageDemo();
     }
+  }
+
+  resetSendpageDemo() {
+    import("./data/sampleProjects.js").then(({ SAMPLE_PROJECTS }) => {
+      const demo = SAMPLE_PROJECTS[0];
+      const idx = state.projects.findIndex(p => p.id === "proj-esprit-nature");
+      if (idx !== -1) {
+        state.projects[idx] = JSON.parse(JSON.stringify(demo));
+        state.currentProject = state.projects[idx];
+      } else {
+        state.projects.unshift(JSON.parse(JSON.stringify(demo)));
+        state.currentProject = state.projects[0];
+      }
+      state.saveToStorage();
+      this.showNotification("✨ Modèle Esprit Nature (Sendpage 100%) rechargé avec succès !");
+      this.render();
+    });
   }
 
   toggleStickyBar(enabled) {

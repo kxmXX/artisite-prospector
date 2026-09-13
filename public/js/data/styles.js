@@ -3,9 +3,9 @@ export const STYLE_PRESETS = [
     "id": "nature-premium",
     "name": "Nature & Organique",
     "description": "Parfait pour paysagistes, élagueurs, fleuristes, maraîchers",
-    "primaryColor": "#2D5A27",
+    "primaryColor": "#527c22",
     "secondaryColor": "#8FA382",
-    "accentColor": "#E2725B",
+    "accentColor": "#527c22",
     "bgColor": "#FAFAF7",
     "bgSecondary": "#F0F2EB",
     "textColor": "#1C241B",
@@ -15,8 +15,8 @@ export const STYLE_PRESETS = [
     "borderRadius": "0.875rem",
     "buttonRadius": "9999px",
     "cardStyle": "bordered",
-    "heroOverlay": "rgba(18, 36, 17, 0.55)",
-    "shadow": "0 10px 25px -5px rgba(45, 90, 39, 0.08)"
+    "heroOverlay": "rgba(18, 36, 17, 0.45)",
+    "shadow": "0 10px 25px -5px rgba(82, 124, 34, 0.08)"
   },
   {
     "id": "artisan-moderne",

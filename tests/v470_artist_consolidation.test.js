@@ -149,3 +149,70 @@ test("v4.7.0 Consolidation: Editor sidebar retains accordion open state and prov
   assert.ok(editorHtml.includes("addGalleryItem"), "Editor must bind addGalleryItem handler");
   assert.ok(editorHtml.includes("toggleGalleryItemType"), "Editor must bind toggleGalleryItemType handler");
 });
+
+test("v4.7.0 Consolidation: 100% Sendpage Benchmark Fidelity for Esprit Nature Paysagiste", () => {
+  const project = generateSite({
+    name: "Esprit Nature",
+    tradeId: "paysagiste",
+    city: "Montauban",
+    region: "Occitanie",
+    phone: "07 70 10 29 71"
+  });
+
+  // 1. Branding: Sendpage Olive Green #527c22 and 9999px pill buttons
+  assert.equal(project.branding.primaryColor, "#527c22");
+  assert.equal(project.branding.buttonRadius, "9999px");
+
+  // 2. Sections Order & Sendpage Visibility
+  const visibleTypes = project.sections.filter(s => s.visibility !== false).map(s => s.type);
+  assert.deepEqual(visibleTypes, [
+    "header", "hero", "about", "services", "gallery", "hours", "reviews", "faq", "footer"
+  ], "Visible sections must strictly follow Sendpage showcase order");
+
+  // 3. Render HTML verification
+  const html = renderWebsiteHTML(project, { isEditor: false });
+
+  // Screenshot 1: Horaires & Lieu
+  assert.ok(html.includes("Horaires & Lieu"), "Must render Horaires & Lieu title");
+  assert.ok(html.includes("HORAIRES"), "Must render HORAIRES badge");
+  assert.ok(html.includes("Montauban"), "Must render Montauban location subtitle");
+  assert.ok(html.includes("9h - 12h / 14h - 18h"), "Must render 9h - 12h / 14h - 18h hours");
+  assert.ok(html.includes("Fermé"), "Must render Fermé for dimanche");
+  assert.ok(html.includes("Carte Horaires et Lieu"), "Must render embedded Google Map in Horaires & Lieu");
+
+  // Screenshot 2: Hero
+  assert.ok(html.includes("Donnez à vos extérieurs"), "Hero must render Sendpage title");
+  assert.ok(html.includes("l'entretien et le soin qu'ils méritent à Montauban et ses environs"), "Hero title with city");
+  assert.ok(html.includes("Votre jardinier professionnel se déplace gratuitement dans toute l'Occitanie"), "Hero subtitle");
+  assert.ok(html.includes("Demander un devis personnalisé"), "CTA primary button");
+  assert.ok(html.includes("07 70 10 29 71"), "CTA secondary button with phone number");
+  assert.ok(html.includes("DÉCOUVRIR"), "Hero scroll indicator");
+
+  // Screenshot 3: À Propos
+  assert.ok(html.includes("À PROPOS"), "About badge");
+  assert.ok(html.includes("Artisan certifié"), "Artisan certifié pill tag");
+  assert.ok(html.includes("Jardinier & Paysagiste"), "Role subtitle");
+  assert.ok(html.includes("Benjamin met son savoir-faire"), "Benjamin story text");
+  assert.ok(html.includes("Découvrir nos services"), "About secondary link");
+
+  // Screenshot 4: Services
+  assert.ok(html.includes("CE QUE NOUS PROPOSONS"), "Services badge");
+  assert.ok(html.includes("Nos services"), "Services title");
+  assert.ok(html.includes("Conception de jardins"), "Service 1 Conception de jardins");
+  assert.ok(html.includes("Aménagement & Plantation"), "Service 2 Aménagement & Plantation");
+  assert.ok(html.includes("Défrichage & Débroussaillage"), "Service 3 Défrichage & Débroussaillage");
+  assert.ok(html.includes("Taille de haies"), "Service 4 Taille de haies");
+  assert.ok(html.includes("Tonte"), "Service 5 Tonte");
+  assert.ok(html.includes("Élagage & Abattage"), "Service 6 Élagage & Abattage");
+
+  // Screenshot 5: Galerie
+  assert.ok(html.includes("NOS RÉALISATIONS"), "Gallery badge");
+  assert.ok(html.includes("Galerie"), "Gallery title");
+  assert.ok(html.includes("AVANT"), "Before / After AVANT badge in gallery");
+  assert.ok(html.includes("APRÈS"), "Before / After APRÈS badge in gallery");
+
+  // Green accent dashes present under sections
+  const dashMatches = html.match(/class="w-12 h-1 rounded-full/g) || [];
+  assert.ok(dashMatches.length >= 4, "Signature green accent dashes must be rendered across sections");
+});
+

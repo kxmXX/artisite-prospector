@@ -65,6 +65,15 @@ export function renderCommandPalette(project, allProjects = []) {
             <div class="px-2.5 py-1 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Outils & Actions Vente</div>
             
             <div class="cmd-item flex items-center justify-between px-3 py-2 rounded-lg text-xs text-zinc-800 hover:bg-zinc-100 cursor-pointer transition-colors"
+                 onclick="window.app.executeCommand('reset-sendpage-demo')" data-title="reinitialiser recharger modele esprit nature sendpage benchmark demo 100%">
+              <div class="flex items-center gap-2.5">
+                <span class="text-sm">🌿</span>
+                <span class="font-bold text-emerald-800">Recharger Démo Esprit Nature (Sendpage 100%)</span>
+              </div>
+              <span class="text-[10px] text-zinc-400">Recharger ↵</span>
+            </div>
+
+            <div class="cmd-item flex items-center justify-between px-3 py-2 rounded-lg text-xs text-zinc-800 hover:bg-zinc-100 cursor-pointer transition-colors"
                  onclick="window.app.executeCommand('share-modal')" data-title="partager qr code lien demo">
               <div class="flex items-center gap-2.5">
                 ${getIcon("share", "w-3.5 h-3.5 text-zinc-500")}

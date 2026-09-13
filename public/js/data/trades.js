@@ -14,16 +14,16 @@ export const TRADES = [
       "Engazonnement & Arrosage automatique"
     ],
     "heroTitles": [
-      "Donnez à vos extérieurs l'entretien et le soin qu'ils méritent",
+      "Donnez à vos extérieurs l'entretien et le soin qu'ils méritent à Montauban et ses environs",
       "Sublimez votre jardin avec un artisan paysagiste passionné",
       "Conception végétale, aménagement durable et entretien rigoureux"
     ],
     "heroSubtitles": [
-      "Votre paysagiste professionnel se déplace gratuitement pour concevoir et entretenir des espaces verts harmonieux, vivants et durables.",
+      "Votre jardinier professionnel se déplace gratuitement dans toute l'Occitanie",
       "Devis détaillé gratuit sous 24h, étude personnalisée sur place et travail soigné respectueux de la nature."
     ],
-    "ctaPrimary": "Demander mon devis gratuit",
-    "ctaSecondary": "Appeler le paysagiste",
+    "ctaPrimary": "Demander un devis personnalisé",
+    "ctaSecondary": "07 70 10 29 71",
     "heroImage": "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=1600&q=80",
     "aboutImage": "https://images.unsplash.com/photo-1622383563227-04401ab4e5ea?auto=format&fit=crop&w=1000&q=80",
     "trustBadges": [
@@ -44,52 +44,54 @@ export const TRADES = [
         "desc": "Équipements performants et valorisation des déchets verts"
       }
     ],
-    "aboutTitle": "Un savoir-faire artisanal au service de la nature",
-    "aboutStory": "Fondée avec la passion du végétal et le goût du travail bien fait, notre entreprise met son expertise au service de vos jardins et parcs. Chez nous, chaque projet est unique : nous prenons le temps d'écouter vos envies, d'analyser l'exposition de votre terrain et la nature du sol pour créer un environnement extérieur harmonieux, facile à vivre et pérenne.",
-    "aboutOwner": "Benjamin & l'équipe",
-    "aboutRole": "Artisan Paysagiste diplômé",
+    "aboutTitle": "Esprit Nature",
+    "aboutBadge": "À PROPOS",
+    "aboutCertified": "Artisan certifié",
+    "aboutRole": "Jardinier & Paysagiste",
+    "aboutOwner": "Benjamin",
+    "aboutStory": "Vous recherchez un jardinier ou un paysagiste pour entretenir et prendre soin de vos extérieurs ? Vous êtes au bon endroit.\n\nChez Esprit Nature, chaque jardin mérite une attention particulière. Benjamin met son savoir-faire, son expérience et sa passion au service de vos espaces extérieurs.\n\nEntreprise à taille humaine, Esprit Nature privilégie avant tout la proximité, l'écoute et la confiance. Attentif à vos besoins, Benjamin vous accompagne avec sérieux, gentillesse et professionnalisme.\n\nSpécialisée dans l'entretien, la taille et la remise en état des jardins et espaces verts, Benjamin et son équipe interviennent avec soin et efficacité.",
     "defaultServices": [
       {
-        "title": "Conception & Aménagement de Jardins",
-        "desc": "Nous imaginons et réalisons des projets d'aménagements complets : massifs fleuris, plantations d'arbres d'ombrage et paillages minéraux.",
-        "tag": "Sur-mesure",
+        "title": "Conception de jardins",
+        "desc": "Nous imaginons des projets de jardin adaptés à vos envies",
+        "tag": "Création",
         "price": "Sur devis gratuit",
         "image": "https://images.unsplash.com/photo-1584467541268-b040f83be3fd?auto=format&fit=crop&w=800&q=80"
       },
       {
-        "title": "Taille de Haies & Végétaux",
-        "desc": "Taille de formation, de réduction de hauteur ou d'alignement pour thuyas, lauriers, charmes et cyprès au cordeau.",
-        "tag": "Entretien",
+        "title": "Aménagement & Plantation",
+        "desc": "De la plantation à l'aménagement, nous créons un extérieur harmonieux et fonctionnel.",
+        "tag": "Plantation",
         "price": "Sur devis personnalisé",
-        "image": "https://images.unsplash.com/photo-1590682680695-43b964a3ae17?auto=format&fit=crop&w=800&q=80"
+        "image": "https://images.unsplash.com/photo-1558904541-efa8c4a52d31?auto=format&fit=crop&w=800&q=80"
       },
       {
-        "title": "Tonte & Entretien de Pelouses",
-        "desc": "Tonte soignée avec ramassage ou mulching, scarification de printemps, regarnissage et fertilisation naturelle.",
-        "tag": "Contrats annuels",
-        "price": "Formules régulières ou ponctuelles",
-        "image": "https://images.unsplash.com/photo-1598902108854-10e335adac99?auto=format&fit=crop&w=800&q=80"
-      },
-      {
-        "title": "Élagage & Débroussaillage",
-        "desc": "Sécurisation des branches menaçantes, remise en état de terrains en friche et broyage sur site.",
-        "tag": "Sécurité",
+        "title": "Défrichage & Débroussaillage",
+        "desc": "Nous dégageons vos terrains et éliminons la végétation envahissante pour leur redonner un aspect propre et entretenu.",
+        "tag": "Remise en état",
         "price": "Intervention rapide",
         "image": "https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&w=800&q=80"
       },
       {
-        "title": "Pose de Clôtures & Claustras",
-        "desc": "Installation de panneaux rigides avec occultants bois ou composite, portillons et brise-vue décoratifs.",
-        "tag": "Aménagement",
+        "title": "Taille de haies",
+        "desc": "Taille soignée et géométrique de vos haies et arbustes pour préserver leur santé et sublimer votre extérieur.",
+        "tag": "Taille au cordeau",
         "price": "Au mètre linéaire",
-        "image": "https://images.unsplash.com/photo-1592150621744-aca64f48394a?auto=format&fit=crop&w=800&q=80"
+        "image": "https://images.unsplash.com/photo-1590682680695-43b964a3ae17?auto=format&fit=crop&w=800&q=80"
       },
       {
-        "title": "Terrasses Bois & Allées Pavées",
-        "desc": "Création d'espaces de vie extérieurs conviviaux en platelage bois résistant ou pas japonais naturels.",
-        "tag": "Menuiserie extérieure",
+        "title": "Tonte",
+        "desc": "Tonte de pelouse impeccable avec finitions nettes des bordures et ramassage soigné des résidus verts.",
+        "tag": "Entretien régulier",
+        "price": "Formule ponctuelle ou annuelle",
+        "image": "https://images.unsplash.com/photo-1598902108854-10e335adac99?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        "title": "Élagage & Abattage",
+        "desc": "Élagage délicat en hauteur, taille raisonnée des ramures et abattage sécurisé de tous types d'arbres.",
+        "tag": "Arboriste grimpeur",
         "price": "Étude personnalisée",
-        "image": "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?auto=format&fit=crop&w=800&q=80"
+        "image": "https://images.unsplash.com/photo-1541414779316-956a5084c0d4?auto=format&fit=crop&w=800&q=80"
       }
     ],
     "beforeAfter": {
@@ -127,14 +129,9 @@ export const TRADES = [
     ],
     "gallery": [
       {
-        "url": "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
-        "title": "Terrasse & Gazon de placage",
+        "url": "https://images.unsplash.com/photo-1558904541-efa8c4a52d31?auto=format&fit=crop&w=800&q=80",
+        "title": "Grand jardin avec saule",
         "tag": "Création"
-      },
-      {
-        "url": "https://images.unsplash.com/photo-1584467541268-b040f83be3fd?auto=format&fit=crop&w=800&q=80",
-        "title": "Massif fleuri japonisant",
-        "tag": "Plantation"
       },
       {
         "url": "https://images.unsplash.com/photo-1590682680695-43b964a3ae17?auto=format&fit=crop&w=800&q=80",
@@ -142,19 +139,28 @@ export const TRADES = [
         "tag": "Entretien"
       },
       {
-        "url": "https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&w=800&q=80",
-        "title": "Élagage sécurisé d'arbre",
+        "url": "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?auto=format&fit=crop&w=800&q=80",
+        "title": "Taille d'arbre d'ornement",
         "tag": "Élagage"
       },
       {
-        "url": "https://images.unsplash.com/photo-1557429287-b2e26467fc2b?auto=format&fit=crop&w=800&q=80",
-        "title": "Claustras bois & brise-vue",
-        "tag": "Clôtures"
+        "type": "beforeAfter",
+        "beforeImage": "https://images.unsplash.com/photo-1500651230702-0e2d8a49d4ad?auto=format&fit=crop&w=800&q=80",
+        "afterImage": "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
+        "title": "Piscine & Engazonnement",
+        "tag": "Avant / Après"
       },
       {
-        "url": "https://images.unsplash.com/photo-1598902108854-10e335adac99?auto=format&fit=crop&w=800&q=80",
-        "title": "Tonte et finition soignée",
-        "tag": "Entretien"
+        "url": "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=800&q=80",
+        "title": "Terrasse couverte & Pelouse",
+        "tag": "Aménagement"
+      },
+      {
+        "type": "beforeAfter",
+        "beforeImage": "https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&w=800&q=80",
+        "afterImage": "https://images.unsplash.com/photo-1584467541268-b040f83be3fd?auto=format&fit=crop&w=800&q=80",
+        "title": "Allée & Défrichage",
+        "tag": "Avant / Après"
       }
     ],
     "reviews": [

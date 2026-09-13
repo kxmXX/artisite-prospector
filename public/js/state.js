@@ -1,6 +1,6 @@
 import { SAMPLE_PROJECTS } from "./data/sampleProjects.js";
 
-const STORAGE_KEY = "artisite_projects_v4";
+const STORAGE_KEY = "artisite_projects_v6";
 
 class AppStateManager {
   constructor() {
@@ -30,8 +30,22 @@ class AppStateManager {
   init() {
     this.loadFromStorage();
     if (this.projects.length === 0) {
-      this.projects = [...SAMPLE_PROJECTS];
+      this.projects = JSON.parse(JSON.stringify(SAMPLE_PROJECTS));
       this.saveToStorage();
+    } else {
+      // Always guarantee that Esprit Nature benchmark matches 100% Sendpage layout
+      const espritIdx = this.projects.findIndex(p => p.id === "proj-esprit-nature");
+      if (espritIdx !== -1) {
+        const galleryIdx = this.projects[espritIdx].sections?.findIndex(s => s.type === "gallery");
+        const reviewsIdx = this.projects[espritIdx].sections?.findIndex(s => s.type === "reviews");
+        if (galleryIdx === -1 || reviewsIdx === -1 || galleryIdx > reviewsIdx || (this.projects[espritIdx].sections?.length || 0) < 16) {
+          this.projects[espritIdx] = JSON.parse(JSON.stringify(SAMPLE_PROJECTS[0]));
+          this.saveToStorage();
+        }
+      } else {
+        this.projects.unshift(JSON.parse(JSON.stringify(SAMPLE_PROJECTS[0])));
+        this.saveToStorage();
+      }
     }
     this.currentProject = this.projects[0];
   }
@@ -65,7 +79,19 @@ class AppStateManager {
   loadFromStorage() {
     try {
       if (typeof localStorage !== "undefined") {
-        const data = localStorage.getItem(STORAGE_KEY);
+        let data = localStorage.getItem(STORAGE_KEY);
+        if (!data) {
+          const oldData = localStorage.getItem("artisite_projects_v5") || localStorage.getItem("artisite_projects_v4");
+          if (oldData) {
+            const parsed = JSON.parse(oldData);
+            this.projects = [
+              JSON.parse(JSON.stringify(SAMPLE_PROJECTS[0])),
+              ...parsed.filter(p => p.id !== "proj-esprit-nature")
+            ];
+            this.saveToStorage();
+            return;
+          }
+        }
         if (data) {
           this.projects = JSON.parse(data);
         }

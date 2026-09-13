@@ -7,7 +7,7 @@ export const SAMPLE_PROJECTS = [
     tradeId: "paysagiste",
     city: "Montauban",
     region: "Occitanie",
-    phone: "07 82 14 39 50",
+    phone: "07 70 10 29 71",
     email: "contact@esprit-nature82.fr",
     address: "Route de Paris, 82000 Montauban",
     presetId: "nature-premium",

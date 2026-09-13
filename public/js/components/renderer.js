@@ -554,20 +554,25 @@ function renderSection(sec, project, options) {
 // 1. Header
 function renderHeader(sec, project, options = {}) {
   const c = sec.content;
+  const isPaysagiste = project?.business?.tradeId === "paysagiste";
   return `
     <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-black/5 transition-all">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
         <a href="#" class="flex items-center gap-3 group no-underline select-none">
-          <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-md transition-transform group-hover:scale-105 flex-shrink-0" style="background-color: var(--primary);">
-            ${c.brandName ? c.brandName.charAt(0).toUpperCase() : 'A'}
-          </div>
-          <div class="header-project-meta">
-            <span class="font-heading text-xl font-bold tracking-tight text-gray-900 block leading-tight no-underline" data-editable="brandName">${c.brandName || project.business?.name || 'Artisan'}</span>
-            <span class="text-[11px] font-medium text-gray-500 uppercase tracking-wider block no-underline">${project.business?.tradeLabel || c.badge || 'Artisan'}${project.business?.city ? ` • ${project.business.city}` : ''}</span>
-          </div>
+          ${isPaysagiste ? `
+            <span class="font-heading text-xl sm:text-2xl font-black tracking-tight text-gray-900 block leading-tight no-underline" data-editable="brandName">${c.brandName || project.business?.name || 'Esprit Nature'}</span>
+          ` : `
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-md transition-transform group-hover:scale-105 flex-shrink-0" style="background-color: var(--primary);">
+              ${c.brandName ? c.brandName.charAt(0).toUpperCase() : 'A'}
+            </div>
+            <div class="header-project-meta">
+              <span class="font-heading text-xl font-bold tracking-tight text-gray-900 block leading-tight no-underline" data-editable="brandName">${c.brandName || project.business?.name || 'Artisan'}</span>
+              <span class="text-[11px] font-medium text-gray-500 uppercase tracking-wider block no-underline">${project.business?.tradeLabel || c.badge || 'Artisan'}${project.business?.city ? ` • ${project.business.city}` : ''}</span>
+            </div>
+          `}
         </a>
 
-        <nav class="hidden md:flex items-center gap-7 text-sm font-medium text-gray-600">
+        <nav class="hidden md:flex items-center gap-7 text-sm font-semibold text-gray-700">
           ${project.branding?.navigationMode === "multi-tab" ? `
             <div class="flex items-center gap-1.5 bg-zinc-100/90 p-1 rounded-full border border-zinc-200/80" data-navigation-mode="multi-tab">
               <button type="button" onclick="(window.app?.setVirtualPage ? window.app.setVirtualPage('home') : window.artisiteSwitchPage?.('home'))" data-tab-nav="home" class="tab-nav-btn px-3 py-1 rounded-full text-xs font-semibold transition-all ${(options.activeVirtualPage || project._activeVirtualPage || 'home') === 'home' ? 'bg-white text-zinc-950 shadow-xs font-bold' : 'text-zinc-600 hover:text-zinc-900'}">Accueil</button>
@@ -580,20 +585,22 @@ function renderHeader(sec, project, options = {}) {
         </nav>
 
         <div class="flex items-center gap-3">
-          <a href="tel:${c.phone || project.business?.phone || ''}" class="hidden sm:inline-flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-gray-900 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors no-underline">
-            ${getIcon("phone", "w-4 h-4 text-emerald-600")}
-            <span data-editable="phone">${c.phone || project.business?.phone || ''}</span>
-          </a>
-          <button type="button" onclick="event.stopPropagation(); window.app ? window.app.toggleSiteTheme() : null;" class="site-theme-toggle inline-flex items-center gap-2 px-3.5 py-2.5 rounded-full text-sm font-semibold text-gray-800 border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all" data-site-theme-toggle aria-label="Activer le mode sombre du site">
-            <span class="site-theme-icon site-theme-icon-light">${getIcon("moon", "w-4 h-4")}</span>
-            <span class="site-theme-icon site-theme-icon-dark hidden">${getIcon("sun", "w-4 h-4")}</span>
-            <span class="site-theme-label">Mode nuit</span>
-          </button>
+          ${isPaysagiste ? '' : `
+            <a href="tel:${c.phone || project.business?.phone || ''}" class="hidden sm:inline-flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-gray-900 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors no-underline">
+              ${getIcon("phone", "w-4 h-4 text-emerald-600")}
+              <span data-editable="phone">${c.phone || project.business?.phone || ''}</span>
+            </a>
+            <button type="button" onclick="event.stopPropagation(); window.app ? window.app.toggleSiteTheme() : null;" class="site-theme-toggle inline-flex items-center gap-2 px-3.5 py-2.5 rounded-full text-sm font-semibold text-gray-800 border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all" data-site-theme-toggle aria-label="Activer le mode sombre du site">
+              <span class="site-theme-icon site-theme-icon-light">${getIcon("moon", "w-4 h-4")}</span>
+              <span class="site-theme-icon site-theme-icon-dark hidden">${getIcon("sun", "w-4 h-4")}</span>
+              <span class="site-theme-label">Mode nuit</span>
+            </button>
+          `}
           ${isButtonHidden(sec, 'ctaText') || isButtonHidden(sec, 'primary') ? '' : `
             <div class="cta-button-wrapper group/cta relative" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-ctaText" data-cta-popover-wrapper data-section-id="${sec.id}" data-button-type="ctaText">
               ${renderButtonActionBadge(sec, 'ctaText', options, project)}
-              <a href="#simulateur" class="btn-cta inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 no-underline" style="background-color: var(--primary);">
-                ${getIcon("sparkles", "w-4 h-4")}
+              <a href="#simulateur" class="btn-cta inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold text-white shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 no-underline" style="background-color: var(--primary);">
+                ${getIcon("phone", "w-4 h-4 text-white")}
                 <span data-editable="ctaText">${c.ctaText || "Demander un devis"}</span>
               </a>
               ${renderButtonPopover(sec, 'ctaText', options, project)}
@@ -749,7 +756,7 @@ function renderHero(sec, project, options = {}) {
               <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-primary" data-cta-popover-wrapper data-section-id="${sec.id}" data-button-type="primary" data-ui-id="${heroButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
                 ${renderButtonActionBadge(sec, 'primary', options, project)}
                 <a href="#simulateur" class="btn-cta btn-keycap${ctaPulseClass}${heroButtonMotion ? ` btn-motion-${heroButtonMotion}` : ''} w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full text-base font-bold text-white shadow-2xl transition-all no-underline" data-ui-id="${heroButtonId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}"${heroButtonMotion ? ` data-motion="${heroButtonMotion}" data-btn-motion="${heroButtonMotion}"` : ''} style="background-color: var(--primary);">
-                  ${getIcon("sparkles", "w-5 h-5")}
+                  ${getIcon("phone", "w-5 h-5 text-white")}
                   <span data-editable="ctaPrimary">${c.ctaPrimary}</span>
                 </a>
                 ${renderButtonPopover(sec, 'primary', options, project)}
@@ -759,28 +766,29 @@ function renderHero(sec, project, options = {}) {
             ${phoneHidden ? '' : `
               <div class="cta-button-wrapper group/cta" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-phone" data-cta-popover-wrapper data-section-id="${sec.id}" data-button-type="phone" data-ui-id="${heroPhoneId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}">
                 ${renderButtonActionBadge(sec, 'phone', options, project)}
-                <a href="tel:${c.phone}" class="btn-cta btn-keycap${ctaPulseClass}${heroPhoneMotion ? ` btn-motion-${heroPhoneMotion}` : ''} w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-full text-base font-semibold text-white bg-white/15 backdrop-blur-md border border-white/30 hover:bg-white/25 transition-colors no-underline" data-ui-id="${heroPhoneId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}"${heroPhoneMotion ? ` data-motion="${heroPhoneMotion}" data-btn-motion="${heroPhoneMotion}"` : ''}>
-                  ${getIcon("phone", "w-5 h-5 text-emerald-400")}
-                  <span data-editable="ctaSecondary">${c.ctaSecondary}</span>
+                <a href="tel:${c.phone}" class="btn-cta btn-keycap${ctaPulseClass}${heroPhoneMotion ? ` btn-motion-${heroPhoneMotion}` : ''} w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-full text-base font-semibold text-white bg-black/50 backdrop-blur-md border border-white/25 hover:bg-black/65 transition-colors no-underline" data-ui-id="${heroPhoneId}" data-ui-type="button" data-ui-target="${options.isEditor ? 'true' : 'false'}"${heroPhoneMotion ? ` data-motion="${heroPhoneMotion}" data-btn-motion="${heroPhoneMotion}"` : ''}>
+                  <span data-editable="ctaSecondary">${c.ctaSecondary || c.phone}</span>
                 </a>
                 ${renderButtonPopover(sec, 'phone', options, project)}
               </div>
             `}
           </div>
 
-          <div class="pt-4 flex flex-wrap items-center justify-center gap-6 text-xs text-white/80 font-medium">
-            <span class="flex items-center gap-1.5 text-emerald-400 font-bold">
-              ${getIcon("checkCircle", "w-4 h-4")}
-              <span>Intervention garantie à ${project.business?.city || 'proximité'}</span>
-            </span>
-            <span>•</span>
-            <span data-editable="trustNote">${c.trustNote}</span>
-          </div>
+          ${project.business?.tradeId === 'paysagiste' ? '' : `
+            <div class="pt-4 flex flex-wrap items-center justify-center gap-6 text-xs text-white/80 font-medium">
+              <span class="flex items-center gap-1.5 text-emerald-400 font-bold">
+                ${getIcon("checkCircle", "w-4 h-4")}
+                <span>Intervention garantie à ${project.business?.city || 'proximité'}</span>
+              </span>
+              <span>•</span>
+              <span data-editable="trustNote">${c.trustNote}</span>
+            </div>
+          `}
         </div>
 
         <!-- Sendpage Scroll Down Indicator -->
         <div class="pt-8 pb-4 flex justify-center">
-          <a href="#services" class="hero-scroll-discover inline-flex flex-col items-center gap-1 text-[11px] font-bold tracking-widest uppercase text-white/80 hover:text-white transition-all transform hover:translate-y-1 no-underline">
+          <a href="#about" class="hero-scroll-discover inline-flex flex-col items-center gap-1 text-[11px] font-bold tracking-widest uppercase text-white/80 hover:text-white transition-all transform hover:translate-y-1 no-underline">
             <span>DÉCOUVRIR</span>
             <span class="text-base animate-bounce">↓</span>
           </a>
@@ -1091,57 +1099,96 @@ function renderAbout(sec, project, options = {}) {
     `;
   }
 
-  // Default: Editorial Split
+  // Default: Editorial Split (Sendpage High Fidelity)
+  const isPaysagiste = project.business?.tradeId === "paysagiste";
+  const certifiedBadge = c.certified || "Artisan certifié";
+  const roleText = c.role || "Jardinier & Paysagiste";
+  const storyText = c.story || "";
+  const paragraphs = storyText.split(/\n\n+/).filter(Boolean);
+
   return `
     <div id="about" class="py-20 lg:py-28" style="background-color: var(--bg);">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
 
-          <div class="lg:col-span-5 order-2 lg:order-1">
-            <div class="relative">
-              <div class="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl border-4 border-white bg-slate-100">
-                ${renderEditableImage(c.image, { sectionId: sec.id, fieldPath: 'image', alt: c.title, className: 'w-full h-full object-cover', options })}
-              </div>
-              <div class="absolute -bottom-6 -right-6 bg-white p-5 rounded-2xl shadow-xl border border-black/5 max-w-xs">
-                <div class="font-bold text-gray-900 text-base" data-editable="owner">${c.owner}</div>
-                <div class="text-xs font-semibold text-gray-500" data-editable="role">${c.role}</div>
-                <div class="mt-2 text-xs text-emerald-600 font-bold flex items-center gap-1">
-                  ${getIcon("check", "w-4 h-4")}
-                  <span>À votre écoute à ${project.business.city}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="lg:col-span-7 order-1 lg:order-2 space-y-6">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-gray-100 text-gray-700" data-editable="badge">
-              ${c.badge || "À propos"}
+          <!-- Left Column: Story and Content -->
+          <div class="lg:col-span-7 order-1 lg:order-1 space-y-4">
+            <div class="text-xs font-bold uppercase tracking-wider text-[#527c22] dark:text-[#8FA382]" data-editable="badge">
+              ${c.badge || "À PROPOS"}
             </div>
 
-            <h2 class="font-heading text-3xl sm:text-4xl font-extrabold text-gray-900 leading-tight" data-editable="title">
+            <h2 class="font-heading text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white leading-tight" data-editable="title">
               ${c.title}
             </h2>
 
-            <div class="text-gray-600 text-base sm:text-lg leading-relaxed space-y-4" data-editable="story">
-              <p>${c.story}</p>
+            <!-- Signature Green Accent Dash -->
+            <div class="w-12 h-1 rounded-full mt-2.5 mb-5" style="background-color: var(--primary, #527c22);"></div>
+
+            <!-- Artisan Certifié Badge -->
+            <div>
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#f0f5eb] text-[#527c22] border border-[#527c22]/20">
+                <span class="font-bold">✓</span>
+                <span data-editable="certified">${certifiedBadge}</span>
+              </span>
             </div>
 
-            <div class="pt-4 grid sm:grid-cols-2 gap-3.5">
-              ${(c.points || []).map((pt, pIdx) => `
-                <div class="flex items-center gap-2.5 text-sm font-medium text-gray-800">
-                  <div class="w-5 h-5 rounded-full flex items-center justify-center text-white flex-shrink-0" style="background-color: var(--primary);">
-                    ${getIcon("check", "w-3 h-3")}
+            <!-- Role Subtitle -->
+            <div class="text-gray-500 dark:text-zinc-400 font-medium text-sm sm:text-base pt-1 pb-2" data-editable="role">
+              ${roleText}
+            </div>
+
+            <!-- Story Paragraphs -->
+            <div class="text-gray-600 dark:text-zinc-300 text-base leading-relaxed space-y-4 pt-1 pb-4" data-editable="story">
+              ${paragraphs.length > 0 ? paragraphs.map(p => `<p>${p}</p>`).join('') : `<p>${storyText}</p>`}
+            </div>
+
+            <!-- Bullet Points (visible for non-paysagiste, hidden data tags for paysagiste) -->
+            ${(!isPaysagiste && c.points && c.points.length > 0) ? `
+              <div class="pt-2 pb-6 grid sm:grid-cols-2 gap-3.5">
+                ${c.points.map((pt, pIdx) => `
+                  <div class="flex items-center gap-2.5 text-sm font-medium text-gray-800 dark:text-zinc-200">
+                    <div class="w-5 h-5 rounded-full flex items-center justify-center text-white flex-shrink-0" style="background-color: var(--primary, #527c22);">
+                      ${getIcon("check", "w-3 h-3")}
+                    </div>
+                    <span data-editable="points.${pIdx}">${pt}</span>
                   </div>
-                  <span data-editable="points.${pIdx}">${pt}</span>
-                </div>
-              `).join('')}
-            </div>
+                `).join('')}
+              </div>
+            ` : (c.points && c.points.length > 0) ? `
+              <div class="hidden" aria-hidden="true">
+                ${c.points.map((pt, pIdx) => `<span data-editable="points.${pIdx}">${pt}</span>`).join('')}
+              </div>
+            ` : ''}
 
-            <div class="pt-6">
-              <a href="#simulateur" class="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold text-white shadow-md hover:shadow-lg transition-all" style="background-color: var(--primary);">
-                <span>Échanger sur votre projet</span>
+            <!-- Bottom Actions -->
+            <div class="pt-4 flex flex-wrap items-center gap-4 sm:gap-6">
+              <a href="#simulateur" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-full text-sm font-semibold text-white shadow-md hover:shadow-lg transition-all no-underline" style="background-color: var(--primary, #527c22);">
+                ${getIcon("phone", "w-4 h-4 text-white")}
+                <span data-editable="aboutCta">${c.aboutCta || "Demander un devis personnalisé"}</span>
+              </a>
+              <a href="#services" class="inline-flex items-center gap-1.5 text-sm font-semibold hover:underline transition-colors no-underline" style="color: var(--primary, #527c22);">
+                <span data-editable="aboutLink">${c.aboutLink || "Découvrir nos services"}</span>
                 ${getIcon("arrowRight", "w-4 h-4")}
               </a>
+            </div>
+          </div>
+
+          <!-- Right Column: Benjamin Portrait Photo -->
+          <div class="lg:col-span-5 order-2 lg:order-2">
+            <div class="relative">
+              <div class="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl border-4 border-white dark:border-zinc-800 bg-slate-100">
+                ${renderEditableImage(c.image, { sectionId: sec.id, fieldPath: 'image', alt: c.title, className: 'w-full h-full object-cover', options })}
+              </div>
+              ${isPaysagiste ? '' : `
+                <div class="absolute -bottom-6 -right-6 bg-white p-5 rounded-2xl shadow-xl border border-black/5 max-w-xs">
+                  <div class="font-bold text-gray-900 text-base" data-editable="owner">${c.owner}</div>
+                  <div class="text-xs font-semibold text-gray-500" data-editable="role">${c.role}</div>
+                  <div class="mt-2 text-xs text-emerald-600 font-bold flex items-center gap-1">
+                    ${getIcon("check", "w-4 h-4")}
+                    <span>À votre écoute à ${project.business.city}</span>
+                  </div>
+                </div>
+              `}
             </div>
           </div>
 
@@ -1318,43 +1365,56 @@ function renderServices(sec, project, options = {}) {
     `;
   }
 
-  // Default Variant: 3-Columns Cards
+  // Default Variant: 3-Columns Cards (Sendpage High Fidelity)
+  const isPaysagiste = project.business?.tradeId === "paysagiste";
   return `
     <div id="services" class="py-20 lg:py-28" style="background-color: var(--bg-sec);">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center max-w-3xl mx-auto space-y-4 mb-16">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-white shadow-sm text-gray-800" data-editable="badge">
+        <div class="text-center max-w-3xl mx-auto space-y-2 mb-12 sm:mb-16">
+          <div class="text-xs font-bold uppercase tracking-wider text-[#527c22] dark:text-[#8FA382]" data-editable="badge">
             ${c.badge}
           </div>
-          <h2 class="font-heading text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight" data-editable="title">
+          <h2 class="font-heading text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight" data-editable="title">
             ${c.title}
           </h2>
-          <p class="text-gray-600 text-base sm:text-lg" data-editable="subtitle">
-            ${c.subtitle}
-          </p>
+          <!-- Green Accent Dash -->
+          <div class="w-12 h-1 rounded-full mx-auto mt-2.5 mb-5" style="background-color: var(--primary, #527c22);"></div>
+          ${c.subtitle ? `
+            <p class="text-gray-600 dark:text-zinc-400 text-sm sm:text-base max-w-xl mx-auto" data-editable="subtitle">
+              ${c.subtitle}
+            </p>
+          ` : ''}
         </div>
 
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           ${(c.services || []).map((srv, idx) => `
-            <div class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-black/5 flex flex-col group transform hover:-translate-y-1">
+            <div class="bg-white dark:bg-zinc-900 rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-zinc-800 flex flex-col group transform hover:-translate-y-1">
               <div class="aspect-[16/10] overflow-hidden relative bg-slate-100">
                 ${renderEditableImage(srv.image, { sectionId: sec.id, fieldPath: 'image', itemIndex: idx, alt: srv.title, className: 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-500', options })}
-                <span class="absolute top-3 right-3 z-10 bg-black/70 backdrop-blur text-white text-[11px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider" data-editable="services.${idx}.tag">
-                  ${srv.tag}
-                </span>
+                ${(!isPaysagiste && srv.tag) ? `
+                  <span class="absolute top-3 right-3 z-10 bg-black/70 backdrop-blur text-white text-[11px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider" data-editable="services.${idx}.tag">
+                    ${srv.tag}
+                  </span>
+                ` : (srv.tag) ? `
+                  <span class="hidden" data-editable="services.${idx}.tag">${srv.tag}</span>
+                ` : ''}
               </div>
-              <div class="p-6 flex-1 flex flex-col justify-between space-y-4">
+              <div class="p-6 sm:p-7 flex-1 flex flex-col justify-between space-y-3">
                 <div>
-                  <h3 class="font-heading text-xl font-bold text-gray-900 leading-snug" data-editable="services.${idx}.title">${srv.title}</h3>
-                  <p class="text-gray-600 text-sm mt-2.5 leading-relaxed" data-editable="services.${idx}.desc">${srv.desc}</p>
+                  <h3 class="font-heading text-xl font-bold text-gray-900 dark:text-white leading-snug" data-editable="services.${idx}.title">${srv.title}</h3>
+                  <p class="text-gray-600 dark:text-zinc-400 text-sm mt-2 leading-relaxed" data-editable="services.${idx}.desc">${srv.desc}</p>
                 </div>
-                <div class="pt-4 border-t border-gray-100 flex items-center justify-between">
-                  <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md" data-editable="services.${idx}.price">${srv.price}</span>
-                  <a href="#simulateur" class="btn-cta text-xs font-bold text-white" style="background-color: var(--primary); border-radius: var(--btn-radius, 9999px);">
-                    <span data-editable="services.${idx}.ctaText">${srv.ctaText || "Chiffrer"}</span>
-                    ${getIcon("arrowRight", "w-3.5 h-3.5")}
-                  </a>
-                </div>
+                ${(!isPaysagiste && srv.price) ? `
+                  <div class="pt-4 border-t border-gray-100 dark:border-zinc-800 flex items-center justify-between">
+                    <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md" data-editable="services.${idx}.price">${srv.price}</span>
+                    <a href="#simulateur" class="btn-cta text-xs font-bold text-white" style="background-color: var(--primary); border-radius: var(--btn-radius, 9999px);">
+                      <span data-editable="services.${idx}.ctaText">${srv.ctaText || "Chiffrer"}</span>
+                      ${getIcon("arrowRight", "w-3.5 h-3.5")}
+                    </a>
+                  </div>
+                ` : (srv.price) ? `
+                  <span class="hidden" data-editable="services.${idx}.price">${srv.price}</span>
+                ` : ''}
               </div>
             </div>
           `).join('')}
@@ -1513,12 +1573,13 @@ function renderRealisations(sec, project, options = {}) {
 function renderGalleryCard(p, idx, sec, project, options, aspectClass) {
   const isBeforeAfter = p.type === 'beforeAfter' || (p.beforeImage && p.afterImage);
   const tradeId = project?.business?.tradeId || 'paysagiste';
+  const isPaysagiste = tradeId === 'paysagiste';
 
   if (isBeforeAfter) {
     const beforeSrc = p.beforeImage || getTradeFallbackDataUrl(tradeId, 'beforeAfter', 'Avant');
     const afterSrc = p.afterImage || getTradeFallbackDataUrl(tradeId, 'beforeAfter', 'Après');
     return `
-      <div class="gallery-card bg-white dark:bg-zinc-900 rounded-2xl sm:rounded-3xl border border-zinc-200/80 dark:border-zinc-800 shadow-xs hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col group">
+      <div class="gallery-card bg-white dark:bg-zinc-900 rounded-2xl sm:rounded-3xl border border-zinc-200/80 dark:border-zinc-800 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col group">
         <div class="relative ${aspectClass} overflow-hidden bg-slate-900 select-none">
           <div class="ba-container split-reveal-container ba-card w-full h-full"
                data-split-direction="horizontal"
@@ -1553,13 +1614,20 @@ function renderGalleryCard(p, idx, sec, project, options, aspectClass) {
             </div>
           </div>
         </div>
-        <div class="p-4 sm:p-5 flex flex-col flex-1 justify-between gap-1.5">
-          <div>
-            <div class="text-[10.5px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 mb-1" data-editable="photos.${idx}.tag">${p.tag || 'Avant / Après'}</div>
-            <h3 class="font-bold text-zinc-900 dark:text-white text-base sm:text-lg leading-snug group-hover:text-emerald-700 transition-colors" data-editable="photos.${idx}.title">${p.title || 'Comparatif Réalisation'}</h3>
-            ${p.desc ? `<p class="text-zinc-600 dark:text-zinc-400 text-xs sm:text-sm mt-1 line-clamp-2" data-editable="photos.${idx}.desc">${p.desc}</p>` : ''}
+        ${isPaysagiste ? `
+          <div class="hidden" aria-hidden="true">
+            <span data-editable="photos.${idx}.tag">${p.tag || 'Avant / Après'}</span>
+            <span data-editable="photos.${idx}.title">${p.title || 'Comparatif'}</span>
           </div>
-        </div>
+        ` : `
+          <div class="p-4 sm:p-5 flex flex-col flex-1 justify-between gap-1.5">
+            <div>
+              <div class="text-[10.5px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 mb-1" data-editable="photos.${idx}.tag">${p.tag || 'Avant / Après'}</div>
+              <h3 class="font-bold text-zinc-900 dark:text-white text-base sm:text-lg leading-snug group-hover:text-emerald-700 transition-colors" data-editable="photos.${idx}.title">${p.title || 'Comparatif Réalisation'}</h3>
+              ${p.desc ? `<p class="text-zinc-600 dark:text-zinc-400 text-xs sm:text-sm mt-1 line-clamp-2" data-editable="photos.${idx}.desc">${p.desc}</p>` : ''}
+            </div>
+          </div>
+        `}
       </div>
     `;
   }
@@ -1567,7 +1635,7 @@ function renderGalleryCard(p, idx, sec, project, options, aspectClass) {
   // Standard photo card
   const photoUrl = p.url || p.image || getTradeFallbackDataUrl(tradeId, 'gallery', p.title || 'Réalisation');
   return `
-    <div class="gallery-card bg-white dark:bg-zinc-900 rounded-2xl sm:rounded-3xl border border-zinc-200/80 dark:border-zinc-800 shadow-xs hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col group cursor-pointer" data-lightbox="${photoUrl}">
+    <div class="gallery-card bg-white dark:bg-zinc-900 rounded-2xl sm:rounded-3xl border border-zinc-200/80 dark:border-zinc-800 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col group cursor-pointer" data-lightbox="${photoUrl}">
       <div class="relative ${aspectClass} overflow-hidden bg-slate-900">
         ${renderEditableImage(photoUrl, { sectionId: sec.id, fieldPath: `photos.${idx}.url`, itemIndex: idx, alt: p.title || 'Photo', className: 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-500', options })}
         <div class="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -1576,13 +1644,20 @@ function renderGalleryCard(p, idx, sec, project, options, aspectClass) {
           </span>
         </div>
       </div>
-      <div class="p-4 sm:p-5 flex flex-col flex-1 justify-between gap-1.5">
-        <div>
-          <div class="text-[10.5px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 mb-1" data-editable="photos.${idx}.tag">${p.tag || 'Réalisation'}</div>
-          <h3 class="font-bold text-zinc-900 dark:text-white text-base sm:text-lg leading-snug group-hover:text-emerald-700 transition-colors" data-editable="photos.${idx}.title">${p.title || 'Chantier Soigné'}</h3>
-          ${p.desc ? `<p class="text-zinc-600 dark:text-zinc-400 text-xs sm:text-sm mt-1 line-clamp-2" data-editable="photos.${idx}.desc">${p.desc}</p>` : ''}
+      ${isPaysagiste ? `
+        <div class="hidden" aria-hidden="true">
+          <span data-editable="photos.${idx}.tag">${p.tag || 'Réalisation'}</span>
+          <span data-editable="photos.${idx}.title">${p.title || 'Chantier Soigné'}</span>
         </div>
-      </div>
+      ` : `
+        <div class="p-4 sm:p-5 flex flex-col flex-1 justify-between gap-1.5">
+          <div>
+            <div class="text-[10.5px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 mb-1" data-editable="photos.${idx}.tag">${p.tag || 'Réalisation'}</div>
+            <h3 class="font-bold text-zinc-900 dark:text-white text-base sm:text-lg leading-snug group-hover:text-emerald-700 transition-colors" data-editable="photos.${idx}.title">${p.title || 'Chantier Soigné'}</h3>
+            ${p.desc ? `<p class="text-zinc-600 dark:text-zinc-400 text-xs sm:text-sm mt-1 line-clamp-2" data-editable="photos.${idx}.desc">${p.desc}</p>` : ''}
+          </div>
+        </div>
+      `}
     </div>
   `;
 }
@@ -1602,9 +1677,10 @@ function renderGallery(sec, project, options = {}) {
     return `
       <div id="galerie" class="py-20 lg:py-28" style="background-color: var(--bg-sec);">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="text-center max-w-2xl mx-auto space-y-3 mb-12">
-            <div class="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400" data-editable="badge">${c.badge || 'Portfolio & Savoir-Faire'}</div>
-            <h2 class="font-heading text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white" data-editable="title">${c.title || 'Nos Réalisations Récentes'}</h2>
+          <div class="text-center max-w-2xl mx-auto space-y-2 mb-12">
+            <div class="text-xs font-bold uppercase tracking-wider text-[#527c22] dark:text-[#8FA382]" data-editable="badge">${c.badge || 'NOS RÉALISATIONS'}</div>
+            <h2 class="font-heading text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white" data-editable="title">${c.title || 'Galerie'}</h2>
+            <div class="w-12 h-1 rounded-full mx-auto mt-2.5 mb-5" style="background-color: var(--primary, #527c22);"></div>
             <p class="text-gray-600 dark:text-zinc-400 text-sm sm:text-base" data-editable="subtitle">${c.subtitle || 'Découvrez en images la qualité de nos interventions et le soin apporté à chaque projet.'}</p>
           </div>
 
@@ -1632,10 +1708,12 @@ function renderGallery(sec, project, options = {}) {
   return `
     <div id="galerie" class="py-20 lg:py-28" style="background-color: var(--bg-sec);">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center max-w-2xl mx-auto space-y-3 mb-12 sm:mb-16">
-          <div class="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400" data-editable="badge">${c.badge || 'Portfolio & Savoir-Faire'}</div>
-          <h2 class="font-heading text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight" data-editable="title">${c.title || 'Nos Réalisations Récentes'}</h2>
-          <p class="text-gray-600 dark:text-zinc-400 text-sm sm:text-base max-w-xl mx-auto" data-editable="subtitle">${c.subtitle || 'Découvrez en images la qualité de nos interventions et le soin apporté à chaque projet.'}</p>
+        <div class="text-center max-w-2xl mx-auto space-y-2 mb-12 sm:mb-16">
+          <div class="text-xs font-bold uppercase tracking-wider text-[#527c22] dark:text-[#8FA382]" data-editable="badge">${c.badge || 'NOS RÉALISATIONS'}</div>
+          <h2 class="font-heading text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight" data-editable="title">${c.title || 'Galerie'}</h2>
+          <!-- Green Accent Dash -->
+          <div class="w-12 h-1 rounded-full mx-auto mt-2.5 mb-5" style="background-color: var(--primary, #527c22);"></div>
+          ${c.subtitle ? `<p class="text-gray-600 dark:text-zinc-400 text-sm sm:text-base max-w-xl mx-auto" data-editable="subtitle">${c.subtitle}</p>` : ''}
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
@@ -1690,11 +1768,27 @@ function renderReviews(sec, project, options = {}) {
 
   // Default: Google Cards
   return `
-    <div id="avis" class="py-20 lg:py-28 bg-white border-t border-black/5">
+    <div id="avis" class="py-20 lg:py-28 bg-white dark:bg-zinc-950 border-t border-black/5">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-2xl mx-auto space-y-2 mb-12 sm:mb-16">
+          <div class="text-xs font-bold uppercase tracking-wider text-[#527c22] dark:text-[#8FA382]" data-editable="badge">
+            ${c.badge || 'AVIS CLIENTS'}
+          </div>
+          <h2 class="font-heading text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight" data-editable="title">
+            ${c.title || 'Ce que disent nos clients'}
+          </h2>
+          <!-- Signature Green Accent Dash -->
+          <div class="w-12 h-1 rounded-full mx-auto mt-2.5 mb-5" style="background-color: var(--primary, #527c22);"></div>
+          ${c.subtitle ? `
+            <p class="text-gray-600 dark:text-zinc-400 text-sm sm:text-base max-w-xl mx-auto" data-editable="subtitle">
+              ${c.subtitle}
+            </p>
+          ` : ''}
+        </div>
+
         <div class="grid lg:grid-cols-12 gap-12 items-start">
 
-          <div class="lg:col-span-4 bg-gray-50 p-8 rounded-3xl border border-black/5 space-y-4">
+          <div class="lg:col-span-4 bg-gray-50 dark:bg-zinc-900 p-8 rounded-3xl border border-black/5 dark:border-zinc-800 space-y-4">
             <div class="inline-flex items-center gap-2 text-amber-500">
               ${renderRatingStars(Math.round(Number(c.overallRating) || 5), { editor: options.isEditor, sectionId: sec.id, reviewIndex: -1 })}
             </div>
@@ -1803,8 +1897,91 @@ function renderQuoteSimulator(sec, project) {
 
 // 12. Hours
 function renderHours(sec, project) {
-  const c = sec.content;
+  const c = sec.content || {};
   const hours = c.hours || {};
+  const isPaysagiste = project?.business?.tradeId === "paysagiste";
+  const isUnified = sec.variant === "unified-map" || sec.settings?.unifiedMap || isPaysagiste;
+
+  if (isUnified) {
+    const defaultDays = ["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi", "dimanche"];
+    const dayLabels = {
+      lundi: "Lundi",
+      mardi: "Mardi",
+      mercredi: "Mercredi",
+      jeudi: "Jeudi",
+      vendredi: "Vendredi",
+      samedi: "Samedi",
+      dimanche: "Dimanche"
+    };
+
+    return `
+      <div id="horaires" class="py-20 lg:py-28 bg-white dark:bg-zinc-950 border-t border-black/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="text-center max-w-2xl mx-auto space-y-2 mb-12 sm:mb-16">
+            <div class="text-xs font-bold uppercase tracking-wider text-[#527c22] dark:text-[#8FA382]" data-editable="badge">
+              ${c.badge || 'HORAIRES'}
+            </div>
+            <h2 class="font-heading text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight" data-editable="title">
+              ${c.title || 'Horaires & Lieu'}
+            </h2>
+            <!-- Signature Green Accent Dash -->
+            <div class="w-12 h-1 rounded-full mx-auto mt-2.5 mb-4" style="background-color: var(--primary, #527c22);"></div>
+            <div class="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-700 dark:text-zinc-300">
+              <span class="text-[#527c22]">📍</span>
+              <span data-editable="subtitle">${c.subtitle || project.business?.city || 'Montauban'}</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch max-w-6xl mx-auto">
+            <!-- Left Column: Timetable Card -->
+            <div class="lg:col-span-6 bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 shadow-sm p-6 sm:p-8 flex flex-col justify-between">
+              <div class="divide-y divide-zinc-100 dark:divide-zinc-800/80">
+                ${defaultDays.map(day => {
+                  const time = hours[day] || (day === "dimanche" ? "Fermé" : "9h - 12h / 14h - 18h");
+                  const isClosed = time.toLowerCase().includes("fermé");
+                  return `
+                    <div class="flex items-center justify-between py-4 text-sm sm:text-base">
+                      <div class="flex items-center gap-3">
+                        <svg class="w-4 h-4 ${isClosed ? 'text-zinc-400' : 'text-[#527c22]'}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span class="font-semibold text-gray-900 dark:text-white">${dayLabels[day] || day}</span>
+                      </div>
+                      <span class="${isClosed ? 'text-zinc-400 dark:text-zinc-500 italic' : 'text-gray-700 dark:text-zinc-300 font-medium'}" data-editable="hours.${day}">${time}</span>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+              ${c.note ? `
+                <div class="mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-800 text-center text-xs text-gray-400 dark:text-zinc-500 flex items-center justify-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span>${c.note}</span>
+                </div>
+              ` : ''}
+            </div>
+
+            <!-- Right Column: Interactive Map -->
+            <div class="lg:col-span-6 bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 shadow-sm overflow-hidden min-h-[380px] sm:min-h-[440px] relative">
+              <iframe
+                title="Carte Horaires et Lieu"
+                class="w-full h-full min-h-[380px] sm:min-h-[440px] border-0 filter saturate-[1.05]"
+                loading="lazy"
+                src="https://maps.google.com/maps?q=${encodeURIComponent(c.address || (c.city ? c.city + ', France' : (project.business?.city ? project.business.city + ', France' : 'Montauban, France')))}&t=&z=12&ie=UTF8&iwloc=&output=embed">
+              </iframe>
+              <div class="absolute bottom-3 left-3 z-10 pointer-events-auto">
+                <a href="https://maps.google.com/?q=${encodeURIComponent(c.address || (c.city ? c.city + ', France' : (project.business?.city ? project.business.city + ', France' : 'Montauban, France')))}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-[11px] font-bold text-white bg-black/60 hover:bg-black/80 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/20 transition-all no-underline">
+                  <span>Calculer mon itinéraire</span>
+                  ${getIcon("externalLink", "w-3 h-3")}
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Classic hours variant
   return `
     <div id="horaires" class="py-16 bg-white border-t border-black/5">
       <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1826,7 +2003,7 @@ function renderHours(sec, project) {
 
           <div class="mt-6 pt-4 border-t border-gray-200 text-center text-xs text-gray-500 flex items-center justify-center gap-2">
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span>${c.note} — Contact : <strong>${c.phone}</strong></span>
+            <span>${c.note || "Disponible sur rendez-vous"} — Contact : <strong>${c.phone || project.business?.phone || ''}</strong></span>
           </div>
         </div>
       </div>
@@ -1909,16 +2086,20 @@ function renderFaq(sec, project) {
   return `
     <div id="faq" class="py-20 lg:py-28 bg-white dark:bg-zinc-950">
       <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center space-y-3 mb-12 sm:mb-16">
-          <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-widest text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800" data-editable="badge">
-            ${c.badge || 'FAQ & Transparence'}
+        <div class="text-center space-y-2 mb-12 sm:mb-16">
+          <div class="text-xs font-bold uppercase tracking-wider text-[#527c22] dark:text-[#8FA382]" data-editable="badge">
+            ${c.badge || 'QUESTIONS FRÉQUENTES'}
           </div>
           <h2 class="font-heading text-3xl sm:text-4xl lg:text-5xl font-extrabold text-zinc-900 dark:text-white tracking-tight" data-editable="title">
-            ${c.title || 'Vos Questions, Nos Réponses'}
+            ${c.title || 'FAQ'}
           </h2>
-          <p class="text-zinc-600 dark:text-zinc-400 text-sm sm:text-base max-w-xl mx-auto leading-relaxed" data-editable="subtitle">
-            ${c.subtitle || 'Tout ce que vous devez savoir avant de nous confier votre projet en toute sérénité.'}
-          </p>
+          <!-- Green Accent Dash -->
+          <div class="w-12 h-1 rounded-full mx-auto mt-2.5 mb-5" style="background-color: var(--primary, #527c22);"></div>
+          ${c.subtitle ? `
+            <p class="text-zinc-600 dark:text-zinc-400 text-sm sm:text-base max-w-xl mx-auto leading-relaxed" data-editable="subtitle">
+              ${c.subtitle}
+            </p>
+          ` : ''}
         </div>
 
         <div class="divide-y divide-zinc-200/80 dark:divide-zinc-800 border-t border-b border-zinc-200/80 dark:border-zinc-800">

@@ -140,6 +140,8 @@ export function generateSite(input = {}) {
     ];
   }
 
+  const isPaysagiste = trade.id === "paysagiste";
+
   // Section 1: Header
   const headerSection = {
     id: "sec-header",
@@ -150,8 +152,14 @@ export function generateSite(input = {}) {
       brandName: name,
       badge: trade.badge,
       phone,
-      ctaText: isFoodTrade ? "Réserver une table" : isPersonalCare ? "Prendre RDV" : isLiberal ? "Prendre RDV" : "Demander un devis",
-      links: [
+      ctaText: isPaysagiste ? "Demander un devis personnalisé" : (isFoodTrade ? "Réserver une table" : isPersonalCare ? "Prendre RDV" : isLiberal ? "Prendre RDV" : "Demander un devis"),
+      links: isPaysagiste ? [
+        { label: "Services", target: "#services" },
+        { label: "À propos", target: "#about" },
+        { label: "Avis", target: "#avis" },
+        { label: "Galerie", target: "#galerie" },
+        { label: "FAQ", target: "#faq" }
+      ] : [
         { label: "Prestations", target: "#services" },
         { label: "Savoir-Faire", target: "#about" },
         { label: "Réalisations", target: "#realisations" },
@@ -164,18 +172,18 @@ export function generateSite(input = {}) {
   };
 
   // Section 2: Hero
-  const isFullscreenHero = trade.id === 'paysagiste';
+  const isFullscreenHero = isPaysagiste;
   const heroSection = {
     id: "sec-hero",
     type: "hero",
     variant: isFullscreenHero ? "fullscreen-image" : "split-image",
     visibility: true,
     content: {
-      badge: `${trade.badge} • ${city}`,
+      badge: isPaysagiste ? "Jardinier Professionnel & Artisan Paysagiste" : `${trade.badge} • ${city}`,
       title: trade.heroTitles[0] || `Votre artisan de confiance à ${city}`,
-      subtitle: `${trade.heroSubtitles[0]} Intervention soignée à ${city} et ses environs.`,
-      ctaPrimary: trade.ctaPrimary || "Demander mon devis gratuit",
-      ctaSecondary: trade.ctaSecondary || "Appeler directement",
+      subtitle: isPaysagiste ? (trade.heroSubtitles[0] || "Votre jardinier professionnel se déplace gratuitement dans toute l'Occitanie") : `${trade.heroSubtitles[0]} Intervention soignée à ${city} et ses environs.`,
+      ctaPrimary: trade.ctaPrimary || "Demander un devis personnalisé",
+      ctaSecondary: trade.ctaSecondary || (phone || "07 70 10 29 71"),
       phone,
       heroImage: trade.heroImage,
       trustNote: isLiberal ? "✓ Déontologie et secret professionnel garantis" : isFoodTrade ? "✓ Produits frais cuisinés maison chaque jour" : "✓ Devis 100% gratuit sous 24h sans engagement"
@@ -191,7 +199,7 @@ export function generateSite(input = {}) {
     id: "sec-trust",
     type: "trust",
     variant: "grid-4",
-    visibility: true,
+    visibility: !isPaysagiste,
     content: {
       badge: "Garanties & Engagements",
       title: `Pourquoi Faire Confiance à ${name} ?`,
@@ -207,11 +215,14 @@ export function generateSite(input = {}) {
     variant: "split-story",
     visibility: true,
     content: {
-      badge: "Notre Histoire & Philosophie",
-      title: trade.aboutTitle || `À propos de ${name}`,
+      badge: isPaysagiste ? "À PROPOS" : "Notre Histoire & Philosophie",
+      title: isPaysagiste ? name : (trade.aboutTitle || `À propos de ${name}`),
+      certified: isPaysagiste ? (trade.aboutCertified || "Artisan certifié") : undefined,
       story: trade.aboutStory.replace(/notre entreprise/g, name),
-      owner: trade.aboutOwner || "L'équipe",
-      role: trade.aboutRole || trade.label,
+      owner: isPaysagiste ? "Benjamin" : (trade.aboutOwner || "L'équipe"),
+      role: isPaysagiste ? (trade.aboutRole || "Jardinier & Paysagiste") : (trade.aboutRole || trade.label),
+      aboutCta: isPaysagiste ? "Demander un devis personnalisé" : "Demander un devis",
+      aboutLink: isPaysagiste ? "Découvrir nos services" : "En savoir plus",
       image: trade.aboutImage,
       points: aboutPoints
     },
@@ -223,7 +234,7 @@ export function generateSite(input = {}) {
     id: "sec-stats",
     type: "stats",
     variant: "ribbon",
-    visibility: true,
+    visibility: !isPaysagiste,
     content: {
       items: statsItems
     },
@@ -237,9 +248,9 @@ export function generateSite(input = {}) {
     variant: "cards-grid",
     visibility: true,
     content: {
-      badge: "Nos Prestations",
-      title: `Prestations & Savoir-Faire à ${city}`,
-      subtitle: `Découvrez l'ensemble de nos services professionnels adaptés aux particuliers et professionnels à ${city} et ses alentours.`,
+      badge: isPaysagiste ? "CE QUE NOUS PROPOSONS" : "Nos Prestations",
+      title: isPaysagiste ? "Nos services" : `Prestations & Savoir-Faire à ${city}`,
+      subtitle: isPaysagiste ? "" : `Découvrez l'ensemble de nos services professionnels adaptés aux particuliers et professionnels à ${city} et ses alentours.`,
       ctaCard: "Demander un chiffrage",
       services: trade.defaultServices.map((s, idx) => ({
         id: `srv-${idx + 1}`,
@@ -258,7 +269,7 @@ export function generateSite(input = {}) {
     id: "sec-before-after",
     type: "beforeAfter",
     variant: "interactive-slider",
-    visibility: true,
+    visibility: !isPaysagiste,
     content: {
       badge: "Preuve en images",
       title: trade.beforeAfter.title,
@@ -278,7 +289,7 @@ export function generateSite(input = {}) {
     id: "sec-realisations",
     type: "realisations",
     variant: "cards-3",
-    visibility: true,
+    visibility: !isPaysagiste,
     content: {
       badge: "Chantiers Réalisés",
       title: "Nos Dernières Réalisations",
@@ -298,13 +309,16 @@ export function generateSite(input = {}) {
   // Section 9: Gallery
   const initialPhotos = (trade.gallery || []).map((g, idx) => ({
     id: `gal-${idx + 1}`,
+    type: g.type,
     url: g.url,
+    beforeImage: g.beforeImage,
+    afterImage: g.afterImage,
     title: g.title,
     tag: g.tag,
     desc: `Intervention soignée et finitions de qualité à ${city}.`
   }));
 
-  if (trade.beforeAfter && trade.beforeAfter.beforeImage && trade.beforeAfter.afterImage && initialPhotos.length >= 2) {
+  if (!isPaysagiste && trade.beforeAfter && trade.beforeAfter.beforeImage && trade.beforeAfter.afterImage && initialPhotos.length >= 2) {
     initialPhotos.splice(1, 0, {
       id: "gal-ba-comp",
       type: "beforeAfter",
@@ -322,9 +336,9 @@ export function generateSite(input = {}) {
     variant: "masonry-grid",
     visibility: true,
     content: {
-      badge: "Portfolio Visuel",
-      title: "Galerie Photos & Métier",
-      subtitle: "Un aperçu soigné de notre quotidien, de notre outillage et de nos finitions.",
+      badge: isPaysagiste ? "NOS RÉALISATIONS" : "Portfolio Visuel",
+      title: isPaysagiste ? "Galerie" : "Galerie Photos & Métier",
+      subtitle: isPaysagiste ? "" : "Un aperçu soigné de notre quotidien, de notre outillage et de nos finitions.",
       photos: initialPhotos
     },
     settings: { enableLightbox: true, aspectRatio: "4/3" }
@@ -337,8 +351,8 @@ export function generateSite(input = {}) {
     variant: "google-cards",
     visibility: true,
     content: {
-      badge: "Avis Clients Vérifiés",
-      title: "La Confiance de Nos Clients Locaux",
+      badge: isPaysagiste ? "AVIS CLIENTS" : "Avis Clients Vérifiés",
+      title: isPaysagiste ? "Ce que disent nos clients" : "La Confiance de Nos Clients Locaux",
       subtitle: `Découvrez les retours d'expérience des particuliers et entreprises qui nous ont confié leurs projets à ${city}.`,
       overallRating: "4.9",
       totalReviews: "48 avis Google",
@@ -360,7 +374,7 @@ export function generateSite(input = {}) {
     id: "sec-quote-simulator",
     type: "quoteSimulator",
     variant: "interactive-calculator",
-    visibility: true,
+    visibility: !isPaysagiste,
     content: {
       badge: "Devis Express en Ligne",
       title: "Simulez Votre Projet en 3 Clics",
@@ -381,17 +395,25 @@ export function generateSite(input = {}) {
   const hoursSection = {
     id: "sec-hours",
     type: "hours",
-    variant: "table-card",
+    variant: isPaysagiste ? "unified-map" : "table-card",
     visibility: true,
     content: {
-      badge: "Disponibilités",
-      title: "Horaires d'Ouverture & Accueil",
-      subtitle: `Nous intervenons du lundi au samedi sur ${city} et ses communes limitrophes.`,
-      hours: business.openingHours,
-      note: "En cas d'urgence constatée, notre ligne téléphonique reste active 7j/7.",
+      badge: isPaysagiste ? "HORAIRES" : "Disponibilités",
+      title: isPaysagiste ? "Horaires & Lieu" : "Horaires d'Ouverture & Accueil",
+      subtitle: isPaysagiste ? city : `Nous intervenons du lundi au samedi sur ${city} et ses communes limitrophes.`,
+      hours: isPaysagiste ? {
+        lundi: "9h - 12h / 14h - 18h",
+        mardi: "9h - 12h / 14h - 18h",
+        mercredi: "9h - 12h / 14h - 18h",
+        jeudi: "9h - 12h / 14h - 18h",
+        vendredi: "9h - 12h / 14h - 18h",
+        samedi: "9h - 12h / 14h - 18h",
+        dimanche: "Fermé"
+      } : business.openingHours,
+      note: isPaysagiste ? "" : "En cas d'urgence constatée, notre ligne téléphonique reste active 7j/7.",
       phone
     },
-    settings: { showLiveStatus: true }
+    settings: { showLiveStatus: true, unifiedMap: isPaysagiste }
   };
 
   // Section 13: Location / Intervention Zone
@@ -400,7 +422,7 @@ export function generateSite(input = {}) {
     id: "sec-location",
     type: "location",
     variant: "zone-card",
-    visibility: true,
+    visibility: !isPaysagiste,
     content: {
       badge: isStorefront ? "Nous Rendre Visite" : "Proximité & Déplacement",
       title: isStorefront ? `Notre Établissement à ${city}` : `Zone d'Intervention : ${city} & ${region}`,
@@ -432,9 +454,9 @@ export function generateSite(input = {}) {
     variant: "accordion",
     visibility: true,
     content: {
-      badge: "Foire Aux Questions",
-      title: "Questions Fréquentes",
-      subtitle: "Tout ce que vous devez savoir avant de nous confier votre projet.",
+      badge: isPaysagiste ? "QUESTIONS FRÉQUENTES" : "Foire Aux Questions",
+      title: isPaysagiste ? "FAQ" : "Questions Fréquentes",
+      subtitle: isPaysagiste ? "" : "Tout ce que vous devez savoir avant de nous confier votre projet.",
       items: (trade.faq || []).map((item, idx) => ({
         id: `faq-${idx + 1}`,
         q: item.q,
@@ -449,7 +471,7 @@ export function generateSite(input = {}) {
     id: "sec-cta",
     type: "cta",
     variant: "banner-dark",
-    visibility: true,
+    visibility: !isPaysagiste,
     content: {
       badge: "Passons à l'action",
       title: `Prêt à concrétiser votre projet à ${city} ?`,
@@ -489,7 +511,25 @@ export function generateSite(input = {}) {
   const emergencyBanner = isEmergencyTrade ? createSectionData("customBlock", "radarEmergency", trade, business) : null;
   if (emergencyBanner) emergencyBanner.id = "sec-radar-emergency";
 
-  const sections = [
+  const sections = isPaysagiste ? [
+    headerSection,
+    heroSection,
+    aboutSection,
+    servicesSection,
+    gallerySection,
+    hoursSection,
+    reviewsSection,
+    faqSection,
+    footerSection,
+    // Secondary modules (stored in model with visibility: false for seamless editor toggle)
+    trustSection,
+    statsSection,
+    beforeAfterSection,
+    realisationsSection,
+    quoteSection,
+    locationSection,
+    ctaSection
+  ] : [
     headerSection,
     heroSection,
     ...(emergencyBanner ? [emergencyBanner] : []),
