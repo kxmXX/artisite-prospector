@@ -24,8 +24,8 @@ export const TRADES = [
     ],
     "ctaPrimary": "Demander mon devis gratuit",
     "ctaSecondary": "Appeler le paysagiste",
-    "heroImage": "https://images.unsplash.com/photo-1558904541-efa8c4a08931?auto=format&fit=crop&w=1600&q=80",
-    "aboutImage": "https://images.unsplash.com/photo-1592417817098-8f3d6eb2250d?auto=format&fit=crop&w=1000&q=80",
+    "heroImage": "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=1600&q=80",
+    "aboutImage": "https://images.unsplash.com/photo-1622383563227-04401ab4e5ea?auto=format&fit=crop&w=1000&q=80",
     "trustBadges": [
       {
         "title": "Devis Gratuit sous 24h",
@@ -68,7 +68,7 @@ export const TRADES = [
         "desc": "Tonte soignée avec ramassage ou mulching, scarification de printemps, regarnissage et fertilisation naturelle.",
         "tag": "Contrats annuels",
         "price": "Formules régulières ou ponctuelles",
-        "image": "https://images.unsplash.com/photo-1592417817098-8f3d6eb2250d?auto=format&fit=crop&w=800&q=80"
+        "image": "https://images.unsplash.com/photo-1598902108854-10e335adac99?auto=format&fit=crop&w=800&q=80"
       },
       {
         "title": "Élagage & Débroussaillage",
@@ -82,7 +82,7 @@ export const TRADES = [
         "desc": "Installation de panneaux rigides avec occultants bois ou composite, portillons et brise-vue décoratifs.",
         "tag": "Aménagement",
         "price": "Au mètre linéaire",
-        "image": "https://images.unsplash.com/photo-1599818987459-009f4f469aa7?auto=format&fit=crop&w=800&q=80"
+        "image": "https://images.unsplash.com/photo-1592150621744-aca64f48394a?auto=format&fit=crop&w=800&q=80"
       },
       {
         "title": "Terrasses Bois & Allées Pavées",
@@ -95,8 +95,8 @@ export const TRADES = [
     "beforeAfter": {
       "title": "Transformation spectaculaire de vos extérieurs",
       "subtitle": "Faites glisser le curseur pour visualiser la métamorphose avant et après notre intervention",
-      "beforeImage": "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=1000&q=80",
-      "afterImage": "https://images.unsplash.com/photo-1558904541-efa8c4a08931?auto=format&fit=crop&w=1000&q=80",
+      "beforeImage": "https://images.unsplash.com/photo-1500651230702-0e2d8a49d4ad?auto=format&fit=crop&w=1000&q=80",
+      "afterImage": "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1000&q=80",
       "beforeLabel": "Terrain en friche avant travaux",
       "afterLabel": "Jardin paysager livré & engazonné",
       "projectCity": "Secteur local",
@@ -108,7 +108,7 @@ export const TRADES = [
         "category": "Aménagement complet",
         "city": "Secteur résidentiel",
         "desc": "Mise en place d'un gazon en rouleau, plantation d'oliviers centenaires et allée en dalles de schiste.",
-        "image": "https://images.unsplash.com/photo-1558904541-efa8c4a08931?auto=format&fit=crop&w=800&q=80"
+        "image": "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=800&q=80"
       },
       {
         "title": "Taille de restructuration d'une grande haie",
@@ -127,7 +127,7 @@ export const TRADES = [
     ],
     "gallery": [
       {
-        "url": "https://images.unsplash.com/photo-1558904541-efa8c4a08931?auto=format&fit=crop&w=800&q=80",
+        "url": "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
         "title": "Terrasse & Gazon de placage",
         "tag": "Création"
       },
@@ -147,12 +147,12 @@ export const TRADES = [
         "tag": "Élagage"
       },
       {
-        "url": "https://images.unsplash.com/photo-1599818987459-009f4f469aa7?auto=format&fit=crop&w=800&q=80",
+        "url": "https://images.unsplash.com/photo-1557429287-b2e26467fc2b?auto=format&fit=crop&w=800&q=80",
         "title": "Claustras bois & brise-vue",
         "tag": "Clôtures"
       },
       {
-        "url": "https://images.unsplash.com/photo-1592417817098-8f3d6eb2250d?auto=format&fit=crop&w=800&q=80",
+        "url": "https://images.unsplash.com/photo-1598902108854-10e335adac99?auto=format&fit=crop&w=800&q=80",
         "title": "Tonte et finition soignée",
         "tag": "Entretien"
       }
@@ -440,7 +440,7 @@ export const TRADES = [
     "ctaPrimary": "Demander mon diagnostic toiture gratuit",
     "ctaSecondary": "Urgence Fuite / Bâchage",
     "heroImage": "https://images.unsplash.com/photo-1632759145351-1d592919f522?auto=format&fit=crop&w=1600&q=80",
-    "aboutImage": "https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?auto=format&fit=crop&w=1000&q=80",
+    "aboutImage": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1000&q=80",
     "trustBadges": [
       {
         "title": "Garantie Décennale 10 Ans",
@@ -528,7 +528,7 @@ export const TRADES = [
         "tag": "Démoussage"
       },
       {
-        "url": "https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?auto=format&fit=crop&w=800&q=80",
+        "url": "https://images.unsplash.com/photo-1590381105924-c72589b9ef3f?auto=format&fit=crop&w=800&q=80",
         "title": "Travail de charpente",
         "tag": "Charpente"
       }
@@ -746,7 +746,7 @@ export const TRADES = [
     "ctaPrimary": "Dépannage Panne : Appeler",
     "ctaSecondary": "Devis Mise aux Normes Gratuit",
     "heroImage": "https://images.unsplash.com/photo-1621905251918-48416bd8575a?auto=format&fit=crop&w=1600&q=80",
-    "aboutImage": "https://images.unsplash.com/photo-1558441719-8b459c64f50b?auto=format&fit=crop&w=1000&q=80",
+    "aboutImage": "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=1000&q=80",
     "trustBadges": [
       {
         "title": "Norme NF C 15-100",
@@ -789,13 +789,13 @@ export const TRADES = [
         "desc": "Diagnostic précis à l'appareil de mesure, isolement de la ligne défaillante et remise en sécurité.",
         "tag": "Urgence 24/7",
         "price": "Intervention rapide",
-        "image": "https://images.unsplash.com/photo-1558441719-8b459c64f50b?auto=format&fit=crop&w=800&q=80"
+        "image": "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=800&q=80"
       }
     ],
     "beforeAfter": {
       "title": "Modernisation d'un tableau électrique : avant / après",
       "subtitle": "Remplacement d'un vieux tableau vétuste à fusibles par un tableau Schneider moderne aux normes NF",
-      "beforeImage": "https://images.unsplash.com/photo-1558441719-8b459c64f50b?auto=format&fit=crop&w=1000&q=80",
+      "beforeImage": "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=1000&q=80",
       "afterImage": "https://images.unsplash.com/photo-1621905251918-48416bd8575a?auto=format&fit=crop&w=1000&q=80",
       "beforeLabel": "Tableau obsolète sans disjoncteur différentiel",
       "afterLabel": "Tableau moderne conforme NF C 15-100",
@@ -1348,7 +1348,7 @@ export const TRADES = [
         "desc": "Gâteaux d'anniversaire personnalisés, wedding cakes, pièces montées en choux et plaques gourmandes d'entreprise.",
         "tag": "Sur-mesure",
         "price": "Devis personnalisé sous 24h",
-        "image": "https://images.unsplash.com/photo-1535141192574-5d4897c13136?auto=format&fit=crop&w=800&q=80"
+        "image": "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=800&q=80"
       },
       {
         "title": "Formules Déjeuner & Traiteur",
@@ -1403,7 +1403,7 @@ export const TRADES = [
       { "url": "https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=800&q=80", "title": "Croissants feuilletés pur beurre", "tag": "Viennoiserie" },
       { "url": "https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=800&q=80", "title": "Entremet chocolat praliné", "tag": "Pâtisserie" },
       { "url": "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=800&q=80", "title": "Sandwich baguette fraîche", "tag": "Snacking" },
-      { "url": "https://images.unsplash.com/photo-1535141192574-5d4897c13136?auto=format&fit=crop&w=800&q=80", "title": "Tartelette aux fraises gariguettes", "tag": "Pâtisserie" },
+      { "url": "https://images.unsplash.com/photo-1549931319-a545dcf3bc73?auto=format&fit=crop&w=800&q=80", "title": "Tartelette aux fraises gariguettes", "tag": "Pâtisserie" },
       { "url": "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?auto=format&fit=crop&w=800&q=80", "title": "Pains spéciaux graines & céréales", "tag": "Spécialités" }
     ],
     "reviews": [
@@ -1593,7 +1593,7 @@ export const TRADES = [
     ],
     "ctaPrimary": "Demander une étude & devis",
     "ctaSecondary": "Appeler le maçon",
-    "heroImage": "https://images.unsplash.com/photo-1541888946425-d0fbb186c5f7?auto=format&fit=crop&w=1600&q=80",
+    "heroImage": "https://images.unsplash.com/photo-1541971875076-8f970d573be6?auto=format&fit=crop&w=1600&q=80",
     "aboutImage": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1000&q=80",
     "trustBadges": [
       { "title": "Qualification Qualibat", "desc": "Compétence technique validée pour le gros œuvre et la rénovation" },
@@ -1611,7 +1611,7 @@ export const TRADES = [
         "desc": "Création d'espaces ouverts traversants avec pose de poutres acier IPN/HEA sous calculs de descente de charges certifiés.",
         "tag": "Structure",
         "price": "Étude technique incluse",
-        "image": "https://images.unsplash.com/photo-1541888946425-d0fbb186c5f7?auto=format&fit=crop&w=800&q=80"
+        "image": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=800&q=80"
       },
       {
         "title": "Dalles Béton Armé & Chapes",
@@ -1639,7 +1639,7 @@ export const TRADES = [
         "desc": "Piquage des enduits ciments néfastes, rejointoiement à la chaux naturelle respirante et consolidation des encadrements.",
         "tag": "Patrimoine",
         "price": "Chaux naturelle",
-        "image": "https://images.unsplash.com/photo-1599818987459-009f4f469aa7?auto=format&fit=crop&w=800&q=80"
+        "image": "https://images.unsplash.com/photo-1541971875076-8f970d573be6?auto=format&fit=crop&w=800&q=80"
       },
       {
         "title": "Terrassement & Évacuation des Gravats",
@@ -1653,7 +1653,7 @@ export const TRADES = [
       "title": "Ouverture d'un mur porteur pour créer une pièce à vivre",
       "subtitle": "Faites glisser pour voir le mur aveugle cloisonné avant travaux et l'espace lumineux ouvert après pose de l'IPN",
       "beforeImage": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1000&q=80",
-      "afterImage": "https://images.unsplash.com/photo-1541888946425-d0fbb186c5f7?auto=format&fit=crop&w=1000&q=80",
+      "afterImage": "https://images.unsplash.com/photo-1541971875076-8f970d573be6?auto=format&fit=crop&w=1000&q=80",
       "beforeLabel": "Mur porteur cloisonné",
       "afterLabel": "Ouverture 4m50 avec IPN intégré",
       "projectCity": "Maison individuelle",
@@ -1679,15 +1679,15 @@ export const TRADES = [
         "category": "Clôture & Piliers",
         "city": "Commune limitrophe",
         "desc": "Semelle filante armée, blocs à bancher et piliers coffrés pour réception de portail motorisé.",
-        "image": "https://images.unsplash.com/photo-1541888946425-d0fbb186c5f7?auto=format&fit=crop&w=800&q=80"
+        "image": "https://images.unsplash.com/photo-1590381105924-c72589b9ef3f?auto=format&fit=crop&w=800&q=80"
       }
     ],
     "gallery": [
-      { "url": "https://images.unsplash.com/photo-1541888946425-d0fbb186c5f7?auto=format&fit=crop&w=800&q=80", "title": "Coulage dalle béton fibré", "tag": "Gros œuvre" },
+      { "url": "https://images.unsplash.com/photo-1541971875076-8f970d573be6?auto=format&fit=crop&w=800&q=80", "title": "Coulage dalle béton fibré", "tag": "Gros œuvre" },
       { "url": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=800&q=80", "title": "Élévation de murs en parpaings", "tag": "Maçonnerie" },
       { "url": "https://images.unsplash.com/photo-1590381105924-c72589b9ef3f?auto=format&fit=crop&w=800&q=80", "title": "Pose de poutre IPN porteuse", "tag": "Structure" },
       { "url": "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80", "title": "Mur de clôture fini et crépi", "tag": "Extérieur" },
-      { "url": "https://images.unsplash.com/photo-1599818987459-009f4f469aa7?auto=format&fit=crop&w=800&q=80", "title": "Rejointoiement muret en pierre", "tag": "Rénovation" },
+      { "url": "https://images.unsplash.com/photo-1541971875076-8f970d573be6?auto=format&fit=crop&w=800&q=80", "title": "Rejointoiement muret en pierre", "tag": "Rénovation" },
       { "url": "https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&w=800&q=80", "title": "Terrassement et fondations", "tag": "Fondations" }
     ],
     "reviews": [

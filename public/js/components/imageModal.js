@@ -99,8 +99,8 @@ export function renderImageModal(state) {
             <div class="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">Photos & Visuels calibrés pour ${trade.label}</div>
             <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
               ${curatedImages.map(img => `
-                <div onclick="window.app.selectPhotoFromLibrary('${img.url}')" class="group relative rounded-xl overflow-hidden border cursor-pointer transition-all hover:border-zinc-900 hover:shadow-md ${img.url === currentUrl ? 'border-zinc-900 ring-2 ring-zinc-900' : 'border-zinc-200'}">
-                  <img src="${img.url}" alt="${img.label}" class="w-full h-24 object-cover group-hover:scale-105 transition-transform duration-300" onerror="if(!this.dataset.fallbackApplied){this.dataset.fallbackApplied='true';this.src='${img.fallback}';}">
+                <div onclick="window.app.selectPhotoFromLibrary('${img.url}')" class="group relative rounded-xl overflow-hidden border cursor-pointer transition-all hover:border-zinc-900 hover:shadow-md aspect-[4/3] bg-zinc-100 ${img.url === currentUrl ? 'border-zinc-900 ring-2 ring-zinc-900' : 'border-zinc-200'}">
+                  <img src="${img.url}" alt="${img.label}" class="w-full h-full max-h-28 object-cover group-hover:scale-105 transition-transform duration-300 block" onerror="if(!this.dataset.fallbackApplied){this.dataset.fallbackApplied='true';this.src='${img.fallback}';}">
                   <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2">
                     <span class="text-[10px] text-white font-medium truncate">${img.label}</span>
                   </div>

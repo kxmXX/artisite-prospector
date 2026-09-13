@@ -557,13 +557,13 @@ function renderHeader(sec, project, options = {}) {
   return `
     <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-black/5 transition-all">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-        <a href="#" class="flex items-center gap-3 group">
-          <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-md transition-transform group-hover:scale-105" style="background-color: var(--primary);">
+        <a href="#" class="flex items-center gap-3 group no-underline select-none">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-md transition-transform group-hover:scale-105 flex-shrink-0" style="background-color: var(--primary);">
             ${c.brandName ? c.brandName.charAt(0).toUpperCase() : 'A'}
           </div>
           <div class="header-project-meta">
-            <span class="font-heading text-xl font-bold tracking-tight text-gray-900 block leading-tight" data-editable="brandName">${c.brandName || project.business?.name || 'Artisan'}</span>
-            <span class="text-[11px] font-medium text-gray-500 uppercase tracking-wider block">${project.business?.tradeLabel || c.badge || 'Artisan'}${project.business?.city ? ` • ${project.business.city}` : ''}</span>
+            <span class="font-heading text-xl font-bold tracking-tight text-gray-900 block leading-tight no-underline" data-editable="brandName">${c.brandName || project.business?.name || 'Artisan'}</span>
+            <span class="text-[11px] font-medium text-gray-500 uppercase tracking-wider block no-underline">${project.business?.tradeLabel || c.badge || 'Artisan'}${project.business?.city ? ` • ${project.business.city}` : ''}</span>
           </div>
         </a>
 
@@ -576,11 +576,11 @@ function renderHeader(sec, project, options = {}) {
               <button type="button" onclick="(window.app?.setVirtualPage ? window.app.setVirtualPage('devis') : window.artisiteSwitchPage?.('devis'))" data-tab-nav="devis" class="tab-nav-btn px-3 py-1 rounded-full text-xs font-semibold transition-all ${(options.activeVirtualPage || project._activeVirtualPage) === 'devis' ? 'bg-white text-zinc-950 shadow-xs font-bold' : 'text-zinc-600 hover:text-zinc-900'}">Devis</button>
               <button type="button" onclick="(window.app?.setVirtualPage ? window.app.setVirtualPage('contact') : window.artisiteSwitchPage?.('contact'))" data-tab-nav="contact" class="tab-nav-btn px-3 py-1 rounded-full text-xs font-semibold transition-all ${(options.activeVirtualPage || project._activeVirtualPage) === 'contact' ? 'bg-white text-zinc-950 shadow-xs font-bold' : 'text-zinc-600 hover:text-zinc-900'}">Contact & RDV</button>
             </div>
-          ` : (c.links || []).map(l => `<a href="${l.target}" class="hover:text-gray-900 transition-colors">${l.label}</a>`).join('')}
+          ` : (c.links || []).map(l => `<a href="${l.target}" class="hover:text-gray-900 transition-colors no-underline">${l.label}</a>`).join('')}
         </nav>
 
         <div class="flex items-center gap-3">
-          <a href="tel:${c.phone || project.business?.phone || ''}" class="hidden sm:inline-flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-gray-900 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors">
+          <a href="tel:${c.phone || project.business?.phone || ''}" class="hidden sm:inline-flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-gray-900 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors no-underline">
             ${getIcon("phone", "w-4 h-4 text-emerald-600")}
             <span data-editable="phone">${c.phone || project.business?.phone || ''}</span>
           </a>
@@ -592,7 +592,7 @@ function renderHeader(sec, project, options = {}) {
           ${isButtonHidden(sec, 'ctaText') || isButtonHidden(sec, 'primary') ? '' : `
             <div class="cta-button-wrapper group/cta relative" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-ctaText" data-cta-popover-wrapper data-section-id="${sec.id}" data-button-type="ctaText">
               ${renderButtonActionBadge(sec, 'ctaText', options, project)}
-              <a href="#simulateur" class="btn-cta inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5" style="background-color: var(--primary);">
+              <a href="#simulateur" class="btn-cta inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 no-underline" style="background-color: var(--primary);">
                 ${getIcon("sparkles", "w-4 h-4")}
                 <span data-editable="ctaText">${c.ctaText || "Demander un devis"}</span>
               </a>

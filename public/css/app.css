@@ -2862,6 +2862,20 @@ p[data-motion], div[data-motion], section[data-motion], h1[data-motion], h2[data
   outline-offset: 2px !important;
 }
 
+/* Eradicate default browser hyperlink underlines across prospect sites and header */
+.artisite-root a,
+.artisite-root a:hover,
+.artisite-root a:visited,
+.artisite-root a:active,
+.artisite-root header a,
+.artisite-root .header-project-meta,
+.artisite-root .header-project-meta span,
+.artisite-root nav a,
+.artisite-root .btn-cta,
+.artisite-root [data-editable] {
+  text-decoration: none !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 1ms !important;
