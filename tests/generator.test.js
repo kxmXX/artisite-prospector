@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { generateSite } from "../public/js/engine/generator.js";
+import { TRADES } from "../public/js/data/trades.js";
 
 test("generateSite generates complete 16-section website for Esprit Nature (Paysagiste, Montauban)", () => {
   const site = generateSite({
@@ -31,10 +32,11 @@ test("generateSite generates complete 16-section website for Esprit Nature (Pays
     assert.ok(sec.content, `Section ${expected} must have content`);
   }
 
-  // Verify before / after slider content
+  // Client generation keeps optional proof media empty until verified assets are supplied.
   const ba = site.sections.find(s => s.type === "beforeAfter");
-  assert.ok(ba.content.beforeImage);
-  assert.ok(ba.content.afterImage);
+  assert.equal(ba.visibility, false);
+  assert.equal(ba.content.beforeImage, "");
+  assert.equal(ba.content.afterImage, "");
   assert.ok(ba.content.beforeLabel);
   assert.ok(ba.content.afterLabel);
 
@@ -53,6 +55,27 @@ test("generateSite handles empty inputs gracefully with robust defaults", () => 
   const fallbackSite = generateSite();
   assert.ok(fallbackSite.id);
   assert.ok(fallbackSite.name);
-  assert.ok(fallbackSite.business.city);
+  assert.equal(fallbackSite.business.city, "");
+  assert.equal(fallbackSite.business.phone, "");
+  assert.equal(fallbackSite.dataProvenance, "user-input");
+  assert.equal(fallbackSite.isDemo, false);
   assert.ok(fallbackSite.sections.length >= 10);
+});
+
+test("all trades keep unprovided facts empty and illustrative media identified", () => {
+  for (const trade of TRADES) {
+    const site = generateSite({ name: "Atelier test", tradeId: trade.id });
+    for (const field of ["phone", "email", "address", "city", "region"]) {
+      assert.equal(site.business[field], "", `${trade.id}: ${field}`);
+    }
+    assert.deepEqual(site.business.openingHours, {});
+    for (const type of ["trust", "stats", "reviews", "hours", "beforeAfter", "realisations"]) {
+      assert.equal(site.sections.find(s => s.type === type).visibility, false, `${trade.id}: ${type}`);
+    }
+    assert.equal(site.sections.find(s => s.type === "about").content.certified, "");
+    assert.equal(site.sections.find(s => s.type === "hero").content.heroImageProvenance, "illustrative");
+    assert.ok(site.sections.find(s => s.type === "services").content.services.every(s => s.price === "" && s.provenance === "illustrative"));
+    const emergency = site.sections.find(s => s.id === "sec-radar-emergency");
+    if (emergency) assert.equal(emergency.visibility, false);
+  }
 });

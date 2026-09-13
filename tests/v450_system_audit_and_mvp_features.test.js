@@ -107,6 +107,8 @@ test("v4.5.0 MVP 2: Social Proof Toast renders live lead notification with city 
 test("v4.5.0 MVP 3: Booking Block renders 24/7 emergency badge and slot selector", () => {
   const project = generateSite({ name: "Dépannage Express", tradeId: "plombier", city: "Lyon" });
   const bookingSec = createSectionData("bookingBlock", project.business);
+  // Availability belongs to this explicit fixture, not an auto-generated emergency banner.
+  bookingSec.content.badge = "Disponibilité de test 24h/24";
   assert.equal(bookingSec.type, "bookingBlock");
   assert.ok(bookingSec.content.slots.length >= 3, "Must have at least 3 time slots");
 

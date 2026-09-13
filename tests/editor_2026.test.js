@@ -32,7 +32,18 @@ test("2026-2030 Editor: Floating canvas toolbar is rendered on sections in edito
 });
 
 test("2026-2030 Editor: Inline editable tags are present on deep child elements", () => {
-  const project = generateSite({ name: "Esprit Nature", tradeId: "paysagiste" });
+  const project = generateSite({ name: "Atelier test", tradeId: "menuisier" });
+  // Exercise populated optional fields without making them defaults for real clients.
+  const trust = project.sections.find(s => s.type === "trust");
+  trust.visibility = true;
+  trust.content.badges = [{ title: "Engagement fourni", desc: "Description fournie", icon: "check" }];
+  const stats = project.sections.find(s => s.type === "stats");
+  stats.visibility = true;
+  stats.content.items = [{ value: "12", label: "Valeur de test", sub: "Fixture" }];
+  const reviews = project.sections.find(s => s.type === "reviews");
+  reviews.visibility = true;
+  reviews.content.reviews = [{ author: "Client de test", rating: 4, text: "Avis de test", date: "2026" }];
+  project.sections.find(s => s.type === "services").content.services[0].price = "Tarif fourni";
   const editorHTML = renderWebsiteHTML(project, { isEditor: true });
 
   // Trust badges deep editability

@@ -1,7 +1,7 @@
-import { generateSite } from "../engine/generator.js";
+import { generateSite, generateDemoSite } from "../engine/generator.js";
 
 export const SAMPLE_PROJECTS = [
-  generateSite({
+  generateDemoSite({
     id: "proj-esprit-nature",
     name: "Esprit Nature",
     tradeId: "paysagiste",
@@ -10,6 +10,15 @@ export const SAMPLE_PROJECTS = [
     phone: "07 70 10 29 71",
     email: "contact@esprit-nature82.fr",
     address: "Route de Paris, 82000 Montauban",
+    openingHours: {
+      lundi: "9h - 12h / 14h - 18h",
+      mardi: "9h - 12h / 14h - 18h",
+      mercredi: "9h - 12h / 14h - 18h",
+      jeudi: "9h - 12h / 14h - 18h",
+      vendredi: "9h - 12h / 14h - 18h",
+      samedi: "9h - 12h / 14h - 18h",
+      dimanche: "Fermé"
+    },
     presetId: "nature-premium",
     pipelineStatus: "demo_sent",
     createdAt: "2026-09-01T10:15:00.000Z"

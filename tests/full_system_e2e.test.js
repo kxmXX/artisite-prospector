@@ -15,7 +15,7 @@ if (!global.localStorage) {
 }
 
 const { state, getDeepValue, setDeepValue } = await import("../public/js/state.js");
-const { generateSite, createSectionData } = await import("../public/js/engine/generator.js");
+const { generateSite, generateDemoSite, createSectionData } = await import("../public/js/engine/generator.js");
 const { renderWebsiteHTML, generateLocalBusinessSchema, renderStickyCallBar } = await import("../public/js/components/renderer.js");
 const { exportStandaloneHTML } = await import("../public/js/engine/exporter.js");
 const { renderCommandPalette } = await import("../public/js/components/commandPalette.js");
@@ -108,8 +108,8 @@ test("E2E Subsystem 1: Multi-Trade Project Generation & Auto-Enrichment", () => 
   // Graceful handling of empty or missing inputs
   const fallbackProject = generateSite({});
   assert.ok(fallbackProject.business.name, "Should supply fallback business name");
-  assert.ok(fallbackProject.business.city, "Should supply fallback city");
-  assert.ok(fallbackProject.business.phone, "Should supply fallback phone");
+  assert.equal(fallbackProject.business.city, "", "Unknown city must remain empty rather than fabricated");
+  assert.equal(fallbackProject.business.phone, "", "Unknown phone must remain empty rather than fabricated");
   assert.equal(fallbackProject.business.tradeId, "paysagiste", "Default trade should be paysagiste");
 });
 
@@ -419,13 +419,15 @@ test("E2E Subsystem 5: CTA Button Controls, Styling, Direct Action Badge & Undo/
 });
 
 test("E2E Subsystem 6: Google Reviews Rating System (Amber stars #fbbf24, overall -1, individual 0..n, average)", () => {
-  const p = generateSite({ name: "Reviews Rating Test", tradeId: "paysagiste", city: "Montauban" });
+  const p = generateDemoSite({ name: "Reviews Rating Test", tradeId: "paysagiste", city: "Montauban" });
   state.addProject(p, true);
 
   const revSec = state.currentProject.sections.find(s => s.type === "reviews");
   assert.ok(revSec, "Must have reviews section");
 
-  // Initial values
+  // Rating interactions use explicit demo fixture data, never fabricated client defaults.
+  revSec.content.overallRating = "4.9";
+  revSec.settings.showRatingCard = true;
   assert.equal(revSec.content.overallRating, "4.9");
   assert.ok(Array.isArray(revSec.content.reviews) && revSec.content.reviews.length >= 3);
 

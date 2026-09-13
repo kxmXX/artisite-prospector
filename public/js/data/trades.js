@@ -1,4 +1,5 @@
-export const TRADES = [
+// Historical showcase content. Never use these examples as facts about a new client.
+export const DEMO_TRADES = [
   {
     "id": "paysagiste",
     "label": "Jardinier / Paysagiste",
@@ -1877,6 +1878,53 @@ export const TRADES = [
   }
 ];
 
+export const TRADES = DEMO_TRADES.map(demo => ({
+  id: demo.id,
+  label: demo.label,
+  category: demo.category,
+  badge: demo.label,
+  defaultPreset: demo.defaultPreset,
+  subcategories: [...demo.subcategories],
+  heroTitles: [demo.label],
+  heroSubtitles: ["Présentez votre activité et échangez sur votre projet."],
+  ctaPrimary: ["restaurant", "boulanger", "coiffeur", "avocat"].includes(demo.id) ? "Nous contacter" : "Parlons de votre projet",
+  ctaSecondary: "Appeler",
+  heroImage: demo.heroImage,
+  heroImageProvenance: "illustrative",
+  aboutImage: "",
+  aboutTitle: "À propos",
+  aboutOwner: "",
+  aboutRole: demo.label,
+  aboutCertified: "",
+  aboutStory: "Présentez ici votre activité, votre parcours et votre approche.",
+  trustBadges: [],
+  defaultServices: demo.defaultServices.map(service => ({
+    title: service.title,
+    desc: "Prestation à personnaliser selon les services proposés.",
+    tag: "À personnaliser",
+    price: "",
+    image: service.image,
+    provenance: "illustrative"
+  })),
+  beforeAfter: { title: "Avant / Après", subtitle: "", beforeImage: "", afterImage: "", beforeLabel: "Avant", afterLabel: "Après", projectCity: "", duration: "" },
+  realisations: [],
+  gallery: [],
+  reviews: [],
+  faq: [{ q: `Comment présenter mon projet (${demo.label}) ?`, a: "Décrivez votre besoin lors de la prise de contact. Les modalités sont à préciser avec le professionnel." }],
+  quoteConfig: {
+    typeLabel: "Votre besoin",
+    types: demo.defaultServices.map(service => service.title),
+    sizeLabel: "Précisions sur le projet",
+    sizes: ["À préciser", "Projet défini", "Besoin de conseils"]
+  },
+  closerTips: { hook: "Présentez la maquette et confirmez les informations avec le professionnel." }
+}));
+
+export function getDemoTradeById(id) {
+  const resolved = getTradeById(id);
+  return DEMO_TRADES.find(trade => trade.id === resolved.id);
+}
+
 export function getTradeById(id) {
   if (!id) return TRADES[0];
   const exact = TRADES.find(t => t.id === id);
@@ -1925,4 +1973,3 @@ export function findTradeByKeywords(query) {
   if (bySub) return bySub;
   return TRADES[0];
 }
-

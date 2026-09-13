@@ -7,31 +7,38 @@ import { renderStickyCallBar } from '../public/js/components/renderer.js';
 import { renderCloserModal } from '../public/js/components/closerModal.js';
 import { renderShareModal } from '../public/js/components/shareModal.js';
 
-test('v4.2.0 Quality: Trade accuracy and certifications', () => {
-  const couvreur = TRADES.find(t => t.id === 'couvreur');
-  assert.ok(couvreur.trustBadges.some(b => (b.title + b.desc).includes('Qualibat')), 'Couvreur has Qualibat');
+test('Generation defaults do not fabricate client facts', () => {
+  for (const trade of TRADES) {
+    assert.deepEqual(trade.trustBadges, [], `${trade.id} must not receive unverified trust badges`);
+    assert.deepEqual(trade.reviews, [], `${trade.id} must not receive fake reviews`);
+  }
 
-  const macon = TRADES.find(t => t.id === 'macon');
-  assert.ok(macon.trustBadges.some(b => (b.title + b.desc).includes('Qualibat')), 'Macon has Qualibat');
+  const site = generateSite({ name: 'Boulangerie Tradition', tradeId: 'boulanger', city: 'Lyon' });
+  assert.equal(site.business.phone, '', 'Missing phone stays empty');
+  assert.equal(site.business.email, '', 'Missing email stays empty');
+  assert.equal(site.business.address, '', 'Missing address stays empty');
+  assert.deepEqual(site.business.openingHours, {}, 'Missing opening hours stay empty');
+  assert.equal(site.branding.socialProofEnabled, false, 'Social proof is opt-in');
 
-  const peintre = TRADES.find(t => t.id === 'peintre');
-  assert.ok(peintre.trustBadges.some(b => (b.title + b.desc).includes('Qualibat')), 'Peintre has Qualibat');
+  const aboutSec = site.sections.find(s => s.type === 'about');
+  const hoursSec = site.sections.find(s => s.type === 'hours');
+  const reviewsSec = site.sections.find(s => s.type === 'reviews');
+  const beforeAfterSec = site.sections.find(s => s.type === 'beforeAfter');
+  assert.equal(aboutSec.content.certified, '', 'No certification is invented');
+  assert.equal(hoursSec.visibility, false, 'Hours stay hidden until provided');
+  assert.equal(reviewsSec.visibility, false, 'Reviews stay hidden until provided');
+  assert.equal(reviewsSec.content.overallRating, '', 'No rating is invented');
+  assert.equal(beforeAfterSec.visibility, false, 'Before/after stays hidden without real images');
 
-  // Test Boulangerie does not have Garantie décennale in about points
-  const boulangerieSite = generateSite({
-    name: 'Boulangerie Tradition',
-    tradeId: 'boulangerie',
-    city: 'Lyon'
+  const withFacts = generateSite({
+    name: 'Boulangerie Tradition', tradeId: 'boulanger', city: 'Lyon',
+    phone: '04 00 00 00 00', email: 'contact@example.test', address: '1 rue Test',
+    openingHours: { mardi: '06h30 - 19h30' }
   });
-  const aboutSec = boulangerieSite.sections.find(s => s.type === 'about');
-  assert.ok(aboutSec, 'About section exists');
-  const pointsText = JSON.stringify(aboutSec.content.points || []);
-  assert.ok(!pointsText.includes('décennale'), 'Boulangerie does not mention garantie décennale');
-
-  // Test Hours are trade-adapted
-  const hoursSec = boulangerieSite.sections.find(s => s.type === 'hours');
-  assert.ok(hoursSec, 'Hours section exists');
-  assert.ok(hoursSec.content.hours?.mardi?.includes('06h30'), 'Boulangerie opens early at 06h30');
+  assert.equal(withFacts.business.phone, '04 00 00 00 00');
+  assert.equal(withFacts.business.email, 'contact@example.test');
+  assert.equal(withFacts.business.address, '1 rue Test');
+  assert.equal(withFacts.sections.find(s => s.type === 'hours').content.hours.mardi, '06h30 - 19h30');
 });
 
 test('v4.2.0 Quality: Exporter includes Fontshare and complete motion engine', () => {

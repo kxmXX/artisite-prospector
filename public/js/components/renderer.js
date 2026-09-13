@@ -1404,9 +1404,9 @@ function renderServices(sec, project, options = {}) {
                   <h3 class="font-heading text-xl font-bold text-gray-900 dark:text-white leading-snug" data-editable="services.${idx}.title">${srv.title}</h3>
                   <p class="text-gray-600 dark:text-zinc-400 text-sm mt-2 leading-relaxed" data-editable="services.${idx}.desc">${srv.desc}</p>
                 </div>
-                ${(!isPaysagiste && srv.price) ? `
+                ${!isPaysagiste ? `
                   <div class="pt-4 border-t border-gray-100 dark:border-zinc-800 flex items-center justify-between">
-                    <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md" data-editable="services.${idx}.price">${srv.price}</span>
+                    ${srv.price ? `<span class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md" data-editable="services.${idx}.price">${srv.price}</span>` : ''}
                     <a href="#simulateur" class="btn-cta text-xs font-bold text-white" style="background-color: var(--primary); border-radius: var(--btn-radius, 9999px);">
                       <span data-editable="services.${idx}.ctaText">${srv.ctaText || "Chiffrer"}</span>
                       ${getIcon("arrowRight", "w-3.5 h-3.5")}

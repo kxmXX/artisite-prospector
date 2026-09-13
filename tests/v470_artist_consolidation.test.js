@@ -4,7 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { generateSite } from "../public/js/engine/generator.js";
+import { generateSite, generateDemoSite } from "../public/js/engine/generator.js";
 import { state } from "../public/js/state.js";
 import { renderWebsiteHTML } from "../public/js/components/renderer.js";
 import { renderEditor } from "../public/js/components/editor.js";
@@ -41,7 +41,7 @@ test("v4.7.0 Consolidation: Fullscreen Hero renders liquid-glass badge, dynamic 
 });
 
 test("v4.7.0 Consolidation: Editorial Gallery renders 3-column grid with mixed Before/After comparison card", () => {
-  const project = generateSite({ name: "Esprit Nature", tradeId: "paysagiste", city: "Montauban" });
+  const project = generateDemoSite({ name: "Esprit Nature", tradeId: "paysagiste", city: "Montauban" });
   state.currentProject = project;
 
   const html = renderWebsiteHTML(project, { isEditor: false });
@@ -126,7 +126,7 @@ test("v4.7.0 Consolidation: 5-Tab Share Modal provides client demo PIN, editor l
 });
 
 test("v4.7.0 Consolidation: Editor sidebar retains accordion open state and provides gallery & hero overlay controls", () => {
-  const project = generateSite({ name: "Esprit Nature", tradeId: "paysagiste", city: "Montauban" });
+  const project = generateDemoSite({ name: "Esprit Nature", tradeId: "paysagiste", city: "Montauban" });
   state.currentProject = project;
   state.currentView = "editor";
 
@@ -151,12 +151,21 @@ test("v4.7.0 Consolidation: Editor sidebar retains accordion open state and prov
 });
 
 test("v4.7.0 Consolidation: 100% Sendpage Benchmark Fidelity for Esprit Nature Paysagiste", () => {
-  const project = generateSite({
+  const project = generateDemoSite({
     name: "Esprit Nature",
     tradeId: "paysagiste",
     city: "Montauban",
     region: "Occitanie",
-    phone: "07 70 10 29 71"
+    phone: "07 70 10 29 71",
+    openingHours: {
+      lundi: "9h - 12h / 14h - 18h",
+      mardi: "9h - 12h / 14h - 18h",
+      mercredi: "9h - 12h / 14h - 18h",
+      jeudi: "9h - 12h / 14h - 18h",
+      vendredi: "9h - 12h / 14h - 18h",
+      samedi: "9h - 12h / 14h - 18h",
+      dimanche: "Fermé"
+    }
   });
 
   // 1. Branding: Sendpage Olive Green #527c22 and 9999px pill buttons

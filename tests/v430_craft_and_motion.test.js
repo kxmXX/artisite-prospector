@@ -55,6 +55,8 @@ test('v4.3.0 Craft: State manager setButtonScale with isLive and setButtonMotion
 
 test('v4.3.0 Craft: Location section renders interactive Google Maps iframe with route overlay', () => {
   const project = generateSite({ name: 'Jardin & Co', tradeId: 'paysagiste', city: 'Toulouse' });
+  // Location is an optional section in the landscaper composition, independent of hours.
+  project.sections.find(s => s.type === 'location').visibility = true;
   const html = renderWebsiteHTML(project, { isEditor: false });
 
   assert.ok(html.includes('iframe'), 'Location renders an embedded iframe');
@@ -64,6 +66,7 @@ test('v4.3.0 Craft: Location section renders interactive Google Maps iframe with
 
 test('v4.3.0 Craft: Services CTA has data-editable attribute', () => {
   const project = generateSite({ name: 'Services Test', tradeId: 'electricien', city: 'Bordeaux' });
+  assert.equal(project.sections.find(s => s.type === 'services').content.services[0].price, '');
   const html = renderWebsiteHTML(project, { isEditor: true });
 
   assert.ok(html.includes('data-editable="services.0.ctaText"'), 'First service CTA button is inline editable');
