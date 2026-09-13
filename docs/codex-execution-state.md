@@ -1,5 +1,30 @@
 # État de reprise Codex — 13 septembre 2026
 
+## Dernière mise à jour — accueil/version intégré
+
+Cette section prévaut sur les états historiques ci-dessous. Les fichiers accueil/version
+précédemment en attente sont intégrés : package.json, index.html, dashboard.js, version.js,
+tests/v440_fixes_and_dashboard.test.js et tests/server.test.js.
+
+- Version cohérente **4.8.0-alpha.1**, non publiée.
+- Taux calculé signé/total ; estimation fondée sur estimatedValue numérique positif ou nul.
+  Valeur inconnue distincte de zéro, nombre de montants renseignés affiché.
+- Suppression des promesses de création garantie en trois secondes et labels explicites du formulaire.
+- Les deux liens CSS de polices existants ont été conservés : leur suppression partielle
+  ne relevait pas du lot version et risquait une régression typographique.
+- Première passe ciblée : 7/9 (deux assertions trop larges/ancien titre) ; assertions corrigées.
+- Validation finale : **143/143 tests**, syntaxe dashboard.js et git diff --check réussis.
+- Navigateur localhost:5182, 1280×720 : titre/badge alpha, taux25% pour1/4 et montant
+  Non renseigné avec0/4 confirmés dans l'arbre accessible et la capture. Pas de test mobile/sombre.
+- Aucun agent relancé, aucun push. Pas de refonte CSS, ni changement des contrôles du canvas.
+
+**Prochaine action exacte** : reprendre le P0 backend déjà diagnostiqué, d'abord la requête
+`/%00` et la résolution des chemins statiques dans server.js ; ajouter un test HTTP réel
+qui vérifie une réponse contrôlée et que le serveur reste disponible. Puis seulement le cache API.
+Le reste du plan demeure ouvert. Aucun échec automatisé connu à la fin de ce sous-lot.
+
+## Historique — génération
+
 ## Dernière mise à jour — sous-lot génération terminé
 
 **Cette section remplace les statuts « génération non intégrée » et les quatre échecs historiques ci-dessous.**

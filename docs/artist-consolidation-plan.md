@@ -49,9 +49,9 @@ Le style touches de clavier est conservé pour les commandes de l'éditeur, pas 
 
 | Lot | Action | Validation requise | État |
 |---|---|---|---|
-| 1 | Audit, contexte durable, version/changelog honnêtes | Base, captures, architecture et risques tracés | Audit/plan terminés be8600c ; version alpha non intégrée |
+| 1 | Audit, contexte durable, version/changelog honnêtes | Base, captures, architecture et risques tracés | Audit/plan terminés be8600c ; version4.8.0-alpha.1 intégrée non publiée |
 | 2 | Stabilité : validation API, cache, tâches async et sauvegarde | Tests entrées invalides / réponses obsolètes / isolation contexte | Sauvegarde/rechargement terminé 67465f5 ; API/async restent à faire |
-| 3 | Accueil, sombre, tokens et lisibilité des contrôles | Vrai champ nom utilisable, thèmes sans perte d'état, mobile sans overflow | Modifications partielles non commitées, non validées visuellement |
+| 3 | Accueil, sombre, tokens et lisibilité des contrôles | Vrai champ nom utilisable, thèmes sans perte d'état, mobile sans overflow | Accueil/version/KPI intégrés et vus desktop ; sombre/responsive restent ouverts |
 | 4 | Génération métier et faits non inventés | Plusieurs métiers, téléphone vide conservé, pas de faux avis/certifications | Catalogue/moteur intégrés 031e887 ; limites app.js/renderer et richesse métier restent à traiter |
 | 5 | Hero / portrait / overlay | Slider appliqué, contraste et proportions vérifiés dans le navigateur | À faire |
 | 6 | Galerie : tailles, médias et réorganisation | Vide/1/plusieurs, override indépendant, suppression et Undo | À faire |
@@ -114,3 +114,11 @@ Les états seront mis à jour avec les preuves effectives dans le rapport final,
   les entrées app.js et le style final ne sont pas validés par ce correctif de données.
 - Prochain sous-lot : terminer accueil/version déjà modifié, notamment taux de conversion affiché,
   cohérence titre et test serveur, avant de revenir aux P0 backend.
+
+### Sous-lot accueil/version terminé
+
+- Version runtime/package/titre alignée à4.8.0-alpha.1 ; taux réel et valeurs estimées explicites.
+- Cas sans projets, un tiers signé, tous signés, montants absents/négatifs/non numériques/zéro testés.
+- Suite finale **143/143** ; capture desktop et accessibilité confirment les valeurs affichées.
+- Pas de publication ni de nouveaux agents. Prochaine correction : crash serveur sur chemin NUL,
+  avec test HTTP réel de maintien en service, puis cache API dans un sous-lot séparé.
