@@ -20,7 +20,7 @@ export const TRADES = [
     ],
     "heroSubtitles": [
       "Votre paysagiste professionnel se déplace gratuitement pour concevoir et entretenir des espaces verts harmonieux, vivants et durables.",
-      "Devis détaillé sous 24h, crédit d'impôt de 50% sur l'entretien courant et travail soigné respectueux de la biodiversité."
+      "Devis détaillé gratuit sous 24h, étude personnalisée sur place et travail soigné respectueux de la nature."
     ],
     "ctaPrimary": "Demander mon devis gratuit",
     "ctaSecondary": "Appeler le paysagiste",
@@ -32,16 +32,16 @@ export const TRADES = [
         "desc": "Étude et déplacement offerts sans engagement"
       },
       {
-        "title": "Crédit d'Impôt 50%",
-        "desc": "Agrément Services à la Personne déductible"
+        "title": "Travail Soigné & Garanti",
+        "desc": "Finitions rigoureuses et chantier nettoyé après chaque passage"
       },
       {
         "title": "Artisan Local Passionné",
-        "desc": "Intervention de proximité et écoute attentive"
+        "desc": "Intervention de proximité et écoute attentive de vos besoins"
       },
       {
         "title": "Matériel Pro & Éco",
-        "desc": "Équipements silencieux et recyclage 100% des déchets verts"
+        "desc": "Équipements performants et valorisation des déchets verts"
       }
     ],
     "aboutTitle": "Un savoir-faire artisanal au service de la nature",
@@ -60,7 +60,7 @@ export const TRADES = [
         "title": "Taille de Haies & Végétaux",
         "desc": "Taille de formation, de réduction de hauteur ou d'alignement pour thuyas, lauriers, charmes et cyprès au cordeau.",
         "tag": "Entretien",
-        "price": "Éligible 50% crédit d'impôt",
+        "price": "Sur devis personnalisé",
         "image": "https://images.unsplash.com/photo-1590682680695-43b964a3ae17?auto=format&fit=crop&w=800&q=80"
       },
       {
@@ -182,8 +182,8 @@ export const TRADES = [
     ],
     "faq": [
       {
-        "q": "Comment fonctionne le crédit d'impôt de 50% sur l'entretien de jardin ?",
-        "a": "Dans le cadre des services à la personne, les travaux d'entretien courant (tonte, taille de haie, désherbage) ouvrent droit à un crédit d'impôt de 50%. Nous vous délivrons l'attestation fiscale officielle."
+        "q": "Comment se déroule l'établissement du devis pour un aménagement de jardin ?",
+        "a": "Nous nous déplaçons directement sur votre terrain pour évaluer la configuration, échanger sur vos envies et vous transmettre un chiffrage détaillé et sans engagement sous 24 à 48 heures."
       },
       {
         "q": "Vos devis sont-ils gratuits et sous quel délai sont-ils transmis ?",
@@ -455,12 +455,12 @@ export const TRADES = [
         "desc": "Mise hors d'eau immédiate après coup de vent ou tempête"
       },
       {
-        "title": "Certification Qualibat RGE",
-        "desc": "Travaux d'isolation et toiture conformes et éligibles aux aides"
+        "title": "Devis Clair & Détaillé",
+        "desc": "Métré précis et transparence complète sur les fournitures"
       },
       {
-        "title": "Matériaux Norme NF",
-        "desc": "Tuiles terre cuite et zinc garantis 30 ans"
+        "title": "Savoir-Faire Qualifié",
+        "desc": "Compétence technique validée Qualibat et respect des normes"
       }
     ],
     "aboutTitle": "La tradition du geste au service de votre toiture",
@@ -724,7 +724,7 @@ export const TRADES = [
     "id": "electricien",
     "label": "Électricien",
     "category": "Installation & Dépannage",
-    "badge": "Électricien Certifié RGE & Normes NF C 15-100",
+    "badge": "Artisan Électricien • Sécurité & Rénovation Conforme",
     "defaultPreset": "artisan-moderne",
     "subcategories": [
       "Dépannage panne de courant & Court-circuit",
@@ -753,8 +753,8 @@ export const TRADES = [
         "desc": "Conformité légale et passage Consuel garanti"
       },
       {
-        "title": "Qualification IRVE",
-        "desc": "Installateur agréé bornes de recharge VE"
+        "title": "Transparence & Conseil",
+        "desc": "Devis gratuit et explications claires avant intervention"
       },
       {
         "title": "Garantie Décennale",

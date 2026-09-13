@@ -84,16 +84,18 @@ export function generateSite(input = {}) {
   const isPersonalCare = ["coiffeur"].includes(trade.id);
   const isLiberal = ["avocat"].includes(trade.id);
 
+  const isBuildingGrosOeuvre = ["couvreur", "macon"].includes(trade.id);
+
   let aboutPoints = [
     `Déplacement offert et étude personnalisée à ${city}`,
-    "Assurance décennale et responsabilité civile professionnelle",
+    isBuildingGrosOeuvre ? "Garantie décennale et assurance responsabilité civile" : "Assurance responsabilité civile professionnelle et finitions soignées",
     "Chantiers nettoyés et restitués impeccables",
     "Interlocuteur unique tout au long de votre projet"
   ];
   let statsItems = [
     { value: "24h", label: "Délai moyen d'envoi du devis", sub: "Étude chiffrée gratuite" },
     { value: "100%", label: "Satisfaction garantie", sub: "Contrôle qualité systématique" },
-    { value: "10 ans", label: "Garantie décennale", sub: "Selon nature des travaux" },
+    isBuildingGrosOeuvre ? { value: "10 ans", label: "Garantie décennale", sub: "Sur les travaux structurels" } : { value: "Soigné", label: "Finition artisanale", sub: "Respect des délais et des lieux" },
     { value: "0 €", label: "Frais de déplacement", sub: `Dans un rayon de 30 km de ${city}` }
   ];
 
