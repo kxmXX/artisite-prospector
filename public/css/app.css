@@ -553,14 +553,10 @@ body {
 }
 
 .faq-item {
-  border: 1px solid #e2e8f0;
-  border-radius: 1rem;
-  margin-bottom: 0.75rem;
-  background: #ffffff;
-  overflow: hidden;
+  background: transparent;
+  transition: all 0.2s ease;
 }
 .faq-header {
-  padding: 1.25rem;
   font-weight: 600;
   cursor: pointer;
   display: flex;
@@ -568,13 +564,43 @@ body {
   align-items: center;
 }
 .faq-content {
-  padding: 0 1.25rem 1.25rem;
   display: none;
-  color: #475569;
   font-size: 0.95rem;
 }
-.faq-item.active .faq-content { display: block; }
-.faq-item.active .faq-icon { transform: rotate(180deg); }
+.faq-item.active .faq-content {
+  display: block;
+}
+.faq-icon-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(16, 185, 129, 0.12);
+  color: #059669;
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 1;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.25s ease, color 0.25s ease;
+  user-select: none;
+}
+.faq-item.active .faq-icon-btn {
+  transform: rotate(45deg);
+  background-color: #059669;
+  color: #ffffff;
+}
+body.dark-theme .faq-icon-btn {
+  background-color: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+}
+body.dark-theme .faq-item.active .faq-icon-btn {
+  background-color: #059669;
+  color: #ffffff;
+}
+.faq-item.active .faq-icon {
+  transform: rotate(180deg);
+}
 
 .lightbox-modal {
   display: none;

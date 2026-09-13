@@ -1903,27 +1903,33 @@ function renderLocation(sec, project) {
   `;
 }
 
-// 14. FAQ
+// 14. FAQ (High Fidelity Esprit Nature / Sendpage Rows with Plus-Minus Toggle)
 function renderFaq(sec, project) {
-  const c = sec.content;
+  const c = sec.content || {};
   return `
-    <div id="faq" class="py-20 bg-white">
+    <div id="faq" class="py-20 lg:py-28 bg-white dark:bg-zinc-950">
       <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center space-y-3 mb-12">
-          <span class="text-xs font-bold uppercase tracking-wider text-gray-400" data-editable="badge">${c.badge}</span>
-          <h2 class="font-heading text-3xl font-bold text-gray-900" data-editable="title">${c.title}</h2>
-          <p class="text-gray-500 text-sm" data-editable="subtitle">${c.subtitle}</p>
+        <div class="text-center space-y-3 mb-12 sm:mb-16">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-widest text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800" data-editable="badge">
+            ${c.badge || 'FAQ & Transparence'}
+          </div>
+          <h2 class="font-heading text-3xl sm:text-4xl lg:text-5xl font-extrabold text-zinc-900 dark:text-white tracking-tight" data-editable="title">
+            ${c.title || 'Vos Questions, Nos Réponses'}
+          </h2>
+          <p class="text-zinc-600 dark:text-zinc-400 text-sm sm:text-base max-w-xl mx-auto leading-relaxed" data-editable="subtitle">
+            ${c.subtitle || 'Tout ce que vous devez savoir avant de nous confier votre projet en toute sérénité.'}
+          </p>
         </div>
 
-        <div class="space-y-4">
+        <div class="divide-y divide-zinc-200/80 dark:divide-zinc-800 border-t border-b border-zinc-200/80 dark:border-zinc-800">
           ${(c.items || []).map((faq, idx) => `
-            <div class="faq-item ${idx === 0 ? 'active' : ''}">
-              <div class="faq-header">
-                <span class="text-sm font-bold text-gray-900" data-editable="items.${idx}.q">${faq.q}</span>
-                <span class="faq-icon text-gray-400 text-xs transition-transform">${getIcon("chevronDown", "w-4 h-4")}</span>
+            <div class="faq-item group/faq transition-colors py-5 sm:py-6 ${idx === 0 ? 'active' : ''}">
+              <div class="faq-header flex items-center justify-between gap-4 cursor-pointer select-none">
+                <span class="text-base sm:text-lg font-bold text-zinc-900 dark:text-white group-hover/faq:text-emerald-600 dark:group-hover/faq:text-emerald-400 transition-colors leading-snug" data-editable="items.${idx}.q">${faq.q}</span>
+                <span class="faq-icon-btn shrink-0">+</span>
               </div>
-              <div class="faq-content">
-                <p class="text-sm text-gray-600 leading-relaxed" data-editable="items.${idx}.a">${faq.a}</p>
+              <div class="faq-content pt-3">
+                <p class="text-sm sm:text-base text-zinc-600 dark:text-zinc-400 leading-relaxed font-normal" data-editable="items.${idx}.a">${faq.a}</p>
               </div>
             </div>
           `).join('')}

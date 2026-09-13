@@ -878,6 +878,39 @@ function renderSectionAccordionContent(sec, project, variants) {
         </div>
       ` : ''}
 
+      <!-- Specific: FAQ (Questions / Réponses) -->
+      ${sec.type === 'faq' ? `
+        <div class="space-y-2 pt-2 border-t border-zinc-200/60">
+          <div class="flex items-center justify-between">
+            <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Questions Fréquentes (${(c.items || []).length}) :</label>
+            <button type="button" onclick="window.app.addFaqItem('${sectionId}')" class="text-[10px] font-bold text-zinc-800 bg-zinc-100 hover:bg-zinc-200 px-2 py-0.5 rounded border border-zinc-200 transition-colors">+ Ajouter une question</button>
+          </div>
+
+          <div class="space-y-2">
+            ${(c.items || []).map((faq, fIdx) => `
+              <div class="p-2.5 rounded-lg bg-zinc-50 border border-zinc-200 space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-bold text-zinc-700 uppercase">#${fIdx + 1} Question</span>
+                  <button type="button" onclick="window.app.removeFaqItem('${sectionId}', ${fIdx})" class="text-red-600 hover:text-red-700 text-[10px] p-0.5" title="Supprimer">🗑️</button>
+                </div>
+                <input type="text" value="${escapeHtml(faq.q || '')}"
+                       placeholder="Votre question ?"
+                       data-field="items.${fIdx}.q"
+                       oninput="window.app.liveUpdateField('${sectionId}', 'items.${fIdx}.q', this.value)"
+                       onchange="window.app.commitFieldUpdate('${sectionId}', 'items.${fIdx}.q', this.value)"
+                       class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-xs text-zinc-900 font-medium focus:border-zinc-900 focus:outline-none">
+                <textarea rows="2"
+                          placeholder="Réponse détaillée..."
+                          data-field="items.${fIdx}.a"
+                          oninput="window.app.liveUpdateField('${sectionId}', 'items.${fIdx}.a', this.value)"
+                          onchange="window.app.commitFieldUpdate('${sectionId}', 'items.${fIdx}.a', this.value)"
+                          class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-[11px] text-zinc-600 focus:border-zinc-900 focus:outline-none leading-snug">${escapeHtml(faq.a || '')}</textarea>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      ` : ''}
+
       <!-- Hero photo with Replace & Trash -->
       ${c.heroImage !== undefined ? `
         <div class="space-y-1.5 pt-1 border-t border-zinc-200/60">
