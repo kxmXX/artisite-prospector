@@ -206,7 +206,7 @@ class App {
     } else if (state.activeDrawer === "closer") {
       modalContainer.innerHTML = renderCloserModal(state.currentProject);
     } else if (state.activeDrawer === "share_modal") {
-      modalContainer.innerHTML = renderShareModal(state.currentProject);
+      modalContainer.innerHTML = renderShareModal(state.currentProject, this._shareModalTab || 'demo');
     } else if (state.activeDrawer === "command_palette") {
       modalContainer.innerHTML = renderCommandPalette(state.currentProject, state.projects);
       setTimeout(() => {
@@ -276,12 +276,29 @@ class App {
     state.closeDrawer();
   }
 
-  copyShareUrl() {
-    const input = document.getElementById("share-modal-url-input");
+  setShareModalTab(tab) {
+    this._shareModalTab = tab;
+    this.renderModals();
+  }
+
+  enterCommercialDemoMode() {
+    this.closeShareModal();
+    state.setView("preview");
+    this.showToast("Mode Démonstration Commerciale Activé (Plein Écran)", "info");
+  }
+
+  downloadStandaloneHTML() {
+    if (!state.currentProject) return;
+    downloadHTML(state.currentProject);
+    this.showToast("Fichier HTML autonome téléchargé !", "success");
+  }
+
+  copyShareUrl(inputId = "share-modal-url-input", labelId = "btn-copy-share-label") {
+    const input = document.getElementById(inputId);
     if (input) {
       input.select();
       navigator.clipboard?.writeText(input.value);
-      const label = document.getElementById("btn-copy-share-label");
+      const label = document.getElementById(labelId);
       if (label) {
         label.textContent = "✓ Copié !";
         setTimeout(() => { label.textContent = "Copier"; }, 2000);
@@ -1389,7 +1406,7 @@ class App {
     if (!body) return;
     const isHidden = body.classList.contains("hidden");
     const parentCard = body.closest(".section-card");
-    const chevron = parentCard?.querySelector(".section-card-header .text-zinc-400 svg");
+    const chevron = parentCard?.querySelector(".section-card-header .text-zinc-400");
 
     if (isHidden) {
       body.classList.remove("hidden");

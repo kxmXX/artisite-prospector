@@ -1109,7 +1109,7 @@ function renderSectionAccordionContent(sec, project, variants) {
  * Settings Tab Accordions matching Image 2 (Sendpage style).
  */
 function renderSettingsAccordions(project, state = {}) {
-  const isOpen = (id) => (state?._openSettingsItem ? state._openSettingsItem === id : id === 'business');
+  const isOpen = (id) => (state?._openSettingsItem !== undefined ? state._openSettingsItem === id : id === 'business');
   return `
     <div class="space-y-2" id="settings-accordion-group">
 
