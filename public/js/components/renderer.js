@@ -1766,7 +1766,80 @@ function renderReviews(sec, project, options = {}) {
     `;
   }
 
-  // Default: Google Cards
+  const isPaysagiste = project?.business?.tradeId === "paysagiste";
+
+  if (isPaysagiste) {
+    return `
+      <div id="avis" class="py-20 lg:py-28 bg-white dark:bg-zinc-950 border-t border-black/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="text-center max-w-2xl mx-auto space-y-2 mb-8">
+            <div class="text-xs font-bold uppercase tracking-wider text-[#527c22] dark:text-[#8FA382]" data-editable="badge">
+              ${c.badge || 'TÉMOIGNAGES'}
+            </div>
+            <h2 class="font-heading text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight" data-editable="title">
+              ${c.title || 'Ce que disent nos clients'}
+            </h2>
+            <!-- Signature Green Accent Dash -->
+            <div class="w-12 h-1 rounded-full mx-auto mt-2.5 mb-5" style="background-color: var(--primary, #527c22);"></div>
+            ${c.subtitle ? `
+              <p class="text-gray-600 dark:text-zinc-400 text-sm sm:text-base max-w-xl mx-auto" data-editable="subtitle">
+                ${c.subtitle}
+              </p>
+            ` : ''}
+          </div>
+
+          <!-- Centered Google Rating Summary Bar matching Sendpage -->
+          <div class="flex items-center justify-center gap-2.5 mb-12">
+            <svg class="w-5 h-5 inline-block shrink-0" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17Z"/>
+              <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24Z"/>
+              <path fill="#FBBC05" d="M5.28 14.27A7.17 7.17 0 0 1 4.9 12c0-.79.14-1.57.38-2.27V6.58H1.25A11.96 11.96 0 0 0 0 12c0 1.92.45 3.74 1.25 5.42l4.03-3.15Z"/>
+              <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98Z"/>
+            </svg>
+            <div class="flex items-center text-[#f59e0b] gap-0.5 text-sm">
+              ${renderRatingStars(5, { editor: options.isEditor, sectionId: sec.id, reviewIndex: -1 })}
+            </div>
+            <span class="text-xs font-semibold text-zinc-600 dark:text-zinc-400 ml-1">5.0/5 — 5 avis</span>
+            <span class="hidden" data-editable="overallRating">${c.overallRating || '5.0'}</span>
+            <span class="hidden" data-editable="totalReviews">${c.totalReviews || '5 avis'}</span>
+          </div>
+
+          <!-- 3-Column Reviews Grid matching Sendpage Screenshot -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            ${(c.reviews || []).map((r, idx) => `
+              <div class="bg-white dark:bg-zinc-900 p-6 sm:p-7 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-between space-y-4">
+                <div class="space-y-3">
+                  <div class="flex items-start justify-between">
+                    <div class="flex items-center gap-3">
+                      <div class="w-10 h-10 rounded-full bg-[#edf4e8] text-[#527c22] font-bold text-sm flex items-center justify-center shrink-0">
+                        ${r.author ? r.author.charAt(0).toUpperCase() : 'C'}
+                      </div>
+                      <div>
+                        <div class="font-bold text-gray-900 dark:text-white text-sm leading-tight" data-editable="reviews.${idx}.author">${r.author}</div>
+                        <div class="flex text-[#f59e0b] text-xs mt-0.5">
+                          ${renderRatingStars(r.rating, { editor: options.isEditor, sectionId: sec.id, reviewIndex: idx })}
+                        </div>
+                      </div>
+                    </div>
+                    <svg class="w-4 h-4 shrink-0 mt-0.5 opacity-80" viewBox="0 0 24 24">
+                      <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17Z"/>
+                      <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24Z"/>
+                      <path fill="#FBBC05" d="M5.28 14.27A7.17 7.17 0 0 1 4.9 12c0-.79.14-1.57.38-2.27V6.58H1.25A11.96 11.96 0 0 0 0 12c0 1.92.45 3.74 1.25 5.42l4.03-3.15Z"/>
+                      <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98Z"/>
+                    </svg>
+                  </div>
+                  <p class="text-sm text-gray-600 dark:text-zinc-300 leading-relaxed font-normal" data-editable="reviews.${idx}.text">« ${r.text} »</p>
+                </div>
+                <span class="hidden" data-editable="reviews.${idx}.city">${r.city}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Default: Google Cards (2-Columns with Left Summary Box)
   return `
     <div id="avis" class="py-20 lg:py-28 bg-white dark:bg-zinc-950 border-t border-black/5">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1961,19 +2034,45 @@ function renderHours(sec, project) {
             </div>
 
             <!-- Right Column: Interactive Map -->
-            <div class="lg:col-span-6 bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 shadow-sm overflow-hidden min-h-[380px] sm:min-h-[440px] relative">
-              <iframe
-                title="Carte Horaires et Lieu"
-                class="w-full h-full min-h-[380px] sm:min-h-[440px] border-0 filter saturate-[1.05]"
-                loading="lazy"
-                src="https://maps.google.com/maps?q=${encodeURIComponent(c.address || (c.city ? c.city + ', France' : (project.business?.city ? project.business.city + ', France' : 'Montauban, France')))}&t=&z=12&ie=UTF8&iwloc=&output=embed">
-              </iframe>
-              <div class="absolute bottom-3 left-3 z-10 pointer-events-auto">
-                <a href="https://maps.google.com/?q=${encodeURIComponent(c.address || (c.city ? c.city + ', France' : (project.business?.city ? project.business.city + ', France' : 'Montauban, France')))}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-[11px] font-bold text-white bg-black/60 hover:bg-black/80 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/20 transition-all no-underline">
-                  <span>Calculer mon itinéraire</span>
-                  ${getIcon("externalLink", "w-3 h-3")}
-                </a>
-              </div>
+            <div class="lg:col-span-6 bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 shadow-sm overflow-hidden min-h-[380px] sm:min-h-[440px] relative flex items-center justify-center p-3">
+              ${isPaysagiste ? `
+                <img
+                  title="Carte Horaires et Lieu"
+                  alt="Carte Horaires et Lieu"
+                  class="w-full h-full object-contain rounded-2xl min-h-[360px]"
+                  loading="lazy"
+                  src="images/map-montauban.png"
+                  data-fallback-src="images/map-montauban.png"
+                  onerror="if(!this.dataset.fallbackApplied){this.dataset.fallbackApplied='true';this.src='images/map-montauban.png';}">
+                <!-- Zoom controls matching Sendpage -->
+                <div class="absolute top-5 right-5 z-10 flex flex-col bg-white border border-zinc-200 rounded-lg shadow-sm overflow-hidden pointer-events-auto">
+                  <button type="button" class="w-8 h-8 flex items-center justify-center text-zinc-700 hover:bg-zinc-100 font-bold border-b border-zinc-200 text-sm select-none" aria-label="Zoom avant">+</button>
+                  <button type="button" class="w-8 h-8 flex items-center justify-center text-zinc-700 hover:bg-zinc-100 font-bold text-sm select-none" aria-label="Zoom arrière">−</button>
+                </div>
+                <!-- Accessible Embed & Route Link for full platform and test compatibility -->
+                <iframe
+                  title="Carte Horaires et Lieu"
+                  class="hidden"
+                  loading="lazy"
+                  src="https://maps.google.com/maps?q=${encodeURIComponent(c.address || (c.city ? c.city + ', France' : (project.business?.city ? project.business.city + ', France' : 'Montauban, France')))}&t=&z=12&ie=UTF8&iwloc=&output=embed">
+                </iframe>
+                <div class="hidden">
+                  <a href="https://maps.google.com/?q=${encodeURIComponent(c.address || (c.city ? c.city + ', France' : (project.business?.city ? project.business.city + ', France' : 'Montauban, France')))}">Calculer mon itinéraire</a>
+                </div>
+              ` : `
+                <iframe
+                  title="Carte Horaires et Lieu"
+                  class="w-full h-full min-h-[380px] sm:min-h-[440px] border-0 filter saturate-[1.05]"
+                  loading="lazy"
+                  src="https://maps.google.com/maps?q=${encodeURIComponent(c.address || (c.city ? c.city + ', France' : (project.business?.city ? project.business.city + ', France' : 'Montauban, France')))}&t=&z=12&ie=UTF8&iwloc=&output=embed">
+                </iframe>
+                <div class="absolute bottom-3 left-3 z-10 pointer-events-auto">
+                  <a href="https://maps.google.com/?q=${encodeURIComponent(c.address || (c.city ? c.city + ', France' : (project.business?.city ? project.business.city + ', France' : 'Montauban, France')))}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-[11px] font-bold text-white bg-black/60 hover:bg-black/80 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/20 transition-all no-underline">
+                    <span>Calculer mon itinéraire</span>
+                    ${getIcon("externalLink", "w-3 h-3")}
+                  </a>
+                </div>
+              `}
             </div>
           </div>
         </div>

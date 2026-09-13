@@ -21,37 +21,61 @@ function hexToRgbText(hex) {
 
 export function getSectionFriendlyTitle(sec) {
   const titles = {
-    header: "En-tête & Menu",
-    hero: "Hero Principal",
+    header: "Menu",
+    hero: "Hero",
+    about: "About",
+    stats: "Key figures",
+    services: "Services",
+    gallery: "Photo gallery",
+    hours: "Hours & Location",
+    reviews: "Client reviews",
+    faq: "FAQ",
     trust: "Garanties & Confiance",
-    about: "Présentation Artisan",
-    stats: "Chiffres Clés",
-    services: "Prestations & Services",
-    beforeAfter: "Comparateur Avant / Après",
-    realisations: "Dernières Réalisations",
-    gallery: "Galerie Photos",
-    reviews: "Avis Clients Google",
-    quoteSimulator: "Simulateur de Devis",
-    hours: "Horaires & Urgences",
-    location: "Zone d'Intervention",
-    faq: "Questions Fréquentes",
-    cta: "Appel à l'Action Final",
-    footer: "Pied de Page",
-    customBlock: "Bloc Personnalisé",
-    process: "Processus 3 Étapes",
-    certifications: "Certifications & Garanties",
+    beforeAfter: "Before / After",
+    realisations: "Our work",
+    quoteSimulator: "Quote simulator",
+    location: "Location",
+    cta: "Final CTA",
+    footer: "Footer",
+    customBlock: "Document PDF",
+    process: "Processus",
+    certifications: "Certifications",
     pricing: "Grille Tarifaire",
-    quoteBlock: "Citation Éditoriale",
+    quoteBlock: "Citation",
     videoBlock: "Vidéo Immersion",
-    stepperBlock: "Étapes de Chantier",
+    stepperBlock: "Étapes",
     tableBlock: "Tableau Comparatif",
     sliderBlock: "Curseur de Surface",
     tabsBlock: "Onglets Prestations",
     roiCalculator: "Simulateur Rentabilité ROI",
     bookingBlock: "Créneaux & Rendez-vous"
   };
-  return titles[sec.type] || sec.type;
+  return titles[sec?.type] || sec?.type || "Section";
 }
+
+export function getSectionIcon(type) {
+  const map = {
+    header: "layout",
+    hero: "image",
+    about: "user",
+    stats: "chartBar",
+    services: "briefcase",
+    gallery: "image",
+    hours: "clock",
+    reviews: "message",
+    faq: "helpCircle",
+    customBlock: "fileText",
+    cta: "phone",
+    footer: "layout",
+    beforeAfter: "image",
+    realisations: "briefcase",
+    quoteSimulator: "fileText",
+    location: "mapPin",
+    trust: "shield"
+  };
+  return map[type] || "layers";
+}
+
 
 export function renderEditor(state) {
   ensureFontCatalog();
@@ -101,9 +125,9 @@ export function renderEditor(state) {
               <select onchange="window.app.handleSectionNavigation(this.value, event)" 
                       class="bg-zinc-100 hover:bg-zinc-200 border border-zinc-200 text-zinc-800 text-[11px] font-semibold rounded-lg px-2.5 py-1 pr-6 cursor-pointer appearance-none transition-colors max-w-[160px] sm:max-w-[200px] truncate"
                       title="Changer de section et défiler directement">
-                ${project.sections.map((s, idx) => `
+                ${project.sections.map((s) => `
                   <option value="${s.id}" ${s.id === selectedSecId ? 'selected' : ''}>
-                    ${idx < 9 ? '0' + (idx + 1) : (idx + 1)}. ${getSectionFriendlyTitle(s)}
+                    ${getSectionFriendlyTitle(s)}
                   </option>
                 `).join('')}
               </select>
@@ -171,6 +195,13 @@ export function renderEditor(state) {
             ${getIcon(state.themeMode === 'dark' ? 'sun' : 'moon', 'w-4 h-4')}
             <span class="theme-control-label">${state.themeMode === 'dark' ? 'Éditeur clair' : 'Éditeur sombre'}</span>
           </button>
+
+          <!-- Direct Fullscreen Vitrine Link Button -->
+          <button type="button" onclick="window.app.openVitrineDemo()" class="btn-keycap bg-emerald-600 hover:bg-emerald-700 text-white inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold shadow-xs" title="Ouvrir la vitrine Sendpage sans aucun éditeur">
+            ${getIcon("eye", "w-3.5 h-3.5")}
+            <span>Voir Vitrine</span>
+          </button>
+
 
           <!-- Command Palette (⌘K) -->
           <button type="button" onclick="window.app.openCommandPalette()" class="btn-keycap btn-keycap-light inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-zinc-700 border border-zinc-200" title="Palette de commande (⌘K)">
@@ -257,40 +288,47 @@ export function renderEditor(state) {
               </button>
             </div>
 
-            <!-- List of Compact Section Cards -->
+            <!-- List of Compact Section Cards (Sendpage Benchmark Fidelity) -->
             <div class="space-y-1.5" id="editor-sections-list">
-              ${project.sections.map((s, idx) => {
+              ${project.sections.map((s) => {
                 const isSel = s.id === state.selectedSectionId;
                 const isVis = s.visibility !== false;
                 const isOpen = isSel;
                 const friendlyTitle = getSectionFriendlyTitle(s);
                 const secDef = SECTION_DEFINITIONS.find(d => d.type === s.type);
                 const variants = secDef?.variants || [];
+                const isStructural = ["header", "hero", "cta", "footer"].includes(s.type);
 
                 return `
-                  <div class="section-card ${isSel ? 'is-selected' : ''} ${!isVis ? 'is-hidden' : ''}"
+                  <div class="section-card ${isStructural ? 'bg-zinc-100/70 border border-zinc-200/60 rounded-xl' : 'bg-white border border-zinc-200/80 rounded-xl'} ${isSel ? 'is-selected ring-1 ring-zinc-900/10' : ''} ${!isVis ? 'is-hidden opacity-50' : ''}"
                        data-sec-id="${s.id}">
 
                     <!-- Compact Header with Smooth Scroll to Canvas Section -->
-                    <div class="section-card-header" role="button" tabindex="0" aria-controls="accordion-${s.id}" aria-expanded="${isOpen}" onclick="window.app.handleSectionNavigation('${s.id}', event)" onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); window.app.handleSectionNavigation('${s.id}', event); }">
-                      <div class="flex items-center gap-2 min-w-0 flex-1">
-                        <span class="section-card-grip cursor-grab active:cursor-grabbing p-0.5 hover:text-zinc-900 rounded" draggable="true" data-sec-id="${s.id}" title="Glisser pour réorganiser">
-                          ${getIcon("gripVertical", "w-3.5 h-3.5")}
+                    <div class="section-card-header px-3 py-2.5 flex items-center justify-between cursor-pointer select-none" role="button" tabindex="0" aria-controls="accordion-${s.id}" aria-expanded="${isOpen}" onclick="window.app.handleSectionNavigation('${s.id}', event)" onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); window.app.handleSectionNavigation('${s.id}', event); }">
+                      <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                        ${isStructural ? '' : `
+                          <span class="section-card-grip cursor-grab active:cursor-grabbing p-0.5 text-zinc-300 hover:text-zinc-600 rounded flex-shrink-0" draggable="true" data-sec-id="${s.id}" title="Glisser pour réorganiser">
+                            ${getIcon("gripVertical", "w-3.5 h-3.5")}
+                          </span>
+                        `}
+                        <span class="text-zinc-400 flex-shrink-0">
+                          ${getIcon(getSectionIcon(s.type), "w-4 h-4")}
                         </span>
-                        <span class="text-[10px] font-mono text-zinc-400 w-4">${idx < 9 ? '0' + (idx + 1) : (idx + 1)}</span>
-                        <span class="text-xs font-medium text-zinc-900 truncate capitalize">${friendlyTitle}</span>
+                        <span class="text-xs ${isStructural ? 'font-semibold text-zinc-800' : 'font-medium text-zinc-800'} truncate">${friendlyTitle}</span>
                       </div>
 
-                      <div class="flex items-center gap-1 flex-shrink-0">
-                        <button type="button"
-                                onclick="event.stopPropagation(); window.app.toggleSectionVisibility('${s.id}')"
-                                class="btn-keycap btn-keycap-light p-1.5 rounded-md text-zinc-800 hover:text-black border border-zinc-200 shadow-2xs transition-all"
-                                title="${isVis ? 'Masquer la section' : 'Afficher la section'}">
-                          ${getIcon(isVis ? "eye" : "eyeOff", "w-3.5 h-3.5")}
-                        </button>
+                      <div class="flex items-center gap-1.5 flex-shrink-0">
+                        ${isStructural ? '' : `
+                          <button type="button"
+                                  onclick="event.stopPropagation(); window.app.toggleSectionVisibility('${s.id}')"
+                                  class="p-1 text-zinc-400 hover:text-zinc-700 transition-colors"
+                                  title="${isVis ? 'Masquer la section' : 'Afficher la section'}">
+                            ${getIcon(isVis ? "eye" : "eyeOff", "w-3.5 h-3.5")}
+                          </button>
+                        `}
                         <button type="button"
                                 onclick="event.stopPropagation(); window.app.handleSectionNavigation('${s.id}', event)"
-                                class="btn-keycap btn-keycap-light accordion-chevron p-1.5 rounded-md text-zinc-800 hover:text-black border border-zinc-200 shadow-2xs transition-all ${isOpen ? 'rotate-180' : ''}"
+                                class="accordion-chevron p-1 text-zinc-400 hover:text-zinc-700 transition-transform ${isOpen ? 'rotate-180' : ''}"
                                 title="${isOpen ? 'Fermer l\'accordéon' : 'Ouvrir l\'accordéon'}">
                           ${getIcon("chevronDown", "w-3.5 h-3.5")}
                         </button>
@@ -305,6 +343,12 @@ export function renderEditor(state) {
                 `;
               }).join('')}
             </div>
+
+            <!-- Sendpage + Add a section link -->
+            <button type="button" onclick="window.app.openAddSectionModal()" class="w-full mt-3 py-2 px-2 text-xs font-semibold text-[#1877F2] hover:text-blue-700 flex items-center gap-1.5 transition-colors">
+              <span class="text-base font-bold leading-none">+</span>
+              <span>Add a section</span>
+            </button>
           </div>
 
           <!-- TAB 2: PARAMÈTRES (MATCHING SENDPAGE SCREENSHOT WITH ACCORDIONS) -->
@@ -331,8 +375,8 @@ export function renderEditor(state) {
               </button>
             </div>
           ` : `
-            <!-- Canva-like Quick Element Adder Dock -->
-            <div class="canva-dock ${state.activeDrawer ? 'hidden' : ''}" id="canva-floating-dock">
+            <!-- Canva-like Quick Element Adder Dock (Hidden to keep canvas clean) -->
+            <div class="canva-dock ${state.activeDrawer ? 'hidden' : ''}" id="canva-floating-dock" style="display: none;">
               <span class="text-[11px] font-bold text-zinc-500 px-1.5 flex items-center gap-1">
                 ${getIcon("plus", "w-3 h-3 text-zinc-400")}
                 <span>Ajouter un bloc :</span>
@@ -354,6 +398,7 @@ export function renderEditor(state) {
               </button>
             </div>
           `}
+
 
           <!-- In-Canvas Floating Text Toolbar (Curseur de taille, Gras, Italique, Souligné, Couleur, Anim) -->
           <div id="floating-text-toolbar" class="floating-text-toolbar" style="display: none;" role="toolbar" aria-label="Formatage du texte" onclick="event.stopPropagation();">

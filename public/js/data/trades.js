@@ -24,8 +24,8 @@ export const TRADES = [
     ],
     "ctaPrimary": "Demander un devis personnalisé",
     "ctaSecondary": "07 70 10 29 71",
-    "heroImage": "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=1600&q=80",
-    "aboutImage": "https://images.unsplash.com/photo-1622383563227-04401ab4e5ea?auto=format&fit=crop&w=1000&q=80",
+    "heroImage": "images/hero-garden.jpg",
+    "aboutImage": "images/benjamin-artisan.jpg",
     "trustBadges": [
       {
         "title": "Devis Gratuit sous 24h",
@@ -56,49 +56,49 @@ export const TRADES = [
         "desc": "Nous imaginons des projets de jardin adaptés à vos envies",
         "tag": "Création",
         "price": "Sur devis gratuit",
-        "image": "https://images.unsplash.com/photo-1584467541268-b040f83be3fd?auto=format&fit=crop&w=800&q=80"
+        "image": "images/service-conception.jpg"
       },
       {
         "title": "Aménagement & Plantation",
         "desc": "De la plantation à l'aménagement, nous créons un extérieur harmonieux et fonctionnel.",
         "tag": "Plantation",
         "price": "Sur devis personnalisé",
-        "image": "https://images.unsplash.com/photo-1558904541-efa8c4a52d31?auto=format&fit=crop&w=800&q=80"
+        "image": "images/service-plantation.jpg"
       },
       {
         "title": "Défrichage & Débroussaillage",
         "desc": "Nous dégageons vos terrains et éliminons la végétation envahissante pour leur redonner un aspect propre et entretenu.",
         "tag": "Remise en état",
         "price": "Intervention rapide",
-        "image": "https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&w=800&q=80"
+        "image": "images/service-defrichage.jpg"
       },
       {
         "title": "Taille de haies",
-        "desc": "Taille soignée et géométrique de vos haies et arbustes pour préserver leur santé et sublimer votre extérieur.",
+        "desc": "Pour des haies denses, soignées et bien dessinées toute l'année.",
         "tag": "Taille au cordeau",
         "price": "Au mètre linéaire",
-        "image": "https://images.unsplash.com/photo-1590682680695-43b964a3ae17?auto=format&fit=crop&w=800&q=80"
+        "image": "images/service-haies.jpg"
       },
       {
         "title": "Tonte",
-        "desc": "Tonte de pelouse impeccable avec finitions nettes des bordures et ramassage soigné des résidus verts.",
+        "desc": "Une tonte régulière et soignée pour une pelouse saine et impeccable.",
         "tag": "Entretien régulier",
         "price": "Formule ponctuelle ou annuelle",
-        "image": "https://images.unsplash.com/photo-1598902108854-10e335adac99?auto=format&fit=crop&w=800&q=80"
+        "image": "images/service-tonte.jpg"
       },
       {
         "title": "Élagage & Abattage",
-        "desc": "Élagage délicat en hauteur, taille raisonnée des ramures et abattage sécurisé de tous types d'arbres.",
+        "desc": "Interventions sécurisées pour entretenir vos arbres ou supprimer les sujets dangereux.",
         "tag": "Arboriste grimpeur",
         "price": "Étude personnalisée",
-        "image": "https://images.unsplash.com/photo-1541414779316-956a5084c0d4?auto=format&fit=crop&w=800&q=80"
+        "image": "images/service-elagage.jpg"
       }
     ],
     "beforeAfter": {
       "title": "Transformation spectaculaire de vos extérieurs",
       "subtitle": "Faites glisser le curseur pour visualiser la métamorphose avant et après notre intervention",
-      "beforeImage": "https://images.unsplash.com/photo-1500651230702-0e2d8a49d4ad?auto=format&fit=crop&w=1000&q=80",
-      "afterImage": "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1000&q=80",
+      "beforeImage": "images/gallery-4-ba-pool.jpg",
+      "afterImage": "images/gallery-4-ba-pool.jpg",
       "beforeLabel": "Terrain en friche avant travaux",
       "afterLabel": "Jardin paysager livré & engazonné",
       "projectCity": "Secteur local",
@@ -110,98 +110,114 @@ export const TRADES = [
         "category": "Aménagement complet",
         "city": "Secteur résidentiel",
         "desc": "Mise en place d'un gazon en rouleau, plantation d'oliviers centenaires et allée en dalles de schiste.",
-        "image": "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=800&q=80"
+        "image": "images/hero-garden.jpg"
       },
       {
         "title": "Taille de restructuration d'une grande haie",
         "category": "Entretien & Taille",
         "city": "Zone pavillonnaire",
         "desc": "Abaissement de 2m de hauteur, taille d'alignement au cordeau et broyage des résidus verts.",
-        "image": "https://images.unsplash.com/photo-1590682680695-43b964a3ae17?auto=format&fit=crop&w=800&q=80"
+        "image": "images/gallery-2-hedge.jpg"
       },
       {
         "title": "Aménagement minéral autour d'une piscine",
         "category": "Piscine & Détente",
         "city": "Propriété privée",
         "desc": "Création d'un massif méditerranéen avec galets blancs de Carrare, lavandes et graminées rustiques.",
-        "image": "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?auto=format&fit=crop&w=800&q=80"
+        "image": "images/gallery-4-ba-pool.jpg"
       }
     ],
     "gallery": [
       {
-        "url": "https://images.unsplash.com/photo-1558904541-efa8c4a52d31?auto=format&fit=crop&w=800&q=80",
+        "url": "images/gallery-1-willow.jpg",
         "title": "Grand jardin avec saule",
         "tag": "Création"
       },
       {
-        "url": "https://images.unsplash.com/photo-1590682680695-43b964a3ae17?auto=format&fit=crop&w=800&q=80",
+        "url": "images/gallery-2-hedge.jpg",
         "title": "Taille de haie au cordeau",
         "tag": "Entretien"
       },
       {
-        "url": "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?auto=format&fit=crop&w=800&q=80",
+        "url": "images/gallery-3-tree.jpg",
         "title": "Taille d'arbre d'ornement",
         "tag": "Élagage"
       },
       {
         "type": "beforeAfter",
-        "beforeImage": "https://images.unsplash.com/photo-1500651230702-0e2d8a49d4ad?auto=format&fit=crop&w=800&q=80",
-        "afterImage": "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
+        "beforeImage": "images/gallery-4-ba-pool.jpg",
+        "afterImage": "images/gallery-4-ba-pool.jpg",
+        "url": "images/gallery-4-ba-pool.jpg",
         "title": "Piscine & Engazonnement",
         "tag": "Avant / Après"
       },
       {
-        "url": "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=800&q=80",
+        "url": "images/gallery-5-terrace.jpg",
         "title": "Terrasse couverte & Pelouse",
         "tag": "Aménagement"
       },
       {
         "type": "beforeAfter",
-        "beforeImage": "https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&w=800&q=80",
-        "afterImage": "https://images.unsplash.com/photo-1584467541268-b040f83be3fd?auto=format&fit=crop&w=800&q=80",
+        "beforeImage": "images/gallery-6-ba-path.jpg",
+        "afterImage": "images/gallery-6-ba-path.jpg",
+        "url": "images/gallery-6-ba-path.jpg",
         "title": "Allée & Défrichage",
         "tag": "Avant / Après"
       }
     ],
     "reviews": [
       {
-        "author": "Jean-Marc V.",
-        "city": "Particulier",
+        "author": "Othman Mercier",
+        "city": "Montauban",
         "rating": 5,
         "date": "Il y a 2 semaines",
-        "text": "Travail irréprochable pour la réfection totale de notre pelouse et la taille des haies. Chantier laissé d'une propreté exemplaire. Très professionnel et ponctuel !"
+        "text": "Benjamin est super , travaille impeccable. Rendez-vous pris rapidement . Tarif moins cher que plusieurs autres artisans, je recommande vraiment :)"
       },
       {
-        "author": "Claire & Thomas B.",
-        "city": "Propriétaires",
+        "author": "Malaurie Lefort",
+        "city": "Montauban",
         "rating": 5,
         "date": "Il y a 1 mois",
-        "text": "De très bons conseils sur le choix des végétaux pour résister aux étés chauds. Le devis a été respecté au centime près. Nous recommandons les yeux fermés."
+        "text": "Un grand merci! Travail très soigné, personne très gentille, très professionnel, à l'écoute de nos besoins ! Nous recommandons à 1000% ! Nous n'hésiterons pas à refaire appel à ses services au besoin!"
       },
       {
-        "author": "Alain D.",
-        "city": "Résidence Les Chênes",
+        "author": "Mathieu Manel Duarte",
+        "city": "Occitanie",
+        "rating": 5,
+        "date": "Il y a 1 mois",
+        "text": "Une prestation irréprochable. Professionnel, à l'écoute, minutieux et passionné par son métier. Le rendu est magnifique. Je recommande sans aucune hésitation !"
+      },
+      {
+        "author": "Chris F",
+        "city": "Montauban",
         "rating": 5,
         "date": "Il y a 2 mois",
-        "text": "Intervention rapide pour l'élagage d'un grand arbre menaçant la toiture. Équipe sympathique et très bien équipée. Excellent rapport qualité/prix."
+        "text": "Benjamin et son équipe ont fait de l'excellent travail, réalisé avec soin et efficacité à un prix raisonnable. Très bon contact également. Merci beaucoup !"
+      },
+      {
+        "author": "Regnier Julie",
+        "city": "Montauban",
+        "rating": 5,
+        "date": "Il y a 3 mois",
+        "text": "Très bon jardinier!!! Ponctuel,rapide,efficace! Cela fait 2 ans que nous faisons appel à lui et nous en sommes satisfaits...nous recommandons Benjamin"
       }
     ],
     "faq": [
       {
-        "q": "Comment se déroule l'établissement du devis pour un aménagement de jardin ?",
-        "a": "Nous nous déplaçons directement sur votre terrain pour évaluer la configuration, échanger sur vos envies et vous transmettre un chiffrage détaillé et sans engagement sous 24 à 48 heures."
-      },
-      {
-        "q": "Vos devis sont-ils gratuits et sous quel délai sont-ils transmis ?",
-        "a": "Tous nos devis sont 100% gratuits et sans engagement. Après visite sur place pour analyser votre terrain, nous vous transmettons un chiffrage sous 24 à 48h ouvrées."
-      },
-      {
-        "q": "Prenez-vous en charge l'évacuation des déchets verts ?",
-        "a": "Absolument. Tous les branchages et tontes sont systématiquement broyés ou acheminés vers une plateforme de compostage agréée locale."
+        "q": "Quel est le processus pour la création d'un jardin ?",
+        "a": "Nous nous déplaçons directement chez vous pour échanger sur vos envies, analyser le terrain et son exposition. Nous vous proposons ensuite un plan d'aménagement sur mesure accompagné d'un devis clair et détaillé. Une fois validé, nous planifions le chantier et réalisons l'ensemble des travaux."
       },
       {
         "q": "Proposez-vous des contrats d'entretien annuels ?",
-        "a": "Oui, nous concevons des contrats sur-mesure (mensuels, bimensuels ou trimestriels) pour assurer la beauté de vos extérieurs en toutes saisons."
+        "a": "Oui, nous proposons des formules d'entretien annuel sur mesure (tonte, taille de haies, entretien des massifs, désherbage) adaptées au rythme des saisons pour garder vos extérieurs impeccables toute l'année."
+      },
+      {
+        "q": "Intervenez-vous pour des petits aménagements ou uniquement des grands projets ?",
+        "a": "Nous intervenons pour tous types de chantiers : de la simple tonte ou taille ponctuelle jusqu'à la création complète et l'aménagement paysager global de vos extérieurs."
+      },
+      {
+        "q": "Quelles sont les garanties sur vos réalisations ?",
+        "a": "Toutes nos prestations sont réalisées dans les règles de l'art avec une garantie de reprise sur les végétaux plantés. Nous disposons d'une assurance responsabilité civile professionnelle complète."
       }
     ],
     "quoteConfig": {

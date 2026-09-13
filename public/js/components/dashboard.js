@@ -81,18 +81,31 @@ export function renderDashboard(state) {
 
           <!-- Action Buttons with Tactile Keycap Aesthetics -->
           <div class="pt-3.5 border-t border-zinc-100 flex items-center justify-between gap-2">
-            <button type="button" onclick="window.app.openEditor('${p.id}')" class="flex-1 btn-keycap btn-keycap-dark inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white shadow-xs hover:bg-zinc-900 transition-colors">
-              ${getIcon("edit", "w-3.5 h-3.5")}
-              <span>Éditeur</span>
-            </button>
+            ${p.id === 'proj-esprit-nature' ? `
+              <button type="button" onclick="window.app.openPreview('${p.id}')" class="flex-1 btn-keycap bg-emerald-600 hover:bg-emerald-700 text-white inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold shadow-xs transition-all" title="Ouvrir la Vitrine Sendpage">
+                ${getIcon("eye", "w-3.5 h-3.5")}
+                <span>Voir Vitrine</span>
+              </button>
+              <button type="button" onclick="window.app.openEditor('${p.id}')" class="btn-keycap btn-keycap-dark inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-white shadow-xs" title="Éditeur">
+                ${getIcon("edit", "w-3.5 h-3.5")}
+                <span>Éditer</span>
+              </button>
+              <button type="button" onclick="window.app.resetDemoProject()" class="btn-keycap btn-keycap-light p-2 rounded-xl text-amber-600 hover:text-amber-800 border border-zinc-200" title="Réinitialiser Démo Sendpage">
+                ⚡
+              </button>
+            ` : `
+              <button type="button" onclick="window.app.openEditor('${p.id}')" class="flex-1 btn-keycap btn-keycap-dark inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white shadow-xs hover:bg-zinc-900 transition-colors">
+                ${getIcon("edit", "w-3.5 h-3.5")}
+                <span>Éditeur</span>
+              </button>
+              <button type="button" onclick="window.app.openPreview('${p.id}')" class="btn-keycap btn-keycap-light p-2 rounded-xl text-zinc-600 hover:text-zinc-900 border border-zinc-200" title="Aperçu Client Démo">
+                ${getIcon("eye", "w-4 h-4")}
+              </button>
+            `}
 
             <button type="button" onclick="window.app.openCloserModal('${p.id}')" class="btn-keycap btn-keycap-light inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-zinc-800 border border-zinc-200 hover:bg-zinc-100" title="Kit de Vente & Script Appel">
               ${getIcon("sparkles", "w-3.5 h-3.5 text-amber-500")}
               <span>Pitch</span>
-            </button>
-
-            <button type="button" onclick="window.app.openPreview('${p.id}')" class="btn-keycap btn-keycap-light p-2 rounded-xl text-zinc-600 hover:text-zinc-900 border border-zinc-200" title="Aperçu Client Démo">
-              ${getIcon("eye", "w-4 h-4")}
             </button>
 
             <button type="button" onclick="window.app.duplicateProject('${p.id}')" class="btn-keycap btn-keycap-light p-2 rounded-xl text-zinc-600 hover:text-zinc-900 border border-zinc-200" title="Dupliquer">
@@ -103,6 +116,7 @@ export function renderDashboard(state) {
               ${getIcon("trash", "w-4 h-4")}
             </button>
           </div>
+
         </div>
       </div>
     `;
@@ -138,10 +152,17 @@ export function renderDashboard(state) {
               <span class="hidden sm:inline">${state.themeMode === 'dark' ? 'Mode Jour' : 'Mode Nuit'}</span>
             </button>
 
+            <button type="button" onclick="window.app.openVitrineDemo()" class="btn-keycap bg-emerald-600 hover:bg-emerald-700 text-white inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold shadow-xs transition-all" title="Ouvrir directement la vitrine Sendpage sans aucun éditeur">
+              <span>👁️</span>
+              <span class="hidden md:inline">Voir la Vitrine Sendpage (Démo)</span>
+              <span class="md:hidden">Vitrine Démo</span>
+            </button>
+
             <button type="button" onclick="window.app.openWizard()" class="btn-keycap btn-keycap-accent inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold shadow-xs">
               ${getIcon("plus", "w-4 h-4")}
               <span>Nouveau prospect</span>
             </button>
+
           </div>
 
         </div>

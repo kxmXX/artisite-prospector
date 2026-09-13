@@ -151,16 +151,26 @@ class App {
       }
     });
 
-    // Check URL parameters (e.g. ?demo=proj-esprit-nature)
+    // Check URL parameters (e.g. ?vitrine=1, ?demo=esprit-nature, ?view=preview)
     const urlParams = new URLSearchParams(window.location.search);
-    const demoId = urlParams.get("demo");
-    if (demoId) {
-      const p = state.projects.find(x => x.id === demoId || x.name.toLowerCase().includes(demoId.toLowerCase()));
-      if (p) {
-        state.setCurrentProject(p);
+    const isVitrine = urlParams.get("vitrine") === "1" || urlParams.get("view") === "preview" || urlParams.get("demo") === "esprit-nature" || urlParams.get("demo") === "1";
+    if (isVitrine) {
+      const esprit = state.projects.find(x => x.id === "proj-esprit-nature") || state.projects[0];
+      if (esprit) {
+        state.setCurrentProject(esprit);
         state.setView("preview");
       }
+    } else {
+      const demoId = urlParams.get("demo");
+      if (demoId) {
+        const p = state.projects.find(x => x.id === demoId || x.name.toLowerCase().includes(demoId.toLowerCase()));
+        if (p) {
+          state.setCurrentProject(p);
+          state.setView("preview");
+        }
+      }
     }
+
 
     this.render();
   }
@@ -241,6 +251,19 @@ class App {
     if (projectId) state.setCurrentProject(projectId);
     state.setView("preview");
   }
+
+  openVitrineDemo() {
+    const esprit = state.projects.find(x => x.id === "proj-esprit-nature") || state.projects[0];
+    if (esprit) state.setCurrentProject(esprit);
+    state.setView("preview");
+  }
+
+  resetDemoProject() {
+    state.resetDemoProject();
+    this.showToast("Démo Esprit Nature réinitialisée au standard Sendpage !", "success");
+    this.render();
+  }
+
 
   openWizard() {
     state.setDrawer("new_project");
