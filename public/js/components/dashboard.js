@@ -133,6 +133,11 @@ export function renderDashboard(state) {
               <input type="text" id="project-search" oninput="window.app.filterProjects(this.value)" placeholder="Filtrer un artisan, ville..." class="w-64 bg-zinc-100/80 border border-zinc-200 rounded-xl px-3.5 py-2 text-xs text-zinc-800 placeholder:text-zinc-400 focus:bg-white focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 focus:outline-none transition-all">
             </div>
 
+            <button type="button" onclick="window.app.toggleThemeMode()" class="btn-keycap btn-keycap-light inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-zinc-700 cursor-pointer border border-zinc-200" title="Basculer le mode sombre de l'interface" aria-label="Basculer le mode sombre de l'interface">
+              ${state.themeMode === 'dark' ? getIcon("sun", "w-4 h-4 text-amber-400") : getIcon("moon", "w-4 h-4 text-zinc-600")}
+              <span class="hidden sm:inline">${state.themeMode === 'dark' ? 'Mode Jour' : 'Mode Nuit'}</span>
+            </button>
+
             <button type="button" onclick="window.app.openWizard()" class="btn-keycap btn-keycap-accent inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold shadow-xs">
               ${getIcon("plus", "w-4 h-4")}
               <span>Nouveau prospect</span>

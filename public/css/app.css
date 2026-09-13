@@ -1715,6 +1715,33 @@ body.dark-theme #right-inspector-panel input,
 body.dark-theme #right-inspector-panel textarea,
 body.dark-theme #right-inspector-panel select { background: #202027 !important; color: #f4f4f5 !important; border-color: #45454f !important; }
 
+/* Dashboard 2026 Obsidian Dark Theme */
+body.dark-theme .min-h-screen.bg-\[\#F8F9FA\] { background-color: #0c0d12 !important; color: #f4f4f5 !important; }
+body.dark-theme nav.bg-white\/85 { background-color: rgba(18, 21, 30, 0.94) !important; border-color: #272c3d !important; }
+body.dark-theme .bg-gradient-to-b.from-white { background: linear-gradient(to bottom, #161a25, #11141d) !important; border-color: #272c3d !important; }
+body.dark-theme [data-project-id] { background-color: #161a25 !important; border-color: #272c3d !important; }
+body.dark-theme [data-project-id]:hover { border-color: #4f5b7d !important; }
+body.dark-theme [data-project-id] .text-zinc-600 { color: #b4bac7 !important; }
+body.dark-theme [data-project-id] .text-zinc-800 { color: #f4f4f5 !important; }
+body.dark-theme .quick-gen-bar { background-color: #161a25 !important; border-color: #2e3549 !important; box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4) !important; }
+body.dark-theme .quick-gen-field-name,
+body.dark-theme .quick-gen-field-trade,
+body.dark-theme .quick-gen-field-city { background-color: #202534 !important; border-color: #30374b !important; }
+body.dark-theme #quick-gen-name,
+body.dark-theme #quick-gen-city { color: #ffffff !important; }
+body.dark-theme #quick-gen-trade { color: #ffffff !important; }
+body.dark-theme #quick-gen-trade option { background-color: #161a25 !important; color: #ffffff !important; }
+body.dark-theme #project-search { background-color: #202534 !important; border-color: #30374b !important; color: #ffffff !important; }
+body.dark-theme .text-zinc-950,
+body.dark-theme .text-zinc-900 { color: #f4f4f5 !important; }
+body.dark-theme .text-zinc-600 { color: #b4bac7 !important; }
+body.dark-theme .text-zinc-500 { color: #8e95a5 !important; }
+body.dark-theme .border-zinc-200,
+body.dark-theme .border-zinc-200\/90,
+body.dark-theme .border-zinc-200\/80,
+body.dark-theme .border-zinc-200\/70 { border-color: #272c3d !important; }
+body.dark-theme .bg-zinc-100 { background-color: #202534 !important; color: #e4e4e7 !important; border-color: #30374b !important; }
+
 /* Generated client day/night switch. Scoped so it never changes the editor chrome. */
 .site-theme-toggle { min-height: 40px; cursor: pointer; }
 .site-theme-icon { display: inline-flex; }
@@ -1769,6 +1796,9 @@ body.dark-theme #right-inspector-panel select { background: #202027 !important; 
 .artisite-root[data-site-theme="dark"] input,
 .artisite-root[data-site-theme="dark"] textarea,
 .artisite-root[data-site-theme="dark"] select { background: #20242c !important; color: #f4f4f5 !important; border-color: #4b5563 !important; }
+.artisite-root[data-site-theme="dark"] .rounded-2xl.bg-white,
+.artisite-root[data-site-theme="dark"] .rounded-3xl.bg-white,
+.artisite-root[data-site-theme="dark"] .rounded-xl.bg-white { background-color: #171a20 !important; border-color: #303641 !important; }
 
 @media (max-width: 1250px) {
   .viewport-label { display: none; }
