@@ -1,5 +1,29 @@
 # État de reprise Codex — 13 septembre 2026
 
+## Dernière mise à jour — P0 chemins serveur corrigé
+
+Cette section prévaut sur les états historiques ci-dessous.
+
+- server.js rejette avant accès disque les caractères de contrôle/NUL, les encodages
+  malformés, antislashs et séparateurs encodés (400). Les chemins résolus hors du dossier
+  public sont refusés (403), y compris un dossier voisin commençant par « public ».
+- Les erreurs de lecture ne divulguent plus le chemin interne au client.
+- Le port réellement alloué est journalisé, permettant un test isolé avec PORT=0.
+- Nouveau tests/static_http.test.js : lancement du vrai serveur, dix requêtes invalides,
+  contrôle health après chacune ; accueil, repli SPA, CSS/JS et304 ETag vérifiés.
+  Le processus de test est arrêté automatiquement, sans toucher les serveurs de prévisualisation.
+- Validation : **17/17 ciblés** (static_http, server, v450), syntaxe server.js et diff --check OK.
+  Suite globale non relancée dans ce sous-lot ; dernier contrôle global :143/143 avant ajout du test.
+- Aucun changement API/cache/frontend, aucun agent, aucun push. Pas de revendication
+  de sécurité exhaustive : liens symboliques et durcissement API ne font pas partie de cette correction.
+
+**Prochaine action exacte** : dans server/apiHandler.js, revoir la clé cache de génération
+qui ignore des champs envoyés au modèle. Construire une clé exacte à partir du contexte
+validé et tester deux requêtes qui ne diffèrent que par téléphone/région, ainsi que le cas identique,
+avec un modèle simulé sans dépense réseau. Ne pas lancer une nouvelle exploration générale.
+
+## Historique — accueil/version
+
 ## Dernière mise à jour — accueil/version intégré
 
 Cette section prévaut sur les états historiques ci-dessous. Les fichiers accueil/version

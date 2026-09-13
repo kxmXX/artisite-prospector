@@ -61,6 +61,8 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 - Compatibilité de déploiement Vercel Serverless via fonctions API catch-all.
 # 4.8.0 — Consolidation (non publiée)
 
+- Serveur local : chemins malformés/NUL et sorties du dossier public refusés sans crash ; erreurs de lecture génériques. Validation HTTP réelle et17 tests ciblés réussis.
+
 - Version de travail 4.8.0-alpha.1 alignée dans le titre, l'accueil et package.json.
 - Indicateurs accueil issus des données : taux signé/total, montants renseignés sans estimation inventée.
 - Validation de ce sous-lot : 143/143 tests, affichage desktop vérifié. Les lots sombre/responsive/backend restent ouverts.
