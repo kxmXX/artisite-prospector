@@ -59,3 +59,8 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 - Catalogue de fallbacks SVG intégrés pour les 12 métiers artisanaux.
 - Fallback multi-modèles Gemini AI (cascade automatique en cas d'indisponibilité ou d'erreur de quota).
 - Compatibilité de déploiement Vercel Serverless via fonctions API catch-all.
+# 4.8.0 — Consolidation (non publiée)
+
+- Plan d'exécution et règles de projet établis avant correction sur la base `7caf557`.
+- 16 captures examinées, 136 tests existants réussis ; vérification fonctionnelle à compléter.
+- Aucune correction des lots suivants n'est annoncée comme livrée à ce stade.

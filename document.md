@@ -1,4 +1,9 @@
-# Artisite Prospector v4.2.0 — Spécifications Techniques & Architecture
+# Artist — Spécifications Techniques & Architecture
+
+> Consolidation du 13 septembre 2026 : base package **4.2.0**, cible **4.8.0 non publiée**.
+> Les sections historiques ci-dessous décrivent des intentions et fonctionnalités antérieures,
+> pas une certification de leur qualité. État audité et lots : [plan de consolidation](docs/artist-consolidation-plan.md).
+> Baseline vérifiée : 136 tests Node réussis. Aucun build/lint/typecheck configuré.
 
 ## 1. Présentation Générale
 
