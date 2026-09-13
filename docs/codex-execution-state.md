@@ -1,5 +1,40 @@
 # État de reprise Codex — 13 septembre 2026
 
+## Dernière mise à jour — sous-lot génération terminé
+
+**Cette section remplace les statuts « génération non intégrée » et les quatre échecs historiques ci-dessous.**
+
+- Nouveau commit : `031e887`, intégration des changements génération/données récupérés et revus.
+- Aucun agent relancé. Aucun push. Branche inchangée.
+- Séparation generateSite / generateDemoSite ; pas de coordonnées, horaires, avis ou certifications
+  préremplis dans le catalogue normal ; médias illustratifs identifiés dans les sections produites.
+- Le bandeau d'urgence optionnel reste disponible mais masqué pour les nouveaux projets ordinaires.
+- Correctif renderer justifié par régression : les CTA des services non paysagistes ne dépendent plus du prix.
+- Les fixtures d'édition profonde et de localisation fournissent explicitement leurs données/visibilités.
+- Tests : 34/34 ciblés initialement ; nouveau test couvrant tous les métiers ; contrôle final npm test
+  **141/142**. Syntaxe generator.js/renderer.js et git diff --check réussis.
+- L'unique échec restant est tests/server.test.js:39, assertion d'ancien titre (lot version).
+- Navigateur : localhost:5180 servait des modules périmés en cache. Origine isolée localhost:5181
+  utilisée ; aperçu Dupont, six CTA sans tarif présents, clic Chiffrer vers #simulateur confirmé.
+  Pas de validation mobile, de contraste globale ou de soumission du formulaire dans ce sous-lot.
+
+Fichiers inclus dans 031e887 : trades.js, sampleProjects.js, generator.js, renderer.js ; tests
+generator, trades, full_system_e2e, v420_quality, v470_artist_consolidation, editor_2026,
+v430_craft_and_motion et v450_system_audit_and_mvp_features.
+
+**Restent non commités** : package.json, public/index.html, dashboard.js, version.js (nouveau),
+tests/v440_fixes_and_dashboard.test.js. Ils constituent le prochain sous-lot accueil/version.
+
+**Prochaine action exacte** : terminer l'affichage du taux calculé (68% encore codé en dur),
+aligner le test du titre avec la version déclarée, tester et intégrer seulement ces fichiers.
+Puis reprendre le P0 serveur NUL/cache dans son périmètre réservé, sans agent supplémentaire.
+
+Limites du lot 4 : app.js injecte encore des coordonnées, renderer contient encore des labels
+commerciaux non vérifiés, createSectionData conserve des exemples ; la FAQ neutre du catalogue
+reste peu riche. Ne pas annoncer l'absence globale de faux faits ni une génération métier finalisée.
+
+## Historique de la reprise précédente
+
 ## Dépôt et point de reprise
 
 - Worktree : `/Users/kevinmokai/Documents/Codex/2026-09-07/artist-consolidation`.

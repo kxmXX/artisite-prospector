@@ -65,3 +65,4 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 - 16 captures examinées, 136 tests existants réussis ; vérification fonctionnelle à compléter.
 - Correctif intégré `67465f5` : les personnalisations existantes de la démo sont conservées au rechargement et en migration v4/v5 (9 tests state réussis).
 - Autres lots partiels non intégrés ; état et quatre échecs de tests restants dans `docs/codex-execution-state.md`.
+- `031e887` : catalogue client séparé de la démo, faits inconnus laissés vides, urgence masquée par défaut ; CTA service conservé sans prix. Contrôle d'intégration : 141/142, seul test du titre/version reste en échec. Les limites de rendu et de saisie sont documentées.

@@ -52,7 +52,7 @@ Le style touches de clavier est conservé pour les commandes de l'éditeur, pas 
 | 1 | Audit, contexte durable, version/changelog honnêtes | Base, captures, architecture et risques tracés | Audit/plan terminés be8600c ; version alpha non intégrée |
 | 2 | Stabilité : validation API, cache, tâches async et sauvegarde | Tests entrées invalides / réponses obsolètes / isolation contexte | Sauvegarde/rechargement terminé 67465f5 ; API/async restent à faire |
 | 3 | Accueil, sombre, tokens et lisibilité des contrôles | Vrai champ nom utilisable, thèmes sans perte d'état, mobile sans overflow | Modifications partielles non commitées, non validées visuellement |
-| 4 | Génération métier et faits non inventés | Plusieurs métiers, téléphone vide conservé, pas de faux avis/certifications | Modifications partielles à intégrer ; 3 échecs de rendu à examiner |
+| 4 | Génération métier et faits non inventés | Plusieurs métiers, téléphone vide conservé, pas de faux avis/certifications | Catalogue/moteur intégrés 031e887 ; limites app.js/renderer et richesse métier restent à traiter |
 | 5 | Hero / portrait / overlay | Slider appliqué, contraste et proportions vérifiés dans le navigateur | À faire |
 | 6 | Galerie : tailles, médias et réorganisation | Vide/1/plusieurs, override indépendant, suppression et Undo | À faire |
 | 7 | Avant/après | Plusieurs instances, clavier, souris, gestes interrompus, export | À faire |
@@ -99,3 +99,18 @@ Les états seront mis à jour avec les preuves effectives dans le rapport final,
 - Prochaine action : intégrer le sous-lot génération déjà écrit en examinant les trois échecs de rendu,
   sans remettre de faux faits dans les données pour satisfaire les anciennes assertions.
 - Les changements accueil/version restent séparés ; pas de publication ni push effectué.
+
+### Sous-lot génération intégré
+
+- Commit `031e887` : catalogue démo séparé, coordonnées inconnues vides, preuves/horaires non
+  inventés par generateSite, médias identifiés comme illustratifs, urgence masquée par défaut.
+- Vrai défaut corrigé : le CTA des services non paysagistes reste rendu lorsque le prix est vide.
+- Tests d'édition et de carte corrigés avec fixtures explicites ; aucune assertion supprimée pour masquer le défaut.
+- 34 tests ciblés réussis, puis extension tous métiers ; contrôle final **141/142**.
+  Seul échec restant : titre historique attendu dans tests/server.test.js, lot version non intégré.
+- Navigateur sur localhost:5181 (origine neuve pour éviter le cache de 5180) : six CTA sans prix
+  visibles dans l'arbre d'accessibilité, clic « Chiffrer » atteint le formulaire #simulateur.
+- Portée limitée : les mentions factices codées dans le renderer, les ajouts via createSectionData,
+  les entrées app.js et le style final ne sont pas validés par ce correctif de données.
+- Prochain sous-lot : terminer accueil/version déjà modifié, notamment taux de conversion affiché,
+  cohérence titre et test serveur, avant de revenir aux P0 backend.
