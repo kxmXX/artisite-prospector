@@ -785,6 +785,99 @@ function renderSectionAccordionContent(sec, project, variants) {
         </div>
       ` : ''}
 
+      <!-- Specific: GALLERY SECTION (Photos, Aspect Ratio, Mixed Before/After) -->
+      ${sec.type === 'gallery' ? `
+        <div class="space-y-3 pt-2 border-t border-zinc-200/60">
+          <div class="flex items-center justify-between">
+            <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Format d'Image (Ratio) :</label>
+            <div class="inline-flex rounded-md border border-zinc-200 p-0.5 bg-zinc-100 text-[10px] font-semibold">
+              <button type="button" onclick="window.app.setGalleryAspectRatio('${sectionId}', '4/3')" class="px-2 py-0.5 rounded transition-all ${(sec.settings?.aspectRatio || '4/3') === '4/3' ? 'bg-white shadow-xs text-zinc-900 font-bold' : 'text-zinc-500 hover:text-zinc-900'}">4:3</button>
+              <button type="button" onclick="window.app.setGalleryAspectRatio('${sectionId}', '16/9')" class="px-2 py-0.5 rounded transition-all ${sec.settings?.aspectRatio === '16/9' ? 'bg-white shadow-xs text-zinc-900 font-bold' : 'text-zinc-500 hover:text-zinc-900'}">16:9</button>
+              <button type="button" onclick="window.app.setGalleryAspectRatio('${sectionId}', '1/1')" class="px-2 py-0.5 rounded transition-all ${sec.settings?.aspectRatio === '1/1' ? 'bg-white shadow-xs text-zinc-900 font-bold' : 'text-zinc-500 hover:text-zinc-900'}">1:1</button>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between pt-1">
+            <label class="block text-[10px] font-medium text-zinc-500 uppercase tracking-wider">Réalisations & Comparatifs (${(c.photos || []).length}) :</label>
+            <div class="flex items-center gap-1">
+              <button type="button" onclick="window.app.addGalleryItem('${sectionId}', 'photo')" class="text-[10px] font-bold text-zinc-800 bg-zinc-100 hover:bg-zinc-200 px-2 py-0.5 rounded border border-zinc-200 transition-colors">+ Photo</button>
+              <button type="button" onclick="window.app.addGalleryItem('${sectionId}', 'beforeAfter')" class="text-[10px] font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-2 py-0.5 rounded border border-emerald-200 transition-colors">+ Avant/Après</button>
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            ${(c.photos || []).map((p, pIdx) => {
+              const isBA = p.type === 'beforeAfter' || (p.beforeImage && p.afterImage);
+              return `
+                <div class="p-2.5 rounded-lg bg-zinc-50 border border-zinc-200 space-y-2">
+                  <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-bold ${isBA ? 'text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded' : 'text-zinc-600 bg-zinc-200/60 px-1.5 py-0.5 rounded'} uppercase tracking-wide">
+                      #${pIdx + 1} ${isBA ? 'Comparatif Avant/Après' : 'Photo'}
+                    </span>
+                    <div class="flex items-center gap-1">
+                      <button type="button" onclick="window.app.toggleGalleryItemType('${sectionId}', ${pIdx})" class="text-[9.5px] text-zinc-600 hover:text-zinc-900 bg-white hover:bg-zinc-100 px-1.5 py-0.5 rounded border border-zinc-200" title="Changer le type d'élément">
+                        ${isBA ? 'Convertir en photo' : 'Convertir en Avant/Après'}
+                      </button>
+                      <button type="button" onclick="window.app.deleteGalleryItem('${sectionId}', ${pIdx})" class="text-red-600 hover:text-red-700 text-[10px] p-0.5" title="Supprimer">🗑️</button>
+                    </div>
+                  </div>
+
+                  ${isBA ? `
+                    <div class="grid grid-cols-2 gap-1.5 text-[10px]">
+                      <div class="space-y-1">
+                        <span class="font-bold text-zinc-500 uppercase">Avant :</span>
+                        <div class="aspect-[4/3] rounded overflow-hidden border border-zinc-200 bg-zinc-100 relative group/thumb">
+                          <img src="${p.beforeImage || ''}" class="w-full h-full object-cover">
+                          <button type="button" onclick="window.app.openImagePicker('${sectionId}', 'photos.${pIdx}.beforeImage')" class="absolute inset-0 bg-black/50 text-white font-medium text-[9px] opacity-0 group-hover/thumb:opacity-100 flex items-center justify-center transition-opacity">Modifier</button>
+                        </div>
+                      </div>
+                      <div class="space-y-1">
+                        <span class="font-bold text-emerald-600 uppercase">Après :</span>
+                        <div class="aspect-[4/3] rounded overflow-hidden border border-zinc-200 bg-zinc-100 relative group/thumb">
+                          <img src="${p.afterImage || ''}" class="w-full h-full object-cover">
+                          <button type="button" onclick="window.app.openImagePicker('${sectionId}', 'photos.${pIdx}.afterImage')" class="absolute inset-0 bg-black/50 text-white font-medium text-[9px] opacity-0 group-hover/thumb:opacity-100 flex items-center justify-center transition-opacity">Modifier</button>
+                        </div>
+                      </div>
+                    </div>
+                  ` : `
+                    <div class="flex items-center gap-2">
+                      <div class="w-14 h-11 rounded overflow-hidden border border-zinc-200 bg-zinc-100 shrink-0 relative group/thumb">
+                        <img src="${p.url || ''}" class="w-full h-full object-cover">
+                        <button type="button" onclick="window.app.openImagePicker('${sectionId}', 'photos.${pIdx}.url')" class="absolute inset-0 bg-black/50 text-white font-medium text-[8px] opacity-0 group-hover/thumb:opacity-100 flex items-center justify-center transition-opacity">Modifier</button>
+                      </div>
+                      <button type="button" onclick="window.app.openImagePicker('${sectionId}', 'photos.${pIdx}.url')" class="text-zinc-700 hover:text-zinc-900 font-medium text-[10.5px] bg-zinc-100 hover:bg-zinc-200 px-2 py-1 rounded border border-zinc-200">
+                        Remplacer l'image
+                      </button>
+                    </div>
+                  `}
+
+                  <div class="grid grid-cols-2 gap-1.5 pt-0.5">
+                    <input type="text" value="${escapeHtml(p.tag || '')}"
+                           placeholder="Catégorie (ex: Taille de haies)"
+                           data-field="photos.${pIdx}.tag"
+                           oninput="window.app.liveUpdateField('${sectionId}', 'photos.${pIdx}.tag', this.value)"
+                           onchange="window.app.commitFieldUpdate('${sectionId}', 'photos.${pIdx}.tag', this.value)"
+                           class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-[11px] text-zinc-900 focus:border-zinc-900 focus:outline-none">
+                    <input type="text" value="${escapeHtml(p.title || '')}"
+                           placeholder="Titre du projet"
+                           data-field="photos.${pIdx}.title"
+                           oninput="window.app.liveUpdateField('${sectionId}', 'photos.${pIdx}.title', this.value)"
+                           onchange="window.app.commitFieldUpdate('${sectionId}', 'photos.${pIdx}.title', this.value)"
+                           class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-[11px] text-zinc-900 focus:border-zinc-900 focus:outline-none">
+                  </div>
+                  <input type="text" value="${escapeHtml(p.desc || '')}"
+                         placeholder="Court descriptif (optionnel)"
+                         data-field="photos.${pIdx}.desc"
+                         oninput="window.app.liveUpdateField('${sectionId}', 'photos.${pIdx}.desc', this.value)"
+                         onchange="window.app.commitFieldUpdate('${sectionId}', 'photos.${pIdx}.desc', this.value)"
+                         class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-[10.5px] text-zinc-600 focus:border-zinc-900 focus:outline-none">
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      ` : ''}
+
       <!-- Hero photo with Replace & Trash -->
       ${c.heroImage !== undefined ? `
         <div class="space-y-1.5 pt-1 border-t border-zinc-200/60">

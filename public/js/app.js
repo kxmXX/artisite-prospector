@@ -2161,6 +2161,84 @@ class App {
     this.removeServiceItem(sectionId, idx);
   }
 
+  setGalleryAspectRatio(sectionId, ratio) {
+    if (!state.currentProject) return;
+    const sec = state.currentProject.sections.find(s => s.id === sectionId);
+    if (!sec) return;
+    sec.settings = sec.settings || {};
+    sec.settings.aspectRatio = ratio;
+    state.saveToStorage();
+    this.renderEditor();
+  }
+
+  addGalleryItem(sectionId, type = 'photo') {
+    if (!state.currentProject) return;
+    const sec = state.currentProject.sections.find(s => s.id === sectionId);
+    if (!sec || !sec.content) return;
+    const photos = Array.isArray(sec.content.photos) ? [...sec.content.photos] : [];
+    const count = photos.length + 1;
+
+    if (type === 'beforeAfter') {
+      photos.push({
+        id: `gal-ba-${Date.now()}`,
+        type: "beforeAfter",
+        title: `Projet Comparatif #${count}`,
+        tag: "Avant / Après",
+        desc: "Rénovation et transformation complète des extérieurs.",
+        beforeImage: "https://images.unsplash.com/photo-1558904541-efa8c4a08931?auto=format&fit=crop&w=800&q=80",
+        afterImage: "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=800&q=80"
+      });
+    } else {
+      photos.push({
+        id: `gal-${Date.now()}`,
+        title: `Réalisation #${count}`,
+        tag: "Chantier",
+        desc: "Intervention soignée et finitions haut de gamme.",
+        url: "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=800&q=80"
+      });
+    }
+    state.updateSectionContent(sectionId, "photos", photos);
+  }
+
+  deleteGalleryItem(sectionId, idx) {
+    if (!state.currentProject) return;
+    const sec = state.currentProject.sections.find(s => s.id === sectionId);
+    if (!sec || !sec.content || !Array.isArray(sec.content.photos)) return;
+    const photos = sec.content.photos.filter((_, i) => i !== idx);
+    state.updateSectionContent(sectionId, "photos", photos);
+  }
+
+  toggleGalleryItemType(sectionId, idx) {
+    if (!state.currentProject) return;
+    const sec = state.currentProject.sections.find(s => s.id === sectionId);
+    if (!sec || !sec.content || !Array.isArray(sec.content.photos)) return;
+    const photos = [...sec.content.photos];
+    const item = photos[idx];
+    if (!item) return;
+
+    const isBA = item.type === 'beforeAfter' || (item.beforeImage && item.afterImage);
+    if (isBA) {
+      photos[idx] = {
+        id: item.id || `gal-${Date.now()}`,
+        url: item.afterImage || item.beforeImage || "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=800&q=80",
+        title: item.title || "Chantier Réalisé",
+        tag: item.tag === "Avant / Après" ? "Réalisation" : (item.tag || "Réalisation"),
+        desc: item.desc || ""
+      };
+    } else {
+      photos[idx] = {
+        id: item.id || `gal-ba-${Date.now()}`,
+        type: "beforeAfter",
+        beforeImage: "https://images.unsplash.com/photo-1558904541-efa8c4a08931?auto=format&fit=crop&w=800&q=80",
+        afterImage: item.url || "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=800&q=80",
+        title: item.title || "Transformation Avant / Après",
+        tag: "Avant / Après",
+        desc: item.desc || "Glissez le curseur pour visualiser la métamorphose."
+      };
+    }
+    state.updateSectionContent(sectionId, "photos", photos);
+  }
+
   addFaqItem(sectionId) {
     if (!state.currentProject) return;
     const sec = state.currentProject.sections.find(s => s.id === sectionId);

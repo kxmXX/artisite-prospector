@@ -1509,43 +1509,116 @@ function renderRealisations(sec, project, options = {}) {
   `;
 }
 
+// Helper to render individual gallery card (Standard Photo or Before/After Interactive Comparison)
+function renderGalleryCard(p, idx, sec, project, options, aspectClass) {
+  const isBeforeAfter = p.type === 'beforeAfter' || (p.beforeImage && p.afterImage);
+  const tradeId = project?.business?.tradeId || 'paysagiste';
+
+  if (isBeforeAfter) {
+    const beforeSrc = p.beforeImage || getTradeFallbackDataUrl(tradeId, 'beforeAfter', 'Avant');
+    const afterSrc = p.afterImage || getTradeFallbackDataUrl(tradeId, 'beforeAfter', 'Après');
+    return `
+      <div class="gallery-card bg-white dark:bg-zinc-900 rounded-2xl sm:rounded-3xl border border-zinc-200/80 dark:border-zinc-800 shadow-xs hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col group">
+        <div class="relative ${aspectClass} overflow-hidden bg-slate-900 select-none">
+          <div class="ba-container split-reveal-container ba-card w-full h-full"
+               data-split-direction="horizontal"
+               data-split-pos="50"
+               data-sec-id="${sec.id}"
+               tabindex="0"
+               role="slider"
+               aria-label="Comparateur Avant Après ${escapeHtml(p.title || '')}"
+               aria-valuenow="50"
+               aria-valuemin="0"
+               aria-valuemax="100">
+            <img src="${afterSrc}" alt="Après intervention" class="ba-img-after sr-img-after" loading="lazy">
+            <div class="ba-img-before-wrapper sr-clipper" style="width: 50%;">
+              <img src="${beforeSrc}" alt="Avant travaux" class="ba-img-before sr-img-before" loading="lazy">
+            </div>
+            <div class="ba-handle sr-handle" style="left: 50%; top: 0; bottom: 0;">
+              <div class="sr-line"></div>
+              <div class="ba-handle-button sr-button w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white shadow-md text-zinc-900 text-xs flex items-center justify-center font-bold">
+                <span>‹ ›</span>
+              </div>
+            </div>
+            <!-- Badges Avant / Après matching Sendpage Esprit Nature -->
+            <div class="absolute top-3 left-3 z-20 pointer-events-none">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-black/65 backdrop-blur-md text-white border border-white/20 shadow-sm">
+                AVANT
+              </span>
+            </div>
+            <div class="absolute top-3 right-3 z-20 pointer-events-none">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-600/90 backdrop-blur-md text-white border border-white/20 shadow-sm">
+                APRÈS
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="p-4 sm:p-5 flex flex-col flex-1 justify-between gap-1.5">
+          <div>
+            <div class="text-[10.5px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 mb-1" data-editable="photos.${idx}.tag">${p.tag || 'Avant / Après'}</div>
+            <h3 class="font-bold text-zinc-900 dark:text-white text-base sm:text-lg leading-snug group-hover:text-emerald-700 transition-colors" data-editable="photos.${idx}.title">${p.title || 'Comparatif Réalisation'}</h3>
+            ${p.desc ? `<p class="text-zinc-600 dark:text-zinc-400 text-xs sm:text-sm mt-1 line-clamp-2" data-editable="photos.${idx}.desc">${p.desc}</p>` : ''}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Standard photo card
+  const photoUrl = p.url || p.image || getTradeFallbackDataUrl(tradeId, 'gallery', p.title || 'Réalisation');
+  return `
+    <div class="gallery-card bg-white dark:bg-zinc-900 rounded-2xl sm:rounded-3xl border border-zinc-200/80 dark:border-zinc-800 shadow-xs hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col group cursor-pointer" data-lightbox="${photoUrl}">
+      <div class="relative ${aspectClass} overflow-hidden bg-slate-900">
+        ${renderEditableImage(photoUrl, { sectionId: sec.id, fieldPath: `photos.${idx}.url`, itemIndex: idx, alt: p.title || 'Photo', className: 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-500', options })}
+        <div class="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+          <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-black/60 backdrop-blur text-white text-xs shadow-md">
+            🔍
+          </span>
+        </div>
+      </div>
+      <div class="p-4 sm:p-5 flex flex-col flex-1 justify-between gap-1.5">
+        <div>
+          <div class="text-[10.5px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 mb-1" data-editable="photos.${idx}.tag">${p.tag || 'Réalisation'}</div>
+          <h3 class="font-bold text-zinc-900 dark:text-white text-base sm:text-lg leading-snug group-hover:text-emerald-700 transition-colors" data-editable="photos.${idx}.title">${p.title || 'Chantier Soigné'}</h3>
+          ${p.desc ? `<p class="text-zinc-600 dark:text-zinc-400 text-xs sm:text-sm mt-1 line-clamp-2" data-editable="photos.${idx}.desc">${p.desc}</p>` : ''}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 // 9. Gallery
 function renderGallery(sec, project, options = {}) {
-  const c = sec.content;
+  const c = sec.content || {};
   const variant = sec.variant || "masonry-grid";
+  const aspectRatio = sec.settings?.aspectRatio || "4/3";
+  const aspectClass = aspectRatio === "16/9" ? "aspect-[16/9]" : aspectRatio === "1/1" ? "aspect-square" : "aspect-[4/3]";
+  const photos = c.photos || [];
 
   if (variant === "editorial-grid") {
-    const photos = c.photos || [];
     const mainPhoto = photos[0];
     const subPhotos = photos.slice(1, 5);
 
     return `
-      <div id="galerie" class="py-20" style="background-color: var(--bg-sec);">
+      <div id="galerie" class="py-20 lg:py-28" style="background-color: var(--bg-sec);">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="text-center max-w-2xl mx-auto space-y-3 mb-12">
-            <div class="text-xs font-bold uppercase tracking-wider text-gray-500" data-editable="badge">${c.badge}</div>
-            <h2 class="font-heading text-3xl font-extrabold text-gray-900" data-editable="title">${c.title}</h2>
-            <p class="text-gray-600 text-sm" data-editable="subtitle">${c.subtitle}</p>
+            <div class="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400" data-editable="badge">${c.badge || 'Portfolio & Savoir-Faire'}</div>
+            <h2 class="font-heading text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white" data-editable="title">${c.title || 'Nos Réalisations Récentes'}</h2>
+            <p class="text-gray-600 dark:text-zinc-400 text-sm sm:text-base" data-editable="subtitle">${c.subtitle || 'Découvrez en images la qualité de nos interventions et le soin apporté à chaque projet.'}</p>
           </div>
 
           <div class="grid lg:grid-cols-12 gap-6 items-stretch">
             ${mainPhoto ? `
-              <div class="lg:col-span-7 aspect-[16/11] rounded-3xl overflow-hidden shadow-lg relative group cursor-pointer bg-slate-900" data-lightbox="${mainPhoto.url}">
-                ${renderEditableImage(mainPhoto.url, { sectionId: sec.id, fieldPath: 'photos.0.url', itemIndex: 0, alt: mainPhoto.title, className: 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-500', options })}
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-6 text-white pointer-events-none">
-                  <div class="text-xs uppercase tracking-wider text-amber-300 font-bold">${mainPhoto.tag}</div>
-                  <div class="text-lg font-bold">${mainPhoto.title}</div>
-                </div>
+              <div class="lg:col-span-7">
+                ${renderGalleryCard(mainPhoto, 0, sec, project, options, "aspect-[16/11]")}
               </div>
             ` : ''}
 
-            <div class="lg:col-span-5 grid grid-cols-2 gap-4">
+            <div class="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
               ${subPhotos.map((p, idx) => `
-                <div class="aspect-[4/3] rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all relative group cursor-pointer bg-slate-900" data-lightbox="${p.url}">
-                  ${renderEditableImage(p.url, { sectionId: sec.id, fieldPath: `photos.${idx + 1}.url`, itemIndex: idx + 1, alt: p.title, className: 'w-full h-full object-cover group-hover:scale-110 transition-transform duration-500', options })}
-                  <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3 text-white pointer-events-none">
-                    <span class="text-xs font-bold truncate">${p.title}</span>
-                  </div>
+                <div>
+                  ${renderGalleryCard(p, idx + 1, sec, project, options, aspectClass)}
                 </div>
               `).join('')}
             </div>
@@ -1555,26 +1628,18 @@ function renderGallery(sec, project, options = {}) {
     `;
   }
 
-  // Default: Masonry Grid
+  // Default: Sendpage 3-column Editorial Grid
   return `
-    <div id="galerie" class="py-20" style="background-color: var(--bg-sec);">
+    <div id="galerie" class="py-20 lg:py-28" style="background-color: var(--bg-sec);">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center max-w-2xl mx-auto space-y-3 mb-12">
-          <div class="text-xs font-bold uppercase tracking-wider text-gray-500" data-editable="badge">${c.badge}</div>
-          <h2 class="font-heading text-3xl font-extrabold text-gray-900" data-editable="title">${c.title}</h2>
-          <p class="text-gray-600 text-sm" data-editable="subtitle">${c.subtitle}</p>
+        <div class="text-center max-w-2xl mx-auto space-y-3 mb-12 sm:mb-16">
+          <div class="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400" data-editable="badge">${c.badge || 'Portfolio & Savoir-Faire'}</div>
+          <h2 class="font-heading text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight" data-editable="title">${c.title || 'Nos Réalisations Récentes'}</h2>
+          <p class="text-gray-600 dark:text-zinc-400 text-sm sm:text-base max-w-xl mx-auto" data-editable="subtitle">${c.subtitle || 'Découvrez en images la qualité de nos interventions et le soin apporté à chaque projet.'}</p>
         </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
-          ${(c.photos || []).map((p, idx) => `
-            <div class="aspect-[4/3] rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all relative group cursor-pointer bg-slate-900" data-lightbox="${p.url}">
-              ${renderEditableImage(p.url, { sectionId: sec.id, fieldPath: `photos.${idx}.url`, itemIndex: idx, alt: p.title, className: 'w-full h-full object-cover group-hover:scale-110 transition-transform duration-500', options })}
-              <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4 text-white pointer-events-none">
-                <div class="text-xs font-bold tracking-wide">${p.title}</div>
-                <div class="text-[10px] text-gray-300 uppercase">${p.tag}</div>
-              </div>
-            </div>
-          `).join('')}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+          ${photos.map((p, idx) => renderGalleryCard(p, idx, sec, project, options, aspectClass)).join('')}
         </div>
       </div>
     </div>

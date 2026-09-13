@@ -296,6 +296,26 @@ export function generateSite(input = {}) {
   };
 
   // Section 9: Gallery
+  const initialPhotos = (trade.gallery || []).map((g, idx) => ({
+    id: `gal-${idx + 1}`,
+    url: g.url,
+    title: g.title,
+    tag: g.tag,
+    desc: `Intervention soignée et finitions de qualité à ${city}.`
+  }));
+
+  if (trade.beforeAfter && trade.beforeAfter.beforeImage && trade.beforeAfter.afterImage && initialPhotos.length >= 2) {
+    initialPhotos.splice(1, 0, {
+      id: "gal-ba-comp",
+      type: "beforeAfter",
+      beforeImage: trade.beforeAfter.beforeImage,
+      afterImage: trade.beforeAfter.afterImage,
+      title: trade.beforeAfter.title || "Transformation Avant / Après",
+      tag: "Avant / Après",
+      desc: "Glissez le curseur pour visualiser la métamorphose avant et après travaux."
+    });
+  }
+
   const gallerySection = {
     id: "sec-gallery",
     type: "gallery",
@@ -305,14 +325,9 @@ export function generateSite(input = {}) {
       badge: "Portfolio Visuel",
       title: "Galerie Photos & Métier",
       subtitle: "Un aperçu soigné de notre quotidien, de notre outillage et de nos finitions.",
-      photos: trade.gallery.map((g, idx) => ({
-        id: `gal-${idx + 1}`,
-        url: g.url,
-        title: g.title,
-        tag: g.tag
-      }))
+      photos: initialPhotos
     },
-    settings: { enableLightbox: true }
+    settings: { enableLightbox: true, aspectRatio: "4/3" }
   };
 
   // Section 10: Reviews
@@ -710,7 +725,7 @@ export function createSectionData(type, variant, trade, business = {}) {
             tag: g.tag
           }))
         },
-        settings: { enableLightbox: true }
+        settings: { enableLightbox: true, aspectRatio: "4/3" }
       };
 
     case "realisations":

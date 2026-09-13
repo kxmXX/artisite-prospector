@@ -538,6 +538,20 @@ body {
   color: #111827; font-size: 16px; font-weight: bold;
 }
 
+.ba-container.ba-card {
+  height: 100% !important;
+  min-height: 220px;
+  border-radius: 0 !important;
+}
+.ba-container.ba-card .ba-handle-button {
+  width: 32px;
+  height: 32px;
+  font-size: 13px;
+}
+.ba-container.ba-card .sr-percent-badge {
+  display: none;
+}
+
 .faq-item {
   border: 1px solid #e2e8f0;
   border-radius: 1rem;
