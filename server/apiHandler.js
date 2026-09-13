@@ -1,5 +1,35 @@
 import { getFallbackModels, enrichSiteWithAI, callGeminiWithFallback } from "./gemini.js";
 import { getTradeFallbackDataUrl } from "../public/js/data/imageFallbacks.js";
+import { createHash } from "node:crypto";
+
+// One validated context feeds both the model and its cache key. Do not lowercase
+// or concatenate with delimiters: case and embedded underscores are meaningful.
+export function validateGenerationContext(body) {
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    const err = new Error("Le contexte de génération doit être un objet JSON");
+    err.statusCode = 400;
+    throw err;
+  }
+  const context = {};
+  for (const field of ["name", "trade", "city", "phone", "region", "tone", "ambiance"]) {
+    const value = body[field] ?? "";
+    if (typeof value !== "string" || value.length > 500) {
+      const err = new Error(`Champ ${field} invalide : texte de 500 caractères maximum`);
+      err.statusCode = 400;
+      throw err;
+    }
+    context[field] = value;
+  }
+  return context;
+}
+
+export function generationCacheKey(context) {
+  return "gen_v2_" + createHash("sha256").update(JSON.stringify({
+    context,
+    models: getFallbackModels(),
+    configured: Boolean(process.env.GEMINI_API_KEY)
+  })).digest("hex");
+}
 
 function extractImageUrl(data) {
   if (typeof data === "string" && /^(data:image\/|https?:\/\/)/i.test(data.trim())) {
@@ -147,8 +177,8 @@ export async function handleApiRequest(req, res) {
 
     // 3. AI Generation with multi-model fallback & in-memory caching
     if (normalizedPath === "/api/ai/generate" && req.method === "POST") {
-      const body = await readBodyJSON(req);
-      const cacheKey = `gen_${body.name}_${body.trade}_${body.city}_${body.tone || 'artisan'}_${body.ambiance || 'mineral'}`.toLowerCase();
+      const body = validateGenerationContext(await readBodyJSON(req));
+      const cacheKey = generationCacheKey(body);
       const cached = getCachedAiResult(cacheKey);
       if (cached) {
         sendJSON(res, 200, {
