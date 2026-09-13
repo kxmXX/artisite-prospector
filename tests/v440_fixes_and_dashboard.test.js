@@ -9,6 +9,7 @@ import { state } from "../public/js/state.js";
 import { renderWebsiteHTML } from "../public/js/components/renderer.js";
 import { renderEditor } from "../public/js/components/editor.js";
 import { renderDashboard } from "../public/js/components/dashboard.js";
+import { APP_VERSION } from "../public/js/version.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -83,9 +84,33 @@ test("v4.4.0: 2026 SaaS Dashboard Cockpit with 1-click prompt chips and KPI metr
   const dashboardHTML = renderDashboard(state);
 
   assert.ok(dashboardHTML.includes("ARTISITE PROSPECTOR"), "Dashboard must render brand title");
-  assert.ok(dashboardHTML.includes("v4.3 PRO"), "Dashboard must render version badge");
+  assert.ok(dashboardHTML.includes(`v${APP_VERSION}`), "Dashboard must render the runtime version badge");
   assert.ok(dashboardHTML.includes("quick-gen-form"), "Dashboard must render quick generation form");
   assert.ok(dashboardHTML.includes("fillQuickGen"), "Dashboard must render 1-click suggestion chips");
   assert.ok(dashboardHTML.includes("Esprit Nature"), "Dashboard must render project card");
   assert.ok(dashboardHTML.includes("Pipeline de vente"), "Dashboard must render pipeline KPI card");
+});
+
+
+test("Runtime version stays aligned with package metadata and the app shell", () => {
+  const pkg = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), "package.json"), "utf-8"));
+  const indexHTML = fs.readFileSync(path.resolve(process.cwd(), "public/index.html"), "utf-8");
+  assert.equal(APP_VERSION, pkg.version, "Runtime version must match package.json");
+  assert.ok(indexHTML.includes(`Artist v${APP_VERSION}`), "Document title must use the same runtime release number");
+});
+
+test("Dashboard metrics use actual statuses and distinguish missing valuations from zero", () => {
+  const render = values => renderDashboard({ projects: values.map((p, i) => ({ id: `test-${i}`, name: 'Test', ...p })) });
+  const empty = render([]);
+  assert.ok(empty.includes('Taux 0%'));
+  assert.ok(empty.includes('Non renseigné'));
+  const partial = render([{ pipelineStatus: 'won', estimatedValue: 100 }, { estimatedValue: -20 }, { estimatedValue: '800' }]);
+  assert.ok(partial.includes('Taux 33%'));
+  assert.ok(partial.includes('100 €'));
+  assert.ok(partial.includes('1/3 renseignés'));
+  assert.ok(!partial.includes('Taux 68%'));
+  const zero = render([{ pipelineStatus: 'won', estimatedValue: 0 }]);
+  assert.ok(zero.includes('Taux 100%'));
+  assert.ok(zero.includes('0 €'));
+  assert.ok(zero.includes('1/1 renseignés'));
 });

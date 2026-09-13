@@ -36,7 +36,8 @@ test("server static file resolution handles SPA fallback and accurate MIME types
   // 1. Root index.html
   const root = resolveFile("/");
   assert.ok(root.contentType.includes("text/html"));
-  assert.ok(root.content.includes("Artisite Prospector v4"));
+  const pkg = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'package.json'), 'utf8'));
+  assert.ok(root.content.includes(`<title>Artist v${pkg.version} — Création de sites vitrines</title>`));
 
   // 2. CSS file
   const css = resolveFile("/css/app.css");
@@ -51,7 +52,7 @@ test("server static file resolution handles SPA fallback and accurate MIME types
   // 4. Fallback route for SPA
   const fallback = resolveFile("/unknown-prospect-route");
   assert.ok(fallback.contentType.includes("text/html"));
-  assert.ok(fallback.content.includes("Artisite Prospector v4"));
+  assert.equal(fallback.content, root.content);
 });
 
 test("handleApiRequest handles /api/health, /api/ai/status and CORS preflight", async () => {

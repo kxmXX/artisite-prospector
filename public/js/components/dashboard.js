@@ -1,5 +1,6 @@
 import { getIcon } from "./icons.js";
 import { getTradeFallbackDataUrl } from "../data/imageFallbacks.js";
+import { APP_VERSION } from "../version.js";
 
 /**
  * 2026 Flagship SaaS Cockpit & Prospector CRM for Michel.
@@ -14,8 +15,9 @@ export function renderDashboard(state) {
   const total = projects.length;
   const contacted = projects.filter(p => p.pipelineStatus === "contacted" || p.pipelineStatus === "demo_sent").length;
   const won = projects.filter(p => p.pipelineStatus === "won").length;
-  const ready = projects.filter(p => !p.pipelineStatus || p.pipelineStatus === "generated" || p.pipelineStatus === "prospect").length;
-  const potentialRevenue = won * 1500 + contacted * 800 + ready * 500;
+  const conversionRate = total ? Math.round(won / total * 100) : 0;
+  const valuedProjects = projects.filter(p => Number.isFinite(p.estimatedValue) && p.estimatedValue >= 0);
+  const potentialRevenue = valuedProjects.reduce((sum, p) => sum + p.estimatedValue, 0);
 
   const projectCardsHTML = projects.map(p => {
     const bus = p.business || {};
@@ -123,7 +125,7 @@ export function renderDashboard(state) {
   }).join('');
 
   return `
-    <div class="min-h-screen bg-[#F8F9FA] text-zinc-900 selection:bg-zinc-900 selection:text-white">
+    <div class="artist-dashboard min-h-screen bg-[#F8F9FA] text-zinc-900 selection:bg-zinc-900 selection:text-white">
       
       <!-- Top Global Bar (Linear / Raycast 2026 Tier) -->
       <nav class="bg-white/85 backdrop-blur-md border-b border-zinc-200/80 sticky top-0 z-30 transition-all">
@@ -136,7 +138,7 @@ export function renderDashboard(state) {
             <div>
               <div class="font-extrabold text-sm sm:text-base text-zinc-950 tracking-tight flex items-center gap-2">
                 <span>ARTISITE PROSPECTOR</span>
-                <span class="text-[10px] uppercase font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 tracking-wider px-2 py-0.5 rounded-full">v4.3 PRO</span>
+                <span class="text-[10px] uppercase font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 tracking-wider px-2 py-0.5 rounded-full">v${APP_VERSION}</span>
               </div>
               <div class="text-[11.5px] text-zinc-500 hidden sm:block font-medium">Studio de prospection commerciale ultra-rapide pour artisans</div>
             </div>
@@ -147,14 +149,14 @@ export function renderDashboard(state) {
               <input type="text" id="project-search" oninput="window.app.filterProjects(this.value)" placeholder="Filtrer un artisan, ville..." class="w-64 bg-zinc-100/80 border border-zinc-200 rounded-xl px-3.5 py-2 text-xs text-zinc-800 placeholder:text-zinc-400 focus:bg-white focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 focus:outline-none transition-all">
             </div>
 
-            <button type="button" onclick="window.app.toggleThemeMode()" class="btn-keycap btn-keycap-light inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-zinc-700 cursor-pointer border border-zinc-200" title="Basculer le mode sombre de l'interface" aria-label="Basculer le mode sombre de l'interface">
+            <button type="button" id="theme-mode-toggle-btn" aria-pressed="${state.themeMode === 'dark'}" onclick="window.app.toggleThemeMode()" class="btn-keycap btn-keycap-light inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-zinc-700 cursor-pointer border border-zinc-200" title="Basculer le mode sombre de l'interface" aria-label="Basculer le mode sombre de l'interface">
               ${state.themeMode === 'dark' ? getIcon("sun", "w-4 h-4 text-amber-400") : getIcon("moon", "w-4 h-4 text-zinc-600")}
               <span class="hidden sm:inline">${state.themeMode === 'dark' ? 'Mode Jour' : 'Mode Nuit'}</span>
             </button>
 
             <button type="button" onclick="window.app.openVitrineDemo()" class="btn-keycap bg-emerald-600 hover:bg-emerald-700 text-white inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold shadow-xs transition-all" title="Ouvrir directement la vitrine Sendpage sans aucun éditeur">
-              <span>👁️</span>
-              <span class="hidden md:inline">Voir la Vitrine Sendpage (Démo)</span>
+              ${getIcon('eye', 'w-4 h-4')}
+              <span class="hidden md:inline">Voir la vitrine d’exemple</span>
               <span class="md:hidden">Vitrine Démo</span>
             </button>
 
@@ -176,17 +178,13 @@ export function renderDashboard(state) {
           <div class="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-emerald-100/40 via-amber-100/20 to-transparent -mr-20 -mt-20 rounded-full pointer-events-none"></div>
 
           <div class="max-w-3xl space-y-3 relative z-10">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-zinc-100 text-zinc-800 border border-zinc-200/80">
-              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span>Générateur Haute Fidélité • Conçu pour Closer en Prospection Directe</span>
-            </div>
             
             <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight text-zinc-950 leading-tight">
-              Générez un site vitrine d'artisan en 3 secondes.
+              Créez un site à l’image de votre artisan.
             </h1>
             
             <p class="text-zinc-600 text-xs sm:text-sm leading-relaxed max-w-2xl font-normal">
-              Renseignez simplement la raison sociale et la ville de votre prospect. Le moteur structure instantanément un site premium adapté au métier, doté de modules crédibles et d'un script de vente pour convertir dès le premier appel.
+              Renseignez son nom, son métier et sa ville. Vous obtenez une première version à personnaliser : textes, photos, couleurs et sections. Vérifiez les informations avant de la partager.
             </p>
           </div>
 
@@ -195,11 +193,11 @@ export function renderDashboard(state) {
             <form id="quick-gen-form" onsubmit="event.preventDefault(); window.app.handleQuickGenerate(event);" class="quick-gen-bar flex flex-col md:flex-row items-stretch md:items-center gap-2 p-2 bg-white rounded-2xl border border-zinc-200/90 shadow-sm">
               <div class="quick-gen-field-name flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-zinc-50/90 hover:bg-zinc-100/80 focus-within:bg-white border border-zinc-200/80 focus-within:border-zinc-900 transition-all flex-1 min-w-[240px]">
                 <span class="text-zinc-400 select-none flex-shrink-0">${getIcon("edit", "w-4 h-4 text-zinc-400")}</span>
-                <input type="text" id="quick-gen-name" required placeholder="Raison sociale (ex: Esprit Nature, Peinture Pro...)" class="w-full min-w-0 bg-transparent border-0 py-1.5 text-xs sm:text-sm font-semibold text-zinc-900 placeholder:text-zinc-400 placeholder:font-normal focus:outline-none">
+                <input type="text" id="quick-gen-name" aria-label="Nom de l’entreprise" maxlength="120" required placeholder="Nom de l’entreprise" class="w-full min-w-0 bg-transparent border-0 py-1.5 text-xs sm:text-sm font-semibold text-zinc-900 placeholder:text-zinc-400 placeholder:font-normal focus:outline-none">
               </div>
               
               <div class="quick-gen-field-trade flex items-center gap-2 px-3 py-1.5 rounded-xl bg-zinc-50/90 hover:bg-zinc-100/80 focus-within:bg-white border border-zinc-200/80 focus-within:border-zinc-900 transition-all w-full md:w-64 min-w-[210px]">
-                <select id="quick-gen-trade" class="w-full min-w-0 bg-transparent border-0 py-1.5 text-xs sm:text-sm font-semibold text-zinc-800 focus:outline-none cursor-pointer">
+                <select id="quick-gen-trade" aria-label="Métier" class="w-full min-w-0 bg-transparent border-0 py-1.5 text-xs sm:text-sm font-semibold text-zinc-800 focus:outline-none cursor-pointer">
                   <option value="paysagiste">🌿 Paysagiste / Jardinier</option>
                   <option value="peintre" selected>🎨 Peintre en Bâtiment</option>
                   <option value="plombier">🔧 Plombier Chauffagiste</option>
@@ -214,12 +212,12 @@ export function renderDashboard(state) {
 
               <div class="quick-gen-field-city flex items-center gap-2 px-3 py-1.5 rounded-xl bg-zinc-50/90 hover:bg-zinc-100/80 focus-within:bg-white border border-zinc-200/80 focus-within:border-zinc-900 transition-all w-full md:w-44 min-w-[140px]">
                 <span class="text-zinc-400 select-none flex-shrink-0">${getIcon("mapPin", "w-4 h-4 text-zinc-400")}</span>
-                <input type="text" id="quick-gen-city" required placeholder="Ville (ex: Paris)" value="Paris" class="w-full min-w-0 bg-transparent border-0 py-1.5 text-xs sm:text-sm font-semibold text-zinc-900 placeholder:text-zinc-400 focus:outline-none">
+                <input type="text" id="quick-gen-city" aria-label="Ville" maxlength="120" required placeholder="Ville" value="Paris" class="w-full min-w-0 bg-transparent border-0 py-1.5 text-xs sm:text-sm font-semibold text-zinc-900 placeholder:text-zinc-400 focus:outline-none">
               </div>
 
               <div class="quick-gen-field-btn flex-shrink-0">
                 <button type="submit" class="btn-keycap btn-keycap-dark px-6 py-3 rounded-xl text-xs sm:text-sm font-bold text-white whitespace-nowrap flex items-center justify-center gap-2 shadow-sm hover:bg-black transition-colors w-full md:w-auto cursor-pointer">
-                  <span>⚡ Générer en 3s</span>
+                  <span>Créer le site</span>
                 </button>
               </div>
             </form>
@@ -264,14 +262,14 @@ export function renderDashboard(state) {
             <div class="bg-emerald-50/60 p-4 rounded-2xl border border-emerald-200/70 shadow-2xs">
               <div class="flex items-center justify-between">
                 <div class="text-2xl font-extrabold text-emerald-800 tracking-tight">${won}</div>
-                <span class="text-[10px] font-bold text-emerald-700 bg-emerald-100/70 px-2 py-0.5 rounded-full">Taux 68%</span>
+                <span title="Projets marqués signés / ensemble des projets" class="text-[10px] font-bold text-emerald-700 bg-emerald-100/70 px-2 py-0.5 rounded-full">Taux ${conversionRate}%</span>
               </div>
               <div class="text-[11px] font-bold text-emerald-700 mt-1">Clients signés ✓</div>
             </div>
             <div class="bg-white p-4 rounded-2xl border border-zinc-200/80 shadow-2xs">
               <div class="flex items-center justify-between">
-                <div class="text-2xl font-extrabold text-zinc-950 tracking-tight">${potentialRevenue.toLocaleString('fr-FR')} €</div>
-                <span class="text-[10px] font-bold text-zinc-600 bg-zinc-100 px-2 py-0.5 rounded-full">Estimé</span>
+                <div class="text-2xl font-extrabold text-zinc-950 tracking-tight">${valuedProjects.length ? `${potentialRevenue.toLocaleString('fr-FR')} €` : 'Non renseigné'}</div>
+                <span class="text-[10px] font-bold text-zinc-600 bg-zinc-100 px-2 py-0.5 rounded-full">${valuedProjects.length}/${total} renseignés</span>
               </div>
               <div class="text-[11px] font-medium text-zinc-500 mt-1">Pipeline de vente</div>
             </div>
