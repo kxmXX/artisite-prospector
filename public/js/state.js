@@ -32,14 +32,9 @@ class AppStateManager {
     if (this.projects.length === 0) {
       this.projects = JSON.parse(JSON.stringify(SAMPLE_PROJECTS));
       this.saveToStorage();
-    } else {
-      // Always guarantee that Esprit Nature benchmark matches 100% Sendpage layout
-      const espritIdx = this.projects.findIndex(p => p.id === "proj-esprit-nature");
-      if (espritIdx !== -1) {
-        this.projects[espritIdx] = JSON.parse(JSON.stringify(SAMPLE_PROJECTS[0]));
-      } else {
-        this.projects.unshift(JSON.parse(JSON.stringify(SAMPLE_PROJECTS[0])));
-      }
+    } else if (!this.projects.some(p => p.id === "proj-esprit-nature")) {
+      // Keep user projects untouched; only add the explicit demo when it is absent.
+      this.projects.unshift(JSON.parse(JSON.stringify(SAMPLE_PROJECTS[0])));
       this.saveToStorage();
     }
     this.currentProject = this.projects[0];
@@ -94,10 +89,10 @@ class AppStateManager {
           const oldData = localStorage.getItem("artisite_projects_v5") || localStorage.getItem("artisite_projects_v4");
           if (oldData) {
             const parsed = JSON.parse(oldData);
-            this.projects = [
-              JSON.parse(JSON.stringify(SAMPLE_PROJECTS[0])),
-              ...parsed.filter(p => p.id !== "proj-esprit-nature")
-            ];
+            this.projects = parsed;
+            if (!this.projects.some(p => p.id === "proj-esprit-nature")) {
+              this.projects.unshift(JSON.parse(JSON.stringify(SAMPLE_PROJECTS[0])));
+            }
             this.saveToStorage();
             return;
           }

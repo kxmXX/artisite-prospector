@@ -122,3 +122,41 @@ test("state manager handles addSection, variant changes and deep array paths", (
   state.updateSectionContent(newSec.id, "items.0.q", "Pains bio ?");
   assert.equal(state.currentProject.sections.find(s => s.id === newSec.id).content.items[0].q, "Pains bio ?");
 });
+
+
+test("state init preserves an existing customized demo project", async () => {
+  const previousStore = { ...global.localStorage.store };
+  const customized = [{
+    id: "proj-esprit-nature",
+    name: "Esprit Nature personnalisé",
+    sections: [],
+    branding: {},
+    business: { name: "Esprit Nature personnalisé" }
+  }];
+  global.localStorage.store = { artisite_projects_v11: JSON.stringify(customized) };
+  const freshModule = await import(`../public/js/state.js?preserve-demo=${Date.now()}`);
+  assert.equal(freshModule.state.projects[0].name, "Esprit Nature personnalisé");
+  global.localStorage.store = previousStore;
+});
+
+for (const storageKey of ["artisite_projects_v11", "artisite_projects_v5", "artisite_projects_v4"]) {
+  test(`loading ${storageKey} preserves complete custom project data`, async () => {
+    const previousStore = global.localStorage.store;
+    const projects = [{
+      id: "proj-esprit-nature", name: "Mon jardin",
+      business: { name: "Mon jardin", phone: "", customField: "conservé" },
+      branding: { primaryColor: "#123456", buttonRadius: "0px" },
+      sections: [{ id: "faq-custom", type: "faq", visibility: false,
+        content: { items: [{ q: "Ma question", a: "Ma réponse" }] }, settings: { motion: "none" } }]
+    }, { id: "client-2", name: "Autre client", sections: [] }];
+    global.localStorage.store = { [storageKey]: JSON.stringify(projects) };
+    try {
+      const fresh = await import(`../public/js/state.js?preserve=${storageKey}`);
+      assert.deepEqual(fresh.state.projects, projects);
+      assert.deepEqual(fresh.state.currentProject, projects[0]);
+      assert.deepEqual(JSON.parse(global.localStorage.getItem("artisite_projects_v11")), projects);
+    } finally {
+      global.localStorage.store = previousStore;
+    }
+  });
+}
