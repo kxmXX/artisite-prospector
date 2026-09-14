@@ -17,6 +17,7 @@ export function exportStandaloneHTML(project) {
   const htmlBody = renderWebsiteHTML(project, { isEditor: false, isStandalone: true });
   const b = project.branding;
   const bus = project.business;
+  const animationMultiplier = b.animationSpeed === "fast" ? 0.6 : (b.animationSpeed === "slow" ? 1.5 : 1);
 
   return `<!DOCTYPE html>
 <html lang="fr" class="scroll-smooth">
@@ -52,6 +53,8 @@ ${UTILITY_CSS}
       --font-body: '${b.bodyFont}', -apple-system, BlinkMacSystemFont, sans-serif;
       --radius: ${b.borderRadius};
       --btn-radius: ${b.buttonRadius};
+      --cta-radius: ${b.buttonRadius};
+      --anim-duration-multiplier: ${animationMultiplier};
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -68,6 +71,7 @@ ${UTILITY_CSS}
     a { color: inherit; text-decoration: none; }
     img { max-width: 100%; height: auto; display: block; }
     button { font-family: inherit; cursor: pointer; border: none; }
+    .btn-cta, [data-cta-button] { border-radius: var(--cta-radius, var(--btn-radius, 8px)) !important; }
 
     /* Vitrine 1.1 — keep the public export visually aligned with the editor
        preview. These are deliberately local to the commercial template. */
@@ -76,6 +80,19 @@ ${UTILITY_CSS}
     .vitrine-site-header { background: rgba(255, 255, 255, .98); }
     .vitrine-template.public-mode > .site-section[data-section-type="header"] { position: sticky; top: 0; z-index: 90; }
     .vitrine-template.public-mode > .site-section[data-section-type="header"] .vitrine-site-header { position: static; }
+
+    /* Section background studio — export must honor the exact same visible surface as the editor. */
+    .bg-sec-white { background-color: #ffffff !important; color: #09090b !important; }
+    .bg-sec-mineral { background-color: #f8fafc !important; color: #09090b !important; }
+    .bg-sec-dark { background-color: #09090b !important; color: #f4f4f5 !important; }
+    .bg-sec-warm { background-color: #faf8f5 !important; color: #292524 !important; }
+    .bg-sec-navy { background-color: #0c1527 !important; color: #f8fafc !important; }
+    .bg-sec-primary { background-color: var(--primary, #059669) !important; color: #ffffff !important; }
+    .site-section[data-section-bg] > :first-child { background-color: transparent !important; background-image: none !important; }
+    .site-section[data-has-custom-bg="true"] > :first-child { background-color: transparent !important; background-image: none !important; }
+    .site-section[data-section-bg="dark"] h1, .site-section[data-section-bg="dark"] h2, .site-section[data-section-bg="dark"] h3,
+    .site-section[data-section-bg="navy"] h1, .site-section[data-section-bg="navy"] h2, .site-section[data-section-bg="navy"] h3 { color: #ffffff !important; }
+    .site-section[data-section-bg="dark"] p, .site-section[data-section-bg="navy"] p { color: #a1a1aa !important; }
     .vitrine-site-header-inner { min-height: 5rem; max-width: 80rem !important; }
     .vitrine-site-nav { gap: 2.35rem; font-size: .875rem; font-weight: 500; }
     .vitrine-site-nav a { color: #262626; text-decoration: none; }
@@ -151,17 +168,26 @@ ${UTILITY_CSS}
     [data-motion="slide-in"].is-revealed { animation: motion-slide-in 450ms cubic-bezier(0.16, 1, 0.3, 1) both; opacity: 1 !important; }
     [data-motion="spring"].is-revealed { animation: motion-spring 550ms cubic-bezier(0.34, 1.56, 0.64, 1) both; opacity: 1 !important; }
     [data-motion="progress-fill"].is-revealed { animation: motion-progress-fill 650ms cubic-bezier(0.16, 1, 0.3, 1) both; transform-origin: left; opacity: 1 !important; }
-    [data-motion="reveal"].is-revealed,
-    [data-motion="stagger"].is-revealed,
-    [data-motion="magnetic"].is-revealed,
-    [data-motion="shimmer"].is-revealed,
-    [data-motion="pulse"].is-revealed { animation: motion-fade-in 420ms cubic-bezier(0.16, 1, 0.3, 1) both; opacity: 1 !important; }
+    [data-motion="reveal"].is-revealed { animation: motion-reveal 650ms cubic-bezier(0.16, 1, 0.3, 1) both; opacity: 1 !important; }
+    [data-motion="stagger"].is-revealed { animation: motion-stagger 650ms cubic-bezier(0.16, 1, 0.3, 1) both; opacity: 1 !important; }
+    [data-motion="magnetic"].is-revealed { animation: motion-magnetic 500ms cubic-bezier(0.2, 0.8, 0.2, 1) both; opacity: 1 !important; }
+    [data-motion="shimmer"].is-revealed { animation: motion-shimmer 850ms ease-out both; opacity: 1 !important; }
+    [data-motion="pulse"].is-revealed { animation: motion-pulse 1.8s ease-in-out infinite; opacity: 1 !important; }
+    [data-motion="zoom-in"].is-revealed { animation: motion-zoom-in 650ms cubic-bezier(0.16, 1, 0.3, 1) both; opacity: 1 !important; }
+    [data-motion]:not([data-motion="pulse"]).is-revealed { animation-duration: calc(0.85s * var(--anim-duration-multiplier, 1)) !important; }
+    [data-motion="pulse"].is-revealed { animation-duration: calc(1.8s * var(--anim-duration-multiplier, 1)) !important; }
     .is-revealed { opacity: 1 !important; }
     @keyframes motion-fade-in { from { opacity: 0; transform: scale(0.99); } to { opacity: 1; transform: scale(1); } }
     @keyframes motion-slide-up { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes motion-slide-in { from { opacity: 0; transform: translateX(-24px); } to { opacity: 1; transform: translateX(0); } }
     @keyframes motion-spring { from { opacity: 0; transform: translateY(20px) scale(0.95); } 65% { transform: translateY(-3px) scale(1.015); } to { opacity: 1; transform: translateY(0) scale(1); } }
-    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; scroll-behavior: auto !important; } }
+    @keyframes motion-reveal { from { opacity: 0; transform: translateY(22px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    @keyframes motion-stagger { from { opacity: 0; transform: translateY(24px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    @keyframes motion-magnetic { 0% { opacity: 0; transform: translateY(14px) scale(0.97); } 70% { transform: translateY(-4px) scale(1.01); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+    @keyframes motion-shimmer { 0% { opacity: .85; filter: brightness(1); transform: scale(.99); } 50% { opacity: 1; filter: brightness(1.2); transform: scale(1.01); } 100% { opacity: 1; filter: brightness(1); transform: scale(1); } }
+    @keyframes motion-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.025); } }
+    @keyframes motion-zoom-in { from { opacity: 0; transform: scale(.92); } to { opacity: 1; transform: scale(1); } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; scroll-behavior: auto !important; } }
 
     /* Modern Web Guidance: Native 2026 Scroll Progress Indicator & Offscreen Optimization */
     .site-scroll-progress { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: var(--primary, #059669); transform-origin: 0 50%; transform: scaleX(0); z-index: 9999; pointer-events: none; box-shadow: 0 0 10px var(--primary, rgba(5,150,105,0.4)); }

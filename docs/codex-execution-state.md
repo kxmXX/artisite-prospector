@@ -1,5 +1,13 @@
 # État de reprise Codex — 14 septembre 2026
 
+## LOT DE LIVRAISON — éditeur 4.8.0-alpha.8
+
+- Fonds : parité corrigée entre éditeur, rendu public et export standalone ; les conteneurs internes ne recouvrent plus le fond choisi.
+- Typographie : Titres et Texte sont des cibles séparées, le catalogue reste dédupliqué, l’aperçu est immédiat et les changements passent par l’historique Undo.
+- Boutons : `buttonRadius` ne modifie plus `borderRadius`; tous les CTA de conversion importants suivent `--cta-radius` jusque dans l’export.
+- Animations : la vitesse devient une variable projet/export, les presets exportés ont leurs propres keyframes, et `prefers-reduced-motion` arrête les boucles.
+- Validation : 37/37 ciblés, 177/177 complets, `git diff --check`. Prochaine action : IDs visibles de tous les composants éditables + opérations IA ciblées Undo.
+
 ## LOT DE LIVRAISON — vitrine 4.8.0-alpha.7
 
 - Référence utilisateur du 14/09 : les écarts restants étaient le header, le contenu À propos, la hiérarchie FAQ et le souhait d’une carte interactive. Les sections Services/Galerie/Avis validées n’ont pas été refondues.

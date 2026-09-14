@@ -7,6 +7,14 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 14 septembre 2026 (4.8.0-alpha.8)
+
+- Éditeur — fonds : thèmes et couleurs personnalisées pilotent désormais la surface réellement visible dans l’éditeur, le rendu public et l’export standalone ; les wrappers internes ne masquent plus le choix.
+- Typographie : cibles Titres/Texte réellement indépendantes, aperçu immédiat par variables CSS, export fidèle et mutations désormais compatibles Undo.
+- Boutons : le rayon global carré → pilule s’applique aux CTA de conversion y compris À propos/formulaire et à l’export, sans modifier le rayon des cartes/conteneurs.
+- Animations : presets distincts réellement exportés, vitesse persistée (`fast` / `normal` / `slow`) et réduction des mouvements qui neutralise les animations continues.
+- Validation : 37/37 tests ciblés, suite complète 177/177 et `git diff --check`. La vitrine Esprit Nature conserve ses proportions validées.
+
 ### Consolidation — 14 septembre 2026 (4.8.0-alpha.7)
 
 - Référence Esprit Nature : header ramené au canevas desktop `80rem` et à 80 px de haut, typographie/menu/CTA recalibrés sur les captures ; les libellés Services / À propos / Avis / Galerie / FAQ restent désormais éditables sans perdre leurs ancres.

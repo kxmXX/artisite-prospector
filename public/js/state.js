@@ -491,7 +491,6 @@ class AppStateManager {
     this.pushHistory(`Rayon boutons : ${radius}`);
     const project = JSON.parse(JSON.stringify(this.currentProject));
     project.branding.buttonRadius = radius;
-    project.branding.borderRadius = radius === "0px" ? "0px" : (radius === "9999px" ? "1.5rem" : "0.75rem");
     this.updateProject(project, false);
   }
 

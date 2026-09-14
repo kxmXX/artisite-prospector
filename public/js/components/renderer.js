@@ -276,6 +276,8 @@ export function renderWebsiteHTML(project, options = { isEditor: false, isStanda
   // but the global Apple-style reveal must not fade entire sections until they
   // happen to intersect a browser viewport.
   const isAppleScrollFx = !isVitrineTemplate && project.branding?.appleScrollFx !== false;
+  const animationSpeed = project.branding?.animationSpeed || 'normal';
+  const animationMultiplier = animationSpeed === 'fast' ? 0.6 : (animationSpeed === 'slow' ? 1.5 : 1);
 
   return `
     <div class="artisite-root ${options.isEditor ? 'editor-mode' : 'public-mode'} ${isVitrineTemplate ? 'vitrine-template' : ''} font-body text-main bg-site min-h-screen ${isPaperGrain ? 'texture-paper-grain' : ''} ${isAppleScrollFx ? 'apple-scrollfx-enabled' : ''}" data-site-theme="${initialSiteTheme}" data-paper-grain="${isPaperGrain ? 'true' : 'false'}" style="
@@ -296,6 +298,7 @@ export function renderWebsiteHTML(project, options = { isEditor: false, isStanda
       --cta-font-size: ${project.branding?.ctaFontSize || ctaFontMap[ctaSize] || '0.95rem'};
       --cta-scale: ${project.branding?.ctaScale ? (project.branding.ctaScale / 100) : 1};
       --cta-transform: ${project.branding?.ctaTransform || 'none'};
+      --anim-duration-multiplier: ${animationMultiplier};
     ">
       <div class="site-scroll-progress" aria-hidden="true"></div>
       <style>${HERO_STYLES}</style>
@@ -419,7 +422,7 @@ function renderSection(sec, project, options) {
     : "";
 
   if (!isEditor) {
-    return `<section id="${sec.type}" class="site-section ${bgTheme} ${isHidden ? 'hidden' : ''}" style="--section-bg: ${themeColor}; ${customBackground}" data-section-type="${sec.type}" data-section-bg="${sectionTheme}" data-scroll-fx="zoom" data-ui-id="${getSectionUiId(sec)}" data-ui-type="section"${motionPreset ? ` data-motion="${motionPreset}"` : ''}>${innerHTML}</section>`;
+    return `<section id="${sec.type}" class="site-section ${bgTheme} ${isHidden ? 'hidden' : ''}" style="--section-bg: ${themeColor}; ${customBackground}" data-section-type="${sec.type}" data-section-bg="${sectionTheme}" data-has-custom-bg="${customBackground ? 'true' : 'false'}" data-scroll-fx="zoom" data-ui-id="${getSectionUiId(sec)}" data-ui-type="section"${motionPreset ? ` data-motion="${motionPreset}"` : ''}>${innerHTML}</section>`;
   }
 
   // Editor Wrapper with Controls
@@ -1118,7 +1121,7 @@ function renderAbout(sec, project, options = {}) {
                   <div class="text-xs text-gray-500" data-editable="role">${c.role} — ${project.business.city}</div>
                 </div>
 
-                <a href="#simulateur" class="inline-flex items-center gap-2 px-6 py-3 rounded-full text-xs font-bold text-white shadow-md transition-all" style="background-color: var(--primary);">
+                <a href="#simulateur" class="btn-cta inline-flex items-center gap-2 px-6 py-3 rounded-full text-xs font-bold text-white shadow-md transition-all" style="background-color: var(--primary);">
                   <span>Prendre contact directement</span>
                   ${getIcon("arrowRight", "w-3.5 h-3.5")}
                 </a>
@@ -1194,7 +1197,7 @@ function renderAbout(sec, project, options = {}) {
 
             <!-- Bottom Actions -->
             <div class="pt-5 flex flex-wrap items-center gap-5 sm:gap-6 vitrine-about-actions">
-              <a href="#simulateur" class="inline-flex items-center gap-2.5 px-8 py-4 rounded-full text-base font-semibold text-white shadow-md hover:shadow-lg transition-all no-underline vitrine-about-cta" style="background-color: var(--primary, #527c22);">
+              <a href="#simulateur" class="btn-cta inline-flex items-center gap-2.5 px-8 py-4 rounded-full text-base font-semibold text-white shadow-md hover:shadow-lg transition-all no-underline vitrine-about-cta" style="background-color: var(--primary, #527c22);">
                 ${getIcon("phone", "w-5 h-5 text-white")}
                 <span data-editable="aboutCta">${c.aboutCta || "Demander un devis personnalisé"}</span>
               </a>
@@ -1985,7 +1988,7 @@ function renderQuoteSimulator(sec, project) {
             </div>
 
             <div class="text-center pt-2">
-              <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full text-base font-bold text-white shadow-xl hover:shadow-2xl transition-all transform hover:-translate-y-0.5" style="background-color: var(--primary);">
+              <button type="submit" class="w-full sm:w-auto btn-cta inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full text-base font-bold text-white shadow-xl hover:shadow-2xl transition-all transform hover:-translate-y-0.5" style="background-color: var(--primary);">
                 ${getIcon("send", "w-4 h-4")}
                 <span data-editable="ctaButton">${c.ctaButton || "Envoyer ma demande de chiffrage"}</span>
               </button>

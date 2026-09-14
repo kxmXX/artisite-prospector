@@ -20,7 +20,7 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - Mouvement : navigation d’ancre douce native, un seul langage de révélation discret, jamais de
   scroll-jacking ; respecter `prefers-reduced-motion`.
 
-## État exact à `4.8.0-alpha.7`
+## État exact à `4.8.0-alpha.8`
 
 - [x] Navigation vitrine Services / À propos / Avis / Galerie / FAQ, sticky et compensée sous un header de 80 px.
 - [x] Header de référence : canevas `80rem`, libellés noirs éditables, CTA vert « Demander un devis personnalisé » et export desktop qui ne masque plus `md:flex`.
@@ -30,7 +30,7 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - [x] FAQ : surtitre `FAQ`, titre `Questions fréquentes`, questions de référence et accordéon clavier/ARIA.
 - [x] Vitrine utilisable comme template : Hero et Galerie conservent leurs contrôles existants ; navigation, À propos, images Services, Avis, Horaires/carte et FAQ sont éditables depuis le même éditeur.
 - [x] Responsive téléphone conservé sans débordement horizontal sur les règles validées en alpha.6.
-- [x] Validation `4.8.0-alpha.7` : 15/15 tests vitrine ciblés, 173/173 suite complète, `git diff --check`, contrôle export du header à 1624 × 900 px.
+- [x] Validation vitrine héritée de `4.8.0-alpha.7` conservée ; lot éditeur `4.8.0-alpha.8` validé par 37/37 tests ciblés, 177/177 suite complète et `git diff --check`.
 
 ## Lot vitrine de référence — terminé
 
@@ -43,11 +43,10 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 
 ## Après la vitrine — contrôles de l’éditeur
 
-- [ ] Réparer les réglages de fond : une couleur de fond ne doit jamais modifier seulement le texte.
-- [ ] Réparer la typographie : catalogue chargé une fois, aperçu immédiat, corps/titres distincts.
-- [ ] Réparer le rayon global des boutons et vérifier carré → pilule.
-- [ ] Rendre le catalogue d’animations réellement appliqué aux blocs, avec aperçu et réduction de
-  mouvement ; ne pas proposer un effet qui ne se voit pas.
+- [x] Réparer les réglages de fond : la surface visible de la section suit maintenant le thème/couleur dans l’éditeur, le rendu public et l’export standalone ; test de parité ajouté.
+- [x] Réparer la typographie : catalogue dédupliqué par `ensureFontCatalog`, aperçu immédiat via variables CSS, cibles Titres/Texte réellement distinctes, export fidèle et mutation compatible Undo.
+- [x] Réparer le rayon global des boutons : carré → pilule s’applique aux CTA réels dans l’éditeur, le rendu public et l’export, sans modifier le rayon des cartes/conteneurs.
+- [x] Rendre le catalogue d’animations réellement appliqué aux blocs : presets distincts en preview/export, vitesse persistée, aperçu direct et `prefers-reduced-motion` qui neutralise les boucles.
 - [ ] Finaliser les identifiants visibles de **tous** les composants éditables, positionnés hors du
   texte, et les opérations IA ciblées avec Undo.
 - [ ] Vérifier les actions de suppression de boutons, le glisser-déposer de sections et les contrôles
@@ -65,11 +64,10 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 
 ## Dernière livraison validée
 
-- Lot `4.8.0-alpha.7` : finition de la référence Esprit Nature + passage en template réellement éditable.
-- Header : 80 px, canevas 80rem, mêmes libellés/CTA que la référence ; correctif standalone `md:flex !important` pour éviter la disparition du menu.
-- À propos / FAQ : contenu de référence et hiérarchie corrigés ; certification limitée à la démo, jamais injectée sur une nouvelle génération.
-- Horaires : iframe Google Maps interactive par défaut, liée à la ville/adresse ; image statique toujours sélectionnable.
-- Éditeur : navigation, À propos, images Services, Avis et Horaires/carte complètent les contrôles Hero/Galerie/FAQ déjà présents.
-- Tests : 15/15 ciblés, 173/173 complets, `git diff --check`. Commit fonctionnel `cbcac39`.
-- Contrôle visuel : export standalone 1624 × 900 px, header conforme en géométrie et navigation visible.
-- Prochaine action unique : reprendre les réglages transversaux de l’éditeur (fonds, typographie, rayon global des boutons, animations) sans retoucher la vitrine sauf régression mesurée.
+- Lot `4.8.0-alpha.8` : contrôles transversaux fonds / typographies / rayon global des boutons / animations fiabilisés de l’éditeur jusqu’à l’export.
+- Fonds : surface de section cohérente dans preview/public/export, y compris couleurs personnalisées.
+- Typographies : Titres/Texte séparés, export fidèle et Undo correct.
+- Boutons : rayon global indépendant du rayon des cartes et propagé aux CTA réels/export.
+- Animations : presets distincts, vitesse persistée et reduced-motion complet.
+- Tests : 37/37 ciblés, 177/177 complets, `git diff --check`.
+- Prochaine action unique : finaliser les identifiants visibles de tous les composants éditables et les opérations IA ciblées avec Undo.

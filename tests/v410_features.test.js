@@ -66,9 +66,11 @@ test("v4.1.0: Continuous scale, radius, font size and typography casing controls
   state.setButtonScale(125);
   assert.equal(state.currentProject.branding.ctaScale, 125, "ctaScale should be updated to 125");
 
-  // Radius picker
+  // Radius picker only changes buttons, not card/container radii
+  const cardRadiusBefore = state.currentProject.branding.borderRadius;
   state.setButtonRadius("8px");
   assert.equal(state.currentProject.branding.buttonRadius, "8px", "buttonRadius should be 8px");
+  assert.equal(state.currentProject.branding.borderRadius, cardRadiusBefore, "Button radius must not mutate card radius");
 
   // Typography case toggle (TT)
   state.toggleButtonCase();

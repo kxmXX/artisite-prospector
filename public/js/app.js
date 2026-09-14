@@ -2067,12 +2067,15 @@ export class App {
 
   setAnimationSpeed(speed) {
     if (!state.currentProject) return;
-    if (!state.currentProject.branding) state.currentProject.branding = {};
-    state.currentProject.branding.animationSpeed = speed;
-    state.save();
+    if (!["fast", "normal", "slow"].includes(speed)) return;
+    const updated = JSON.parse(JSON.stringify(state.currentProject));
+    updated.branding = updated.branding || {};
+    updated.branding.animationSpeed = speed;
+    state.updateProject(updated, true, `Vitesse animations : ${speed}`);
     const multiplier = speed === "fast" ? "0.6" : (speed === "slow" ? "1.5" : "1.0");
     document.documentElement.style.setProperty("--anim-duration-multiplier", multiplier);
-    this.render();
+    const root = document.querySelector(".artisite-root");
+    if (root) root.style.setProperty("--anim-duration-multiplier", multiplier);
     this.showToast(`Rythme des animations : ${speed === 'fast' ? 'Rapide (0.5s)' : (speed === 'slow' ? 'Posé (1.4s)' : 'Naturel (0.9s)')}`, "info");
   }
 
@@ -3047,17 +3050,17 @@ export class App {
 
   liveUpdateBorderRadius(radius, btnRadius) {
     if (!state.currentProject) return;
-    state.currentProject.branding.borderRadius = radius;
-    state.currentProject.branding.buttonRadius = btnRadius;
+    const nextButtonRadius = btnRadius || radius;
+    const updated = JSON.parse(JSON.stringify(state.currentProject));
+    updated.branding = updated.branding || {};
+    updated.branding.buttonRadius = nextButtonRadius;
+    state.updateProject(updated, true, `Rayon boutons : ${nextButtonRadius}`);
 
     const root = document.querySelector(".artisite-root");
     if (root) {
-      root.style.setProperty("--radius", radius);
-      root.style.setProperty("--btn-radius", btnRadius);
-      root.style.setProperty("--cta-radius", btnRadius);
+      root.style.setProperty("--btn-radius", nextButtonRadius);
+      root.style.setProperty("--cta-radius", nextButtonRadius);
     }
-    state.pushHistory("Modification arrondi");
-    state.saveToStorage();
     this.updateUndoRedoUI();
 
     // Update border radius button active states in sidebar settings
@@ -3165,17 +3168,19 @@ export class App {
 
   updateTypography(headingFont, bodyFont) {
     if (!state.currentProject) return;
-    state.currentProject.branding.headingFont = headingFont;
-    state.currentProject.branding.bodyFont = bodyFont;
+    const updated = JSON.parse(JSON.stringify(state.currentProject));
+    updated.branding = updated.branding || {};
+    updated.branding.headingFont = headingFont;
+    updated.branding.bodyFont = bodyFont;
 
+    // State owns the committed mutation so Undo captures the previous typography,
+    // while CSS variables keep the canvas response immediate.
+    state.updateProject(updated, true, `Typographie : ${this.typographyTarget === "body" ? bodyFont : headingFont}`);
     const root = document.querySelector(".artisite-root");
     if (root) {
       root.style.setProperty("--font-heading", `'${headingFont}', -apple-system, BlinkMacSystemFont, sans-serif`);
       root.style.setProperty("--font-body", `'${bodyFont}', -apple-system, BlinkMacSystemFont, sans-serif`);
     }
-
-    state.pushHistory(`Typographie : ${headingFont}`);
-    state.saveToStorage();
     this.updateUndoRedoUI();
   }
 

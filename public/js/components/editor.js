@@ -1534,7 +1534,7 @@ function renderSettingsAccordions(project, state = {}) {
               <button type="button" onclick="window.app.setTypographyTarget('body')" class="py-1.5 rounded border text-[11px] ${(typeof window !== 'undefined' && window.app?.typographyTarget === 'body') ? 'border-zinc-900 bg-zinc-900 text-white' : 'border-zinc-200 bg-white text-zinc-600'}">Texte</button>
             </div>
             ${FONT_CATALOG.map(font => `
-              <button type="button" aria-label="Utiliser ${font.name}" onclick="window.app.applyTypographyFont('${font.name}')" class="font-option w-full text-left p-2 rounded-lg border bg-white hover:border-zinc-400 text-xs ${(project.branding.headingFont === font.name || project.branding.bodyFont === font.name) ? 'is-active' : ''}" style="font-family: '${font.name}', sans-serif">
+              <button type="button" aria-label="Utiliser ${font.name}" onclick="window.app.applyTypographyFont('${font.name}')" class="font-option w-full text-left p-2 rounded-lg border bg-white hover:border-zinc-400 text-xs ${(((typeof window !== 'undefined' && window.app?.typographyTarget === 'body') ? project.branding.bodyFont : project.branding.headingFont) === font.name) ? 'is-active' : ''}" style="font-family: '${font.name}', sans-serif">
                 <div class="font-bold text-zinc-900">${font.name}</div>
                 <div class="text-[10px] text-zinc-400">${font.category} · ${font.description}</div>
               </button>
@@ -1595,7 +1595,7 @@ function renderSettingsAccordions(project, state = {}) {
                 ['1.5rem', '1.5rem', '24px'],
                 ['9999px', '9999px', 'Pilule']
               ].map(([radius, btnRadius, label]) => `
-                <button type="button" data-radius-option data-radius="${radius}" onclick="window.app.liveUpdateBorderRadius('${radius}', '${btnRadius}')" class="py-1.5 border text-center text-[11px] font-medium ${project.branding.borderRadius === radius ? 'border-zinc-900 bg-white font-semibold text-zinc-950' : 'border-zinc-200 bg-white text-zinc-600'}" style="border-radius:${radius}">${label}</button>
+                <button type="button" data-radius-option data-radius="${radius}" onclick="window.app.liveUpdateBorderRadius('${radius}', '${btnRadius}')" class="py-1.5 border text-center text-[11px] font-medium ${project.branding.buttonRadius === btnRadius ? 'border-zinc-900 bg-white font-semibold text-zinc-950' : 'border-zinc-200 bg-white text-zinc-600'}" style="border-radius:${radius}">${label}</button>
               `).join('')}
             </div>
           </div>
