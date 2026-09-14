@@ -1813,7 +1813,7 @@ function renderReviews(sec, project, options = {}) {
           </div>
 
           <!-- Centered Google Rating Summary Bar matching Sendpage -->
-          <div class="flex flex-wrap items-center justify-center gap-2.5 mb-14 sm:mb-16" data-review-summary>
+          <div class="flex flex-wrap items-center justify-center gap-2.5 mb-14 vitrine-review-summary" data-review-summary>
             <svg class="w-5 h-5 inline-block shrink-0" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17Z"/>
               <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24Z"/>
@@ -1831,7 +1831,7 @@ function renderReviews(sec, project, options = {}) {
           <!-- 3-Column Reviews Grid matching Sendpage Screenshot -->
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-7xl mx-auto vitrine-review-grid">
             ${(c.reviews || []).map((r, idx) => `
-              <div class="bg-white dark:bg-zinc-900 p-7 sm:p-8 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-between space-y-5">
+              <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-between space-y-5 vitrine-review-card">
                 <div class="space-y-4">
                   <div class="flex items-start justify-between">
                     <div class="flex items-center gap-3">
@@ -1839,7 +1839,7 @@ function renderReviews(sec, project, options = {}) {
                         ${r.author ? r.author.charAt(0).toUpperCase() : 'C'}
                       </div>
                       <div>
-                        <div class="font-bold text-gray-900 dark:text-white text-sm leading-tight" data-editable="reviews.${idx}.author">${r.author}</div>
+                        <div class="font-bold text-gray-900 dark:text-white leading-tight vitrine-review-author" data-editable="reviews.${idx}.author">${r.author}</div>
                         <div class="flex text-[#f59e0b] text-xs mt-0.5">
                           ${renderRatingStars(r.rating, { editor: options.isEditor, sectionId: sec.id, reviewIndex: idx })}
                         </div>
@@ -1852,7 +1852,7 @@ function renderReviews(sec, project, options = {}) {
                       <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98Z"/>
                     </svg>
                   </div>
-                  <p class="text-base text-gray-600 dark:text-zinc-300 leading-relaxed font-normal" data-editable="reviews.${idx}.text">« ${r.text} »</p>
+                  <p class="text-gray-600 dark:text-zinc-300 font-normal vitrine-review-copy" data-editable="reviews.${idx}.text">« ${r.text} »</p>
                 </div>
                 <span class="hidden" data-editable="reviews.${idx}.city">${r.city}</span>
               </div>
@@ -2026,7 +2026,7 @@ function renderHours(sec, project, options = {}) {
 
     return `
       <div id="horaires" class="py-20 lg:py-28 bg-white dark:bg-zinc-950 border-t border-black/5">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 vitrine-hours-shell">
           <div class="text-center max-w-2xl mx-auto space-y-2 mb-12 sm:mb-16">
             <div class="text-xs font-bold uppercase tracking-wider text-[#527c22] dark:text-[#8FA382]" data-editable="badge">
               ${c.badge || 'HORAIRES'}
@@ -2042,15 +2042,15 @@ function renderHours(sec, project, options = {}) {
             </div>
           </div>
 
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch max-w-6xl mx-auto">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch mx-auto vitrine-hours-grid">
             <!-- Left Column: Timetable Card -->
-            <div class="lg:col-span-6 bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 shadow-sm p-6 sm:p-8 flex flex-col justify-between">
+            <div class="lg:col-span-6 bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 shadow-sm flex flex-col justify-between vitrine-hours-card">
               <div class="divide-y divide-zinc-100 dark:divide-zinc-800/80">
                 ${defaultDays.map(day => {
                   const time = hours[day] || (day === "dimanche" ? "Fermé" : "9h - 12h / 14h - 18h");
                   const isClosed = time.toLowerCase().includes("fermé");
                   return `
-                    <div class="flex items-center justify-between py-4 text-sm sm:text-base">
+                    <div class="flex items-center justify-between vitrine-hours-row">
                       <div class="flex items-center gap-3">
                         <svg class="w-4 h-4 ${isClosed ? 'text-zinc-400' : 'text-[#527c22]'}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -2071,18 +2071,18 @@ function renderHours(sec, project, options = {}) {
             </div>
 
             <!-- Right Column: dynamic map, tied to the editable address/city. -->
-            <div class="lg:col-span-6 bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 shadow-sm overflow-hidden min-h-[380px] sm:min-h-[440px] relative">
+            <div class="lg:col-span-6 bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 shadow-sm overflow-hidden relative vitrine-hours-map">
               ${mapImage ? renderEditableImage(mapImage, {
                 sectionId: sec.id,
                 fieldPath: "mapImage",
                 alt: `Carte de localisation — ${c.city || project.business?.city || "zone d'intervention"}`,
-                className: "w-full h-full min-h-[380px] sm:min-h-[440px] object-cover",
+                className: "w-full h-full object-cover",
                 options,
                 tradeId: project.business?.tradeId
               }) : `
                 <iframe
                   title="Carte Horaires et Lieu"
-                  class="w-full h-full min-h-[380px] sm:min-h-[440px] border-0 filter saturate-[1.05]"
+                  class="w-full h-full border-0 filter saturate-[1.05]"
                   loading="lazy"
                   src="https://maps.google.com/maps?q=${encodeURIComponent(c.address || (c.city ? c.city + ', France' : (project.business?.city ? project.business.city + ', France' : 'Montauban, France')))}&t=&z=12&ie=UTF8&iwloc=&output=embed">
                 </iframe>
@@ -2221,7 +2221,7 @@ function renderFaq(sec, project) {
           ` : ''}
         </div>
 
-        <div class="divide-y divide-zinc-200/80 dark:divide-zinc-800">
+        <div class="divide-y divide-zinc-200/80 dark:divide-zinc-800 vitrine-faq-list mx-auto">
           ${(c.items || []).map((faq, idx) => `
             <div class="faq-item group/faq transition-colors py-6 sm:py-7">
               <button type="button" class="faq-header flex items-center justify-between gap-4 cursor-pointer select-none" aria-expanded="false" aria-controls="faq-answer-${sec.id}-${idx}">

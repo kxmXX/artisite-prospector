@@ -7,7 +7,15 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
-### Consolidation non publiée — 14 septembre 2026 (4.8.0-alpha.1)
+### Consolidation non publiée — 14 septembre 2026 (4.8.0-alpha.2)
+
+- Vitrine : les proportions d’Horaires & Lieu et des avis reposent maintenant sur des
+  classes dédiées réellement fournies par le CSS, plutôt que sur des utilitaires responsives
+  absents. L’aperçu et l’export HTML reçoivent les mêmes dimensions.
+- Version visible portée à `4.8.0-alpha.2` dans le titre, le badge de l’application et le
+  package afin d’identifier sans ambiguïté ce lot après publication.
+
+### Consolidation précédente — 14 septembre 2026 (4.8.0-alpha.1)
 
 - Génération vitrine : aucune certification n’est désormais inventée par défaut ; le champ
   reste personnalisable pour les informations vérifiées.

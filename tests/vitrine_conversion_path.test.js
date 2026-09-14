@@ -81,7 +81,8 @@ test("the hours and location template keeps a real mobile stack", () => {
   const html = renderWebsiteHTML(project);
 
   assert.match(html, /grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch/);
-  assert.match(html, /lg:col-span-6[^>]*min-h-\[380px\] sm:min-h-\[440px\]/);
+  assert.match(html, /lg:col-span-6[^>]*vitrine-hours-map/);
+  assert.match(html, /vitrine-hours-card/);
   assert.match(html, /<svg[^>]*text-\[#527c22\][^>]*>/);
   assert.doesNotMatch(html, />📍</);
 });
@@ -115,8 +116,10 @@ test("paysagiste reviews and FAQ preserve the spacious vitrine rhythm", () => {
 
   assert.match(html, /data-review-summary/);
   assert.match(html, /vitrine-review-grid/);
-  assert.match(html, /text-base text-gray-600 dark:text-zinc-300 leading-relaxed/);
+  assert.match(html, /vitrine-review-card/);
+  assert.match(html, /vitrine-review-copy/);
   assert.match(html, /vitrine-faq-shell/);
+  assert.match(html, /vitrine-faq-list/);
   assert.match(html, /faq-item group\/faq transition-colors py-6 sm:py-7/);
 });
 

@@ -1,5 +1,24 @@
 # État de reprise Codex — 14 septembre 2026
 
+## LOT EN COURS — vitrine 4.8.0-alpha.2
+
+- Écart traité : les références utilisateur montrent que les cartes Horaires et Avis sont
+  visuellement trop compactes. Cause identifiée : les utilitaires responsives présents dans le
+  HTML (`sm:p-8`, `sm:text-lg`, etc.) ne sont pas tous fournis par `public/css/app.css`.
+- Correction préparée : classes vitrine explicites pour taille, padding et rythme des blocs
+  Horaires, Avis et FAQ ; mêmes règles injectées dans l’export HTML. Version visible portée à
+  `4.8.0-alpha.2` dans package, titre et badge runtime.
+- Fichiers modifiés : `public/css/app.css`, `public/js/components/renderer.js`,
+  `public/js/engine/exporter.js`, `package.json`, `public/index.html`,
+  `public/js/version.js`, `CHANGELOG.md`, ce suivi et le plan.
+- Tests à exécuter avant commit : vitrine/export ciblés, cohérence de version, contrôle
+  navigateur desktop et mobile. **Exécutés : 20/20** (`vitrine_conversion_path`, `exporter`,
+  `v440_fixes_and_dashboard`) et `git diff --check` ; mesure Playwright à 1440/390 px réussie.
+- Mesures réelles : à 1440 px, Horaires 528 × 541 px par colonne ; Avis 400 × 328–342 px.
+  À 390 px, Horaires 358 × 469/400 px et Avis 358 × 296–318 px : aucun écrasement horizontal.
+- Prochaine action exacte après publication : reprendre le lot éditeur des contrôles de typographie,
+  fonds, rayon et animations avec tests ciblés, sans toucher aux données de vitrine existantes.
+
 ## REPRISE COURTE — priorité vitrine (prévaut sur l'historique)
 
 - Lot de fiabilité contenu : une nouvelle vitrine paysagiste ne génère plus la mention

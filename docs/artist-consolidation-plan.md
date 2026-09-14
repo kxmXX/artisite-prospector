@@ -5,6 +5,17 @@ Branche : `refactor/artist-consolidation`, worktree isolé `Documents/Codex/2026
 Version cible : **4.8.0**, non publiée. La base déclare 4.2.0 dans package.json,
 V4.3 PRO sur l'accueil et v4.7 dans les tests : cette divergence sera supprimée.
 
+## Avancement courant — 4.8.0-alpha.2
+
+- Lot vitrine en cours : correction des proportions constatées sur les captures des sections
+  « Horaires & Lieu », Avis et FAQ. Les dimensions critiques passent par des classes vitrine
+  dédiées et présentes dans le CSS, puis sont recopiées dans l’export autonome.
+- Contrôle navigateur local effectué : à 1440 px, les deux cartes Horaires font 528 × 541 px,
+  les avis 400 × 328–342 px ; à 390 px, les cartes restent à 358 px de large et s’empilent
+  sans compression. Le titre de page produit est `Artist v4.8.0-alpha.2`.
+- Ensuite seulement : reprendre les contrôles d’édition encore prioritaires (typo, fonds,
+  rayon, animations) sans modifier les données personnalisées des vitrines.
+
 ## État initial vérifié
 
 - Vanilla JS, serveur Node natif, aucune dépendance npm déclarée ; `npm test` : **136/136**.
