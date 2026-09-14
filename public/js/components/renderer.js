@@ -2074,7 +2074,7 @@ function renderHours(sec, project, options = {}) {
             <!-- Signature Green Accent Dash -->
             <div class="w-12 h-1 rounded-full mx-auto mt-2.5 mb-4" style="background-color: var(--primary, #527c22);"></div>
             <div class="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-700 dark:text-zinc-300">
-              ${getIcon("mapPin", "w-4 h-4 text-[#527c22]", { "aria-hidden": "true" })}
+              ${getIcon("mapPin", "w-4 h-4 text-[#527c22]")}
               <span data-editable="subtitle">${c.subtitle || project.business?.city || 'Montauban'}</span>
             </div>
           </div>

@@ -1,4 +1,14 @@
-# État de reprise Codex — 14 septembre 2026
+# État de reprise Codex — 15 septembre 2026
+
+## LOT DE LIVRAISON — stabilisation V3 4.8.0-alpha.14
+
+- Base auditée : `f49ec7f feat(ui): ship structural V3 product experience` récupéré depuis `origin/main`; les 184 tests historiques passaient mais ne couvraient pas les collisions et ruptures de navigation V3.
+- Réglages : `setSidebarTab()` rerend désormais immédiatement la surface V3 et rebinde les interactions ; plus de bascule différée après une autre action.
+- Canvas : preview appareil piloté par état explicite `data-viewport`, largeur réelle 768/390 px après transition ; la toolbar section dispose d’une voie éditeur dédiée et ne recouvre plus le contenu client.
+- Mobile : séparation stricte entre dock d’édition V3 et sticky call bar client ; le mode aperçu masque le chrome inférieur éditeur.
+- Qualité : appel `getIcon()` invalide corrigé (plus de `width/height=[object Object]`) et actions de structure agrandies.
+- Contrôle navigateur : Chrome headless 1440 × 900 et 390 × 844, aucun message console SVG, toolbar/content = 0 px de recouvrement, Réglages immédiat. Tests : 39/39 ciblés, 189/189 complets et `git diff --check`.
+- Prochaine action : vérifier l’édition réelle sous 1280 px où l’inspecteur droit est masqué, puis rejouer sélection/visibilité/drag-drop/texte/image/CTA/Assistant/Undo.
 
 ## LOT DE LIVRAISON — déduplication génération 4.8.0-alpha.13
 

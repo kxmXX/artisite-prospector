@@ -56,6 +56,19 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - [x] Le délai souhaité est réellement rendu dans le formulaire public lorsqu’il possède des options.
 - [x] Footer éditable depuis la sidebar : nom, description, téléphone, email, adresse et copyright.
 
+## Audit régressions V3 — base `f49ec7f`
+
+- [x] Baseline réelle reprise depuis `origin/main` : V3 `f49ec7f`, version restée `4.8.0-alpha.13`, suite historique 184/184 malgré des régressions navigateur non couvertes.
+- [x] P0 — Réglages V3 : le rail déclenche maintenant un rendu immédiat de la surface Réglages au lieu d’attendre un autre événement.
+- [x] P0 — Prévisualisation appareil : états V3 synchronisés et largeurs réelles 768 px / 390 px après transition, sans dépendre des utilitaires arbitraires absents.
+- [x] P0 — Chrome de section : toolbar déplacée dans une voie dédiée hors du contenu client ; contrôle navigateur = 0 px de recouvrement.
+- [x] P0 — Mobile : le dock V3 et la sticky call bar ne se superposent plus ; en conception la sticky client est masquée, en aperçu le dock éditeur est retiré.
+- [x] P1 — Console : correction du `getIcon()` qui sérialisait un objet en `width/height="[object Object]"`.
+- [x] P1 — Actions de structure : cibles critiques portées à 32 px minimum.
+- [ ] P0 — Vérifier l’accès aux contrôles de contenu lorsque l’inspecteur droit disparaît à 1280 px et moins.
+- [ ] P0/P1 — Rejouer sélection, visibilité, drag-and-drop, édition texte/image/CTA, Assistant et Undo dans la V3.
+- [ ] P1 — Auditer modales, focus, scroll et responsive dashboard après stabilisation des fonctions d’édition.
+
 ## Stabilité async / backend — reprise après l’éditeur
 
 - [x] Protéger la génération photo IA : résultat lié à projet/section/champ/index, réponse tardive ignorée après changement de cible ou de projet, application revérifiée avant mutation.
@@ -86,4 +99,5 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - Lot `4.8.0-alpha.11` : simulateur de devis et footer complétés comme champs de template éditables ; 16/16 tests vitrine ciblés, 180/180 complets.
 - Lot `4.8.0-alpha.12` : génération photo IA protégée contre les réponses tardives et les changements de cible/projet ; 9/9 tests async ciblés, 183/183 complets.
 - Lot `4.8.0-alpha.13` : déduplication `in-flight` exacte des générations IA ; 10/10 backend ciblés, 184/184 complets.
-- Prochaine action unique : revoir les prompts de génération restants pour supprimer toute transformation d’exemples en faits client non vérifiés, avec tests sans réseau.
+- Lot `4.8.0-alpha.14` : premier correctif V3 post-`f49ec7f` — Réglages, previews appareil, collisions toolbar/dock, SVG et cibles de structure stabilisés ; audit navigateur 1440/390, 39/39 ciblés, 189/189 complets et `git diff --check`.
+- Prochaine action unique : rétablir l’accès complet aux contrôles d’édition à 1280/1024 px puis rejouer les interactions section/inspector/Assistant avant de revenir au lot factuel IA.

@@ -7,6 +7,14 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 15 septembre 2026 (4.8.0-alpha.14)
+
+- V3 post-`f49ec7f` : Réglages du rail rendus immédiatement, preview appareil réellement contraint à 768/390 px et états actifs synchronisés.
+- Canvas éditeur : toolbar de section déplacée hors de la surface client ; sur mobile, séparation du dock V3 et de la sticky call bar selon Conception/Aperçu.
+- Correctifs UI : fin des erreurs SVG `width/height=[object Object]` et cibles de structure principales agrandies à 32 px.
+- Audit navigateur : Chrome 1440 × 900 / 390 × 844, 0 px de recouvrement toolbar/contenu et aucune erreur console SVG après correction.
+- Couverture : nouveau `tests/v3_ui_regressions.test.js`; 39/39 ciblés, 189/189 complets et `git diff --check`.
+
 ### Consolidation — 14 septembre 2026 (4.8.0-alpha.13)
 
 - API génération : les requêtes simultanées portant exactement la même clé de contexte partagent désormais une seule promesse modèle en cours.

@@ -99,11 +99,11 @@
 .studio-v3-mobile-close { display:none;width:32px;height:32px;border:0;border-radius:9px;background:#eeede8;color:#68716d; }
 .studio-v3-structure-summary { height:44px;padding:0 13px 0 17px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--v3-line);color:#8b918e;font-size:9.5px; }
 .studio-v3-structure-summary span+span::before { content:"·";margin-right:8px; }
-.studio-v3-structure-summary button { margin-left:auto;border:0;background:transparent;color:#4b5b54;display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700; }
+.studio-v3-structure-summary button { margin-left:auto;min-height:32px;padding:0 6px;border:0;background:transparent;color:#4b5b54;display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700; }
 .studio-v3-sectionlist,.studio-v3-panelbody { min-height:0;overflow-y:auto;overscroll-behavior:contain; }
 .studio-v3-sectionlist { padding:9px 9px 20px; }
 .studio-v3-sectionrow {
-  min-height:52px;display:grid;grid-template-columns:24px 18px minmax(0,1fr) 28px 24px;align-items:center;gap:2px;
+  min-height:52px;display:grid;grid-template-columns:24px 20px minmax(0,1fr) 32px 32px;align-items:center;gap:2px;
   padding:2px 5px;border-radius:10px;color:#48524f;position:relative;transition:background .14s ease,color .14s ease;
 }
 .studio-v3-sectionrow:hover { background:#f0efea; }
@@ -118,7 +118,7 @@
 .studio-v3-sectionmain>span:last-child { min-width:0;display:flex;flex-direction:column;gap:2px; }
 .studio-v3-sectionmain b { overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11.5px;font-weight:690;letter-spacing:-.01em; }
 .studio-v3-sectionmain small { color:#a1a7a4;font:500 8.5px/1 ui-monospace,monospace;text-transform:uppercase; }
-.studio-v3-rowaction,.studio-v3-rowarrow { width:26px;height:26px;border:0;border-radius:8px;display:grid;place-items:center;color:#9ca3a0;background:transparent; }
+.studio-v3-rowaction,.studio-v3-rowarrow { width:32px;height:32px;border:0;border-radius:8px;display:grid;place-items:center;color:#9ca3a0;background:transparent; }
 .studio-v3-rowaction:hover,.studio-v3-rowarrow:hover { color:var(--v3-ink);background:rgba(24,32,31,.055); }
 .studio-v3-settings-body { padding:10px; }
 
@@ -152,8 +152,8 @@
   margin-top:0!important;flex:0 0 auto;box-shadow:0 22px 70px rgba(26,34,31,.16),0 0 0 1px rgba(24,32,31,.07)!important;
   border-radius:10px!important;overflow:visible!important;transition:width .28s cubic-bezier(.2,.75,.2,1),border-radius .2s ease!important;
 }
-#canvas-container.w-\[768px\] { border-radius:18px!important; }
-#canvas-container.w-\[390px\] { border-radius:24px!important; }
+#canvas-container[data-viewport="tablet"] { width:768px!important;max-width:none!important;border-radius:18px!important; }
+#canvas-container[data-viewport="mobile"] { width:390px!important;max-width:none!important;border-radius:24px!important; }
 
 /* ---------- inspector ---------- */
 .studio-v3-inspector-panel { width:318px!important;max-width:318px!important;min-width:0!important;min-height:0;background:var(--v3-panel);border-left:1px solid var(--v3-line);overflow-y:auto;overflow-x:hidden!important;z-index:30; }
@@ -204,7 +204,9 @@
   .studio-v3-stagebar { top:10px;max-width:calc(100vw - 16px); }
   .studio-v3-stagecontext { display:none; }
   .studio-v3-mode-switch span { display:none; }
-  #canvas-container { max-width:100%!important; }
+  #canvas-container,
+  #canvas-container[data-viewport="tablet"],
+  #canvas-container[data-viewport="mobile"] { width:100%!important;max-width:100%!important; }
 }
 @media (max-width:520px) {
   .studio-v3-projectmark { display:none; }
@@ -465,8 +467,13 @@
   .studio-v3-wizard-content #wizard-form { padding:18px!important; }
 }
 
-/* renderer's actual section toolbar: contextual only, never persistent */
+/* renderer's actual section toolbar: contextual only, never persistent.
+   Reserve an editor-only lane above each section so chrome never covers client content. */
+.studio-v3-canvas .editor-section-wrapper { margin-top:44px!important; }
+.client-preview-mode .studio-v3-canvas .editor-section-wrapper { margin-top:0!important; }
 .studio-v3-canvas .editor-section-toolbar {
+  top:-40px!important;
+  right:8px!important;
   opacity:0!important;
   pointer-events:none!important;
   transform:translateY(-4px) scale(.76)!important;
@@ -483,7 +490,12 @@
   transform:translateY(0) scale(.76)!important;
 }
 @media (max-width:900px) {
+  .studio-v3-canvas .editor-section-wrapper { margin-top:0!important; }
   .studio-v3-canvas .editor-section-toolbar { display:none!important; }
+  body:not(.client-preview-mode) .studio-v3-editor > .sticky-call-bar { display:none!important; }
+  body.client-preview-mode .studio-v3-rail { display:none!important; }
+  body.client-preview-mode .studio-v3-preview-return { display:none!important; }
+  body.client-preview-mode .studio-v3-canvas { padding-bottom:12px!important; }
 }
 
 /* ---------- system surfaces V3 ---------- */

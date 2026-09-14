@@ -223,15 +223,15 @@ export function renderEditor(state) {
               <b>${getSectionFriendlyTitle(selectedSec)}</b>
             </div>
             <div class="studio-v3-device-switch" aria-label="Prévisualisation par appareil">
-              <button type="button" onclick="window.app.setViewport('desktop')" class="${state.viewport === 'desktop' ? 'is-active' : ''}" title="Ordinateur">${getIcon("monitor", "w-4 h-4")}</button>
-              <button type="button" onclick="window.app.setViewport('tablet')" class="${state.viewport === 'tablet' ? 'is-active' : ''}" title="Tablette">${getIcon("tablet", "w-4 h-4")}</button>
-              <button type="button" onclick="window.app.setViewport('mobile')" class="${state.viewport === 'mobile' ? 'is-active' : ''}" title="Mobile">${getIcon("smartphone", "w-4 h-4")}</button>
+              <button type="button" data-viewport="desktop" onclick="window.app.setViewport('desktop')" class="${state.viewport === 'desktop' ? 'is-active' : ''}" title="Ordinateur">${getIcon("monitor", "w-4 h-4")}</button>
+              <button type="button" data-viewport="tablet" onclick="window.app.setViewport('tablet')" class="${state.viewport === 'tablet' ? 'is-active' : ''}" title="Tablette">${getIcon("tablet", "w-4 h-4")}</button>
+              <button type="button" data-viewport="mobile" onclick="window.app.setViewport('mobile')" class="${state.viewport === 'mobile' ? 'is-active' : ''}" title="Mobile">${getIcon("smartphone", "w-4 h-4")}</button>
             </div>
           </div>
 
           <!-- In-situ Live Preview Client Floating Pill (Docked at bottom so header and theme toggles remain completely accessible) -->
           ${isLivePreview ? `
-            <div class="fixed bottom-5 left-1/2 transform -translate-x-1/2 z-50 bg-zinc-950/95 text-white px-5 py-2.5 rounded-full shadow-2xl border border-zinc-700 flex items-center gap-4 text-xs backdrop-blur animate-fade-in">
+            <div class="studio-v3-preview-return fixed bottom-5 left-1/2 transform -translate-x-1/2 z-50 bg-zinc-950/95 text-white px-5 py-2.5 rounded-full shadow-2xl border border-zinc-700 flex items-center gap-4 text-xs backdrop-blur animate-fade-in">
               <span class="flex items-center gap-2 font-bold text-zinc-200">
                 <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
                 <span>Aperçu Client Démo en direct</span>
@@ -331,7 +331,7 @@ export function renderEditor(state) {
             <button type="button" id="ftb-close" class="ftb-btn text-zinc-400 hover:text-white px-1.5" title="Fermer">✕</button>
           </div>
 
-          <div class="transition-all duration-300 ${viewportWidthClass} ${isLivePreview ? 'client-preview-mode' : ''} min-h-full mt-3 rounded-t-xl overflow-visible shadow-sm" id="canvas-container" style="background-color: ${project.branding?.bgColor || '#ffffff'}; color: ${project.branding?.textColor || '#18181b'};">
+          <div class="transition-all duration-300 ${viewportWidthClass} ${isLivePreview ? 'client-preview-mode' : ''} min-h-full mt-3 rounded-t-xl overflow-visible shadow-sm" id="canvas-container" data-viewport="${state.viewport}" style="background-color: ${project.branding?.bgColor || '#ffffff'}; color: ${project.branding?.textColor || '#18181b'};">
             ${websiteHTML}
           </div>
         </main>

@@ -586,12 +586,29 @@ export class App {
   updateViewportUI() {
     const vp = state.viewport;
     const canvasContainer = document.getElementById("canvas-container");
+    const viewportConfig = {
+      desktop: {
+        className: "w-full max-w-none shadow-none transition-all duration-300 bg-white min-h-full",
+        width: "100%",
+        maxWidth: "none"
+      },
+      tablet: {
+        className: "w-[768px] mx-auto shadow-sm rounded-2xl overflow-hidden border border-zinc-300 my-8 bg-white transition-all duration-300 min-h-full",
+        width: "768px",
+        maxWidth: "none"
+      },
+      mobile: {
+        className: "w-[390px] mx-auto shadow-sm rounded-3xl overflow-hidden border-2 border-zinc-400 my-8 bg-white transition-all duration-300 min-h-full",
+        width: "min(390px, 100%)",
+        maxWidth: "390px"
+      }
+    };
+    const config = viewportConfig[vp] || viewportConfig.desktop;
     if (canvasContainer) {
-      canvasContainer.className = {
-        desktop: "w-full max-w-none shadow-none transition-all duration-300 bg-white min-h-full",
-        tablet: "w-[768px] mx-auto shadow-sm rounded-2xl overflow-hidden border border-zinc-300 my-8 bg-white transition-all duration-300 min-h-full",
-        mobile: "w-[390px] mx-auto shadow-sm rounded-3xl overflow-hidden border-2 border-zinc-400 my-8 bg-white transition-all duration-300 min-h-full"
-      }[vp] || "w-full";
+      canvasContainer.className = config.className;
+      canvasContainer.dataset.viewport = vp;
+      canvasContainer.style.width = config.width;
+      canvasContainer.style.maxWidth = config.maxWidth;
     }
     document.querySelectorAll(".viewport-option").forEach(button => {
       const label = button.getAttribute("aria-label") || "";
@@ -600,11 +617,22 @@ export class App {
         (vp === "mobile" && label.includes("mobile"));
       button.classList.toggle("is-active", active);
     });
+    document.querySelectorAll(".studio-v3-device-switch [data-viewport]").forEach(button => {
+      button.classList.toggle("is-active", button.dataset.viewport === vp);
+    });
   }
 
   setSidebarTab(tab) {
     this.activeSidebarTab = tab;
     state.activeSidebarTab = tab;
+
+    // V3 renders one sidebar surface at a time. Re-render immediately instead of
+    // mutating the legacy tab nodes that no longer exist in this layout.
+    if (document.querySelector(".studio-v3-editor")) {
+      this.render();
+      if (state.currentView === "editor") this.initCanvasInteractivity();
+      return;
+    }
     
     const tabSections = document.getElementById("sidebar-tab-sections");
     const tabSettings = document.getElementById("sidebar-tab-settings");
