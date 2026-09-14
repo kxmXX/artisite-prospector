@@ -89,3 +89,21 @@ test("desktop vitrine navigation keeps a deliberate gap between links", async ()
   const css = await readFile(new URL("../public/css/app.css", import.meta.url), "utf8");
   assert.match(css, /\.gap-7 \{ gap: 1\.75rem; \}/);
 });
+
+test("paysagiste vitrine keeps its fixed one-page navigation and generous editorial proportions", async () => {
+  const project = generateDemoSite({ name: "Esprit Nature", tradeId: "paysagiste", city: "Montauban" });
+  const html = renderWebsiteHTML(project);
+  const css = await readFile(new URL("../public/css/app.css", import.meta.url), "utf8");
+
+  for (const label of ["Services", "À propos", "Avis", "Galerie", "FAQ"]) {
+    assert.match(html, new RegExp(`>${label}</a>`));
+  }
+  assert.match(html, /class="sticky top-0 z-50/);
+  assert.match(html, /vitrine-shell/);
+  assert.match(html, /lg:col-span-6 order-1/);
+  assert.match(html, /lg:col-span-6 order-2/);
+  assert.match(html, /vitrine-about-image/);
+  assert.match(css, /\.vitrine-shell \{ max-width: 96rem; \}/);
+  assert.match(css, /\.vitrine-about-image \{ min-height: 32rem; \}/);
+  assert.match(css, /scroll-margin-top: 6rem/);
+});

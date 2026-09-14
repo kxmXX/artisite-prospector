@@ -24,6 +24,14 @@
 - Prochaine action exacte : vérifier et corriger les contrôles d'édition de présentation,
   services et galerie en mode éditeur, en gardant les mêmes données dans l'export.
 
+- Sous-lot vitrine 1.1 — proportions : le paysagiste utilise systématiquement les cinq
+  ancres de la page unique (Services, À propos, Avis, Galerie, FAQ). Le header fixe compense
+  l'arrivée des ancres ; la surface est élargie à 96rem, À propos passe en 6/6 avec image
+  dominante et les cartes Services gagnent en densité. Les attributs éditables et le parcours
+  devis sont conservés. Tests de rendu ciblés : **16/16**, diff propre.
+- Prochaine action exacte : aligner la densité des avis et de la FAQ sur les captures,
+  puis vérifier le rendu exporté avant de toucher aux outils d'édition secondaires.
+
 - Sous-lot FAQ terminé localement : accordéon compact fermé au départ, déclencheurs natifs
   au clavier avec `aria-expanded` / `aria-controls`, réponse masquée de façon cohérente et
   focus visible. La galerie emploie désormais l'icône vectorielle de recherche, sans emoji.

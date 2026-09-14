@@ -89,6 +89,14 @@ puis présentation/services/galerie/FAQ. Voir la tête courte de codex-execution
   être comprimée sous 380 px dans cette composition. L'icône de position est harmonisée au
   système SVG. Test de rendu ajouté ; validation sur appareil/mobile navigateur reste distincte.
 
+### Sous-lot vitrine 1.1 — proportions et navigation — 14 septembre 2026
+
+- Navigation fixe paysagiste normalisée sur les cinq destinations de la page, avec compensation
+  de scroll. Surface de lecture élargie, split À propos équilibré 6/6 et photo dominante,
+  services plus généreux. Personnalisation et export conservent leurs mêmes données.
+- Suite : avis/FAQ selon captures puis contrôle visuel navigateur/export, avant les outils
+  d'édition secondaires.
+
 ### Sous-lot FAQ accessible terminé — 14 septembre 2026
 
 - FAQ compacte au chargement, navigation au clavier, état `aria-expanded` et association

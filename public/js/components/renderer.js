@@ -567,10 +567,15 @@ function renderHeader(sec, project, options = {}) {
     { label: "Galerie", target: "#galerie", type: "gallery" },
     { label: "FAQ", target: "#faq", type: "faq" }
   ].filter(link => visibleTypes.has(link.type));
-  const navigationLinks = (c.links && c.links.length) ? c.links : (isPaysagiste ? defaultVitrineLinks : []);
+  // The vitrine has a single scrolling page: its primary navigation must always
+  // expose the visible editorial destinations, rather than inheriting a partial
+  // generic navigation from an older template.
+  const navigationLinks = isPaysagiste
+    ? defaultVitrineLinks
+    : ((c.links && c.links.length) ? c.links : []);
   return `
     <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-black/5 transition-all">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <div class="max-w-7xl vitrine-shell mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
         <a href="#" class="flex items-center gap-3 group no-underline select-none">
           ${isPaysagiste ? `
             <span class="font-heading text-xl sm:text-2xl font-black tracking-tight text-gray-900 block leading-tight no-underline" data-editable="brandName">${c.brandName || project.business?.name || 'Esprit Nature'}</span>
@@ -1121,16 +1126,16 @@ function renderAbout(sec, project, options = {}) {
 
   return `
     <div id="about" class="py-20 lg:py-28" style="background-color: var(--bg);">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+      <div class="max-w-7xl vitrine-shell mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center vitrine-about-grid">
 
           <!-- Left Column: Story and Content -->
-          <div class="lg:col-span-7 order-1 lg:order-1 space-y-4">
+          <div class="lg:col-span-6 order-1 lg:order-1 space-y-5 vitrine-about-copy">
             <div class="text-xs font-bold uppercase tracking-wider text-[#527c22] dark:text-[#8FA382]" data-editable="badge">
               ${c.badge || "À PROPOS"}
             </div>
 
-            <h2 class="font-heading text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white leading-tight" data-editable="title">
+            <h2 class="font-heading text-4xl sm:text-5xl font-extrabold text-gray-900 dark:text-white leading-tight vitrine-about-title" data-editable="title">
               ${c.title}
             </h2>
 
@@ -1147,12 +1152,12 @@ function renderAbout(sec, project, options = {}) {
             ` : ''}
 
             <!-- Role Subtitle -->
-            <div class="text-gray-500 dark:text-zinc-400 font-medium text-sm sm:text-base pt-1 pb-2" data-editable="role">
+            <div class="text-gray-500 dark:text-zinc-400 font-medium text-base sm:text-lg pt-1 pb-2" data-editable="role">
               ${roleText}
             </div>
 
             <!-- Story Paragraphs -->
-            <div class="text-gray-600 dark:text-zinc-300 text-base leading-relaxed space-y-4 pt-1 pb-4" data-editable="story">
+            <div class="text-gray-600 dark:text-zinc-300 text-lg leading-relaxed space-y-5 pt-1 pb-5 vitrine-about-story" data-editable="story">
               ${paragraphs.length > 0 ? paragraphs.map(p => `<p>${p}</p>`).join('') : `<p>${storyText}</p>`}
             </div>
 
@@ -1175,12 +1180,12 @@ function renderAbout(sec, project, options = {}) {
             ` : ''}
 
             <!-- Bottom Actions -->
-            <div class="pt-4 flex flex-wrap items-center gap-4 sm:gap-6">
-              <a href="#simulateur" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-full text-sm font-semibold text-white shadow-md hover:shadow-lg transition-all no-underline" style="background-color: var(--primary, #527c22);">
-                ${getIcon("phone", "w-4 h-4 text-white")}
+            <div class="pt-5 flex flex-wrap items-center gap-5 sm:gap-6 vitrine-about-actions">
+              <a href="#simulateur" class="inline-flex items-center gap-2.5 px-8 py-4 rounded-full text-base font-semibold text-white shadow-md hover:shadow-lg transition-all no-underline vitrine-about-cta" style="background-color: var(--primary, #527c22);">
+                ${getIcon("phone", "w-5 h-5 text-white")}
                 <span data-editable="aboutCta">${c.aboutCta || "Demander un devis personnalisé"}</span>
               </a>
-              <a href="#services" class="inline-flex items-center gap-1.5 text-sm font-semibold hover:underline transition-colors no-underline" style="color: var(--primary, #527c22);">
+              <a href="#services" class="inline-flex items-center gap-2 text-base font-semibold hover:underline transition-colors no-underline vitrine-about-link" style="color: var(--primary, #527c22);">
                 <span data-editable="aboutLink">${c.aboutLink || "Découvrir nos services"}</span>
                 ${getIcon("arrowRight", "w-4 h-4")}
               </a>
@@ -1188,9 +1193,9 @@ function renderAbout(sec, project, options = {}) {
           </div>
 
           <!-- Right Column: Benjamin Portrait Photo -->
-          <div class="lg:col-span-5 order-2 lg:order-2">
+          <div class="lg:col-span-6 order-2 lg:order-2">
             <div class="relative">
-              <div class="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl border-4 border-white dark:border-zinc-800 bg-slate-100">
+              <div class="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl border-4 border-white dark:border-zinc-800 bg-slate-100 vitrine-about-image">
                 ${renderEditableImage(c.image, { sectionId: sec.id, fieldPath: 'image', alt: c.title, className: 'w-full h-full object-cover', options })}
               </div>
               ${isPaysagiste ? '' : `
@@ -1228,7 +1233,7 @@ function renderStats(sec, project) {
 
   return `
     <div class="py-14 text-white shadow-inner" style="background-color: var(--primary);">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-7xl vitrine-shell mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 text-center divide-y sm:divide-y-0 sm:divide-x divide-white/20">
           ${items.map((item, idx) => `
             <div class="p-4 flex flex-col justify-center items-center">
@@ -1400,7 +1405,7 @@ function renderServices(sec, project, options = {}) {
           ` : ''}
         </div>
 
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 vitrine-service-grid">
           ${(c.services || []).map((srv, idx) => `
             <div class="bg-white dark:bg-zinc-900 rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-zinc-800 flex flex-col group transform hover:-translate-y-1">
               <div class="aspect-[16/10] overflow-hidden relative bg-slate-100">
@@ -1413,10 +1418,10 @@ function renderServices(sec, project, options = {}) {
                   <span class="hidden" data-editable="services.${idx}.tag">${srv.tag}</span>
                 ` : ''}
               </div>
-              <div class="p-6 sm:p-7 flex-1 flex flex-col justify-between space-y-3">
+              <div class="p-7 sm:p-8 flex-1 flex flex-col justify-between space-y-4">
                 <div>
-                  <h3 class="font-heading text-xl font-bold text-gray-900 dark:text-white leading-snug" data-editable="services.${idx}.title">${srv.title}</h3>
-                  <p class="text-gray-600 dark:text-zinc-400 text-sm mt-2 leading-relaxed" data-editable="services.${idx}.desc">${srv.desc}</p>
+                  <h3 class="font-heading text-2xl font-bold text-gray-900 dark:text-white leading-snug" data-editable="services.${idx}.title">${srv.title}</h3>
+                  <p class="text-gray-600 dark:text-zinc-400 text-base mt-3 leading-relaxed" data-editable="services.${idx}.desc">${srv.desc}</p>
                 </div>
                 ${!isPaysagiste ? `
                   <div class="pt-4 border-t border-gray-100 dark:border-zinc-800 flex items-center justify-between">

@@ -23,6 +23,9 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
   d'itinéraire au lieu d'une carte Montauban imposée.
 - Vitrine mobile : le même bloc s'empile désormais explicitement avant le breakpoint desktop,
   avec une carte d'au moins 380 px de haut ; l'icône de localisation est vectorielle.
+- Vitrine 1.1 : navigation fixe unifiée Services / À propos / Avis / Galerie / FAQ, ancres
+  compensées sous le header, composition élargie, présentation 6/6 à photo dominante et
+  cartes Services agrandies sans retirer les champs d'édition.
 - Vitrine : navigation de secours pour le template paysagiste, dock de contact caché sur le
   hero, respect de `prefers-reduced-motion` et absence de badge de certification par défaut.
 
