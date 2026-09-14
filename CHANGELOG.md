@@ -30,6 +30,8 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
   lecture plus généreuses, tout en conservant l'accordéon clavier et les données éditables.
 - Export HTML autonome : styles vitrine 1.1 synchronisés avec l'aperçu (ancres, split
   À propos, colonnes, proportions et FAQ) pour éviter une divergence après téléchargement.
+- Vitrine : suppression du fondu global qui pouvait laisser des sections entières non peintes
+  hors viewport ; chaque bloc reste lisible pendant la navigation et les ancres.
 - Vitrine : navigation de secours pour le template paysagiste, dock de contact caché sur le
   hero, respect de `prefers-reduced-motion` et absence de badge de certification par défaut.
 

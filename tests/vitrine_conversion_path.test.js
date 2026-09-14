@@ -131,3 +131,16 @@ test("standalone vitrine export retains navigation offsets and editorial proport
   assert.match(html, /href="#services"/);
   assert.match(html, /href="#faq"/);
 });
+
+test("vitrine keeps every anchored section paintable while editor mode stays explicit", async () => {
+  const project = generateDemoSite({ name: "Esprit Nature", tradeId: "paysagiste", city: "Montauban" });
+  const preview = renderWebsiteHTML(project, { isEditor: false });
+  const editor = renderWebsiteHTML(project, { isEditor: true });
+  const css = await readFile(new URL("../public/css/app.css", import.meta.url), "utf8");
+
+  assert.match(preview, /artisite-root public-mode vitrine-template/);
+  assert.match(editor, /artisite-root editor-mode vitrine-template/);
+  assert.doesNotMatch(preview, /apple-scrollfx-enabled/);
+  assert.match(css, /public-mode:not\(\.vitrine-template\)/);
+  assert.doesNotMatch(css, /:not\(\.editor-mode\) \.site-section/);
+});

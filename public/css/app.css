@@ -2989,8 +2989,9 @@ p[data-motion], div[data-motion], section[data-motion], h1[data-motion], h2[data
   transform: translateY(2px);
 }
 
-/* Performance: defer rendering for offscreen sections outside editor */
-.artisite-root:not(.editor-mode) .site-section:not(:first-child):not(:nth-child(2)) {
+/* Performance: defer only non-vitrine public sections. The long single-page
+   vitrine must keep every anchor paintable for smooth navigation and export. */
+.artisite-root.public-mode:not(.vitrine-template) .site-section:not(:first-child):not(:nth-child(2)) {
   content-visibility: auto;
   contain-intrinsic-size: 1px 500px;
 }

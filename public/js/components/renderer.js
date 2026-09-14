@@ -266,10 +266,15 @@ export function renderWebsiteHTML(project, options = { isEditor: false, isStanda
   const isPaperGrain = !!(project.branding?.paperGrain || project.branding?.stylePreset === 'editorial-terroir' || project.branding?.stylePreset === 'papercraft-mineral');
   const socialProofHTML = renderSocialProofToast(project, options);
 
-  const isAppleScrollFx = project.branding?.appleScrollFx !== false;
+  const isVitrineTemplate = project.business?.tradeId === "paysagiste";
+  // The one-page vitrine is primarily a conversion surface. Its content must
+  // remain immediately legible; section-specific motion stays configurable,
+  // but the global Apple-style reveal must not fade entire sections until they
+  // happen to intersect a browser viewport.
+  const isAppleScrollFx = !isVitrineTemplate && project.branding?.appleScrollFx !== false;
 
   return `
-    <div class="artisite-root font-body text-main bg-site min-h-screen ${isPaperGrain ? 'texture-paper-grain' : ''} ${isAppleScrollFx ? 'apple-scrollfx-enabled' : ''}" data-site-theme="${initialSiteTheme}" data-paper-grain="${isPaperGrain ? 'true' : 'false'}" style="
+    <div class="artisite-root ${options.isEditor ? 'editor-mode' : 'public-mode'} ${isVitrineTemplate ? 'vitrine-template' : ''} font-body text-main bg-site min-h-screen ${isPaperGrain ? 'texture-paper-grain' : ''} ${isAppleScrollFx ? 'apple-scrollfx-enabled' : ''}" data-site-theme="${initialSiteTheme}" data-paper-grain="${isPaperGrain ? 'true' : 'false'}" style="
       --primary: ${project.branding?.primaryColor || '#059669'};
       --secondary: ${project.branding?.secondaryColor || '#065f46'};
       --accent: ${project.branding?.accentColor || '#f59e0b'};

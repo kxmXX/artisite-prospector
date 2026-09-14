@@ -109,6 +109,12 @@ puis présentation/services/galerie/FAQ. Voir la tête courte de codex-execution
   autonome, y compris les colonnes 6/12 et la FAQ sans cadre. Suite : contrôle navigateur
   borné public/export avant les outils secondaires.
 
+### Sous-lot rendu réel vitrine — 14 septembre 2026
+
+- Le différé de rendu et le fondu global sont exclus de la vitrine paysagiste : les sections
+  restent immédiatement peintes pour les ancres, le scroll et l'export. Vérification
+  navigateur locale à 1440 px : 10 sections, aucune opacity résiduelle.
+
 ### Sous-lot FAQ accessible terminé — 14 septembre 2026
 
 - FAQ compacte au chargement, navigation au clavier, état `aria-expanded` et association

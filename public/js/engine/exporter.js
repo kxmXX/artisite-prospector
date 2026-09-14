@@ -123,7 +123,7 @@ ${UTILITY_CSS}
       .site-scroll-progress { animation: site-scroll-grow auto linear; animation-timeline: scroll(); }
       @keyframes site-scroll-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
     }
-    .site-section:not(:first-child):not(:nth-child(2)) { content-visibility: auto; contain-intrinsic-size: 1px 500px; }
+    .artisite-root.public-mode:not(.vitrine-template) .site-section:not(:first-child):not(:nth-child(2)) { content-visibility: auto; contain-intrinsic-size: 1px 500px; }
     a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--primary, #059669) !important; outline-offset: 2px !important; }
 
     /* SplitReveal 2026 */

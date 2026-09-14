@@ -45,6 +45,14 @@
   diff propre. Prochaine action exacte : contrôle navigateur borné de l'export/public, puis
   outils secondaires si le rendu ne révèle pas de correction vitrine supplémentaire.
 
+- Sous-lot rendu réel vitrine : Playwright a confirmé que `content-visibility` et l'effet
+  Apple global pouvaient faire apparaître les sections longues blanches ou transparentes en
+  capture/navigation. La vitrine paysagiste est désormais explicitement `public-mode
+  vitrine-template`, tous ses 10 blocs publics sont paintables et l'effet global est désactivé
+  (les animations ciblées restent disponibles). Tests ciblés : **20/20** ; contrôle navigateur
+  1440 px : 10/10 sections paintables, 0 opaque/fadée. Prochaine action : reprendre les
+  contrôles de personnalisation qui modifiaient mal fond/texte, rayon, typo et animations.
+
 - Sous-lot FAQ terminé localement : accordéon compact fermé au départ, déclencheurs natifs
   au clavier avec `aria-expanded` / `aria-controls`, réponse masquée de façon cohérente et
   focus visible. La galerie emploie désormais l'icône vectorielle de recherche, sans emoji.
