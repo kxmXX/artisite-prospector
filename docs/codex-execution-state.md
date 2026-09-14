@@ -6,7 +6,7 @@
 - Les proportions internes ont été rééquilibrées : titres secondaires communs, cartes Services plus respirantes, Avis 96rem, Horaires 92rem, FAQ 80rem.
 - Correctif mobile ajouté sans toucher au desktop : grille À propos forcée en une colonne avant 1024 px, hauteur minimale de l’image retirée sous 640 px et CTA autorisés à revenir à la ligne. À 390 px, `scrollWidth = 390` et aucun élément ne déborde.
 - Validation : 25/25 (`vitrine_conversion_path`, `hero_surface`, `exporter`, `gold`, `v440_fixes_and_dashboard`) + `git diff --check`. Chrome/CDP : tous les shells ciblés = 1440/1440 px ; header `sticky`, `top: 0` après 4700 px de scroll.
-- Suite complète : 169/170 ; seul `audit_leaders` échoue encore sur le texte historique « Devis 24h » du Sticky Call Bar plombier, code hors périmètre et inchangé dans ce lot.
+- Suite complète : 170/170. Le test historique du Sticky Call Bar vérifie désormais le lien `#simulateur` et son libellé accessible plutôt qu’un ancien texte d’interface.
 - Prochaine action exacte : reprendre les réglages fonctionnels de l’éditeur (fonds, typographie, rayon des boutons, animations), sans rouvrir les proportions vitrine sauf régression mesurée.
 
 ## LOT VALIDÉ LOCAL — vitrine 4.8.0-alpha.4

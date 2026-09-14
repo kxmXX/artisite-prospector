@@ -80,7 +80,7 @@ que chaque changement de produit.** Il complète le journal détaillé dans
   son shell validé ; aperçu et export autonome partagent les mêmes règles.
 - Tests : 25/25 (`vitrine_conversion_path`, `hero_surface`, `exporter`, `gold`,
   `v440_fixes_and_dashboard`) + `git diff --check`.
-- Suite complète : 169/170. L’unique échec est `audit_leaders` sur le libellé historique « Devis 24h » du Sticky Call Bar plombier ; la fonction concernée n’est pas modifiée par ce lot.
+- Suite complète : 170/170. Le test historique du Sticky Call Bar a été réaligné sur le contrat actuel (`href="#simulateur"` + libellé accessible), sans modifier son comportement.
 - Contrôle Chrome/CDP desktop : header, Services, À propos, Avis, Galerie, Horaires et FAQ =
   1440/1440 px ; section header `sticky`, `top: 0` après 4700 px de scroll.
 - Contrôle 390 px : shells et document = 390 px, aucun débordement horizontal. La grille et

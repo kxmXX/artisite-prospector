@@ -63,7 +63,8 @@ test("Leader MVP Feature 4: Sticky Floating Action Bar renders conversion pill w
   assert.ok(stickyHtml.includes("sticky-call-bar"), "Should render sticky call bar container");
   assert.ok(stickyHtml.includes("tel:0611223344"), "Should render direct call button");
   assert.ok(stickyHtml.includes("wa.me/"), "Should render direct WhatsApp button");
-  assert.ok(stickyHtml.includes("Devis 24h"), "Should render quote anchor");
+  assert.ok(stickyHtml.includes('href="#simulateur"'), "Should render quote anchor");
+  assert.ok(stickyHtml.includes('aria-label="Demander un devis"'), "Quote anchor should stay explicitly labelled");
 
   // In renderWebsiteHTML: sticky bar must be included
   const fullHtml = renderWebsiteHTML(project, { isEditor: false });
