@@ -8,8 +8,8 @@ export function renderCommandPalette(project, allProjects = []) {
   const sections = project?.sections || [];
 
   return `
-    <div id="cmd-palette-backdrop" class="fixed inset-0 z-50 flex items-start justify-center pt-20 p-4 bg-zinc-950/60 backdrop-blur-xs animate-fade-in" onclick="if(event.target === this) window.app.closeCommandPalette()">
-      <div class="w-full max-w-xl bg-white rounded-2xl border border-zinc-200 shadow-2xl overflow-hidden transition-all" onclick="event.stopPropagation()">
+    <div id="cmd-palette-backdrop" class="studio-system-modal fixed inset-0 z-50 flex items-start justify-center pt-20 p-4 animate-fade-in" onclick="if(event.target === this) window.app.closeCommandPalette()">
+      <div class="studio-modal-card w-full max-w-xl overflow-hidden transition-all" onclick="event.stopPropagation()">
         
         <!-- Search Input Bar -->
         <div class="p-3.5 border-b border-zinc-200 flex items-center gap-3 bg-white">

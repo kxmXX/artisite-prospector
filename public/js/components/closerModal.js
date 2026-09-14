@@ -31,8 +31,8 @@ export function renderCloserModal(project) {
   const battlecards = getObjectionBattlecards(project);
 
   return `
-    <div id="closer-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-      <div class="bg-white rounded-3xl shadow-2xl max-w-3xl w-full border border-zinc-200 overflow-hidden flex flex-col max-h-[92vh]">
+    <div id="closer-modal" class="studio-system-modal fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
+      <div class="studio-modal-card max-w-3xl w-full overflow-hidden flex flex-col max-h-[92vh]">
         
         <!-- Header with Live Call Teleprompter Status -->
         <div class="px-6 py-3.5 bg-zinc-950 text-white flex items-center justify-between flex-shrink-0">
@@ -66,7 +66,7 @@ export function renderCloserModal(project) {
         </div>
 
         <!-- Cockpit Navigation Tabs (7 Power Tabs) -->
-        <div class="px-6 py-2 bg-zinc-100/80 border-b border-zinc-200 flex gap-1.5 text-xs overflow-x-auto flex-shrink-0">
+        <div class="studio-modal-tabs px-6 py-2 bg-zinc-100/80 border-b border-zinc-200 flex gap-1.5 text-xs overflow-x-auto flex-shrink-0">
           <button type="button" onclick="window.app.switchCloserTab('script')" id="tab-closer-script" class="px-3 py-1.5 rounded-lg font-bold text-zinc-900 bg-white shadow-xs border border-zinc-200 whitespace-nowrap">
             📞 Script Appel
           </button>

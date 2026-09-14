@@ -101,16 +101,19 @@ export function renderEditor(state) {
   const inspectorHTML = renderInspector(selectedSec, project, state);
 
   return `
-    <div class="h-screen flex flex-col bg-[#F4F5F7] text-zinc-900 overflow-hidden select-none">
+    <div class="studio-system studio-editor h-screen flex flex-col text-zinc-900 overflow-hidden select-none">
 
       <!-- TOP NAVIGATION BAR (PC-Optimized with 1-Click Modes & Mechanical Keycaps) -->
-      <header class="h-16 bg-white text-zinc-900 px-4 sm:px-6 flex items-center justify-between border-b border-zinc-200 z-40 flex-shrink-0 pc-header">
+      <header class="studio-editor-header h-16 px-4 sm:px-6 flex items-center justify-between z-40 flex-shrink-0 pc-header">
 
         <!-- Left: Back Button & Project Identification + Interactive Breadcrumb -->
         <div class="flex items-center gap-3.5">
           <button type="button" onclick="window.app.openDashboard()" class="btn-keycap btn-keycap-light inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-700 px-3 py-2 rounded-lg border border-zinc-200">
             ${getIcon("arrowLeft", "w-3.5 h-3.5")}
             <span>Projets</span>
+          </button>
+          <button type="button" class="studio-mobile-sections-toggle" aria-expanded="false" onclick="const p=document.querySelector('.studio-panel-left');const open=p?.classList.toggle('studio-mobile-open');this.setAttribute('aria-expanded',open?'true':'false')">
+            ${getIcon("layers", "w-3.5 h-3.5")}<span>Sections</span>
           </button>
 
           <div class="h-5 w-[1px] bg-zinc-200 hidden sm:block"></div>
@@ -256,10 +259,10 @@ export function renderEditor(state) {
       </header>
 
       <!-- MAIN WORKSPACE: SIDEBAR + CANVAS + INSPECTOR -->
-      <div class="flex-1 flex overflow-hidden editor-workspace-layout min-h-0">
+      <div class="studio-editor-workspace flex-1 flex overflow-hidden editor-workspace-layout min-h-0">
 
         <!-- LEFT SIDEBAR: SEGMENTED PILL TABS [SECTIONS] / [PARAMÈTRES] -->
-        <aside class="w-84 xl:w-96 bg-white border-r border-zinc-200 flex flex-col flex-shrink-0 z-20 overflow-hidden pc-sidebar ${isLivePreview ? 'hidden' : ''}">
+        <aside class="studio-panel studio-panel-left w-84 xl:w-96 flex flex-col flex-shrink-0 z-20 overflow-hidden pc-sidebar ${isLivePreview ? 'hidden' : ''}">
 
           <!-- Segmented Pill-Tabs (Sendpage / Linear style) -->
           <div class="p-3 border-b border-zinc-200/80">
@@ -359,7 +362,7 @@ export function renderEditor(state) {
         </aside>
 
         <!-- CENTRAL CANVAS: WEBPAGE PREVIEW / LIVE EDIT WITH CANVA DOCK -->
-        <main id="editor-main-canvas" class="flex-1 bg-[#F4F5F7] overflow-y-auto relative flex flex-col items-center editor-canvas-scroll-host min-h-0 h-full w-full">
+        <main id="editor-main-canvas" class="studio-canvas-stage flex-1 overflow-y-auto relative flex flex-col items-center editor-canvas-scroll-host min-h-0 h-full w-full">
 
           <!-- In-situ Live Preview Client Floating Pill (Docked at bottom so header and theme toggles remain completely accessible) -->
           ${isLivePreview ? `
@@ -469,7 +472,7 @@ export function renderEditor(state) {
         </main>
 
         <!-- RIGHT INSPECTOR: DETAILED SECTION PROPS (OPTIONAL ON LARGE SCREENS) -->
-        <aside class="w-72 bg-white border-l border-zinc-200 flex-shrink-0 z-20 overflow-y-auto ${isLivePreview ? 'hidden' : 'hidden 2xl:block'}" id="right-inspector-panel">
+        <aside class="studio-panel studio-panel-right w-72 flex-shrink-0 z-20 overflow-y-auto ${isLivePreview ? 'hidden' : 'hidden 2xl:block'}" id="right-inspector-panel">
           ${inspectorHTML}
         </aside>
 

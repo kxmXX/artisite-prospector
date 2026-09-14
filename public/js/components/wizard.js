@@ -11,8 +11,8 @@ export function renderWizardModal() {
   const presetOptions = STYLE_PRESETS.map(p => `<option value="${p.id}">${p.name} — ${p.description}</option>`).join('');
 
   return `
-    <div id="wizard-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-      <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full border border-zinc-200 overflow-hidden relative">
+    <div id="wizard-modal" class="studio-system-modal fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
+      <div class="studio-modal-card max-w-lg w-full overflow-hidden relative">
         
         <!-- Header -->
         <div class="px-6 py-4 flex items-center justify-between border-b border-zinc-200">

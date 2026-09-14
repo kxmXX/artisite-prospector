@@ -35,8 +35,8 @@ export function renderImageModal(state) {
   const suggestedPrompt = defaultPromptSuggestions[tradeId] || `Photo professionnelle haute définition pour artisan ${trade.label} intervenant à ${project?.business?.city || 'proximité'}`;
 
   return `
-    <div id="image-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-      <div class="bg-white rounded-2xl shadow-2xl max-w-xl w-full border border-zinc-200 overflow-hidden flex flex-col max-h-[90vh]">
+    <div id="image-modal" class="studio-system-modal fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
+      <div class="studio-modal-card max-w-xl w-full overflow-hidden flex flex-col max-h-[90vh]">
 
         <!-- Header -->
         <div class="px-6 py-4 bg-white border-b border-zinc-200 flex items-center justify-between flex-shrink-0">
