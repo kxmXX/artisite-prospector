@@ -1984,6 +1984,15 @@ function renderQuoteSimulator(sec, project) {
               </div>
             </div>
 
+            ${(c.urgencyOptions || []).length ? `
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-2" data-editable="urgencyLabel">${c.urgencyLabel || 'Délai souhaité'}</label>
+                <select class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 focus:outline-none focus:border-zinc-900 focus:bg-white">
+                  ${(c.urgencyOptions || []).map(option => `<option value="${option}">${option}</option>`).join('')}
+                </select>
+              </div>
+            ` : ''}
+
             <div class="grid sm:grid-cols-2 gap-6">
               <div>
                 <label for="quote-name-${sec.id}" class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-2">Votre Nom ou Entreprise</label>

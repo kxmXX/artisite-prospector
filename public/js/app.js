@@ -2207,6 +2207,14 @@ export class App {
     state.updateSectionContent(sectionId, field, value);
   }
 
+  updateListField(sectionId, field, rawValue) {
+    const values = String(rawValue || "")
+      .split(/\r?\n/)
+      .map(value => value.trim())
+      .filter(Boolean);
+    state.updateSectionContent(sectionId, field, values);
+  }
+
   handleAddSection(type, variant) {
     const project = state.currentProject;
     if (!project) return;
@@ -2380,6 +2388,9 @@ export class App {
   // Image Management & Trash System
   openImagePicker(sectionId, fieldPath, itemIndex = null) {
     if (!state.currentProject) return;
+    this.lastGeneratedAIPhotoUrl = "";
+    this.lastGeneratedAIPhotoMeta = null;
+    this._aiRequests?.get("image-photo")?.dispose();
     const sec = state.currentProject.sections.find(s => s.id === sectionId);
     let currentUrl = "";
     if (sec && sec.content) {
@@ -2415,6 +2426,9 @@ export class App {
   }
 
   closeImageModal() {
+    this._aiRequests?.get("image-photo")?.dispose();
+    this.lastGeneratedAIPhotoUrl = "";
+    this.lastGeneratedAIPhotoMeta = null;
     state.activeImageMeta = null;
     state.closeDrawer();
   }
@@ -2451,6 +2465,26 @@ export class App {
   }
 
   async generateAIPhoto() {
+    const activeMeta = state.activeImageMeta;
+    if (!state.currentProject || !activeMeta) return;
+
+    const targetMeta = {
+      projectId: state.currentProject.id,
+      sectionId: activeMeta.sectionId,
+      fieldPath: activeMeta.fieldPath,
+      itemIndex: activeMeta.itemIndex ?? null,
+      sectionType: activeMeta.sectionType || "hero"
+    };
+    const request = this.beginAIRequest("image-photo");
+    const sameTarget = () => {
+      const current = state.activeImageMeta;
+      return request.current() && state.activeDrawer === "image_modal" &&
+        state.currentProject?.id === targetMeta.projectId &&
+        current?.sectionId === targetMeta.sectionId &&
+        current?.fieldPath === targetMeta.fieldPath &&
+        (current?.itemIndex ?? null) === targetMeta.itemIndex;
+    };
+
     const promptInput = document.getElementById("ai-image-prompt-input");
     const prompt = promptInput?.value?.trim() || "Photo artisanale pro";
     const btn = document.getElementById("btn-generate-ai-photo");
@@ -2464,7 +2498,7 @@ export class App {
 
     try {
       const tradeId = state.currentProject?.business?.tradeId || "paysagiste";
-      const sectionType = state.activeImageMeta?.sectionType || "hero";
+      const sectionType = targetMeta.sectionType;
 
       let imageUrl = "";
       try {
@@ -2473,34 +2507,52 @@ export class App {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ prompt, tradeId, sectionType, style: this.selectedAIStyle || "4k" })
         });
+        if (!sameTarget()) return;
         if (res.ok) {
           const data = await res.json();
+          if (!sameTarget()) return;
           if (data.imageUrl) imageUrl = data.imageUrl;
         }
       } catch (err) {
-        // Fallback to vector engine
+        if (!sameTarget()) return;
+        // Fallback to vector engine when the remote image endpoint is unavailable.
       }
 
+      if (!sameTarget()) return;
       if (!imageUrl) {
         const { getTradeFallbackDataUrl } = await import("./data/imageFallbacks.js");
+        if (!sameTarget()) return;
         imageUrl = getTradeFallbackDataUrl(tradeId, sectionType, prompt);
       }
 
+      if (!sameTarget()) return;
       this.lastGeneratedAIPhotoUrl = imageUrl;
+      this.lastGeneratedAIPhotoMeta = targetMeta;
       if (previewImg) previewImg.src = imageUrl;
       if (outputContainer) outputContainer.classList.remove("hidden");
     } finally {
-      if (btn) {
+      if (this._aiRequests?.get("image-photo") === request && btn) {
         btn.disabled = false;
         btn.innerHTML = `<span>⚡ Regénérer une autre variante</span>`;
       }
+      request.dispose();
     }
   }
 
   applyGeneratedAIPhoto() {
-    if (!this.lastGeneratedAIPhotoUrl || !state.activeImageMeta) return;
-    const { sectionId, fieldPath, itemIndex } = state.activeImageMeta;
-    this.applyImageUpdate(sectionId, fieldPath, this.lastGeneratedAIPhotoUrl, itemIndex);
+    if (!this.lastGeneratedAIPhotoUrl || !this.lastGeneratedAIPhotoMeta || !state.activeImageMeta || !state.currentProject) return;
+    const generated = this.lastGeneratedAIPhotoMeta;
+    const active = state.activeImageMeta;
+    const targetMatches = generated.projectId === state.currentProject.id &&
+      generated.sectionId === active.sectionId && generated.fieldPath === active.fieldPath &&
+      (generated.itemIndex ?? null) === (active.itemIndex ?? null);
+    if (!targetMatches) {
+      this.lastGeneratedAIPhotoUrl = "";
+      this.lastGeneratedAIPhotoMeta = null;
+      this.showToast("Ce visuel appartient à une autre cible. Relancez la génération.", "info");
+      return;
+    }
+    this.applyImageUpdate(active.sectionId, active.fieldPath, this.lastGeneratedAIPhotoUrl, active.itemIndex);
     this.closeImageModal();
   }
 

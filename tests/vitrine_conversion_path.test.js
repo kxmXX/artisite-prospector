@@ -208,11 +208,26 @@ test("editor exposes the vitrine template content controls", async () => {
     "À propos — contenu du template",
     "Avis clients (",
     "Horaires & carte",
+    "Simulateur de devis",
+    "Pied de page",
+    "updateListField('${sectionId}', 'types'",
     "services.${sIdx}.image",
     "Choisir l'image de carte"
   ]) assert.ok(editorSource.includes(marker), `missing vitrine editor control: ${marker}`);
   assert.match(appSource, /addReviewItem\(sectionId\)/);
   assert.match(appSource, /removeReviewItem\(sectionId, idx\)/);
+  assert.match(appSource, /updateListField\(sectionId, field, rawValue\)/);
+});
+
+test("quote simulator exposes editable urgency choices in the rendered conversion form", () => {
+  const project = generateDemoSite({ name: "Esprit Nature", tradeId: "paysagiste", city: "Montauban" });
+  const quote = project.sections.find(section => section.type === "quoteSimulator");
+  quote.content.urgencyLabel = "Quand intervenir ?";
+  quote.content.urgencyOptions = ["Cette semaine", "Le mois prochain"];
+  const html = renderWebsiteHTML(project);
+  assert.match(html, /data-editable="urgencyLabel">Quand intervenir \?<\/label>/);
+  assert.match(html, /<option value="Cette semaine">Cette semaine<\/option>/);
+  assert.match(html, /<option value="Le mois prochain">Le mois prochain<\/option>/);
 });
 
 test("vitrine keeps every anchored section paintable while editor mode stays explicit", async () => {

@@ -1,5 +1,12 @@
 # État de reprise Codex — 14 septembre 2026
 
+## LOT DE LIVRAISON — template 4.8.0-alpha.11
+
+- Le simulateur de devis devient un vrai bloc de template éditable : labels, listes prestation/taille/délai et CTA sont pilotables depuis la sidebar.
+- Le délai souhaité est maintenant visible dans le formulaire public et utilise les données du projet au lieu de rester dormant dans le modèle.
+- Footer : contenu et coordonnées de section modifiables directement, sans architecture parallèle.
+- Tests : 16/16 ciblés (`vitrine_conversion_path`), 180/180 complets et `git diff --check`. Prochaine action : audit de couverture final des champs vitrine et contrôle visuel éditeur.
+
 ## LOT DE LIVRAISON — éditeur 4.8.0-alpha.10
 
 - Suppression/restauration des CTA validée avec Undo immédiat ; le comportement existant est conservé.

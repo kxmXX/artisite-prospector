@@ -7,6 +7,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 14 septembre 2026 (4.8.0-alpha.11)
+
+- Template vitrine : le simulateur de devis expose maintenant dans la sidebar ses libellés, listes de prestations/tailles/délais et son CTA.
+- Formulaire public : le champ de délai souhaité, déjà présent dans le modèle de données, est désormais réellement rendu et suit les options éditées.
+- Footer : nom, description, téléphone, email, adresse et copyright sont modifiables depuis le même éditeur que le reste du template.
+- Validation : 16/16 sur `vitrine_conversion_path`, 180/180 complets et `git diff --check`.
+
 ### Consolidation — 14 septembre 2026 (4.8.0-alpha.10)
 
 - Éditeur : suppression/restauration des CTA revérifiée avec Undo immédiat et couverture de régression.

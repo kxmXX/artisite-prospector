@@ -816,6 +816,47 @@ function renderSectionAccordionContent(sec, project, variants) {
         </div>
       ` : ''}
 
+      <!-- Vitrine template: quote simulator conversion content -->
+      ${sec.type === 'quoteSimulator' ? `
+        <div class="space-y-2.5 pt-2 border-t border-zinc-200/60">
+          <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Simulateur de devis</label>
+          <div class="grid grid-cols-2 gap-2">
+            <input type="text" value="${escapeHtml(c.typeLabel || '')}" placeholder="Libellé prestation" data-field="typeLabel"
+                   oninput="window.app.liveUpdateField('${sectionId}', 'typeLabel', this.value)" onchange="window.app.commitFieldUpdate('${sectionId}', 'typeLabel', this.value)"
+                   class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-[11px]">
+            <input type="text" value="${escapeHtml(c.sizeLabel || '')}" placeholder="Libellé taille" data-field="sizeLabel"
+                   oninput="window.app.liveUpdateField('${sectionId}', 'sizeLabel', this.value)" onchange="window.app.commitFieldUpdate('${sectionId}', 'sizeLabel', this.value)"
+                   class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-[11px]">
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div><label class="block text-[9px] text-zinc-400 mb-0.5">Prestations — une par ligne</label><textarea rows="5" onchange="window.app.updateListField('${sectionId}', 'types', this.value)" class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-[10.5px] leading-snug">${escapeHtml((c.types || []).join('\n'))}</textarea></div>
+            <div><label class="block text-[9px] text-zinc-400 mb-0.5">Tailles — une par ligne</label><textarea rows="5" onchange="window.app.updateListField('${sectionId}', 'sizes', this.value)" class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-[10.5px] leading-snug">${escapeHtml((c.sizes || []).join('\n'))}</textarea></div>
+          </div>
+          <input type="text" value="${escapeHtml(c.urgencyLabel || '')}" placeholder="Libellé délai" data-field="urgencyLabel"
+                 oninput="window.app.liveUpdateField('${sectionId}', 'urgencyLabel', this.value)" onchange="window.app.commitFieldUpdate('${sectionId}', 'urgencyLabel', this.value)"
+                 class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-[11px]">
+          <textarea rows="4" onchange="window.app.updateListField('${sectionId}', 'urgencyOptions', this.value)" class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-[10.5px] leading-snug" aria-label="Délais proposés, un par ligne">${escapeHtml((c.urgencyOptions || []).join('\n'))}</textarea>
+          <input type="text" value="${escapeHtml(c.ctaButton || '')}" placeholder="Texte du bouton d'envoi" data-field="ctaButton"
+                 oninput="window.app.liveUpdateField('${sectionId}', 'ctaButton', this.value)" onchange="window.app.commitFieldUpdate('${sectionId}', 'ctaButton', this.value)"
+                 class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-[11px]">
+        </div>
+      ` : ''}
+
+      <!-- Vitrine template: footer identity and verified contact copy -->
+      ${sec.type === 'footer' ? `
+        <div class="space-y-2.5 pt-2 border-t border-zinc-200/60">
+          <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Pied de page</label>
+          <input type="text" value="${escapeHtml(c.brandName || '')}" placeholder="Nom affiché" data-field="brandName" oninput="window.app.liveUpdateField('${sectionId}', 'brandName', this.value)" onchange="window.app.commitFieldUpdate('${sectionId}', 'brandName', this.value)" class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-[11px]">
+          <textarea rows="3" data-field="desc" placeholder="Description" oninput="window.app.liveUpdateField('${sectionId}', 'desc', this.value)" onchange="window.app.commitFieldUpdate('${sectionId}', 'desc', this.value)" class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-[11px] leading-snug">${escapeHtml(c.desc || '')}</textarea>
+          <div class="grid grid-cols-2 gap-2">
+            <input type="text" value="${escapeHtml(c.phone || '')}" placeholder="Téléphone" data-field="phone" oninput="window.app.liveUpdateField('${sectionId}', 'phone', this.value)" onchange="window.app.commitFieldUpdate('${sectionId}', 'phone', this.value)" class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-[11px]">
+            <input type="email" value="${escapeHtml(c.email || '')}" placeholder="Email" data-field="email" oninput="window.app.liveUpdateField('${sectionId}', 'email', this.value)" onchange="window.app.commitFieldUpdate('${sectionId}', 'email', this.value)" class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-[11px]">
+          </div>
+          <input type="text" value="${escapeHtml(c.address || '')}" placeholder="Adresse" data-field="address" oninput="window.app.liveUpdateField('${sectionId}', 'address', this.value)" onchange="window.app.commitFieldUpdate('${sectionId}', 'address', this.value)" class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-[11px]">
+          <input type="text" value="${escapeHtml(c.copyright || '')}" placeholder="Copyright" data-field="copyright" oninput="window.app.liveUpdateField('${sectionId}', 'copyright', this.value)" onchange="window.app.commitFieldUpdate('${sectionId}', 'copyright', this.value)" class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-[10.5px]">
+        </div>
+      ` : ''}
+
       <!-- Quote text if quoteBlock -->
       ${c.quote !== undefined ? `
         <div class="space-y-1">
