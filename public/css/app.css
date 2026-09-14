@@ -777,7 +777,7 @@ body.dark-theme .faq-item.active .faq-icon-btn {
   padding: 0 6px;
   border-radius: 6px;
   background: transparent;
-  color: #a1a1aa;
+  color: #d4d4d8;
   border: 1px solid transparent;
   cursor: pointer;
   font-size: 11px;
@@ -913,7 +913,9 @@ input, textarea, select, [contenteditable] {
   background-color: #fafafa;
 }
 .section-card-grip {
-  color: #a1a1aa;
+  color: #52525b;
+  background: #ffffff;
+  border: 1px solid #d4d4d8;
   cursor: grab;
   display: flex;
   align-items: center;
@@ -921,7 +923,16 @@ input, textarea, select, [contenteditable] {
   transition: color 0.15s ease;
 }
 .section-card-grip:hover {
-  color: #52525b;
+  color: #18181b;
+  background: #f4f4f5;
+  border-color: #a1a1aa;
+}
+.section-card-grip:focus-visible,
+.btn-sec-ctrl:focus-visible,
+.cta-direct-btn:focus-visible,
+.cta-context-btn:focus-visible {
+  outline: 2px solid #f59e0b !important;
+  outline-offset: 2px !important;
 }
 .section-card.is-dragging {
   opacity: 0.35;

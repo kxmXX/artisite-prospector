@@ -1,5 +1,12 @@
 # État de reprise Codex — 14 septembre 2026
 
+## LOT DE LIVRAISON — éditeur 4.8.0-alpha.10
+
+- Suppression/restauration des CTA validée avec Undo immédiat ; le comportement existant est conservé.
+- Drag-and-drop sidebar validé de la poignée jusqu’à `state.reorderSections`; poignée transformée en contrôle focusable avec `aria-label`.
+- Contrôles éditeur critiques : focus visible orange explicite et contraste renforcé de la poignée.
+- Tests : 36/36 ciblés (`v410_enhancements`, `v410_features`, `state`, `full_system_e2e`), 180/180 complets et `git diff --check`. Prochaine action : reprendre le prochain lot produit restant sans modifier les proportions de la vitrine validée.
+
 ## LOT DE LIVRAISON — éditeur 4.8.0-alpha.9
 
 - Identifiants stables `#E…` générés à partir du projet/section/champ et affichés hors du texte pour les sections, champs, images et boutons en mode éditeur.

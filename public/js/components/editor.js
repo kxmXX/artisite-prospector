@@ -307,9 +307,9 @@ export function renderEditor(state) {
                     <div class="section-card-header px-3 py-2.5 flex items-center justify-between cursor-pointer select-none" role="button" tabindex="0" aria-controls="accordion-${s.id}" aria-expanded="${isOpen}" onclick="window.app.handleSectionNavigation('${s.id}', event)" onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); window.app.handleSectionNavigation('${s.id}', event); }">
                       <div class="flex items-center gap-2.5 min-w-0 flex-1">
                         ${isStructural ? '' : `
-                          <span class="section-card-grip cursor-grab active:cursor-grabbing p-0.5 text-zinc-300 hover:text-zinc-600 rounded flex-shrink-0" draggable="true" data-sec-id="${s.id}" title="Glisser pour réorganiser">
+                          <button type="button" class="section-card-grip cursor-grab active:cursor-grabbing p-0.5 rounded flex-shrink-0" draggable="true" data-sec-id="${s.id}" aria-label="Glisser pour réorganiser ${escapeHtml(friendlyTitle)}" title="Glisser pour réorganiser" onclick="event.stopPropagation()" onkeydown="if(event.key === 'ArrowUp' || event.key === 'ArrowDown') { event.preventDefault(); event.stopPropagation(); window.app.moveSection('${s.id}', event.key === 'ArrowUp' ? 'up' : 'down'); }">
                             ${getIcon("gripVertical", "w-3.5 h-3.5")}
-                          </span>
+                          </button>
                         `}
                         <span class="text-zinc-400 flex-shrink-0">
                           ${getIcon(getSectionIcon(s.type), "w-4 h-4")}

@@ -58,6 +58,21 @@ test("v4.1.0: Button deletion, restoration and Undo/Redo support", () => {
   assert.ok(!clearedHero.settings?.hiddenButtons || clearedHero.settings.hiddenButtons.length === 0, "hiddenButtons must be cleared");
 });
 
+
+
+test("v4.8.0: Editor destructive controls and section drag handle stay visible and wired", () => {
+  const editorSource = fs.readFileSync(path.resolve(process.cwd(), "public/js/components/editor.js"), "utf-8");
+  const appSource = fs.readFileSync(path.resolve(process.cwd(), "public/js/app.js"), "utf-8");
+  const css = fs.readFileSync(path.resolve(process.cwd(), "public/css/app.css"), "utf-8");
+
+  assert.ok(editorSource.includes('class="section-card-grip'), "Sidebar must expose a dedicated section drag handle");
+  assert.ok(editorSource.includes('draggable="true" data-sec-id='), "Drag handle must carry the section id used by reorder logic");
+  assert.ok(editorSource.includes('aria-label="Glisser pour réorganiser'), "Drag handle must stay identifiable to keyboard/screen-reader users");
+  assert.ok(appSource.includes('state.reorderSections(sourceId, targetId, isAfter ? "after" : "before")'), "Drop handler must commit an actual reorder mutation");
+  assert.ok(appSource.includes('label: "Annuler (⌘Z)"'), "Button deletion must expose an immediate Undo action");
+  assert.ok(css.includes('.section-card-grip:focus-visible'), "Drag handle and editor controls must have an explicit high-contrast focus state");
+  assert.ok(css.includes('outline: 2px solid #f59e0b !important'), "Editor focus ring must remain visible on dark and light controls");
+});
 test("v4.1.0: Continuous scale, radius, font size and typography casing controls", () => {
   const p = generateSite({ name: "Menuiserie Pro", tradeId: "menuisier" });
   state.addProject(p, true);

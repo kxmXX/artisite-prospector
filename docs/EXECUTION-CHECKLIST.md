@@ -48,8 +48,7 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - [x] Réparer le rayon global des boutons : carré → pilule s’applique aux CTA réels dans l’éditeur, le rendu public et l’export, sans modifier le rayon des cartes/conteneurs.
 - [x] Rendre le catalogue d’animations réellement appliqué aux blocs : presets distincts en preview/export, vitesse persistée, aperçu direct et `prefers-reduced-motion` qui neutralise les boucles.
 - [x] Finaliser les identifiants visibles de **tous** les composants éditables : références stables `#E…` affichées hors du texte pour sections/champs/images/boutons, résolution IA exacte et mutations ciblées compatibles Undo.
-- [ ] Vérifier les actions de suppression de boutons, le glisser-déposer de sections et les contrôles
-  visibles à contraste suffisant.
+- [x] Vérifier les actions de suppression/restauration de boutons, le glisser-déposer de sections et les contrôles visibles : Undo immédiat, mutation de réordre testée, poignée focusable/accessible et focus à contraste renforcé.
 
 ## Procédure de chaque commit
 
@@ -70,4 +69,5 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - Animations : presets distincts, vitesse persistée et reduced-motion complet.
 - Tests : 37/37 ciblés, 177/177 complets, `git diff --check`.
 - Lot `4.8.0-alpha.9` : références stables `#E…` pour les cibles éditables et résolution Copilot champ par champ ; 11/11 tests ciblés, 178/178 complets.
-- Prochaine action unique : vérifier suppression/restauration de boutons, glisser-déposer de sections et contraste des contrôles visibles.
+- Lot `4.8.0-alpha.10` : suppression/restauration + Undo, drag-and-drop câblé jusqu’à `reorderSections`, poignée accessible et focus contrasté ; 36/36 tests ciblés, 180/180 complets.
+- Prochaine action unique : audit du prochain sous-lot éditeur restant après ces contrôles transversaux, sans rouvrir la vitrine validée.

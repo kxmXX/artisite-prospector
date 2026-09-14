@@ -7,6 +7,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 14 septembre 2026 (4.8.0-alpha.10)
+
+- Éditeur : suppression/restauration des CTA revérifiée avec Undo immédiat et couverture de régression.
+- Sections : le drag-and-drop de la sidebar reste relié à `reorderSections`; la poignée est désormais un vrai contrôle focusable avec libellé accessible.
+- Contrastes : poignée et contrôles critiques disposent d’un état focus explicite à fort contraste, visible sur surfaces claires et sombres.
+- Validation : 36/36 ciblés (`v410_enhancements`, `v410_features`, `state`, `full_system_e2e`), 180/180 complets et `git diff --check`.
+
 ### Consolidation — 14 septembre 2026 (4.8.0-alpha.9)
 
 - Éditeur : références stables courtes `#E…` visibles hors des contenus pour sections, champs, images et boutons, sans recouvrir le texte client.
