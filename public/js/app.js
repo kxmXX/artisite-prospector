@@ -28,7 +28,33 @@ function escapeHtml(str) {
     .replace(/'/g, "&#039;");
 }
 
-class App {
+export class App {
+  // Scope async work to its original project, contents and request. Subscription
+  // also detects leaving and returning to the same project/drawer.
+  beginAIRequest(channel) {
+    this._aiRequests ||= new Map();
+    this._aiRequests.get(channel)?.dispose();
+    const project = state.currentProject;
+    const snapshot = JSON.stringify(project);
+    const view = state.currentView;
+    const drawer = state.activeDrawer;
+    let invalid = false;
+    const unsubscribe = state.subscribe((s, event) => {
+      if (event === "project_selected" || s.currentProject?.id !== project?.id ||
+          s.currentView !== view || JSON.stringify(s.currentProject) !== snapshot ||
+          (channel === "wizard" && s.activeDrawer !== drawer)) invalid = true;
+    });
+    const request = {
+      current: () => !invalid && this._aiRequests.get(channel) === request &&
+        state.currentProject?.id === project?.id && state.currentView === view &&
+        JSON.stringify(state.currentProject) === snapshot &&
+        (channel !== "wizard" || state.activeDrawer === drawer),
+      dispose: () => { invalid = true; unsubscribe(); }
+    };
+    this._aiRequests.set(channel, request);
+    return request;
+  }
+
   constructor() {
     this.rootEl = document.getElementById("app");
     this.wizardMode = "fast";
@@ -1016,6 +1042,7 @@ class App {
   // Wizard Generation Submission with Animated Terminal & AI Call
   async handleWizardSubmit(e) {
     e.preventDefault();
+    const request = this.beginAIRequest("wizard");
     const name = document.getElementById("wiz-name")?.value || "Artisan";
     const tradeId = document.getElementById("wiz-trade")?.value || "paysagiste";
     const city = document.getElementById("wiz-city")?.value || "Montauban";
@@ -1051,6 +1078,7 @@ class App {
 
     steps.forEach(({ id, delay }) => {
       setTimeout(() => {
+        if (!request.current()) return;
         const el = document.getElementById(id);
         if (el) {
           el.classList.remove("opacity-40");
@@ -1062,8 +1090,10 @@ class App {
     });
 
     const aiRes = await aiPromise;
+    if (!request.current()) { request.dispose(); return; }
 
     setTimeout(() => {
+      if (!request.current()) { request.dispose(); return; }
       const validColor = customColor && /^#[0-9a-f]{6}$/i.test(customColor) ? customColor : undefined;
       const newProject = generateSite({
         name,
@@ -1156,6 +1186,7 @@ class App {
         newProject.aiModel = aiRes.modelUsed || "gemini-flash";
       }
 
+      request.dispose();
       state.closeDrawer();
       state.addProject(newProject, true);
     }, 2000);
@@ -3190,6 +3221,14 @@ class App {
     const input = document.getElementById("copilot-prompt-input");
     const promptText = input ? input.value : "";
     if (!promptText.trim()) return;
+    if (!state.currentProject) return;
+    const request = this.beginAIRequest("copilot");
+    const canApply = () => {
+      if (request.current()) return true;
+      request.dispose();
+      this.showToast("Proposition périmée : le projet a changé. Relancez votre demande.", "info");
+      return false;
+    };
 
     const targetId = promptText.match(/#([a-z][a-z0-9-]*)/i)?.[1] || null;
     const targetNode = targetId ? document.querySelector(`[data-ui-id="${targetId}"]`) : null;
@@ -3206,7 +3245,9 @@ class App {
     }
 
     const renderApprovalCard = (summary, onApply) => {
+      if (!canApply()) return;
       if (!feedback) {
+        request.dispose();
         onApply();
         return;
       }
@@ -3238,14 +3279,16 @@ class App {
       const btnReject = document.getElementById("btn-reject-ai");
       if (btnApprove) {
         btnApprove.onclick = () => {
+          if (!canApply()) return;
+          request.dispose();
           onApply();
           feedback.innerHTML = `<div class="text-xs font-semibold text-emerald-700 p-2 bg-emerald-50 rounded-lg border border-emerald-200">✅ Modification appliquée avec succès (Annulation ⌘Z possible)</div>`;
           if (input) input.value = "";
-          setTimeout(() => state.setCopilotOpen(false), 900);
         };
       }
       if (btnReject) {
         btnReject.onclick = () => {
+          request.dispose();
           feedback.classList.add("hidden");
           feedback.innerHTML = "";
         };
@@ -3268,6 +3311,7 @@ class App {
       });
       if (apiRes.ok) {
         const json = await apiRes.json();
+        if (!canApply()) return;
         if (json.success && json.data) {
           const d = json.data;
           const updated = JSON.parse(JSON.stringify(state.currentProject));
@@ -3313,6 +3357,7 @@ class App {
     }
 
     // Local fallback
+    if (!canApply()) return;
     const res = processCopilotPrompt(state.currentProject, promptText);
     renderApprovalCard(res.message, () => {
       state.updateProject(res.project, true, `Copilot: ${promptText}`);
