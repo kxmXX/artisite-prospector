@@ -71,44 +71,71 @@ export function clearAiCache() {
   aiResponseCache.clear();
 }
 
-export function readBodyJSON(req) {
-  if (req.body && typeof req.body === "object") {
-    return Promise.resolve(req.body);
+const MAX_BODY_BYTES = 2 * 1024 * 1024;
+
+function bodyError(statusCode, message) {
+  return Object.assign(new Error(message), { statusCode });
+}
+
+function parseBody(text) {
+  if (Buffer.byteLength(text, "utf8") > MAX_BODY_BYTES) {
+    throw bodyError(413, "Payload Too Large");
   }
-  if (typeof req.body === "string" && req.body) {
-    try {
-      return Promise.resolve(JSON.parse(req.body));
-    } catch {
-      return Promise.resolve({});
+  let value;
+  try { value = text === "" ? {} : JSON.parse(text); }
+  catch { throw bodyError(400, "Invalid JSON body"); }
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    throw bodyError(400, "JSON body must be an object");
+  }
+  return value;
+}
+
+export async function readBodyJSON(req) {
+  if (req.body !== undefined) {
+    if (typeof req.body === "string" || Buffer.isBuffer(req.body)) {
+      return parseBody(req.body.toString());
     }
+    if (!req.body || typeof req.body !== "object" || Array.isArray(req.body) ||
+        ![Object.prototype, null].includes(Object.getPrototypeOf(req.body))) {
+      throw bodyError(400, "JSON body must be an object");
+    }
+    let serialized;
+    try { serialized = JSON.stringify(req.body); }
+    catch { throw bodyError(400, "Invalid JSON body"); }
+    if (typeof serialized !== "string") throw bodyError(400, "Invalid JSON body");
+    return parseBody(serialized);
   }
   return new Promise((resolve, reject) => {
-    let body = "";
+    let chunks = [];
+    let bytes = 0;
     let terminated = false;
+    const fail = err => {
+      if (terminated) return;
+      terminated = true;
+      chunks = [];
+      reject(err);
+    };
     req.on("data", chunk => {
       if (terminated) return;
-      body += chunk.toString();
-      if (body.length > 2 * 1024 * 1024) { // 2MB limit
-        terminated = true;
-        if (typeof req.destroy === "function") req.destroy();
-        const err = new Error("Payload Too Large");
-        err.statusCode = 413;
-        reject(err);
-      }
+      const buffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+      bytes += buffer.length;
+      // Keep draining without retaining bytes; destroying the socket prevents a 413 response.
+      if (bytes > MAX_BODY_BYTES) return fail(bodyError(413, "Payload Too Large"));
+      chunks.push(buffer);
     });
     req.on("end", () => {
       if (terminated) return;
       try {
-        resolve(body ? JSON.parse(body) : {});
+        const value = parseBody(Buffer.concat(chunks).toString("utf8"));
+        terminated = true;
+        chunks = [];
+        resolve(value);
       } catch (err) {
-        const parseErr = new Error("Invalid JSON body");
-        parseErr.statusCode = 400;
-        reject(parseErr);
+        fail(err);
       }
     });
-    req.on("error", (err) => {
-      if (!terminated) reject(err);
-    });
+    req.on("error", fail);
+    req.on("aborted", () => fail(bodyError(400, "Request aborted")));
   });
 }
 
