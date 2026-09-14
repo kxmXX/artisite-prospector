@@ -1,4 +1,5 @@
 import { getIcon } from "./icons.js";
+import { HERO_STYLES } from "./heroStyles.js";
 import { getTradeFallbackDataUrl } from "../data/imageFallbacks.js";
 import { getUiId, getSectionUiId, getUiCode } from "../data/uiIds.js";
 
@@ -288,6 +289,7 @@ export function renderWebsiteHTML(project, options = { isEditor: false, isStanda
       --cta-transform: ${project.branding?.ctaTransform || 'none'};
     ">
       <div class="site-scroll-progress" aria-hidden="true"></div>
+      <style>${HERO_STYLES}</style>
       ${sectionsHTML}
       ${stickyBarHTML}
       ${lightboxHTML}
@@ -729,15 +731,15 @@ function renderHero(sec, project, options = {}) {
     ` : '';
 
     return `
-      <div class="relative overflow-hidden py-24 sm:py-32 lg:py-40 text-white min-h-[85vh] flex flex-col justify-between">
+      <div class="hero-fullscreen text-white">
         <img src="${c.heroImage || getTradeFallbackDataUrl(project.business?.tradeId, 'hero', c.title)}"
              alt="${c.title || 'Artisan local'}"
-             class="absolute inset-0 w-full h-full object-cover -z-10"
+             class="hero-background"
              loading="eager" fetchpriority="high" decoding="async"
              onerror="if(!this.dataset.fallbackApplied){this.dataset.fallbackApplied='true';this.src='${getTradeFallbackDataUrl(project.business?.tradeId, 'hero', c.title)}';}">
-        <div class="hero-darkening-overlay absolute inset-0 -z-10 transition-colors pointer-events-none" style="background-color: rgba(0, 0, 0, ${overlayOpacity});"></div>
+        <div class="hero-darkening-overlay" aria-hidden="true" style="background-color: rgba(0, 0, 0, ${overlayOpacity});"></div>
         ${bgEditBtn}
-        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-7 my-auto">
+        <div class="hero-content text-center space-y-7">
           <div class="liquid-glass-badge inline-flex items-center gap-2.5 px-5 py-2 rounded-full text-[11px] sm:text-xs font-semibold uppercase tracking-widest text-white shadow-lg mx-auto select-none">
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-sm"></span>
             <span data-editable="badge">${c.badge}</span>
@@ -787,7 +789,7 @@ function renderHero(sec, project, options = {}) {
         </div>
 
         <!-- Sendpage Scroll Down Indicator -->
-        <div class="pt-8 pb-4 flex justify-center">
+        <div class="hero-discover flex justify-center">
           <a href="#about" class="hero-scroll-discover inline-flex flex-col items-center gap-1 text-[11px] font-bold tracking-widest uppercase text-white/80 hover:text-white transition-all transform hover:translate-y-1 no-underline">
             <span>DÉCOUVRIR</span>
             <span class="text-base animate-bounce">↓</span>
