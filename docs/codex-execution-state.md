@@ -1,5 +1,31 @@
 # État de reprise Codex — 14 septembre 2026
 
+## État courant — réponses IA tardives protégées
+
+Cette section prévaut sur les états historiques suivants.
+
+- Terminé : public/js/app.js (garde par demande/projet/contenu/vue) et
+  tests/ai_stale_response.test.js. Aucun autre périmètre de code modifié.
+- Assistant : contrôle après réception, avant repli local et à l'approbation ; une proposition
+  périmée est refusée avec notification. Une nouvelle demande invalide la précédente.
+  Application unique via historique existant, Undo conservé ; fermeture différée supprimée
+  pour ne pas fermer une session plus récente.
+- Wizard : départ/retour projet ou fermeture du tiroir invalident la demande, y compris
+  pendant le délai final et les étapes animées. Aucun projet ajouté par une réponse périmée.
+- Tests ciblés : **15/15** (ai_stale_response, state), syntaxe app.js et diff --check réussis.
+  Vraies méthodes App avec DOM/réseau/délais simulés ; pas de validation navigateur,
+  pas d'appel réseau, pas de suite complète répétée.
+- Aucun agent relancé, aucun push ; version4.8.0-alpha.1 non publiée. Aucun échec ciblé.
+- Limites : refus conservateur de toute modification du projet (pas de fusion), requête
+  réseau non annulée. Génération photo et audit IA hors périmètre de ce sous-lot.
+  Lots UI/partage/faits générés toujours ouverts ; agents historiques inchangés ci-dessous.
+
+**Prochaine action exacte** : protéger generateAIPhoto dans app.js contre un changement de
+projet ou de cible image pendant l'attente ; vérifier le parcours application de l'image,
+avec réponse différée simulée. Réutiliser la garde si adaptée, sans refonte globale.
+
+## Historique — lecture JSON
+
 ## État courant — lecture JSON harmonisée
 
 Cette section prévaut sur tous les états historiques ci-dessous.

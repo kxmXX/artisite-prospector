@@ -149,3 +149,12 @@ Les états seront mis à jour avec les preuves effectives dans le rapport final,
   pas sur le corps brut déjà consommé par l'hébergeur.
 - Prochain sous-lot du lot2 : empêcher les réponses IA tardives d'écraser les modifications
   utilisateur dans app.js, avec scénario de réponse différée. Les lots suivants restent ouverts.
+
+### Sous-lot réponses IA tardives terminé — 14 septembre 2026
+
+- Wizard et assistant liés à la demande initiale et au contenu du projet ; changement de
+  projet/vue, édition ou nouvelle demande rendent le résultat périmé. Vérification aussi
+  au clic Appliquer et après délai wizard ; historique/Undo conservés.
+- 15/15 tests ciblés avec méthodes App et promesses retardées, sans réseau ; syntaxe et
+  diff --check réussis. Navigateur non testé dans ce sous-lot, aucun push ni agent.
+- Prochain sous-lot : génération photo asynchrone et cible image ; audit IA et autres lots ouverts.

@@ -9,6 +9,9 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ### Consolidation non publiée — 14 septembre 2026 (4.8.0-alpha.1)
 
+- Wizard/assistant : réponses périmées refusées après changement de projet ou modification,
+  avec contrôle à l'approbation et maintien d'Undo. 15/15 tests ciblés sans réseau.
+
 - Lecture JSON API cohérente entre Node et serverless : erreurs400 explicites, limite2 Mio
   en octets, conservation des caractères UTF-8 fragmentés, gestion des requêtes interrompues.
 - Validation ciblée :9/9 tests, sans appel réseau. Pas de publication.
