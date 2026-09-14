@@ -16,6 +16,10 @@
   été appliquée aux projets existants. Une démo créée/rechargée sur une origine neuve est10/16.
 - Prochaine action vitrine : présentation/services/galerie selon captures, puis FAQ compacte,
   puis vérification mobile390 et export. Ne pas rouvrir les lots backend différés à ce stade.
+- Publication : branche `refactor/artist-consolidation` poussée sur GitHub, puis production
+  Vercel publiée le14 septembre : https://artisite-prospector.vercel.app
+  (`dpl_81B47DRPDeMj2yAsZ5mzLjQ1Xi7W`, READY). Parcours public contrôlé : CTA devis ->
+  `#simulateur`, formulaire visible ; aperçu sans ruban « Proposition ».
 
 - Demande utilisateur : vitrine fonctionnelle conforme aux captures AVANT le reste.
   Ordre détaillé révisé dans artist-consolidation-plan.md. Aucun lot supprimé.
