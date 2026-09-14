@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { generateSite, generateDemoSite } from "../public/js/engine/generator.js";
 import { renderWebsiteHTML } from "../public/js/components/renderer.js";
+import { exportStandaloneHTML } from "../public/js/engine/exporter.js";
 import { readFile } from "node:fs/promises";
 
 test("vitrine quote CTAs resolve to a visible, labelled contact form", () => {
@@ -117,4 +118,16 @@ test("paysagiste reviews and FAQ preserve the spacious vitrine rhythm", () => {
   assert.match(html, /text-base text-gray-600 dark:text-zinc-300 leading-relaxed/);
   assert.match(html, /vitrine-faq-shell/);
   assert.match(html, /faq-item group\/faq transition-colors py-6 sm:py-7/);
+});
+
+test("standalone vitrine export retains navigation offsets and editorial proportions", () => {
+  const project = generateDemoSite({ name: "Esprit Nature", tradeId: "paysagiste", city: "Montauban" });
+  const html = exportStandaloneHTML(project);
+
+  assert.match(html, /\.vitrine-shell \{ max-width: 96rem; \}/);
+  assert.match(html, /scroll-margin-top: 6rem/);
+  assert.match(html, /\.lg\\:col-span-6 \{ grid-column: span 6 \/ span 6; \}/);
+  assert.match(html, /\.vitrine-faq-shell \.faq-item \{ border: 0;/);
+  assert.match(html, /href="#services"/);
+  assert.match(html, /href="#faq"/);
 });

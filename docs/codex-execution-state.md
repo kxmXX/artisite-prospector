@@ -39,6 +39,12 @@
 - Prochaine action exacte : vérifier le rendu public/export de cette composition et les ancres
   sur les sections longues, puis seulement reprendre les outils d'édition secondaires.
 
+- Sous-lot export vitrine : correction d'une divergence réelle — l'export HTML embarque sa
+  propre CSS et ignorait les nouvelles classes vitrine. Les ancres, 6/12, proportions et FAQ
+  sont désormais incluses dans le fichier autonome. Tests export + vitrine ciblés : **19/19**,
+  diff propre. Prochaine action exacte : contrôle navigateur borné de l'export/public, puis
+  outils secondaires si le rendu ne révèle pas de correction vitrine supplémentaire.
+
 - Sous-lot FAQ terminé localement : accordéon compact fermé au départ, déclencheurs natifs
   au clavier avec `aria-expanded` / `aria-controls`, réponse masquée de façon cohérente et
   focus visible. La galerie emploie désormais l'icône vectorielle de recherche, sans emoji.

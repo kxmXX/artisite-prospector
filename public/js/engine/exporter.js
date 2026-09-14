@@ -55,6 +55,7 @@ ${UTILITY_CSS}
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
     body {
       font-family: var(--font-body);
       background-color: var(--bg);
@@ -67,6 +68,26 @@ ${UTILITY_CSS}
     a { color: inherit; text-decoration: none; }
     img { max-width: 100%; height: auto; display: block; }
     button { font-family: inherit; cursor: pointer; border: none; }
+
+    /* Vitrine 1.1 — keep the public export visually aligned with the editor
+       preview. These are deliberately local to the commercial template. */
+    .vitrine-shell { max-width: 96rem; }
+    .site-section[id], #services, #about, #avis, #galerie, #faq, #horaires { scroll-margin-top: 6rem; }
+    .vitrine-about-image { min-height: 32rem; }
+    .vitrine-service-grid { gap: 2rem; }
+    .vitrine-review-grid { max-width: 80rem; }
+    .vitrine-faq-shell { max-width: 62rem; }
+    .vitrine-faq-shell .faq-item { border: 0; border-radius: 0; margin: 0; background: transparent; overflow: visible; }
+    .vitrine-faq-shell .faq-header { padding: 0; width: 100%; text-align: left; }
+    .vitrine-faq-shell .faq-content { padding: 0.75rem 0 0; }
+    @media (min-width: 1024px) {
+      .lg\\:col-span-6 { grid-column: span 6 / span 6; }
+      .vitrine-about-grid { gap: 5rem; }
+      .vitrine-about-title { font-size: 3.75rem; line-height: 1.08; }
+      .vitrine-about-story { font-size: 1.125rem; }
+      .vitrine-about-image { min-height: 42rem; }
+      .vitrine-service-grid { gap: 2.5rem; }
+    }
 
     /* Physical keyboard keycap treatment for exported CTAs. */
     .btn-keycap { position: relative; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; transition: transform 120ms ease, box-shadow 120ms ease, background-color 120ms ease; }

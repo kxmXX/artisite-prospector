@@ -103,6 +103,12 @@ puis présentation/services/galerie/FAQ. Voir la tête courte de codex-execution
   Les deux blocs continuent à utiliser les mêmes champs de contenu exportables.
 - Suite : vérification du rendu public et de l'export, puis reprise des outils secondaires.
 
+### Sous-lot export vitrine 1.1 — 14 septembre 2026
+
+- Les règles de navigation et proportions vitrine sont désormais embarquées dans l'export HTML
+  autonome, y compris les colonnes 6/12 et la FAQ sans cadre. Suite : contrôle navigateur
+  borné public/export avant les outils secondaires.
+
 ### Sous-lot FAQ accessible terminé — 14 septembre 2026
 
 - FAQ compacte au chargement, navigation au clavier, état `aria-expanded` et association

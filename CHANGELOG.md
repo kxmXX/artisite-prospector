@@ -28,6 +28,8 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
   cartes Services agrandies sans retirer les champs d'édition.
 - Vitrine 1.1 : avis plus respirants et FAQ élargie, avec séparateurs simples et zones de
   lecture plus généreuses, tout en conservant l'accordéon clavier et les données éditables.
+- Export HTML autonome : styles vitrine 1.1 synchronisés avec l'aperçu (ancres, split
+  À propos, colonnes, proportions et FAQ) pour éviter une divergence après téléchargement.
 - Vitrine : navigation de secours pour le template paysagiste, dock de contact caché sur le
   hero, respect de `prefers-reduced-motion` et absence de badge de certification par défaut.
 
