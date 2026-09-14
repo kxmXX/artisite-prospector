@@ -1,28 +1,80 @@
 import { getStylePresetById } from "../data/styles.js";
-import { getUiId, getSectionUiId } from "../data/uiIds.js";
+import { getUiId, getSectionUiId, getUiCode } from "../data/uiIds.js";
 import { copilotComponentReasoning } from "./componentIntelligence.js";
 
 export function getProjectUiTargets(project) {
   const targets = new Map();
+
+  const addTarget = (target) => {
+    if (!target?.targetId) return;
+    targets.set(target.targetId, target);
+  };
+
+  const collectContentLeaves = (value, prefix = "", result = []) => {
+    if (Array.isArray(value)) {
+      value.forEach((item, index) => collectContentLeaves(item, prefix ? `${prefix}.${index}` : String(index), result));
+      return result;
+    }
+    if (value && typeof value === "object") {
+      Object.entries(value).forEach(([key, child]) => collectContentLeaves(child, prefix ? `${prefix}.${key}` : key, result));
+      return result;
+    }
+    if (prefix) result.push(prefix);
+    return result;
+  };
+
   (project?.sections || []).forEach(section => {
-    targets.set(getSectionUiId(section), {
-      targetId: getSectionUiId(section),
+    const sectionTargetId = getSectionUiId(section);
+    addTarget({
+      targetId: sectionTargetId,
+      code: getUiCode(project?.id, section.id, "section"),
       sectionId: section.id,
       type: "section",
       path: null
     });
 
-    if (section.type === "hero" || section.type === "cta") {
-      const primaryId = getUiId(project, section, section.type === "hero" ? "btn" : "btn-primary");
-      targets.set(primaryId, {
-        targetId: primaryId,
+    collectContentLeaves(section.content || {}).forEach(fieldPath => {
+      const targetId = getUiId(project, section, `field-${fieldPath}`);
+      addTarget({
+        targetId,
+        code: getUiCode(project?.id, section.id, fieldPath),
+        sectionId: section.id,
+        type: "field",
+        fieldPath,
+        path: `content.${fieldPath}`
+      });
+    });
+
+    const buttonDefs = [];
+    if (section.type === "hero") {
+      buttonDefs.push(["btn", "content.ctaPrimary"], ["btn-phone", "content.ctaSecondary"]);
+    } else if (section.type === "cta") {
+      buttonDefs.push(["btn-primary", "content.ctaPrimary"], ["btn-phone", "content.phone"]);
+    } else if (section.type === "header") {
+      buttonDefs.push(["ctaText", "content.ctaText"]);
+    }
+    buttonDefs.forEach(([role, path]) => {
+      const targetId = getUiId(project, section, role);
+      addTarget({
+        targetId,
+        code: getUiCode(project?.id, section.id, `button-${role}`),
         sectionId: section.id,
         type: "button",
-        path: "content.ctaPrimary"
+        path
       });
-    }
+    });
   });
   return targets;
+}
+
+export function resolveProjectUiTarget(project, reference) {
+  const ref = String(reference || "").trim().replace(/^#/, "");
+  if (!ref) return null;
+  const targets = getProjectUiTargets(project);
+  if (targets.has(ref)) return targets.get(ref);
+  const normalized = ref.toUpperCase();
+  const byCode = [...targets.values()].filter(target => String(target.code || "").toUpperCase() === normalized);
+  return byCode.length === 1 ? byCode[0] : null;
 }
 
 function readHex(text) {
@@ -98,15 +150,16 @@ export function processCopilotPrompt(project, promptText) {
   
   const text = promptText.toLowerCase().trim();
 
-  const targetMatch = promptText.match(/#([a-z][a-z0-9-]*)/i);
+  const targetMatch = promptText.match(/#((?:E[A-Z0-9]{5})|(?:[a-z][a-z0-9-]*))/i);
   if (targetMatch) {
-    const targetId = targetMatch[1];
-    const target = getProjectUiTargets(project).get(targetId);
+    const targetRef = targetMatch[1];
+    const target = resolveProjectUiTarget(project, targetRef);
+    const targetId = target?.targetId || targetRef;
     if (!target) {
       return {
         project,
-        message: `La cible #${targetId} est introuvable.`,
-        targetId,
+        message: `La cible #${targetRef} est introuvable ou ambiguë.`,
+        targetId: targetRef,
         operations: [],
         error: "TARGET_NOT_FOUND"
       };
@@ -121,13 +174,21 @@ export function processCopilotPrompt(project, promptText) {
     } else if (hex && /couleur|color|fond|background/.test(text) && target.type === "section") {
       operations.push({ op: "set", targetId, path: "backgroundColor", value: hex });
     } else {
-      return {
-        project,
-        message: `J’ai trouvé #${targetId}, mais l’action demandée n’est pas encore supportée.`,
-        targetId,
-        operations: [],
-        error: "UNSUPPORTED_OPERATION"
-      };
+      const quotedValue = promptText.match(/[«“"]([^»”"]+)[»”"]/);
+      if (target.type === "field" && quotedValue && /modifie|modifier|change|changer|remplace|remplacer|mets|mettre|texte|contenu/i.test(text)) {
+        operations.push({ op: "set", targetId, path: "content", value: quotedValue[1] });
+      } else {
+        return {
+          project,
+          message: `J’ai trouvé #${targetRef}, mais l’action demandée n’est pas encore supportée.`,
+          targetId,
+          operations: [],
+          error: "UNSUPPORTED_OPERATION"
+        };
+      }
+    }
+    if (!operations.length) {
+      return { project, message: `Aucune opération ciblée pour #${targetRef}.`, targetId, operations: [], error: "UNSUPPORTED_OPERATION" };
     }
 
     const result = applyCopilotOperations(project, operations);

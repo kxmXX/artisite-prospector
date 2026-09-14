@@ -47,8 +47,7 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - [x] Réparer la typographie : catalogue dédupliqué par `ensureFontCatalog`, aperçu immédiat via variables CSS, cibles Titres/Texte réellement distinctes, export fidèle et mutation compatible Undo.
 - [x] Réparer le rayon global des boutons : carré → pilule s’applique aux CTA réels dans l’éditeur, le rendu public et l’export, sans modifier le rayon des cartes/conteneurs.
 - [x] Rendre le catalogue d’animations réellement appliqué aux blocs : presets distincts en preview/export, vitesse persistée, aperçu direct et `prefers-reduced-motion` qui neutralise les boucles.
-- [ ] Finaliser les identifiants visibles de **tous** les composants éditables, positionnés hors du
-  texte, et les opérations IA ciblées avec Undo.
+- [x] Finaliser les identifiants visibles de **tous** les composants éditables : références stables `#E…` affichées hors du texte pour sections/champs/images/boutons, résolution IA exacte et mutations ciblées compatibles Undo.
 - [ ] Vérifier les actions de suppression de boutons, le glisser-déposer de sections et les contrôles
   visibles à contraste suffisant.
 
@@ -70,4 +69,5 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - Boutons : rayon global indépendant du rayon des cartes et propagé aux CTA réels/export.
 - Animations : presets distincts, vitesse persistée et reduced-motion complet.
 - Tests : 37/37 ciblés, 177/177 complets, `git diff --check`.
-- Prochaine action unique : finaliser les identifiants visibles de tous les composants éditables et les opérations IA ciblées avec Undo.
+- Lot `4.8.0-alpha.9` : références stables `#E…` pour les cibles éditables et résolution Copilot champ par champ ; 11/11 tests ciblés, 178/178 complets.
+- Prochaine action unique : vérifier suppression/restauration de boutons, glisser-déposer de sections et contraste des contrôles visibles.

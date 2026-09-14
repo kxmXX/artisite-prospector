@@ -42,6 +42,8 @@ test("v4.1.0 Enhancements: Sequential numbered element badges (#1, #2, #3...) wi
   const cssPath = path.resolve(process.cwd(), "public/css/app.css");
   const css = fs.readFileSync(cssPath, "utf-8");
   assert.ok(css.includes(".editor-section-wrapper [data-ui-index]:hover::after"), "CSS must show badge on hover in editor wrapper");
+  assert.ok(css.includes('content: "#" attr(data-ui-code)'), "Stable UI reference must be shown instead of relying only on sequential numbering");
+  assert.ok(css.includes('right: calc(100% + 6px)'), "Stable reference must sit outside editable text bounds");
   assert.ok(css.includes('.client-preview-mode [data-ui-index]::after'), "CSS must suppress badges in client preview mode");
 });
 

@@ -1,15 +1,22 @@
-export function stableUiNumber(...parts) {
+function stableUiHash(...parts) {
   let hash = 2166136261;
   const input = parts.join("|");
   for (let i = 0; i < input.length; i += 1) {
     hash ^= input.charCodeAt(i);
     hash = Math.imul(hash, 16777619);
   }
-  return (hash >>> 0) % 9000 + 1000;
+  return hash >>> 0;
+}
+
+export function stableUiNumber(...parts) {
+  return stableUiHash(...parts) % 9000 + 1000;
 }
 
 export function getUiCode(...parts) {
-  return String((stableUiNumber(...parts) % 99) + 1).padStart(2, "0");
+  // Short, stable, human-facing reference. Keep the full hash entropy rather than
+  // collapsing every editable component into the old 01–99 badge space.
+  const token = stableUiHash(...parts).toString(36).toUpperCase().padStart(7, "0").slice(-5);
+  return `E${token}`;
 }
 
 export function getUiId(project, section, role = "component") {

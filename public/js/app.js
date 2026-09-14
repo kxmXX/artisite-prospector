@@ -10,7 +10,7 @@ import { renderImageModal } from "./components/imageModal.js";
 import { renderInspector } from "./components/inspector.js";
 import { renderWebsiteHTML, generateLocalBusinessSchema } from "./components/renderer.js";
 import { generateSite, createSectionData } from "./engine/generator.js";
-import { processCopilotPrompt, applyCopilotOperations } from "./engine/copilot.js";
+import { processCopilotPrompt, applyCopilotOperations, resolveProjectUiTarget } from "./engine/copilot.js";
 import { downloadHTML, downloadJSON, generateProductionPackage, downloadProductionPackage } from "./engine/exporter.js";
 import { getStylePresetById } from "./data/styles.js";
 import { getTradeById } from "./data/trades.js";
@@ -3260,8 +3260,12 @@ export class App {
       return false;
     };
 
-    const targetId = promptText.match(/#([a-z][a-z0-9-]*)/i)?.[1] || null;
-    const targetNode = targetId ? document.querySelector(`[data-ui-id="${targetId}"]`) : null;
+    const targetRef = promptText.match(/#((?:E[A-Z0-9]{5})|(?:[a-z][a-z0-9-]*))/i)?.[1] || null;
+    const resolvedTarget = targetRef ? resolveProjectUiTarget(state.currentProject, targetRef) : null;
+    const targetId = resolvedTarget?.targetId || targetRef;
+    const targetNode = targetId
+      ? (document.querySelector(`[data-ui-id="${targetId}"]`) || (targetRef ? document.querySelector(`[data-ui-code="${targetRef.toUpperCase()}"]`) : null))
+      : null;
 
     const feedback = document.getElementById("copilot-feedback");
     if (feedback) {

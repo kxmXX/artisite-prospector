@@ -2181,7 +2181,25 @@ body.dark-theme .bg-zinc-100 { background-color: #202534 !important; color: #e4e
   font-size: .7rem;
 }
 
-/* Numbered Element Badges (#1, #2, #3...) - S, M, L keycaps shown clearly on hover in editor mode */
+/* Stable editor references: compact codes live beside controls/content, never on top of copy. */
+.ui-stable-ref {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 18px;
+  padding: 0 5px;
+  border: 1px solid rgba(251, 191, 36, .35);
+  border-radius: 9999px;
+  background: #27272a;
+  color: #fbbf24;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* Numbered Element Badges (#1, #2, #3...) remain as an internal ordering aid. */
 [data-ui-index] {
   position: relative;
 }
@@ -2231,6 +2249,26 @@ body.dark-theme .bg-zinc-100 { background-color: #202534 !important; color: #e4e
   padding: 0 7px;
   top: -12px;
 }
+
+.editor-section-wrapper.is-active-section [data-ui-index][data-ui-code]::after,
+.editor-section-wrapper [data-ui-index][data-ui-code]:hover::after,
+.editor-section-wrapper [data-ui-index][data-ui-code]:focus-within::after {
+  content: "#" attr(data-ui-code);
+  display: inline-flex !important;
+  top: 50%;
+  right: calc(100% + 6px);
+  left: auto;
+  transform: translateY(-50%);
+  min-width: 0;
+  width: auto;
+  height: 18px;
+  padding: 0 5px;
+  font-size: 9px;
+  opacity: .68;
+  white-space: nowrap;
+}
+.editor-section-wrapper [data-ui-index][data-ui-code]:hover::after,
+.editor-section-wrapper [data-ui-index][data-ui-code]:focus-within::after { opacity: 1; }
 
 @keyframes badgePop {
   from { opacity: 0; transform: scale(0.85); }

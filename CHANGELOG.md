@@ -7,6 +7,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 14 septembre 2026 (4.8.0-alpha.9)
+
+- Éditeur : références stables courtes `#E…` visibles hors des contenus pour sections, champs, images et boutons, sans recouvrir le texte client.
+- Copilot ciblé : une référence stable résout exactement son composant ; les changements de contenu ciblés restent limités au champ demandé et passent par le flux Undo.
+- Images imbriquées : services et réalisations exposent désormais leur chemin de donnée réel (`services.N.image`, `items.N.image`) pour un ciblage non ambigu.
+- Validation : 11/11 tests ciblés (`gold`, `v410_enhancements`), puis 178/178 sur la suite complète et `git diff --check`.
+
 ### Consolidation — 14 septembre 2026 (4.8.0-alpha.8)
 
 - Éditeur — fonds : thèmes et couleurs personnalisées pilotent désormais la surface réellement visible dans l’éditeur, le rendu public et l’export standalone ; les wrappers internes ne masquent plus le choix.

@@ -119,7 +119,7 @@ function renderRatingStars(rating = 5, { editor = false, sectionId = "", reviewI
  * Image renderer with optional Editor Controls (Replace, Trash, Drag & Drop).
  * Includes automatic trade fallback SVG if URL fails or returns 403.
  */
-export function renderEditableImage(url, { sectionId = "", fieldPath = "", alt = "", className = "", options = {}, itemIndex = null, tradeId = "paysagiste" } = {}) {
+export function renderEditableImage(url, { sectionId = "", fieldPath = "", targetFieldPath = "", alt = "", className = "", options = {}, itemIndex = null, tradeId = "paysagiste" } = {}) {
   const isEditor = options?.isEditor;
   const isHero = fieldPath === "heroImage" || String(sectionId || "").toLowerCase().includes("hero");
   const activeTrade = tradeId || options?.tradeId || "paysagiste";
@@ -135,6 +135,9 @@ export function renderEditableImage(url, { sectionId = "", fieldPath = "", alt =
   const project = options?.project || (typeof state !== "undefined" ? state.currentProject : null);
   const sec = project?.sections?.find(s => s.id === sectionId);
   const imgKey = `${fieldPath}_${idx}`;
+  const uiFieldPath = targetFieldPath || fieldPath;
+  const imageTargetId = project && sec ? getUiId(project, sec, `field-${uiFieldPath}`) : "";
+  const imageUiCode = project && sec ? getUiCode(project?.id, sec.id, uiFieldPath) : "";
   const imgMotion = sec?.settings?.imageMotions?.[imgKey] || sec?.settings?.[`motion_${fieldPath}`] || sec?.settings?.motion_image || "";
   const motionAttr = imgMotion && imgMotion !== "none" ? ` data-motion="${imgMotion}"` : "";
   const motionClass = imgMotion && imgMotion !== "none" ? ` motion-preset-${imgMotion.replace('-in', '')}${imgMotion === 'pulse' ? ' btn-pulse-active' : ''}` : "";
@@ -143,8 +146,11 @@ export function renderEditableImage(url, { sectionId = "", fieldPath = "", alt =
     return `<img src="${displayUrl}" data-fallback-src="${fallbackSvg}" alt="${alt}" class="${className}${motionClass}" ${perfAttrs} ${onErrorAttr}${motionAttr}>`;
   }
 
+  globalElementIndex += 1;
+  const imageElementIndex = globalElementIndex;
   return `
     <div class="relative group/img w-full h-full"
+         ${imageTargetId ? `data-ui-id="${imageTargetId}" data-ui-code="${imageUiCode}" data-ui-type="field" data-ui-target="true" data-ui-index="${imageElementIndex}" data-ui-index-size="m"` : ''}
          ondragover="event.preventDefault(); this.classList.add('ring-2', 'ring-zinc-900');"
          ondragleave="this.classList.remove('ring-2', 'ring-zinc-900');"
          ondrop="event.preventDefault(); this.classList.remove('ring-2', 'ring-zinc-900'); window.app.handleImageElementDrop(event, '${sectionId}', '${fieldPath}', ${indexParam});">
@@ -479,6 +485,7 @@ function renderSection(sec, project, options) {
       <!-- Sleek Floating Action Bar (Linear / Framer style) -->
       <div class="editor-section-toolbar">
         <span class="font-semibold text-zinc-300 px-2 py-0.5 rounded-full bg-zinc-800/80 text-[10px] uppercase tracking-wider mr-1">${SECTION_TITLES[sec.type] || sec.type}</span>
+        <span class="ui-stable-ref" title="Référence stable de cette section">#${getUiCode(project?.id, sec?.id, 'section')}</span>
 
         <button type="button" class="btn-sec-ctrl btn-sec-up" title="Monter cette section (↑)" data-action="move-up" data-id="${sec.id}">
           ${getIcon("chevronUp", "w-3.5 h-3.5")}
@@ -659,10 +666,13 @@ function isButtonHidden(sec, buttonType, specificKey = null) {
 function renderButtonActionBadge(sec, buttonType, options = {}, project = {}) {
   if (!options.isEditor) return "";
   const btnNum = getButtonSequentialNumber(sec, buttonType);
-  const buttonId = getUiId(project, sec, buttonType === "phone" ? "btn-phone" : (buttonType === "primary" ? (sec.type === "hero" ? "btn" : "btn-primary") : buttonType));
+  const buttonRole = buttonType === "phone" ? "btn-phone" : (buttonType === "primary" ? (sec.type === "hero" ? "btn" : "btn-primary") : buttonType);
+  const buttonId = getUiId(project, sec, buttonRole);
+  const buttonCode = getUiCode(project?.id, sec?.id, `button-${buttonRole}`);
   return `
     <div class="cta-direct-badge" onclick="event.stopPropagation();" role="toolbar" aria-label="Commandes directes du bouton">
       <span class="cta-direct-id font-mono font-bold" title="Bouton #${btnNum} (Identifiant: #${buttonId})">#${btnNum}</span>
+      <span class="ui-stable-ref" data-ui-code="${buttonCode}" title="Référence stable IA du bouton">#${buttonCode}</span>
       <button type="button" onclick="event.preventDefault(); event.stopPropagation(); window.app.adjustButtonFontSize(-1)" class="cta-direct-btn" title="Réduire la taille du texte">A-</button>
       <button type="button" onclick="event.preventDefault(); event.stopPropagation(); window.app.adjustButtonFontSize(1)" class="cta-direct-btn" title="Agrandir la taille du texte">A+</button>
       <button type="button" onclick="event.preventDefault(); event.stopPropagation(); window.app.toggleButtonPopover('${sec.id}', '${buttonType}')" class="cta-direct-btn cta-direct-gear" title="Réglages du bouton (Taille continue, Bords, Animation, Style)">⚙️</button>
@@ -679,7 +689,9 @@ function renderButtonPopover(sec, buttonType, options = {}, project = {}) {
   const isUpper = project?.branding?.ctaTransform === "uppercase";
   const ctaSize = project?.branding?.ctaSize || "md";
   const btnMotion = sec.settings?.[`${buttonType}-motion`] || sec.settings?.[`btn-${buttonType}-motion`] || "";
-  const buttonId = getUiId(project, sec, buttonType === "phone" ? "btn-phone" : (buttonType === "primary" ? (sec.type === "hero" ? "btn" : "btn-primary") : buttonType));
+  const buttonRole = buttonType === "phone" ? "btn-phone" : (buttonType === "primary" ? (sec.type === "hero" ? "btn" : "btn-primary") : buttonType);
+  const buttonId = getUiId(project, sec, buttonRole);
+  const buttonCode = getUiCode(project?.id, sec?.id, `button-${buttonRole}`);
 
   return `
     <div id="cta-popover-${sec.id}-${buttonType}" class="cta-context-popover" role="dialog" aria-label="Réglages du bouton ${buttonType}" onclick="event.stopPropagation();">
@@ -691,6 +703,7 @@ function renderButtonPopover(sec, buttonType, options = {}, project = {}) {
       <!-- Row 1: ID & Continuous Scale Slider -->
       <div class="flex items-center justify-between gap-2 pb-1 border-b border-zinc-700/60">
         <span class="text-[10px] font-mono text-amber-400 font-bold bg-zinc-800 px-2 py-0.5 rounded border border-amber-400/30" title="Identifiant #${buttonId}">#${btnNum}</span>
+        <span class="ui-stable-ref" data-ui-code="${buttonCode}" title="Référence stable IA">#${buttonCode}</span>
         <div class="flex items-center gap-1.5 flex-1 justify-end">
           <span class="text-[9.5px] uppercase font-bold text-zinc-400">Échelle:</span>
           <input type="range" min="80" max="140" step="5" value="${currentScale}" 
@@ -1290,7 +1303,7 @@ function renderServices(sec, project, options = {}) {
             ${(c.services || []).map((srv, idx) => `
               <div class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all border border-black/5 flex flex-col group">
                 <div class="aspect-[16/9] overflow-hidden relative bg-slate-100">
-                  ${renderEditableImage(srv.image, { sectionId: sec.id, fieldPath: 'image', itemIndex: idx, alt: srv.title, className: 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-500', options })}
+                  ${renderEditableImage(srv.image, { sectionId: sec.id, fieldPath: 'image', targetFieldPath: `services.${idx}.image`, itemIndex: idx, alt: srv.title, className: 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-500', options })}
                   <span class="absolute top-4 right-4 z-10 bg-black/75 backdrop-blur text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider" data-editable="services.${idx}.tag">
                     ${srv.tag}
                   </span>
@@ -1340,7 +1353,7 @@ function renderServices(sec, project, options = {}) {
                 <div class="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center ${isEven ? 'lg:flex-row-reverse' : ''}">
                   <div class="lg:col-span-6 ${isEven ? 'lg:order-2' : 'lg:order-1'}">
                     <div class="aspect-[16/10] rounded-3xl overflow-hidden shadow-xl border-2 border-black/5 bg-slate-100">
-                      ${renderEditableImage(srv.image, { sectionId: sec.id, fieldPath: 'image', itemIndex: idx, alt: srv.title, className: 'w-full h-full object-cover', options })}
+                      ${renderEditableImage(srv.image, { sectionId: sec.id, fieldPath: 'image', targetFieldPath: `services.${idx}.image`, itemIndex: idx, alt: srv.title, className: 'w-full h-full object-cover', options })}
                     </div>
                   </div>
                   <div class="lg:col-span-6 ${isEven ? 'lg:order-1' : 'lg:order-2'} space-y-4">
@@ -1425,7 +1438,7 @@ function renderServices(sec, project, options = {}) {
           ${(c.services || []).map((srv, idx) => `
             <div class="bg-white dark:bg-zinc-900 rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-zinc-800 flex flex-col group transform hover:-translate-y-1">
               <div class="aspect-[16/10] overflow-hidden relative bg-slate-100">
-                ${renderEditableImage(srv.image, { sectionId: sec.id, fieldPath: 'image', itemIndex: idx, alt: srv.title, className: 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-500', options })}
+                ${renderEditableImage(srv.image, { sectionId: sec.id, fieldPath: 'image', targetFieldPath: `services.${idx}.image`, itemIndex: idx, alt: srv.title, className: 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-500', options })}
                 ${(!isPaysagiste && srv.tag) ? `
                   <span class="absolute top-3 right-3 z-10 bg-black/70 backdrop-blur text-white text-[11px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider" data-editable="services.${idx}.tag">
                     ${srv.tag}
@@ -1586,7 +1599,7 @@ function renderRealisations(sec, project, options = {}) {
           ${(c.items || []).map((r, idx) => `
             <div class="rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg transition-all group">
               <div class="aspect-[16/11] overflow-hidden bg-slate-100">
-                ${renderEditableImage(r.image, { sectionId: sec.id, fieldPath: 'image', itemIndex: idx, alt: r.title, className: 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-500', options })}
+                ${renderEditableImage(r.image, { sectionId: sec.id, fieldPath: 'image', targetFieldPath: `items.${idx}.image`, itemIndex: idx, alt: r.title, className: 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-500', options })}
               </div>
               <div class="p-5 space-y-2">
                 <div class="flex items-center justify-between text-xs">

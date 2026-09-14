@@ -1,5 +1,12 @@
 # État de reprise Codex — 14 septembre 2026
 
+## LOT DE LIVRAISON — éditeur 4.8.0-alpha.9
+
+- Identifiants stables `#E…` générés à partir du projet/section/champ et affichés hors du texte pour les sections, champs, images et boutons en mode éditeur.
+- Le registre Copilot couvre désormais les feuilles de contenu imbriquées et résout soit l’identifiant interne, soit la référence courte visible.
+- Les instructions ciblées de remplacement de contenu n’altèrent que le champ résolu et la mutation approuvée conserve le chemin Undo.
+- Tests : 11/11 ciblés (`gold`, `v410_enhancements`), 178/178 complets et `git diff --check`. Prochaine action : suppression/restauration des boutons, drag-and-drop des sections et contraste des contrôles.
+
 ## LOT DE LIVRAISON — éditeur 4.8.0-alpha.8
 
 - Fonds : parité corrigée entre éditeur, rendu public et export standalone ; les conteneurs internes ne recouvrent plus le fond choisi.

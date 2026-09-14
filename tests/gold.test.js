@@ -4,7 +4,7 @@ import { readFile } from "node:fs/promises";
 import { generateSite } from "../public/js/engine/generator.js";
 import { renderWebsiteHTML } from "../public/js/components/renderer.js";
 import { FONT_CATALOG } from "../public/js/data/fonts.js";
-import { getProjectUiTargets, applyCopilotOperations } from "../public/js/engine/copilot.js";
+import { getProjectUiTargets, applyCopilotOperations, resolveProjectUiTarget, processCopilotPrompt } from "../public/js/engine/copilot.js";
 
 test("Gold: typography catalog contains at least 20 usable modern fonts", () => {
   assert.ok(FONT_CATALOG.length >= 20);
@@ -22,6 +22,30 @@ test("Gold: editor IDs are stable, preview IDs remain non-interactive, and stick
   assert.match(editorHTML, /sticky-call-bar/);
   assert.match(previewHTML, /data-ui-target="false"/);
   assert.ok(!previewHTML.includes("data-ui-target=\"true\""));
+});
+
+test("Gold: stable visible references resolve to exact editable fields for targeted Copilot edits", async () => {
+  const site = generateSite({ name: "Gold Target", tradeId: "paysagiste", city: "Montauban" });
+  const hero = site.sections.find(section => section.type === "hero");
+  const targetList = [...getProjectUiTargets(site).values()];
+  const codes = targetList.map(item => item.code);
+  assert.equal(new Set(codes).size, codes.length, "Human-facing references must be unique inside one generated project");
+  const titleTarget = targetList.find(item => item.sectionId === hero.id && item.fieldPath === "title");
+  assert.ok(titleTarget, "Hero title must be registered as a field-level Copilot target");
+  assert.match(titleTarget.code, /^E[A-Z0-9]{5}$/, "Visible reference must be compact and stable");
+  assert.equal(resolveProjectUiTarget(site, titleTarget.code)?.targetId, titleTarget.targetId);
+
+  const editorHTML = renderWebsiteHTML(site, { isEditor: true });
+  assert.ok(editorHTML.includes(`data-ui-code="${titleTarget.code}"`), "Editor markup must expose the same stable reference next to the field");
+
+  const result = processCopilotPrompt(site, `Modifie #${titleTarget.code} texte par «Titre ciblé»`);
+  const updatedHero = result.project.sections.find(section => section.id === hero.id);
+  assert.equal(updatedHero.content.title, "Titre ciblé", "Short visible reference must update only the requested field");
+  assert.equal(result.operations.length, 1);
+
+  const appSource = await readFile(new URL("../public/js/app.js", import.meta.url), "utf8");
+  assert.match(appSource, /resolveProjectUiTarget\(state\.currentProject, targetRef\)/, "Remote Copilot flow must resolve the same visible reference");
+  assert.match(appSource, /state\.updateProject\(targeted\.project, true, `Copilot ciblé:/, "Approved targeted AI mutations must remain Undo-ready");
 });
 
 test("Gold: targeted Copilot operations preserve unrelated project properties and support Undo-ready mutations", () => {
