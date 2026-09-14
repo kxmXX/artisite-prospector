@@ -44,8 +44,11 @@ function extractImageUrl(data) {
     : null;
 }
 
-// High-performance in-memory cache for repeated AI queries to eliminate network latency
+// High-performance in-memory cache for repeated AI queries to eliminate network latency.
+// A second map shares only currently-running requests with the exact same cache key,
+// preventing duplicate model calls during bursts without weakening context isolation.
 const aiResponseCache = new Map();
+const aiGenerationInFlight = new Map();
 const CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes TTL
 
 export function getCachedAiResult(cacheKey) {
@@ -69,6 +72,32 @@ export function setCachedAiResult(cacheKey, data, ttlMs = CACHE_TTL_MS) {
 
 export function clearAiCache() {
   aiResponseCache.clear();
+  aiGenerationInFlight.clear();
+}
+
+async function generateWithDeduplication(cacheKey, context) {
+  const existing = aiGenerationInFlight.get(cacheKey);
+  if (existing) {
+    return { aiResult: await existing, shared: true };
+  }
+
+  let task;
+  task = Promise.resolve()
+    .then(() => enrichSiteWithAI(context))
+    .then(aiResult => {
+      // Populate the finished cache before releasing the in-flight slot so a
+      // third request cannot slip into a gap and start a duplicate model call.
+      if (aiResult?.success) {
+        setCachedAiResult(cacheKey, { modelUsed: aiResult.modelUsed, data: aiResult.data });
+      }
+      return aiResult;
+    })
+    .finally(() => {
+      if (aiGenerationInFlight.get(cacheKey) === task) aiGenerationInFlight.delete(cacheKey);
+    });
+
+  aiGenerationInFlight.set(cacheKey, task);
+  return { aiResult: await task, shared: false };
 }
 
 const MAX_BODY_BYTES = 2 * 1024 * 1024;
@@ -217,12 +246,11 @@ export async function handleApiRequest(req, res) {
         return;
       }
 
-      const aiResult = await enrichSiteWithAI(body);
+      const { aiResult, shared } = await generateWithDeduplication(cacheKey, body);
       if (aiResult.success) {
-        setCachedAiResult(cacheKey, { modelUsed: aiResult.modelUsed, data: aiResult.data });
         sendJSON(res, 200, {
           success: true,
-          source: "gemini",
+          source: shared ? "inflight" : "gemini",
           modelUsed: aiResult.modelUsed,
           data: aiResult.data
         });

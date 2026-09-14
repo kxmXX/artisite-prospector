@@ -59,7 +59,7 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 ## Stabilité async / backend — reprise après l’éditeur
 
 - [x] Protéger la génération photo IA : résultat lié à projet/section/champ/index, réponse tardive ignorée après changement de cible ou de projet, application revérifiée avant mutation.
-- [ ] Dédupliquer les requêtes de génération IA simultanées qui portent la même clé de contexte, sans partager une réponse entre contextes différents.
+- [x] Dédupliquer les requêtes de génération IA simultanées qui portent la même clé de contexte : une seule promesse `in-flight` par clé exacte, contextes différents isolés, puis promotion dans le cache TTL.
 - [ ] Revoir les prompts de génération restants pour ne pas transformer des exemples en faits client non vérifiés.
 - [ ] Contre-audit sécurité / performance et limites de partage avant toute revendication multi-utilisateur.
 
@@ -85,4 +85,5 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - Lot `4.8.0-alpha.10` : suppression/restauration + Undo, drag-and-drop câblé jusqu’à `reorderSections`, poignée accessible et focus contrasté ; 36/36 tests ciblés, 180/180 complets.
 - Lot `4.8.0-alpha.11` : simulateur de devis et footer complétés comme champs de template éditables ; 16/16 tests vitrine ciblés, 180/180 complets.
 - Lot `4.8.0-alpha.12` : génération photo IA protégée contre les réponses tardives et les changements de cible/projet ; 9/9 tests async ciblés, 183/183 complets.
-- Prochaine action unique : dédupliquer les requêtes de génération IA simultanées identiques côté API, avec modèle simulé et sans appel réseau.
+- Lot `4.8.0-alpha.13` : déduplication `in-flight` exacte des générations IA ; 10/10 backend ciblés, 184/184 complets.
+- Prochaine action unique : revoir les prompts de génération restants pour supprimer toute transformation d’exemples en faits client non vérifiés, avec tests sans réseau.

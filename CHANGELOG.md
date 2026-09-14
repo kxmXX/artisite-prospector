@@ -7,6 +7,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 14 septembre 2026 (4.8.0-alpha.13)
+
+- API génération : les requêtes simultanées portant exactement la même clé de contexte partagent désormais une seule promesse modèle en cours.
+- Isolation : une variation de contexte validé (téléphone, région ou autre champ de clé) garde son propre appel et ne reçoit jamais la réponse d’une autre requête.
+- Cache : un résultat réussi est promu dans le cache TTL avant de libérer le slot `in-flight`, supprimant la fenêtre où un troisième appel pouvait repartir vers le modèle.
+- Validation : 10/10 tests backend ciblés, 184/184 sur la suite complète et `git diff --check`.
+
 ### Consolidation — 14 septembre 2026 (4.8.0-alpha.12)
 
 - IA image : une génération asynchrone est désormais liée au projet, à la section, au champ et à l’index qui l’ont déclenchée ; une réponse tardive n’est plus réutilisable sur une autre cible.

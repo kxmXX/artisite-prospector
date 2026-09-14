@@ -60,3 +60,69 @@ test('generation cache isolates complete context and only reuses exact validated
   assert.equal(unconfigured.source, 'local_engine');
   assert.equal(unconfigured.success, false, 'old cache must not conceal missing configuration');
 });
+
+test('concurrent generation deduplicates only identical validated contexts', async t => {
+  const oldFetch = globalThis.fetch;
+  const oldKey = process.env.GEMINI_API_KEY;
+  const oldModels = process.env.GEMINI_MODELS;
+  process.env.GEMINI_API_KEY = 'test-only-not-a-real-key';
+  process.env.GEMINI_MODELS = 'test-model';
+  clearAiCache();
+
+  const pendingFetches = [];
+  let calls = 0;
+  globalThis.fetch = async (_url, options) => {
+    calls++;
+    const prompt = JSON.parse(options.body).contents[0].parts[0].text;
+    return new Promise(resolve => pendingFetches.push({
+      prompt,
+      resolve: requestNumber => resolve({ ok: true, json: async () => ({ candidates: [{ content: { parts: [{
+        text: JSON.stringify({ requestNumber, prompt })
+      }] } }] }) })
+    }));
+  };
+
+  t.after(() => {
+    globalThis.fetch = oldFetch;
+    for (const [key, value] of [['GEMINI_API_KEY', oldKey], ['GEMINI_MODELS', oldModels]]) {
+      if (value === undefined) delete process.env[key]; else process.env[key] = value;
+    }
+    clearAiCache();
+  });
+
+  const request = body => new Promise(async (resolve, reject) => {
+    let status, data;
+    try {
+      await handleApiRequest({ method: 'POST', url: '/api/ai/generate', body }, {
+        writeHead(code) { status = code; },
+        end(text) { data = JSON.parse(text); }
+      });
+      resolve({ status, ...data });
+    } catch (error) { reject(error); }
+  });
+
+  const base = { name: 'Atelier Concurrent', trade: 'plombier', city: 'Lyon', phone: '0100000000', region: 'Rhône', tone: 'sobre', ambiance: 'mineral' };
+  const firstPromise = request(base);
+  const duplicatePromise = request({ ...base });
+  const distinctPromise = request({ ...base, phone: '0200000000' });
+
+  // Let both handlers reach the mocked model call before resolving either one.
+  for (let i = 0; i < 20 && pendingFetches.length < 2; i++) await new Promise(r => setTimeout(r, 0));
+  assert.equal(calls, 2, 'identical context shares one call while a distinct phone gets its own call');
+  assert.equal(pendingFetches.length, 2);
+
+  pendingFetches[0].resolve(1);
+  pendingFetches[1].resolve(2);
+  const [first, duplicate, distinct] = await Promise.all([firstPromise, duplicatePromise, distinctPromise]);
+
+  assert.equal(first.status, 200);
+  assert.equal(first.source, 'gemini');
+  assert.equal(duplicate.source, 'inflight');
+  assert.deepEqual(duplicate.data, first.data, 'concurrent duplicate receives the exact shared result');
+  assert.equal(distinct.source, 'gemini');
+  assert.notEqual(distinct.data.requestNumber, first.data.requestNumber, 'different context never shares in-flight data');
+
+  const cached = await request(base);
+  assert.equal(cached.source, 'cache', 'completed shared result is promoted to the normal TTL cache');
+  assert.equal(calls, 2, 'cache hit does not call the model again');
+});

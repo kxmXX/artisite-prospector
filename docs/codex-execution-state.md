@@ -1,5 +1,12 @@
 # État de reprise Codex — 14 septembre 2026
 
+## LOT DE LIVRAISON — déduplication génération 4.8.0-alpha.13
+
+- `server/apiHandler.js` maintient une promesse `in-flight` par `generationCacheKey` exacte : deux requêtes concurrentes identiques n’appellent plus deux fois le modèle.
+- Les contextes différents restent isolés par la clé SHA-256 existante ; le test concurrent vérifie explicitement un téléphone différent en parallèle.
+- Le résultat réussi est placé dans le cache TTL avant suppression du slot en cours, évitant une course entre fin de génération et remplissage du cache. Les erreurs ne sont pas conservées dans ce cache.
+- Tests : 10/10 backend ciblés (`generation_cache`, `request_body`, `server`), 184/184 complets, `git diff --check`. Prochaine action : audit factuel des prompts de génération, sans réseau.
+
 ## LOT DE LIVRAISON — stabilité IA 4.8.0-alpha.12
 
 - `generateAIPhoto()` capture désormais le projet et la cible image d’origine ; `beginAIRequest("image-photo")` invalide la réponse après changement de projet ou modification du projet pendant l’attente.
