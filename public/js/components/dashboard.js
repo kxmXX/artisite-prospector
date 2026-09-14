@@ -2,20 +2,26 @@ import { getIcon } from "./icons.js";
 import { getTradeFallbackDataUrl } from "../data/imageFallbacks.js";
 import { APP_VERSION } from "../version.js";
 
+/**
+ * Studio V3 dashboard.
+ * The dashboard is a prospecting desk first: one dominant generation action,
+ * a compact pipeline readout, then a project library instead of a generic card grid.
+ */
 export function renderDashboard(state) {
   const projects = state.projects || [];
   const total = projects.length;
   const contacted = projects.filter(p => p.pipelineStatus === "contacted" || p.pipelineStatus === "demo_sent").length;
   const won = projects.filter(p => p.pipelineStatus === "won").length;
-  const conversionRate = total ? Math.round(won / total * 100) : 0;
+  const ready = projects.filter(p => !p.pipelineStatus || p.pipelineStatus === "generated" || p.pipelineStatus === "prospect").length;
+  const conversionRate = total ? Math.round((won / total) * 100) : 0;
   const valuedProjects = projects.filter(p => Number.isFinite(p.estimatedValue) && p.estimatedValue >= 0);
   const potentialRevenue = valuedProjects.reduce((sum, p) => sum + p.estimatedValue, 0);
 
   const statusMap = {
-    prospect: { label: "À contacter", tone: "prospect" },
+    prospect: { label: "À contacter", tone: "neutral" },
     generated: { label: "Site prêt", tone: "ready" },
-    contacted: { label: "En prospection", tone: "contacted" },
-    demo_sent: { label: "Démo partagée", tone: "demo" },
+    contacted: { label: "En prospection", tone: "active" },
+    demo_sent: { label: "Démo partagée", tone: "shared" },
     won: { label: "Client signé", tone: "won" }
   };
 
@@ -27,98 +33,143 @@ export function renderDashboard(state) {
     const heroImage = p.sections?.find(s => s.type === "hero")?.content?.heroImage || fallbackImage;
     const activeSecCount = p.sections?.filter(s => s.visibility !== false).length || 0;
     const totalSecCount = p.sections?.length || 0;
-    const featured = index === 0 ? " project-card--featured" : "";
+
     return `
-      <article class="project-card${featured}" data-project-id="${p.id}" data-pipeline-status="${p.pipelineStatus || 'generated'}">
-        <button type="button" class="project-card-media" onclick="window.app.openEditor('${p.id}')" aria-label="Ouvrir ${p.name} dans l’éditeur">
-          <img src="${heroImage}" data-fallback-src="${fallbackImage}" alt="Aperçu de ${p.name}" onerror="if(!this.dataset.fallbackApplied){this.dataset.fallbackApplied='true';this.src=this.dataset.fallbackSrc;}">
-          <span class="project-card-shade"></span>
-          <span class="project-card-index">${String(index + 1).padStart(2, '0')}</span>
-          <span class="project-card-status project-card-status--${st.tone}">${st.label}</span>
-          <span class="project-card-open">Ouvrir ${getIcon("arrowRight", "w-4 h-4")}</span>
+      <article class="dashboard-v3-project ${index === 0 ? 'is-featured' : ''}" data-project-id="${p.id}" data-pipeline-status="${p.pipelineStatus || 'generated'}">
+        <button type="button" class="dashboard-v3-project-media" onclick="window.app.openEditor('${p.id}')" aria-label="Ouvrir ${p.name} dans l'éditeur">
+          <img src="${heroImage}" data-fallback-src="${fallbackImage}" alt="Aperçu ${p.name}" onerror="if(!this.dataset.fallbackApplied){this.dataset.fallbackApplied='true';this.src=this.dataset.fallbackSrc;}">
+          <span class="dashboard-v3-project-index">${String(index + 1).padStart(2, '0')}</span>
+          <span class="dashboard-v3-project-status is-${st.tone}">${st.label}</span>
         </button>
-        <div class="project-card-copy">
-          <div>
-            <p class="project-card-kicker">${bus.tradeLabel || 'Artisan'} · ${bus.city || 'France'}</p>
-            <h3>${p.name}</h3>
-          </div>
-          <div class="project-card-meta">
+
+        <div class="dashboard-v3-project-copy">
+          <div class="dashboard-v3-project-kicker">${bus.tradeLabel || 'Artisan'} · ${bus.city || 'France'}</div>
+          <button type="button" onclick="window.app.openEditor('${p.id}')" class="dashboard-v3-project-title">${p.name}</button>
+          <div class="dashboard-v3-project-meta">
             <span>${activeSecCount}/${totalSecCount} sections</span>
-            <span>${p.branding?.presetName || 'Direction libre'}</span>
+            <span>${p.branding?.presetName || 'Direction personnalisée'}</span>
+            <span>${bus.phone || 'Téléphone non renseigné'}</span>
           </div>
         </div>
-        <div class="project-card-actions">
-          ${p.id === 'proj-esprit-nature' ? `<button type="button" onclick="window.app.openPreview('${p.id}')" class="project-action project-action--primary">${getIcon("eye", "w-4 h-4")}<span>Voir vitrine</span></button>` : ''}
-          <button type="button" onclick="window.app.openEditor('${p.id}')" class="project-action project-action--primary">${getIcon("edit", "w-4 h-4")}<span>Éditer</span></button>
-          <button type="button" onclick="window.app.openPreview('${p.id}')" class="project-action" title="Aperçu client">${getIcon("eye", "w-4 h-4")}</button>
-          <button type="button" onclick="window.app.openCloserModal('${p.id}')" class="project-action" title="Kit de vente">${getIcon("sparkles", "w-4 h-4")}</button>
-          <button type="button" onclick="window.app.duplicateProject('${p.id}')" class="project-action" title="Dupliquer">${getIcon("copy", "w-4 h-4")}</button>
-          <button type="button" onclick="window.app.deleteProject('${p.id}')" class="project-action project-action--danger" title="Supprimer">${getIcon("trash", "w-4 h-4")}</button>
+
+        <div class="dashboard-v3-project-actions">
+          <button type="button" onclick="window.app.openEditor('${p.id}')" class="is-primary">${getIcon("edit", "w-3.5 h-3.5")}<span>Éditer</span></button>
+          <button type="button" onclick="window.app.openPreview('${p.id}')">${getIcon("eye", "w-3.5 h-3.5")}<span>Aperçu</span></button>
+          <button type="button" onclick="window.app.openCloserModal('${p.id}')">${getIcon("briefcase", "w-3.5 h-3.5")}<span>Pitch</span></button>
+          <button type="button" onclick="window.app.duplicateProject('${p.id}')" class="is-icon" title="Dupliquer" aria-label="Dupliquer ${p.name}">${getIcon("copy", "w-3.5 h-3.5")}</button>
+          <button type="button" onclick="window.app.deleteProject('${p.id}')" class="is-icon is-danger" title="Supprimer" aria-label="Supprimer ${p.name}">${getIcon("trash", "w-3.5 h-3.5")}</button>
         </div>
       </article>`;
   }).join('');
 
   return `
-    <div class="artist-dashboard studio-dashboard">
-      <nav class="studio-nav">
-        <div class="studio-nav-inner">
-          <button type="button" class="studio-brand" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Retour en haut">
-            <span class="studio-brand-mark">A</span>
-            <span class="studio-brand-copy"><b>ARTISITE PROSPECTOR</b><small>direction studio · v${APP_VERSION}</small></span>
-          </button>
-          <div class="studio-nav-tools">
-            <label class="studio-search">${getIcon("search", "w-4 h-4")}<input type="text" id="project-search" oninput="window.app.filterProjects(this.value)" placeholder="Rechercher un projet"></label>
-            <button type="button" id="theme-mode-toggle-btn" aria-pressed="${state.themeMode === 'dark'}" onclick="window.app.toggleThemeMode()" class="studio-icon-button" aria-label="Basculer le thème">${state.themeMode === 'dark' ? getIcon("sun", "w-4 h-4") : getIcon("moon", "w-4 h-4")}</button>
-            <button type="button" onclick="window.app.openVitrineDemo()" class="studio-link-button">Voir la vitrine ${getIcon("externalLink", "w-4 h-4")}</button>
-            <button type="button" onclick="window.app.openWizard()" class="studio-primary-button">${getIcon("plus", "w-4 h-4")} Nouveau prospect</button>
-          </div>
-        </div>
-      </nav>
+    <div class="dashboard-v3-shell app-dashboard-shell selection:bg-zinc-900 selection:text-white">
+      <aside class="dashboard-v3-rail" aria-label="Navigation principale">
+        <div class="dashboard-v3-monogram">A</div>
+        <button type="button" class="dashboard-v3-rail-item is-active" aria-label="Projets">${getIcon("layers", "w-5 h-5")}<span>Projets</span></button>
+        <button type="button" class="dashboard-v3-rail-item" onclick="window.app.openWizard()" aria-label="Nouveau prospect">${getIcon("plus", "w-5 h-5")}<span>Nouveau</span></button>
+        <button type="button" class="dashboard-v3-rail-item" onclick="window.app.openVitrineDemo()" aria-label="Voir la vitrine">${getIcon("eye", "w-5 h-5")}<span>Vitrine</span></button>
+        <div class="dashboard-v3-rail-space"></div>
+        <button type="button" class="dashboard-v3-rail-item" onclick="window.app.toggleThemeMode()" aria-label="Changer l'ambiance">${getIcon(state.themeMode === 'dark' ? 'sun' : 'moon', "w-5 h-5")}<span>Thème</span></button>
+      </aside>
 
-      <main class="studio-main">
-        <section class="studio-hero" onpointermove="const r=this.getBoundingClientRect();this.style.setProperty('--mx',event.clientX-r.left+'px');this.style.setProperty('--my',event.clientY-r.top+'px')">
-          <div class="studio-hero-atmosphere" aria-hidden="true"><i></i><i></i><i></i></div>
-          <div class="studio-hero-grid">
-            <div class="studio-hero-copy">
-              <p class="studio-eyebrow"><span>01</span> Direction commerciale</p>
+      <div class="dashboard-v3-page">
+        <header class="dashboard-v3-header dashboard-topbar">
+          <div class="dashboard-v3-brand">
+            <span>ARTISITE PROSPECTOR</span>
+            <b>v${APP_VERSION}</b>
+            <small>Direction studio</small>
+          </div>
+          <div class="dashboard-v3-header-actions">
+            <label class="dashboard-v3-search">
+              ${getIcon("search", "w-4 h-4")}
+              <input type="text" id="project-search" oninput="window.app.filterProjects(this.value)" placeholder="Rechercher un projet" aria-label="Rechercher un projet">
+            </label>
+            <button type="button" onclick="window.app.openVitrineDemo()" class="dashboard-v3-secondary">${getIcon("eye", "w-4 h-4")}<span>Voir la vitrine</span></button>
+            <button type="button" onclick="window.app.openWizard()" class="dashboard-v3-new">${getIcon("plus", "w-4 h-4")}<span>Nouveau prospect</span></button>
+          </div>
+        </header>
+
+        <main class="dashboard-v3-main">
+          <section class="dashboard-v3-command">
+            <div class="dashboard-v3-composer-zone">
+              <div class="dashboard-v3-chapter"><span>01</span><i></i><b>Direction commerciale</b></div>
               <h1>Un prospect.<br><em>Une direction.</em><br>Un site prêt à vendre.</h1>
-              <p class="studio-lede">Passez d’un nom et d’une ville à une direction de site complète. L’outil compose la base ; vous gardez la décision.</p>
+              <p>Passez d’un nom et d’une ville à une direction de site complète. L’outil compose la base ; vous gardez la décision.</p>
+
+              <form id="quick-gen-form" onsubmit="event.preventDefault(); window.app.handleQuickGenerate(event);" class="quick-gen-bar dashboard-v3-composer">
+                <label class="dashboard-v3-field dashboard-v3-field-name">
+                  <span>Entreprise</span>
+                  <div>${getIcon("edit", "w-4 h-4")}<input type="text" id="quick-gen-name" required aria-label="Raison sociale" placeholder="Atelier Morel"></div>
+                </label>
+                <label class="dashboard-v3-field">
+                  <span>Métier</span>
+                  <div>${getIcon("briefcase", "w-4 h-4")}<select id="quick-gen-trade" aria-label="Métier">
+                    <option value="paysagiste">Paysagiste / Jardinier</option>
+                    <option value="peintre" selected>Peintre en bâtiment</option>
+                    <option value="plombier">Plombier Chauffagiste</option>
+                    <option value="menuisier">Menuisier / Ébéniste</option>
+                    <option value="electricien">Électricien</option>
+                    <option value="couvreur">Couvreur / Zingueur</option>
+                    <option value="macon">Maçon / Rénovation</option>
+                    <option value="restaurateur">Restaurant / Bistro</option>
+                    <option value="coiffeur">Salon de Coiffure</option>
+                  </select></div>
+                </label>
+                <label class="dashboard-v3-field">
+                  <span>Ville</span>
+                  <div>${getIcon("mapPin", "w-4 h-4")}<input type="text" id="quick-gen-city" required aria-label="Ville" placeholder="Paris" value="Paris"></div>
+                </label>
+                <button type="submit" class="dashboard-v3-generate"><span>Créer la direction</span>${getIcon("arrowRight", "w-4 h-4")}</button>
+              </form>
+
+              <div class="dashboard-v3-presets">
+                <span>Raccourcis</span>
+                <button type="button" onclick="window.app.fillQuickGen('Atelier Peinture Parisienne', 'peintre', 'Paris')">Atelier peinture · Paris</button>
+                <button type="button" onclick="window.app.fillQuickGen('Esprit Nature', 'paysagiste', 'Montauban')">Esprit Nature · Montauban</button>
+                <button type="button" onclick="window.app.fillQuickGen('AquaPro Dépannage', 'plombier', 'Toulouse')">AquaPro · Toulouse</button>
+                <button type="button" onclick="window.app.fillQuickGen('Atelier Dubreuil', 'menuisier', 'Bordeaux')">Dubreuil · Bordeaux</button>
+                <button type="button" onclick="window.app.fillQuickGen('VoltService 24/7', 'electricien', 'Lyon')">VoltService · Lyon</button>
+              </div>
             </div>
 
-            <aside class="studio-instrument" aria-label="Vue d’ensemble du pipeline">
-              <div class="instrument-head"><span>Pipeline vivant</span><span>${String(total).padStart(2,'0')} projets</span></div>
-              <div class="instrument-gauge" style="--conversion:${conversionRate}%"><div><strong>${conversionRate}%</strong><span>conversion</span></div></div>
-              <div class="instrument-lines">
-                <div><span>En mouvement</span><b>${contacted}</b></div>
-                <div><span>Signés</span><b>${won}</b></div>
-                <div><span>Pipeline de vente</span><b>${valuedProjects.length ? `${potentialRevenue.toLocaleString('fr-FR')} €` : 'Non renseigné'}</b></div>
+            <aside class="dashboard-v3-pipeline">
+              <div class="dashboard-v3-pipeline-head"><span>Pipeline de vente</span><small>${String(total).padStart(2, '0')} projets</small></div>
+              <div class="dashboard-v3-conversion" style="--conversion:${conversionRate * 3.6}deg">
+                <div><strong>${conversionRate}%</strong><span>conversion</span></div>
               </div>
-              <span class="instrument-rate">Taux ${conversionRate}% · ${valuedProjects.length}/${total} renseignés</span>
+              <dl>
+                <div><dt>En mouvement</dt><dd>${contacted}</dd></div>
+                <div><dt>Prêts à contacter</dt><dd>${ready}</dd></div>
+                <div><dt>Signés</dt><dd>${won}</dd></div>
+                <div><dt>Potentiel</dt><dd>${valuedProjects.length ? `${potentialRevenue.toLocaleString('fr-FR')} €` : 'Non renseigné'}</dd></div>
+              </dl>
+              <span class="dashboard-v3-pipeline-rate">Taux ${conversionRate}% · ${valuedProjects.length}/${total} renseignés</span>
             </aside>
-          </div>
+          </section>
 
-          <div class="studio-composer">
-            <div class="composer-label"><span>02</span><div><b>Décrire le prochain prospect</b><small>Nom, métier, ville. Le reste devient une direction.</small></div></div>
-            <form id="quick-gen-form" onsubmit="event.preventDefault(); window.app.handleQuickGenerate(event);" class="quick-gen-bar studio-commandbar">
-              <label class="studio-field studio-field--name">${getIcon("edit", "w-4 h-4")}<span><small>Entreprise</small><input type="text" id="quick-gen-name" aria-label="Nom de l’entreprise" maxlength="120" required placeholder="Atelier Morel"></span></label>
-              <label class="studio-field">${getIcon("briefcase", "w-4 h-4")}<span><small>Métier</small><select id="quick-gen-trade" aria-label="Métier"><option value="paysagiste">Paysagiste / Jardinier</option><option value="peintre" selected>Peintre en bâtiment</option><option value="plombier">Plombier chauffagiste</option><option value="menuisier">Menuisier / Ébéniste</option><option value="electricien">Électricien</option><option value="couvreur">Couvreur / Zingueur</option><option value="macon">Maçon / Rénovation</option><option value="restaurateur">Restaurant / Bistro</option><option value="coiffeur">Salon de coiffure</option></select></span></label>
-              <label class="studio-field studio-field--city">${getIcon("mapPin", "w-4 h-4")}<span><small>Ville</small><input type="text" id="quick-gen-city" aria-label="Ville" maxlength="120" required value="Paris" placeholder="Paris"></span></label>
-              <div class="quick-gen-field-btn"><button type="submit" class="studio-generate-button"><span>Créer la direction</span>${getIcon("externalLink", "w-4 h-4")}</button></div>
-            </form>
-            <div class="studio-presets"><span>Raccourcis</span><button type="button" onclick="window.app.fillQuickGen('Atelier Peinture Parisienne','peintre','Paris')">Atelier peinture · Paris</button><button type="button" onclick="window.app.fillQuickGen('Esprit Nature','paysagiste','Montauban')">Esprit Nature · Montauban</button><button type="button" onclick="window.app.fillQuickGen('AquaPro Dépannage','plombier','Toulouse')">AquaPro · Toulouse</button><button type="button" onclick="window.app.fillQuickGen('Atelier Dubreuil','menuisier','Bordeaux')">Dubreuil · Bordeaux</button><button type="button" onclick="window.app.fillQuickGen('VoltService 24/7','electricien','Lyon')">VoltService · Lyon</button></div>
-          </div>
-        </section>
+          <section class="dashboard-v3-library">
+            <div class="dashboard-v3-library-head">
+              <div>
+                <div class="dashboard-v3-chapter"><span>02</span><i></i><b>Directions actives</b></div>
+                <h2>Vos projets, comme une<br>bibliothèque de directions.</h2>
+              </div>
+              <div class="dashboard-v3-library-tools">
+                <span>${total} direction${total > 1 ? 's' : ''}</span>
+                <button type="button" onclick="window.app.openWizard()">${getIcon("plus", "w-4 h-4")} Ajouter</button>
+              </div>
+            </div>
 
-        <section class="studio-library">
-          <header class="studio-library-head">
-            <div><p class="studio-eyebrow studio-eyebrow--dark"><span>03</span> Directions actives</p><h2>Vos projets, comme une bibliothèque de mondes.</h2></div>
-            <div class="library-side"><p>${total} direction${total === 1 ? '' : 's'} · ${won} signée${won === 1 ? '' : 's'}</p><button type="button" onclick="window.app.openCloserModal()">${getIcon("phone", "w-4 h-4")} Script de closing</button></div>
-          </header>
-
-          <div id="projects-grid" class="studio-project-grid">
-            ${projectCardsHTML || `<div class="studio-empty"><span>01</span><h3>La bibliothèque est vide.</h3><p>Créez une première direction depuis le générateur ci-dessus.</p><button type="button" onclick="window.app.openWizard()">Nouveau prospect ${getIcon("externalLink", "w-4 h-4")}</button></div>`}
-          </div>
-        </section>
-      </main>
-    </div>`;
+            <div id="projects-grid" class="dashboard-v3-project-list">
+              ${projectCardsHTML || `
+                <div class="dashboard-v3-empty">
+                  <span>01</span><h3>Aucune direction encore.</h3><p>Créez votre premier prospect avec le composeur ci-dessus.</p>
+                  <button type="button" onclick="window.app.openWizard()">Créer un prospect</button>
+                </div>`}
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+  `;
 }

@@ -101,268 +101,133 @@ export function renderEditor(state) {
   const inspectorHTML = renderInspector(selectedSec, project, state);
 
   return `
-    <div class="studio-system studio-editor h-screen flex flex-col text-zinc-900 overflow-hidden select-none">
+    <div class="studio-system studio-editor studio-v3-editor h-screen flex flex-col text-zinc-900 overflow-hidden select-none">
 
-      <!-- TOP NAVIGATION BAR (PC-Optimized with 1-Click Modes & Mechanical Keycaps) -->
-      <header class="studio-editor-header h-16 px-4 sm:px-6 flex items-center justify-between z-40 flex-shrink-0 pc-header">
-
-        <!-- Left: Back Button & Project Identification + Interactive Breadcrumb -->
-        <div class="flex items-center gap-3.5">
-          <button type="button" onclick="window.app.openDashboard()" class="btn-keycap btn-keycap-light inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-700 px-3 py-2 rounded-lg border border-zinc-200">
-            ${getIcon("arrowLeft", "w-3.5 h-3.5")}
-            <span>Projets</span>
+      <!-- STUDIO V3: compact project bar; canvas controls move into the workspace -->
+      <header class="studio-v3-topbar">
+        <div class="studio-v3-projectbar">
+          <button type="button" onclick="window.app.openDashboard()" class="studio-v3-iconbtn" title="Retour aux projets" aria-label="Retour aux projets">
+            ${getIcon("arrowLeft", "w-4 h-4")}
           </button>
-          <button type="button" class="studio-mobile-sections-toggle" aria-expanded="false" onclick="const p=document.querySelector('.studio-panel-left');const open=p?.classList.toggle('studio-mobile-open');this.setAttribute('aria-expanded',open?'true':'false')">
-            ${getIcon("layers", "w-3.5 h-3.5")}<span>Sections</span>
-          </button>
-
-          <div class="h-5 w-[1px] bg-zinc-200 hidden sm:block"></div>
-
-          <!-- Interactive Breadcrumb Navigation -->
-          <nav aria-label="Fil d'Ariane de navigation" class="flex items-center gap-2 text-xs">
-            <button type="button" onclick="window.app.scrollToSection('${project.sections[0]?.id || ''}')" class="font-bold text-sm text-zinc-900 truncate max-w-[140px] sm:max-w-[180px] hover:text-emerald-700 transition-colors" id="editor-title-display" title="Défiler tout en haut">
-              ${project.name}
-            </button>
-            <span class="text-zinc-300 font-bold hidden sm:inline">/</span>
-            <div class="relative inline-flex items-center">
-              <select onchange="window.app.handleSectionNavigation(this.value, event)" 
-                      class="bg-zinc-100 hover:bg-zinc-200 border border-zinc-200 text-zinc-800 text-[11px] font-semibold rounded-lg px-2.5 py-1 pr-6 cursor-pointer appearance-none transition-colors max-w-[160px] sm:max-w-[200px] truncate"
-                      title="Changer de section et défiler directement">
-                ${project.sections.map((s) => `
-                  <option value="${s.id}" ${s.id === selectedSecId ? 'selected' : ''}>
-                    ${getSectionFriendlyTitle(s)}
-                  </option>
-                `).join('')}
-              </select>
-              <div class="pointer-events-none absolute right-2 text-zinc-500 text-[10px]">▼</div>
+          <div class="studio-v3-projectmark">A</div>
+          <div class="studio-v3-projectcopy">
+            <button type="button" onclick="window.app.scrollToSection('${project.sections[0]?.id || ''}')" id="editor-title-display" class="studio-v3-projectname">${project.name}</button>
+            <div class="studio-v3-projectmeta">
+              <span>${project.business.tradeLabel}</span>
+              <span class="studio-v3-dot"></span>
+              <span>${project.business.city || 'France'}</span>
+              <span class="studio-v3-save"><i></i><span id="save-status-text">Enregistré</span></span>
             </div>
-            <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-700 border border-zinc-200 hidden lg:inline">
-              ${project.business.tradeLabel}
-            </span>
-            <div class="hidden xl:flex items-center gap-1 text-[11px] text-zinc-400 pl-1">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-              <span id="save-status-text">Enregistré</span>
-            </div>
-          </nav>
-        </div>
-
-        <!-- Middle: 1-Click Conception / Preview Switcher + Device Viewport -->
-        <div class="flex items-center gap-2.5 sm:gap-3.5">
-
-          <!-- Mode Switcher: 🛠️ Conception vs 👁️ Vue Client Démo -->
-          <div class="flex items-center bg-zinc-100 rounded-xl p-1 border border-zinc-200 shadow-2xs">
-            <button type="button" aria-pressed="${!isLivePreview}" onclick="window.app.setEditorMode('conception')" class="btn-keycap ${!isLivePreview ? 'btn-keycap-dark' : 'btn-keycap-light'} px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5">
-              ${getIcon("edit", "w-3.5 h-3.5")}
-              <span class="hidden sm:inline">Mode Conception</span>
-              <span class="sm:hidden">Éditer</span>
-            </button>
-            <button type="button" aria-pressed="${isLivePreview}" onclick="window.app.setEditorMode('preview')" class="btn-keycap ${isLivePreview ? 'btn-keycap-dark' : 'btn-keycap-light'} px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 ml-1" title="Voir exactement le rendu final sans barres d'outils">
-              ${getIcon("eye", "w-3.5 h-3.5")}
-              <span class="hidden sm:inline">Vue Client Démo</span>
-              <span class="sm:hidden">Client</span>
-            </button>
-          </div>
-
-          <!-- Undo / Redo -->
-          <div class="hidden sm:flex items-center bg-zinc-100 rounded-lg p-0.5 border border-zinc-200">
-            <button type="button" id="btn-undo-header" onclick="window.app.undo()" class="btn-keycap btn-keycap-light p-1.5 text-zinc-700 rounded-md ${!state.canUndo() ? 'opacity-30 cursor-not-allowed' : ''}" title="Annuler (⌘Z)">
-              ${getIcon("undo", "w-3.5 h-3.5")}
-            </button>
-            <button type="button" id="btn-redo-header" onclick="window.app.redo()" class="btn-keycap btn-keycap-light p-1.5 text-zinc-700 rounded-md ${!state.canRedo() ? 'opacity-30 cursor-not-allowed' : ''}" title="Rétablir (⌘⇧Z)">
-              ${getIcon("redo", "w-3.5 h-3.5")}
-            </button>
-          </div>
-
-          <!-- Device Switcher Segmented Control -->
-          <div class="viewport-switcher flex items-center bg-zinc-100 rounded-lg p-1 border border-zinc-200" aria-label="Prévisualisation par appareil">
-            <button type="button" onclick="window.app.setViewport('desktop')" class="viewport-option p-2 rounded-md transition-all ${state.viewport === 'desktop' ? 'is-active' : ''}" title="Desktop (100%)" aria-label="Prévisualiser sur ordinateur">
-              ${getIcon("monitor", "w-3.5 h-3.5")}
-              <span class="viewport-label">Ordinateur</span>
-            </button>
-            <button type="button" onclick="window.app.setViewport('tablet')" class="viewport-option p-2 rounded-md transition-all ${state.viewport === 'tablet' ? 'is-active' : ''}" title="Tablette (768px)" aria-label="Prévisualiser sur tablette">
-              ${getIcon("tablet", "w-3.5 h-3.5")}
-              <span class="viewport-label">Tablette</span>
-            </button>
-            <button type="button" onclick="window.app.setViewport('mobile')" class="viewport-option p-2 rounded-md transition-all ${state.viewport === 'mobile' ? 'is-active' : ''}" title="Mobile (390px)" aria-label="Prévisualiser sur mobile">
-              ${getIcon("smartphone", "w-3.5 h-3.5")}
-              <span class="viewport-label">Mobile</span>
-            </button>
           </div>
         </div>
 
-        <!-- Right: Theme Mode Toggle, Tools & Exporter -->
-        <div class="flex items-center gap-2">
-
-          <!-- True Dark / Light Mode Switcher -->
-          <button type="button" id="theme-mode-toggle-btn" onclick="window.app.toggleThemeMode()" class="btn-keycap btn-keycap-light px-3 py-2 rounded-lg text-xs font-bold text-zinc-800 border border-zinc-200 flex items-center gap-1.5" title="Changer l'ambiance de l'éditeur" aria-label="Changer l'ambiance de l'éditeur">
-            ${getIcon(state.themeMode === 'dark' ? 'sun' : 'moon', 'w-4 h-4')}
-            <span class="theme-control-label">${state.themeMode === 'dark' ? 'Éditeur clair' : 'Éditeur sombre'}</span>
+        <div class="studio-v3-topactions">
+          <div class="studio-v3-history" aria-label="Historique">
+            <button type="button" id="btn-undo-header" onclick="window.app.undo()" class="studio-v3-iconbtn ${!state.canUndo() ? 'is-disabled' : ''}" title="Annuler (⌘Z)">${getIcon("undo", "w-4 h-4")}</button>
+            <button type="button" id="btn-redo-header" onclick="window.app.redo()" class="studio-v3-iconbtn ${!state.canRedo() ? 'is-disabled' : ''}" title="Rétablir (⌘⇧Z)">${getIcon("redo", "w-4 h-4")}</button>
+          </div>
+          <button type="button" onclick="window.app.openCommandPalette()" class="studio-v3-action" title="Palette de commande (⌘K)">
+            ${getIcon("search", "w-4 h-4")}<span>Rechercher</span><kbd>⌘K</kbd>
           </button>
-
-          <!-- Direct Fullscreen Vitrine Link Button -->
-          <button type="button" onclick="window.app.openVitrineDemo()" class="btn-keycap bg-emerald-600 hover:bg-emerald-700 text-white inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold shadow-xs" title="Ouvrir la vitrine Sendpage sans aucun éditeur">
-            ${getIcon("eye", "w-3.5 h-3.5")}
-            <span>Voir Vitrine</span>
-          </button>
-
-
-          <!-- Command Palette (⌘K) -->
-          <button type="button" onclick="window.app.openCommandPalette()" class="btn-keycap btn-keycap-light inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-zinc-700 border border-zinc-200" title="Palette de commande (⌘K)">
-            ${getIcon("search", "w-3.5 h-3.5 text-zinc-500")}
-            <kbd class="hidden xl:inline text-[10px] font-mono px-1 py-0.2 bg-white rounded border border-zinc-200 text-zinc-500">⌘K</kbd>
-          </button>
-
-          <!-- Share Demo with QR -->
-          <button type="button" onclick="window.app.openShareModal()" class="btn-keycap btn-keycap-light inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-700 border border-zinc-200" title="Partager démo client avec QR Code">
-            ${getIcon("share", "w-3.5 h-3.5 text-zinc-600")}
-            <span class="hidden xl:inline">Partager (QR)</span>
-          </button>
-
-          <button type="button" onclick="window.app.openCloserModal('${project.id}')" class="btn-keycap btn-keycap-light inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-700 border border-zinc-200" title="Ouvrir le kit commercial">
-            ${getIcon("briefcase", "w-3.5 h-3.5 text-amber-500")}
-            <span class="hidden md:inline">Kit Closer</span>
-          </button>
-
-          <!-- Export Dropdown with Tactile Keycap -->
+          <button type="button" onclick="window.app.openShareModal()" class="studio-v3-iconbtn" title="Partager la démo">${getIcon("share", "w-4 h-4")}</button>
+          <button type="button" onclick="window.app.openVitrineDemo()" class="studio-v3-previewbtn">${getIcon("eye", "w-4 h-4")}<span>Voir le site</span></button>
           <div class="relative">
-            <button type="button" id="export-menu-button" aria-expanded="false" aria-controls="export-menu" aria-haspopup="menu" onclick="window.app.toggleExportMenu()" class="btn-keycap btn-keycap-accent inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold shadow-xs" title="Exporter le site vitrine">
-              ${getIcon("download", "w-3.5 h-3.5")}
-              <span>Exporter</span>
-              ${getIcon("chevronDown", "w-3 h-3 text-white/80")}
+            <button type="button" id="export-menu-button" aria-expanded="false" aria-controls="export-menu" aria-haspopup="menu" onclick="window.app.toggleExportMenu()" class="studio-v3-publishbtn">
+              ${getIcon("download", "w-4 h-4")}<span>Exporter</span>${getIcon("chevronDown", "w-3 h-3")}
             </button>
-            <div id="export-menu" data-open="false" role="menu" class="export-menu absolute right-0 top-full mt-1.5 w-64 bg-white rounded-xl shadow-xl border border-zinc-200 p-2 text-xs text-zinc-700 hidden z-50 animate-fade-in">
-              <button type="button" onclick="window.app.exportHTML()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-zinc-50 flex items-center gap-2.5 transition-colors">
-                ${getIcon("code", "w-4 h-4 text-zinc-700")}
-                <div>
-                  <div class="font-semibold text-zinc-900">Site Web Autonome (.HTML)</div>
-                  <div class="text-[10px] text-zinc-400">Prêt pour hébergement ou envoi direct</div>
-                </div>
-              </button>
-              <button type="button" onclick="window.app.exportJSON()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-zinc-50 flex items-center gap-2.5 transition-colors">
-                ${getIcon("fileJson", "w-4 h-4 text-zinc-700")}
-                <div>
-                  <div class="font-semibold text-zinc-900">Données Projet (.JSON)</div>
-                  <div class="text-[10px] text-zinc-400">Sauvegarde et structure complète</div>
-                </div>
-              </button>
-              <button type="button" onclick="window.app.printCommercialProposal()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-zinc-50 flex items-center gap-2.5 transition-colors">
-                ${getIcon("printer", "w-4 h-4 text-zinc-700")}
-                <div>
-                  <div class="font-semibold text-zinc-900">Fiche Devis Commercial (PDF)</div>
-                  <div class="text-[10px] text-zinc-400">Document imprimable pour le prospect</div>
-                </div>
-              </button>
+            <div id="export-menu" data-open="false" role="menu" class="export-menu studio-v3-exportmenu hidden">
+              <button type="button" onclick="window.app.exportHTML()">${getIcon("code", "w-4 h-4")}<span><b>Site autonome</b><small>HTML prêt à héberger</small></span></button>
+              <button type="button" onclick="window.app.exportJSON()">${getIcon("fileJson", "w-4 h-4")}<span><b>Données projet</b><small>Sauvegarde JSON</small></span></button>
+              <button type="button" onclick="window.app.printCommercialProposal()">${getIcon("printer", "w-4 h-4")}<span><b>Proposition</b><small>Version imprimable</small></span></button>
             </div>
           </div>
         </div>
-
       </header>
 
-      <!-- MAIN WORKSPACE: SIDEBAR + CANVAS + INSPECTOR -->
-      <div class="studio-editor-workspace flex-1 flex overflow-hidden editor-workspace-layout min-h-0">
+      <!-- STUDIO V3 WORKSPACE: rail + structure + canvas + inspector -->
+      <div class="studio-v3-workspace editor-workspace-layout">
+        ${!isLivePreview ? `
+        <nav class="studio-v3-rail" aria-label="Outils du studio">
+          <button type="button" class="studio-v3-railbtn ${state.activeSidebarTab !== 'settings' ? 'is-active' : ''}" onclick="window.app.setSidebarTab('sections'); requestAnimationFrame(() => document.querySelector('.studio-v3-structure-panel')?.classList.add('is-mobile-open'))" title="Structure">
+            ${getIcon("layers", "w-5 h-5")}<span>Structure</span>
+          </button>
+          <button type="button" class="studio-v3-railbtn ${state.activeSidebarTab === 'settings' ? 'is-active' : ''}" onclick="window.app.setSidebarTab('settings'); requestAnimationFrame(() => document.querySelector('.studio-v3-structure-panel')?.classList.add('is-mobile-open'))" title="Réglages globaux">
+            ${getIcon("sliders", "w-5 h-5")}<span>Réglages</span>
+          </button>
+          <button type="button" class="studio-v3-railbtn" onclick="window.app.openAddSectionModal('sections')" title="Ajouter une section">
+            ${getIcon("plus", "w-5 h-5")}<span>Ajouter</span>
+          </button>
+          <div class="studio-v3-railspacer"></div>
+          <button type="button" class="studio-v3-railbtn studio-v3-ai" onclick="window.app.toggleCopilotPanel(true)" title="Assistant Studio">
+            ${getIcon("sparkles", "w-5 h-5")}<span>Assistant</span>
+          </button>
+        </nav>
 
-        <!-- LEFT SIDEBAR: SEGMENTED PILL TABS [SECTIONS] / [PARAMÈTRES] -->
-        <aside class="studio-panel studio-panel-left w-84 xl:w-96 flex flex-col flex-shrink-0 z-20 overflow-hidden pc-sidebar ${isLivePreview ? 'hidden' : ''}">
-
-          <!-- Segmented Pill-Tabs (Sendpage / Linear style) -->
-          <div class="p-3 border-b border-zinc-200/80">
-            <div class="pill-tabs-container">
-              <button type="button" id="tab-btn-sections" onclick="window.app.setSidebarTab('sections')" class="pill-tab-btn ${state.activeSidebarTab !== 'settings' ? 'is-active' : ''}">
-                ${getIcon("layers", "w-3.5 h-3.5")}
-                <span>Sections</span>
-              </button>
-              <button type="button" id="tab-btn-settings" onclick="window.app.setSidebarTab('settings')" class="pill-tab-btn ${state.activeSidebarTab === 'settings' ? 'is-active' : ''}">
-                ${getIcon("settings", "w-3.5 h-3.5")}
-                <span>Paramètres</span>
-              </button>
+        <aside class="studio-v3-structure-panel">
+          <div class="studio-v3-panelhead">
+            <div>
+              <span class="studio-v3-eyebrow">${state.activeSidebarTab === 'settings' ? 'Projet' : 'Architecture'}</span>
+              <h2>${state.activeSidebarTab === 'settings' ? 'Réglages du site' : 'Structure du site'}</h2>
             </div>
+            <button type="button" class="studio-v3-mobile-close" onclick="this.closest('.studio-v3-structure-panel')?.classList.remove('is-mobile-open')" aria-label="Fermer">${getIcon("x", "w-4 h-4")}</button>
           </div>
 
-          <!-- TAB 1: SECTIONS MANAGER (COMPACT CARDS + DISCRETE GRIP + EYE TOGGLE + INSTANT ACCORDION) -->
-          <div id="sidebar-tab-sections" class="flex-1 overflow-y-auto p-3 space-y-2 ${state.activeSidebarTab === 'settings' ? 'hidden' : ''}">
-
-            <div class="flex items-center justify-between pb-1.5 px-0.5">
-              <span class="text-[11px] font-medium uppercase tracking-wider text-zinc-400">
-                ${project.sections.filter(s => s.visibility !== false).length}/${project.sections.length} sections actives
-              </span>
-              <button type="button" onclick="window.app.openAddSectionModal()" class="inline-flex items-center gap-1 text-[11px] font-medium text-zinc-700 hover:text-zinc-900 bg-zinc-100 hover:bg-zinc-200 px-2.5 py-1 rounded-md border border-zinc-200 transition-colors">
-                ${getIcon("plus", "w-3 h-3")}
-                <span>Ajouter</span>
-              </button>
+          ${state.activeSidebarTab === 'settings' ? `
+            <div class="studio-v3-panelbody studio-v3-settings-body">${renderSettingsAccordions(project, state)}</div>
+          ` : `
+            <div class="studio-v3-structure-summary">
+              <span>${project.sections.filter(s => s.visibility !== false).length} visibles</span>
+              <span>${project.sections.length} sections</span>
+              <button type="button" onclick="window.app.openAddSectionModal('sections')">${getIcon("plus", "w-3.5 h-3.5")} Ajouter</button>
             </div>
-
-            <!-- List of Compact Section Cards (Sendpage Benchmark Fidelity) -->
-            <div class="space-y-1.5" id="editor-sections-list">
-              ${project.sections.map((s) => {
+            <div class="studio-v3-sectionlist" id="editor-sections-list">
+              ${project.sections.map((s, index) => {
                 const isSel = s.id === state.selectedSectionId;
                 const isVis = s.visibility !== false;
-                const isOpen = isSel;
-                const friendlyTitle = getSectionFriendlyTitle(s);
-                const secDef = SECTION_DEFINITIONS.find(d => d.type === s.type);
-                const variants = secDef?.variants || [];
                 const isStructural = ["header", "hero", "cta", "footer"].includes(s.type);
-
                 return `
-                  <div class="section-card ${isStructural ? 'bg-zinc-100/70 border border-zinc-200/60 rounded-xl' : 'bg-white border border-zinc-200/80 rounded-xl'} ${isSel ? 'is-selected ring-1 ring-zinc-900/10' : ''} ${!isVis ? 'is-hidden opacity-50' : ''}"
-                       data-sec-id="${s.id}">
-
-                    <!-- Compact Header with Smooth Scroll to Canvas Section -->
-                    <div class="section-card-header px-3 py-2.5 flex items-center justify-between cursor-pointer select-none" role="button" tabindex="0" aria-controls="accordion-${s.id}" aria-expanded="${isOpen}" onclick="window.app.handleSectionNavigation('${s.id}', event)" onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); window.app.handleSectionNavigation('${s.id}', event); }">
-                      <div class="flex items-center gap-2.5 min-w-0 flex-1">
-                        ${isStructural ? '' : `
-                          <button type="button" class="section-card-grip cursor-grab active:cursor-grabbing p-0.5 rounded flex-shrink-0" draggable="true" data-sec-id="${s.id}" aria-label="Glisser pour réorganiser ${escapeHtml(friendlyTitle)}" title="Glisser pour réorganiser" onclick="event.stopPropagation()" onkeydown="if(event.key === 'ArrowUp' || event.key === 'ArrowDown') { event.preventDefault(); event.stopPropagation(); window.app.moveSection('${s.id}', event.key === 'ArrowUp' ? 'up' : 'down'); }">
-                            ${getIcon("gripVertical", "w-3.5 h-3.5")}
-                          </button>
-                        `}
-                        <span class="text-zinc-400 flex-shrink-0">
-                          ${getIcon(getSectionIcon(s.type), "w-4 h-4")}
-                        </span>
-                        <span class="text-xs ${isStructural ? 'font-semibold text-zinc-800' : 'font-medium text-zinc-800'} truncate">${friendlyTitle}</span>
-                      </div>
-
-                      <div class="flex items-center gap-1.5 flex-shrink-0">
-                        ${isStructural ? '' : `
-                          <button type="button"
-                                  onclick="event.stopPropagation(); window.app.toggleSectionVisibility('${s.id}')"
-                                  class="p-1 text-zinc-400 hover:text-zinc-700 transition-colors"
-                                  title="${isVis ? 'Masquer la section' : 'Afficher la section'}">
-                            ${getIcon(isVis ? "eye" : "eyeOff", "w-3.5 h-3.5")}
-                          </button>
-                        `}
-                        <button type="button"
-                                onclick="event.stopPropagation(); window.app.handleSectionNavigation('${s.id}', event)"
-                                class="accordion-chevron p-1 text-zinc-400 hover:text-zinc-700 transition-transform ${isOpen ? 'rotate-180' : ''}"
-                                title="${isOpen ? 'Fermer l\'accordéon' : 'Ouvrir l\'accordéon'}">
-                          ${getIcon("chevronDown", "w-3.5 h-3.5")}
-                        </button>
-                      </div>
-                    </div>
-
-                    <!-- Instant Accordion Drawer -->
-                    <div class="section-accordion-body ${isOpen ? '' : 'hidden'}" id="accordion-${s.id}">
-                      ${renderSectionAccordionContent(s, project, variants)}
-                    </div>
-                  </div>
-                `;
+                  <div class="studio-v3-sectionrow ${isSel ? 'is-selected' : ''} ${!isVis ? 'is-hidden' : ''}" data-sec-id="${s.id}">
+                    <span class="studio-v3-order">${String(index + 1).padStart(2, '0')}</span>
+                    ${isStructural ? '<span class="studio-v3-grip is-locked">•</span>' : `<span class="section-card-grip studio-v3-grip" draggable="true" data-sec-id="${s.id}" role="button" tabindex="0" aria-label="Glisser pour réorganiser ${getSectionFriendlyTitle(s)}" title="Réorganiser">${getIcon("gripVertical", "w-3.5 h-3.5")}</span>`}
+                    <button type="button" class="studio-v3-sectionmain" onclick="window.app.handleSectionNavigation('${s.id}', event)">
+                      <span class="studio-v3-sectionicon">${getIcon(getSectionIcon(s.type), "w-4 h-4")}</span>
+                      <span><b>${getSectionFriendlyTitle(s)}</b><small>${s.type}</small></span>
+                    </button>
+                    ${isStructural ? '' : `<button type="button" onclick="event.stopPropagation(); window.app.toggleSectionVisibility('${s.id}')" class="studio-v3-rowaction" title="${isVis ? 'Masquer' : 'Afficher'}">${getIcon(isVis ? "eye" : "eyeOff", "w-3.5 h-3.5")}</button>`}
+                    <button type="button" onclick="window.app.handleSectionNavigation('${s.id}', event)" class="studio-v3-rowarrow" aria-label="Inspecter">${getIcon("chevronRight", "w-3.5 h-3.5")}</button>
+                  </div>`;
               }).join('')}
             </div>
-
-            <!-- Sendpage + Add a section link -->
-            <button type="button" onclick="window.app.openAddSectionModal()" class="w-full mt-3 py-2 px-2 text-xs font-semibold text-[#1877F2] hover:text-blue-700 flex items-center gap-1.5 transition-colors">
-              <span class="text-base font-bold leading-none">+</span>
-              <span>Add a section</span>
-            </button>
-          </div>
-
-          <!-- TAB 2: PARAMÈTRES (MATCHING SENDPAGE SCREENSHOT WITH ACCORDIONS) -->
-          <div id="sidebar-tab-settings" class="flex-1 overflow-y-auto p-3 space-y-2 ${state.activeSidebarTab !== 'settings' ? 'hidden' : ''}">
-            ${renderSettingsAccordions(project, state)}
-          </div>
-
+          `}
+          ${state.activeSidebarTab !== 'settings' ? `
+            <template id="studio-v3-settings-capabilities">${renderSettingsAccordions(project, state)}</template>
+          ` : ''}
+          <template id="studio-v3-section-capabilities">
+            ${project.sections.map((sec) => {
+              const secDef = SECTION_DEFINITIONS.find(d => d.type === sec.type);
+              return renderSectionAccordionContent(sec, project, secDef?.variants || []);
+            }).join('')}
+          </template>
         </aside>
+        ` : ''}
 
         <!-- CENTRAL CANVAS: WEBPAGE PREVIEW / LIVE EDIT WITH CANVA DOCK -->
-        <main id="editor-main-canvas" class="studio-canvas-stage flex-1 overflow-y-auto relative flex flex-col items-center editor-canvas-scroll-host min-h-0 h-full w-full">
+        <main id="editor-main-canvas" class="studio-v3-canvas flex-1 overflow-y-auto relative flex flex-col items-center editor-canvas-scroll-host min-h-0 h-full w-full">
+          <div class="studio-v3-stagebar">
+            <div class="studio-v3-mode-switch" aria-label="Mode d'édition">
+              <button type="button" aria-pressed="${!isLivePreview}" onclick="window.app.setEditorMode('conception')" class="${!isLivePreview ? 'is-active' : ''}">${getIcon("edit", "w-3.5 h-3.5")}<span>Éditer</span></button>
+              <button type="button" aria-pressed="${isLivePreview}" onclick="window.app.setEditorMode('preview')" class="${isLivePreview ? 'is-active' : ''}">${getIcon("eye", "w-3.5 h-3.5")}<span>Aperçu</span></button>
+            </div>
+            <div class="studio-v3-stagecontext">
+              <span>${getIcon(getSectionIcon(selectedSec?.type), "w-3.5 h-3.5")}</span>
+              <b>${getSectionFriendlyTitle(selectedSec)}</b>
+            </div>
+            <div class="studio-v3-device-switch" aria-label="Prévisualisation par appareil">
+              <button type="button" onclick="window.app.setViewport('desktop')" class="${state.viewport === 'desktop' ? 'is-active' : ''}" title="Ordinateur">${getIcon("monitor", "w-4 h-4")}</button>
+              <button type="button" onclick="window.app.setViewport('tablet')" class="${state.viewport === 'tablet' ? 'is-active' : ''}" title="Tablette">${getIcon("tablet", "w-4 h-4")}</button>
+              <button type="button" onclick="window.app.setViewport('mobile')" class="${state.viewport === 'mobile' ? 'is-active' : ''}" title="Mobile">${getIcon("smartphone", "w-4 h-4")}</button>
+            </div>
+          </div>
 
           <!-- In-situ Live Preview Client Floating Pill (Docked at bottom so header and theme toggles remain completely accessible) -->
           ${isLivePreview ? `
@@ -471,10 +336,13 @@ export function renderEditor(state) {
           </div>
         </main>
 
-        <!-- RIGHT INSPECTOR: DETAILED SECTION PROPS (OPTIONAL ON LARGE SCREENS) -->
-        <aside class="studio-panel studio-panel-right w-72 flex-shrink-0 z-20 overflow-y-auto ${isLivePreview ? 'hidden' : 'hidden 2xl:block'}" id="right-inspector-panel">
-          ${inspectorHTML}
+        ${!isLivePreview ? `
+        <aside class="studio-v3-inspector-panel" id="right-inspector-panel">
+          <div class="studio-v3-inspector-shell">
+            ${inspectorHTML}
+          </div>
         </aside>
+        ` : ''}
 
       </div>
 

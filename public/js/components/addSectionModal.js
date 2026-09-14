@@ -503,7 +503,7 @@ export function renderAddSectionModal(project, activeTab = "sections") {
 
   return `
     <div id="add-section-modal" class="studio-system-modal fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 animate-fade-in">
-      <div class="studio-modal-card max-w-4xl lg:max-w-5xl w-full overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="studio-modal-card studio-v3-modal studio-v3-library-modal max-w-4xl lg:max-w-5xl w-full overflow-hidden flex flex-col max-h-[90vh]">
         
         <!-- Header -->
         <div class="px-6 py-4 border-b border-zinc-200 flex items-center justify-between flex-shrink-0 bg-white">

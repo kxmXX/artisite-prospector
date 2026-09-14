@@ -32,7 +32,7 @@ export function renderCloserModal(project) {
 
   return `
     <div id="closer-modal" class="studio-system-modal fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
-      <div class="studio-modal-card max-w-3xl w-full overflow-hidden flex flex-col max-h-[92vh]">
+      <div class="studio-modal-card studio-v3-modal studio-v3-closer max-w-3xl w-full overflow-hidden flex flex-col max-h-[92vh]">
         
         <!-- Header with Live Call Teleprompter Status -->
         <div class="px-6 py-3.5 bg-zinc-950 text-white flex items-center justify-between flex-shrink-0">

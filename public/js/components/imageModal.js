@@ -36,7 +36,7 @@ export function renderImageModal(state) {
 
   return `
     <div id="image-modal" class="studio-system-modal fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
-      <div class="studio-modal-card max-w-xl w-full overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="studio-modal-card studio-v3-modal studio-v3-image max-w-xl w-full overflow-hidden flex flex-col max-h-[90vh]">
 
         <!-- Header -->
         <div class="px-6 py-4 bg-white border-b border-zinc-200 flex items-center justify-between flex-shrink-0">
