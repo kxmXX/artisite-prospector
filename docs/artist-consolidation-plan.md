@@ -47,6 +47,21 @@ Le style touches de clavier est conservé pour les commandes de l'éditeur, pas 
 
 ## Lots, responsabilités et critères de sortie
 
+### Ordre prioritaire révisé — 14 septembre, demande utilisateur
+
+1. Vitrine conforme aux captures : hero5, présentation/services, galerie6, avant/après7,
+   FAQ8. Navigation/devis/contact passent en tête dès qu'ils bloquent le parcours visiteur.
+2. Vitrine desktop/mobile et export (10–11), puis contrôles nécessaires à l'édition (9 et3).
+3. Reprendre les tâches différées : génération photo/audit IA2, faits générés4,
+   partage10, sécurité/performance12 et contre-audit13. Aucun lot abandonné.
+
+Un seul sous-lot à la fois ; pas de nouveaux agents ni d'audit général.
+Terminé partiellement lot5 : couches photo/voile/texte et lisibilité titre/sous-titre corrigées,
+styles communs vitrine/éditeur/export, 9 tests ciblés cumulés. Desktop contrôlé ; mobile390
+reste à confirmer (viewport outil instable). Ni conformité complète ni WCAG globale revendiquées.
+Prochaine action : parcours devis/contact (#simulateur vs #quoteSimulator et cible visible),
+puis présentation/services/galerie/FAQ. Voir la tête courte de codex-execution-state.md.
+
 | Lot | Action | Validation requise | État |
 |---|---|---|---|
 | 1 | Audit, contexte durable, version/changelog honnêtes | Base, captures, architecture et risques tracés | Audit/plan terminés be8600c ; version4.8.0-alpha.1 intégrée non publiée |

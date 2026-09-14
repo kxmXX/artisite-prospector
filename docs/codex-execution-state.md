@@ -1,5 +1,32 @@
 # État de reprise Codex — 14 septembre 2026
 
+## REPRISE COURTE — priorité vitrine (prévaut sur l'historique)
+
+- Demande utilisateur : vitrine fonctionnelle conforme aux captures AVANT le reste.
+  Ordre détaillé révisé dans artist-consolidation-plan.md. Aucun lot supprimé.
+- Dernier sous-lot : hero plein cadre, renderer.js + heroStyles.js commun aux rendus et
+  export, test hero_surface. Photo/voile/texte ont désormais des couches explicites ; titre
+  et sous-titre blancs, dimensions fluides. Aucun projet existant réinitialisé.
+- Cause constatée navigateur : utilitaire -z-10 absent et règles de contraste globales
+  forçant le titre noir. Avant : photo cachant le titre ; après : titre/sous-titre visibles.
+- Tests : renderer + v470 8/8, puis nouveau hero_surface 1/1 ; syntaxe/diff OK.
+  Ces tests de markup ne prouvent pas la fidélité100% malgré le nom d'un ancien test.
+- Navigateur : desktop1280×720 confirmé ; demande viewport390 mais dernière confirmation
+  effective683px (outil redimensionné), donc validation mobile390 complète RESTANTE.
+  Textes calculés blancs confirmés après correction finale ; pas de certification WCAG
+  pour toute image/tout réglage d'overlay. Barre de proposition encombrante encore visible.
+- Serveurs de ce tour :5183 session7591,5184 session3382. Cache ancien constaté sur5183 ;
+  confirmation finale sur127.0.0.1:5184. Pas de push, agents non relancés, alpha inchangée.
+- DIFFÉRÉ, pas oublié : génération photo async, audit IA, faits non vérifiés, partage,
+  sécurité/performance ; conservation des précédents correctifs state/API/cache/async.
+- PROCHAINE ACTION EXACTE : parcours vitrine « Demander un devis » : vérifier #simulateur
+  et #quoteSimulator, disponibilité de la section cible (démo9/16 visibles), action de contact
+  réelle et navigation. Corriger ce blocage avant de poursuivre portrait/services/galerie/FAQ.
+- Économie : lire seulement cette tête et le sous-lot concerné, un lot à la fois,
+  tests ciblés, aucun nouvel audit/agent. Compaction conversation automatique non pilotable.
+
+## Historique conservé — ne pas relire intégralement à chaque reprise
+
 ## État courant — réponses IA tardives protégées
 
 Cette section prévaut sur les états historiques suivants.

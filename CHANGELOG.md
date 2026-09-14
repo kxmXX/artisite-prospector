@@ -9,6 +9,9 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ### Consolidation non publiée — 14 septembre 2026 (4.8.0-alpha.1)
 
+- Vitrine plein cadre : photo, voile et contenu correctement superposés ; titre/sous-titre
+  blancs et composition responsive commune à l'éditeur, l'aperçu et l'export HTML.
+
 - Wizard/assistant : réponses périmées refusées après changement de projet ou modification,
   avec contrôle à l'approbation et maintien d'Undo. 15/15 tests ciblés sans réseau.
 
