@@ -58,6 +58,13 @@ test("paysagiste vitrine keeps its location template wide and bound to editable 
   assert.match(css, /\.lg\\:col-span-6 \{ grid-column: span 6 \/ span 6; \}/);
 });
 
+test("new paysagiste vitrines do not invent a certification", () => {
+  const project = generateSite({ name: "Atelier Test", tradeId: "paysagiste" });
+  const about = project.sections.find(section => section.type === "about");
+  assert.equal(about.content.certified, "");
+  assert.doesNotMatch(renderWebsiteHTML(project), /Artisan certifié/);
+});
+
 test("the demo map visual remains replaceable in the editor", () => {
   const project = generateDemoSite({ name: "Esprit Nature", tradeId: "paysagiste", city: "Montauban" });
   const html = renderWebsiteHTML(project, { isEditor: true });

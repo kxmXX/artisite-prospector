@@ -2,6 +2,12 @@
 
 ## REPRISE COURTE — priorité vitrine (prévaut sur l'historique)
 
+- Lot de fiabilité contenu : une nouvelle vitrine paysagiste ne génère plus la mention
+  non vérifiée « Artisan certifié ». Le champ reste disponible pour un client qui peut
+  fournir cette information. Les projets déjà personnalisés ne sont pas modifiés.
+- Tests ciblés : **20/20** (génération, qualité, vitrine, hero, consolidation) +
+  `git diff --check` réussis. Un test historique qui imposait cette mention a été corrigé.
+
 - Sous-lot responsive desktop : aucune largeur horizontale excédentaire à 1280 px ; les
   grilles services et galerie sont réellement sur trois colonnes, la carte conserve sa
   largeur et les sections restent trouvables. Correction de l'utilitaire `gap-7` manquant :

@@ -203,7 +203,7 @@ test("v4.7.0 Consolidation: 100% Sendpage Benchmark Fidelity for Esprit Nature P
 
   // Screenshot 3: À Propos
   assert.ok(html.includes("À PROPOS"), "About badge");
-  assert.ok(html.includes("Artisan certifié"), "Artisan certifié pill tag");
+  assert.doesNotMatch(html, /Artisan certifié/, "A certification must not be invented for the demo");
   assert.ok(html.includes("Jardinier & Paysagiste"), "Role subtitle");
   assert.ok(html.includes("Benjamin met son savoir-faire"), "Benjamin story text");
   assert.ok(html.includes("Découvrir nos services"), "About secondary link");

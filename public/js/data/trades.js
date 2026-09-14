@@ -47,7 +47,7 @@ export const DEMO_TRADES = [
     ],
     "aboutTitle": "Esprit Nature",
     "aboutBadge": "À PROPOS",
-    "aboutCertified": "Artisan certifié",
+    "aboutCertified": "",
     "aboutRole": "Jardinier & Paysagiste",
     "aboutOwner": "Benjamin",
     "aboutStory": "Vous recherchez un jardinier ou un paysagiste pour entretenir et prendre soin de vos extérieurs ? Vous êtes au bon endroit.\n\nChez Esprit Nature, chaque jardin mérite une attention particulière. Benjamin met son savoir-faire, son expérience et sa passion au service de vos espaces extérieurs.\n\nEntreprise à taille humaine, Esprit Nature privilégie avant tout la proximité, l'écoute et la confiance. Attentif à vos besoins, Benjamin vous accompagne avec sérieux, gentillesse et professionnalisme.\n\nSpécialisée dans l'entretien, la taille et la remise en état des jardins et espaces verts, Benjamin et son équipe interviennent avec soin et efficacité.",

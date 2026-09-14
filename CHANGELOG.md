@@ -9,6 +9,9 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ### Consolidation non publiée — 14 septembre 2026 (4.8.0-alpha.1)
 
+- Génération vitrine : aucune certification n’est désormais inventée par défaut ; le champ
+  reste personnalisable pour les informations vérifiées.
+
 - Vitrine desktop : navigation espacée correctement entre ses liens ; contrôle de non-
   débordement et des grilles principales ajouté à la validation ciblée.
 
