@@ -20,37 +20,26 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - Mouvement : navigation d’ancre douce native, un seul langage de révélation discret, jamais de
   scroll-jacking ; respecter `prefers-reduced-motion`.
 
-## État exact à `4.8.0-alpha.6`
+## État exact à `4.8.0-alpha.7`
 
-- [x] Ancres vitrine Services, À propos, Avis, Galerie et FAQ.
-- [x] Sections public paysagiste toujours peintes (pas de contenu blanc dû à `content-visibility`).
-- [x] Carte / horaires en deux colonnes desktop et pile mobile.
-- [x] Dimensions explicites pour Avis, Horaires et export autonome.
-- [x] FAQ accessible au clavier (`aria-expanded`, `aria-controls`).
-- [x] Vitrine sans badge de certification inventé sur une nouvelle génération.
-- [x] Header noir, surface 112rem, CTA À propos séparés, footer vitrine et dock public retiré.
-- [x] Contrainte `.max-w-7xl` neutralisée par une règle vitrine plus spécifique : largeur réelle
-  de 1440 px mesurée sur un viewport de 1440 px.
-- [x] Hero desktop 16:9 mesuré à 1440 × 810 px ; header encore visible à `scrollY = 4700`.
-- [x] Transition d’ancre issue du pattern InView de Motion Primitives, avec mouvement réduit.
-- [x] Version `4.8.0-alpha.6` synchronisée ; ce lot aligne Services, Galerie, Avis, Horaires et
-  FAQ sur le même canevas 112rem que À propos et le header. Le hash de livraison reste
-  vérifiable avec `git log -1 --oneline` après publication.
+- [x] Navigation vitrine Services / À propos / Avis / Galerie / FAQ, sticky et compensée sous un header de 80 px.
+- [x] Header de référence : canevas `80rem`, libellés noirs éditables, CTA vert « Demander un devis personnalisé » et export desktop qui ne masque plus `md:flex`.
+- [x] Hero, Services, Galerie, Avis et proportions générales déjà validés conservés.
+- [x] À propos aligné sur la capture : récit exact, rôle, CTA, portrait et badge « Artisan certifié » uniquement dans la démo de référence ; aucune certification inventée sur une nouvelle génération.
+- [x] Horaires & Lieu en deux colonnes desktop / pile mobile ; carte interactive par défaut, ville/adresse éditables et mode image personnalisée disponible.
+- [x] FAQ : surtitre `FAQ`, titre `Questions fréquentes`, questions de référence et accordéon clavier/ARIA.
+- [x] Vitrine utilisable comme template : Hero et Galerie conservent leurs contrôles existants ; navigation, À propos, images Services, Avis, Horaires/carte et FAQ sont éditables depuis le même éditeur.
+- [x] Responsive téléphone conservé sans débordement horizontal sur les règles validées en alpha.6.
+- [x] Validation `4.8.0-alpha.7` : 15/15 tests vitrine ciblés, 173/173 suite complète, `git diff --check`, contrôle export du header à 1624 × 900 px.
 
-## Prochain lot — vitrine de référence
+## Lot vitrine de référence — terminé
 
-- [x] Vérifier le header public à 1440 px : liens noirs, espacement large, CTA vert, aucune couleur
-  navigateur visitée/bleue/violette.
-- [x] Vérifier le hero : image couvrante 16:9, titre lisible, hauteur proche d’un viewport.
-- [x] Vérifier À propos : largeur utile accrue, texte/image à proportions éditoriales et deux CTA
-  sans chevauchement.
-- [x] Vérifier Services, Galerie, Horaires, Avis et FAQ sur les captures desktop : tous les
-  shells mesurent 1440 px sur un viewport 1440 px, comme À propos et le header.
-- [x] Vérifier le footer vitrine : pas de contact vide, liens utiles uniquement, contraste lisible.
-- [x] Vérifier l’absence du dock/pilule de téléphone sur **le rendu public vitrine** ; conserver le
-  réglage déplaçable uniquement dans l’éditeur.
-- [x] Tester 1440 px et 390 px, puis l’export HTML autonome.
-- [x] Incrémenter en `4.8.0-alpha.6`, synchroniser les emplacements de version et publier le lot.
+- [x] Header public rapproché de la référence sans rouvrir les sections déjà validées.
+- [x] Contenu À propos et hiérarchie FAQ alignés sur les captures fournies.
+- [x] Carte Horaires & Lieu rendue interactive tout en gardant une option image.
+- [x] Export standalone synchronisé avec le rendu public et navigation desktop visible.
+- [x] Principaux contenus du template rendus modifiables depuis le SaaS sans architecture parallèle.
+- [x] Publication préparée en `4.8.0-alpha.7`.
 
 ## Après la vitrine — contrôles de l’éditeur
 
@@ -76,15 +65,11 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 
 ## Dernière livraison validée
 
-- Lot `4.8.0-alpha.6` : proportions secondaires alignées sur la référence À propos sans modifier
-  son shell validé ; aperçu et export autonome partagent les mêmes règles.
-- Tests : 25/25 (`vitrine_conversion_path`, `hero_surface`, `exporter`, `gold`,
-  `v440_fixes_and_dashboard`) + `git diff --check`.
-- Suite complète : 170/170. Le test historique du Sticky Call Bar a été réaligné sur le contrat actuel (`href="#simulateur"` + libellé accessible), sans modifier son comportement.
-- Contrôle Chrome/CDP desktop : header, Services, À propos, Avis, Galerie, Horaires et FAQ =
-  1440/1440 px ; section header `sticky`, `top: 0` après 4700 px de scroll.
-- Contrôle 390 px : shells et document = 390 px, aucun débordement horizontal. La grille et
-  l'image À propos ont été corrigées uniquement sous les breakpoints concernés, sans modifier
-  les proportions desktop validées.
-- Prochaine action unique : reprendre les réglages fonctionnels de l'éditeur (fonds, typographie,
-  rayon de boutons, animations), sans rouvrir les proportions vitrine sauf nouvelle régression.
+- Lot `4.8.0-alpha.7` : finition de la référence Esprit Nature + passage en template réellement éditable.
+- Header : 80 px, canevas 80rem, mêmes libellés/CTA que la référence ; correctif standalone `md:flex !important` pour éviter la disparition du menu.
+- À propos / FAQ : contenu de référence et hiérarchie corrigés ; certification limitée à la démo, jamais injectée sur une nouvelle génération.
+- Horaires : iframe Google Maps interactive par défaut, liée à la ville/adresse ; image statique toujours sélectionnable.
+- Éditeur : navigation, À propos, images Services, Avis et Horaires/carte complètent les contrôles Hero/Galerie/FAQ déjà présents.
+- Tests : 15/15 ciblés, 173/173 complets, `git diff --check`. Commit fonctionnel `cbcac39`.
+- Contrôle visuel : export standalone 1624 × 900 px, header conforme en géométrie et navigation visible.
+- Prochaine action unique : reprendre les réglages transversaux de l’éditeur (fonds, typographie, rayon global des boutons, animations) sans retoucher la vitrine sauf régression mesurée.

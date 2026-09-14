@@ -7,6 +7,16 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 14 septembre 2026 (4.8.0-alpha.7)
+
+- Référence Esprit Nature : header ramené au canevas desktop `80rem` et à 80 px de haut, typographie/menu/CTA recalibrés sur les captures ; les libellés Services / À propos / Avis / Galerie / FAQ restent désormais éditables sans perdre leurs ancres.
+- À propos : la démo de référence retrouve le badge visible « Artisan certifié » et conserve mot pour mot le récit, le rôle et les deux CTA de la capture. Une nouvelle vitrine hors démo ne reçoit toujours aucune certification non vérifiée.
+- FAQ : hiérarchie corrigée conformément à la référence (`FAQ` en surtitre, `Questions fréquentes` en titre) tout en conservant l’accordéon accessible.
+- Horaires & Lieu : carte Google interactive par défaut, pilotée par ville/adresse et lien d’itinéraire ; l’éditeur permet de revenir à une image personnalisée.
+- Template éditable : contrôles explicites ajoutés pour identité/navigation, contenu et portrait À propos, images Services, avis clients, horaires/adresse et mode de carte. Les contrôles Hero, Galerie et FAQ existants restent réutilisés au lieu de créer un second système.
+- Export autonome : correction de la règle responsive `hidden` / `md:flex` qui pouvait masquer le menu desktop ; aperçu exporté contrôlé à 1624 × 900 px.
+- Validation : `vitrine_conversion_path` 15/15, suite complète 173/173 et `git diff --check`. Commit fonctionnel : `cbcac39`.
+
 ### Consolidation — 14 septembre 2026 (4.8.0-alpha.6)
 
 - Vitrine paysagiste : Services, Galerie, Avis, Horaires & Lieu et FAQ utilisent désormais le même canevas public `112rem` que le bloc À propos et le header, sans modifier sa géométrie desktop validée.

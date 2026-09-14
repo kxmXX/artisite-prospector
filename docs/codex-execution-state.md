@@ -1,5 +1,17 @@
 # État de reprise Codex — 14 septembre 2026
 
+## LOT DE LIVRAISON — vitrine 4.8.0-alpha.7
+
+- Référence utilisateur du 14/09 : les écarts restants étaient le header, le contenu À propos, la hiérarchie FAQ et le souhait d’une carte interactive. Les sections Services/Galerie/Avis validées n’ont pas été refondues.
+- Header : hauteur 5rem, canevas interne 80rem, typo 18px/700 pour la marque, navigation 14px/500 et CTA 14px/600. Les labels issus de `content.links` peuvent être modifiés dans le SaaS tout en conservant les cinq ancres publiques.
+- À propos : badge de démo « Artisan certifié » restauré parce qu’il figure explicitement sur la capture de référence ; le récit, rôle et CTA correspondent aux données de référence. `generateSite()` hors démo continue de produire `certified: ""`.
+- FAQ : `FAQ` est le surtitre et `Questions fréquentes` le titre. L’accordéon/ARIA reste inchangé.
+- Horaires : carte Google interactive par défaut à partir de `address`/`city`, lien itinéraire conservé ; `mapMode: image` permet une carte statique personnalisée.
+- Éditeur vitrine : nouveaux contrôles pour identité/navigation, À propos + portrait, images Services, Avis et Horaires/carte ; réutilisation des contrôles Hero, Galerie, FAQ et CTA déjà présents.
+- Export : correction de `UTILITY_CSS` (`md:flex !important`) afin que `.hidden !important` ne masque plus la navigation desktop. Screenshot standalone du header contrôlé à 1624 × 900 px.
+- Validation : `vitrine_conversion_path` 15/15, suite complète 173/173, `git diff --check`. Commit fonctionnel poussé : `cbcac39`.
+- Prochaine action exacte : fonds, typographie, rayon global de boutons et animations dans l’éditeur ; ne pas rouvrir les proportions de la vitrine sans régression mesurée.
+
 ## LOT DE LIVRAISON — vitrine 4.8.0-alpha.6
 
 - Services, Galerie, Avis, Horaires & Lieu et FAQ partagent maintenant le même `vitrine-shell` 112rem que À propos et le header ; aperçu et export autonome restent synchronisés.
