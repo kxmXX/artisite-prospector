@@ -7,7 +7,16 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
-### Consolidation non publiée — 14 septembre 2026 (4.8.0-alpha.2)
+### Consolidation non publiée — 14 septembre 2026 (4.8.0-alpha.3)
+
+- Vitrine paysagiste : header élargi à liens noirs explicites, CTA calibré, surface de lecture
+  portée à 112rem et actions « À propos » séparées sans risque de chevauchement.
+- Vitrine paysagiste : dock de téléphone retiré du rendu public pour laisser les CTA éditoriaux
+  maîtriser le parcours ; le dock reste disponible dans l’éditeur et pour les autres templates.
+- Vitrine paysagiste : footer public cohérent avec la référence, sans contacts vides ni liens
+  génériques hors parcours ; FAQ espacée avec des déclencheurs pleine largeur.
+- Documentation : ajout de `docs/EXECUTION-CHECKLIST.md`, à actualiser avec chaque commit pour
+  permettre une reprise fiable par un autre intervenant.
 
 - Vitrine : les proportions d’Horaires & Lieu et des avis reposent maintenant sur des
   classes dédiées réellement fournies par le CSS, plutôt que sur des utilitaires responsives

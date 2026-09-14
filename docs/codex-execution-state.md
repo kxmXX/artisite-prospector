@@ -1,5 +1,21 @@
 # État de reprise Codex — 14 septembre 2026
 
+## LOT PRÊT À PUBLIER — vitrine 4.8.0-alpha.3
+
+- Références appliquées : profil premium minimal, composition éditoriale ample et navigation
+  d’ancre discrète ; aucune animation décorative ajoutée. Le dépôt `ui-intelligence` a été
+  consulté selon son protocole, sans importer son code tiers.
+- Correctifs : header vitrine avec liens noir explicite et espacement stable, shell à 112rem,
+  CTA À propos séparés, FAQ en rangées pleine largeur, footer vitrine dédié et dock téléphonique
+  retiré du rendu public paysagiste (conservé dans l’éditeur).
+- Checklist durable ajoutée : `docs/EXECUTION-CHECKLIST.md`. Elle impose une mise à jour dans le
+  même commit que toute modification et consigne état, tests, version, anomalies et prochaine action.
+- Validation effectuée : 24/24 tests ciblés (`vitrine_conversion_path`, `exporter`, `gold`,
+  `v440_fixes_and_dashboard`), `git diff --check`, contrôle Playwright 1440/390 px. Le header
+  calcule `rgb(38, 38, 38)`, le dock public est absent et les CTA n’ont pas de recouvrement.
+- Prochaine action après publication : vérifier les proportions hero/services/galerie avec les
+  captures, puis reprendre les contrôles éditeur fonds/typographie/rayon/animations.
+
 ## LOT EN COURS — vitrine 4.8.0-alpha.2
 
 - Écart traité : les références utilisateur montrent que les cartes Horaires et Avis sont

@@ -7,6 +7,19 @@ V4.3 PRO sur l'accueil et v4.7 dans les tests : cette divergence sera supprimée
 
 ## Avancement courant — 4.8.0-alpha.2
 
+### Lot vitrine de référence — 4.8.0-alpha.3
+
+- Header du template paysagiste : liens noir explicites, espacement accru et CTA vert calibré.
+- Surface vitrine portée à 112rem ; actions À propos séparées par une règle dédiée afin qu’aucun
+  réglage CSS absent ne les fasse se chevaucher.
+- Dock téléphone supprimé du rendu public paysagiste ; il reste dans l’éditeur, où il est
+  configurable et déplaçable. Footer public dédié, contacts vides omis et FAQ aérée.
+- Checklist de transmission ajoutée dans `docs/EXECUTION-CHECKLIST.md`. À chaque commit : version,
+  tests, anomalies, prochaine action et hash de livraison doivent y être consignés.
+- Contrôles réalisés : 24/24 tests ciblés, `git diff --check`, Playwright desktop/mobile. Les
+  prochains écarts à traiter restent le hero, les proportions Services/Galerie, puis les réglages
+  éditeur de fond, typo, rayon et animation.
+
 - Lot vitrine en cours : correction des proportions constatées sur les captures des sections
   « Horaires & Lieu », Avis et FAQ. Les dimensions critiques passent par des classes vitrine
   dédiées et présentes dans le CSS, puis sont recopiées dans l’export autonome.

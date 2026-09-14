@@ -105,9 +105,12 @@ test("paysagiste vitrine keeps its fixed one-page navigation and generous editor
   assert.match(html, /lg:col-span-6 order-1/);
   assert.match(html, /lg:col-span-6 order-2/);
   assert.match(html, /vitrine-about-image/);
-  assert.match(css, /\.vitrine-shell \{ max-width: 96rem; \}/);
+  assert.match(css, /\.vitrine-shell \{ max-width: 112rem; \}/);
   assert.match(css, /\.vitrine-about-image \{ min-height: 32rem; \}/);
   assert.match(css, /scroll-margin-top: 6rem/);
+  assert.match(html, /vitrine-site-nav/);
+  assert.match(html, /vitrine-site-footer/);
+  assert.doesNotMatch(html, /sticky-call-bar/);
 });
 
 test("paysagiste reviews and FAQ preserve the spacious vitrine rhythm", () => {
@@ -127,7 +130,7 @@ test("standalone vitrine export retains navigation offsets and editorial proport
   const project = generateDemoSite({ name: "Esprit Nature", tradeId: "paysagiste", city: "Montauban" });
   const html = exportStandaloneHTML(project);
 
-  assert.match(html, /\.vitrine-shell \{ max-width: 96rem; \}/);
+  assert.match(html, /\.vitrine-shell \{ max-width: 112rem; \}/);
   assert.match(html, /scroll-margin-top: 6rem/);
   assert.match(html, /\.lg\\:col-span-6 \{ grid-column: span 6 \/ span 6; \}/);
   assert.match(html, /\.vitrine-faq-shell \.faq-item \{ border: 0;/);

@@ -261,12 +261,16 @@ export function renderWebsiteHTML(project, options = { isEditor: false, isStanda
     xl: '1.25rem'
   };
 
-  const stickyBarHTML = options.includeStickyBar === false ? "" : renderStickyCallBar(project, options);
   const initialSiteTheme = project.siteTheme || getInitialSiteTheme(project);
   const isPaperGrain = !!(project.branding?.paperGrain || project.branding?.stylePreset === 'editorial-terroir' || project.branding?.stylePreset === 'papercraft-mineral');
   const socialProofHTML = renderSocialProofToast(project, options);
 
   const isVitrineTemplate = project.business?.tradeId === "paysagiste";
+  // The vitrine reference has one deliberate contact CTA per section. Its editor
+  // still exposes the draggable dock, but the public site must not overlay content.
+  const stickyBarHTML = options.includeStickyBar === false || (isVitrineTemplate && !options.isEditor)
+    ? ""
+    : renderStickyCallBar(project, options);
   // The one-page vitrine is primarily a conversion surface. Its content must
   // remain immediately legible; section-specific motion stays configurable,
   // but the global Apple-style reveal must not fade entire sections until they
@@ -579,8 +583,8 @@ function renderHeader(sec, project, options = {}) {
     ? defaultVitrineLinks
     : ((c.links && c.links.length) ? c.links : []);
   return `
-    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-black/5 transition-all">
-      <div class="max-w-7xl vitrine-shell mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-black/5 transition-all ${isPaysagiste ? 'vitrine-site-header' : ''}">
+      <div class="max-w-7xl vitrine-shell mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between ${isPaysagiste ? 'vitrine-site-header-inner' : ''}">
         <a href="#" class="flex items-center gap-3 group no-underline select-none">
           ${isPaysagiste ? `
             <span class="font-heading text-xl sm:text-2xl font-black tracking-tight text-gray-900 block leading-tight no-underline" data-editable="brandName">${c.brandName || project.business?.name || 'Esprit Nature'}</span>
@@ -595,7 +599,7 @@ function renderHeader(sec, project, options = {}) {
           `}
         </a>
 
-        <nav class="hidden md:flex items-center gap-7 text-sm font-semibold text-gray-700">
+        <nav class="hidden md:flex items-center gap-7 text-sm font-semibold text-gray-700 ${isPaysagiste ? 'vitrine-site-nav' : ''}">
           ${project.branding?.navigationMode === "multi-tab" ? `
             <div class="flex items-center gap-1.5 bg-zinc-100/90 p-1 rounded-full border border-zinc-200/80" data-navigation-mode="multi-tab">
               <button type="button" onclick="(window.app?.setVirtualPage ? window.app.setVirtualPage('home') : window.artisiteSwitchPage?.('home'))" data-tab-nav="home" class="tab-nav-btn px-3 py-1 rounded-full text-xs font-semibold transition-all ${(options.activeVirtualPage || project._activeVirtualPage || 'home') === 'home' ? 'bg-white text-zinc-950 shadow-xs font-bold' : 'text-zinc-600 hover:text-zinc-900'}">Accueil</button>
@@ -622,7 +626,7 @@ function renderHeader(sec, project, options = {}) {
           ${isButtonHidden(sec, 'ctaText') || isButtonHidden(sec, 'primary') ? '' : `
             <div class="cta-button-wrapper group/cta relative" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-ctaText" data-cta-popover-wrapper data-section-id="${sec.id}" data-button-type="ctaText">
               ${renderButtonActionBadge(sec, 'ctaText', options, project)}
-              <a href="#simulateur" class="btn-cta inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold text-white shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 no-underline" style="background-color: var(--primary);">
+              <a href="#simulateur" class="btn-cta inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold text-white shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 no-underline ${isPaysagiste ? 'vitrine-header-cta' : ''}" style="background-color: var(--primary);">
                 ${getIcon("phone", "w-4 h-4 text-white")}
                 <span data-editable="ctaText">${c.ctaText || "Demander un devis"}</span>
               </a>
@@ -2304,6 +2308,36 @@ function renderCta(sec, project, options = {}) {
 // 16. Footer
 function renderFooter(sec, project) {
   const c = sec.content;
+  const isPaysagiste = project.business?.tradeId === "paysagiste";
+  if (isPaysagiste) {
+    const phone = c.phone || project.business?.phone || '';
+    const email = c.email || project.business?.email || '';
+    const address = c.address || project.business?.address || '';
+    return `
+      <footer class="vitrine-site-footer py-16 text-sm">
+        <div class="max-w-7xl vitrine-shell mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+            <div class="space-y-4">
+              <div class="font-heading text-2xl font-bold text-gray-900">${c.brandName || project.business?.name || 'Artisan'}</div>
+              <p class="text-sm max-w-md leading-relaxed">${c.desc || `${project.business?.tradeLabel || 'Artisan'} professionnel à ${project.business?.city || 'votre service'}.`}</p>
+              ${address ? `<div class="text-sm">${address}</div>` : ''}
+            </div>
+            <nav aria-label="Navigation de pied de page">
+              <div class="font-semibold text-gray-900 mb-4">Navigation</div>
+              <ul class="space-y-3">
+                <li><a href="#services">Services</a></li><li><a href="#about">À propos</a></li><li><a href="#avis">Avis</a></li><li><a href="#galerie">Galerie</a></li><li><a href="#faq">FAQ</a></li>
+              </ul>
+            </nav>
+            ${(phone || email || project.business?.city) ? `<div class="space-y-3"><div class="font-semibold text-gray-900">Contact</div>${phone ? `<a class="block" href="tel:${phone}">${phone}</a>` : ''}${email ? `<a class="block" href="mailto:${email}">${email}</a>` : ''}${project.business?.city ? `<div>${project.business.city}</div>` : ''}</div>` : ''}
+          </div>
+          <div class="pt-7 border-t border-black/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+            <div>${c.copyright || `© ${new Date().getFullYear()} ${c.brandName || project.business?.name || 'Artisan'}. Tous droits réservés.`}</div>
+            <div class="flex gap-5"><a href="#">Mentions légales</a><a href="#">Données personnelles</a></div>
+          </div>
+        </div>
+      </footer>
+    `;
+  }
   return `
     <footer class="bg-gray-950 text-gray-400 py-16 border-t border-white/10 text-sm">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

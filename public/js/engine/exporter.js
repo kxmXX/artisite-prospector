@@ -71,9 +71,18 @@ ${UTILITY_CSS}
 
     /* Vitrine 1.1 — keep the public export visually aligned with the editor
        preview. These are deliberately local to the commercial template. */
-    .vitrine-shell { max-width: 96rem; }
+    .vitrine-shell { max-width: 112rem; }
     .site-section[id], #services, #about, #avis, #galerie, #faq, #horaires { scroll-margin-top: 6rem; }
+    .vitrine-site-header { background: rgba(255, 255, 255, .98); }
+    .vitrine-site-header-inner { min-height: 6.25rem; }
+    .vitrine-site-nav { gap: 2.75rem; font-size: 1rem; }
+    .vitrine-site-nav a { color: #262626; text-decoration: none; }
+    .vitrine-site-nav a:hover, .vitrine-site-nav a:focus-visible { color: var(--primary, #527c22); }
+    .vitrine-header-cta { min-height: 3.25rem; padding: 0 1.75rem; font-size: 1rem; }
     .vitrine-about-image { min-height: 32rem; }
+    .vitrine-about-actions { column-gap: 1.75rem; row-gap: 1rem; }
+    .vitrine-about-cta { min-height: 3.75rem; white-space: nowrap; }
+    .vitrine-about-link { min-height: 3.25rem; white-space: nowrap; }
     .vitrine-service-grid { gap: 2rem; }
     .vitrine-review-grid { max-width: 80rem; }
     .vitrine-faq-shell { max-width: 62rem; }
@@ -87,6 +96,12 @@ ${UTILITY_CSS}
     .vitrine-review-author { font-size: 1.0625rem; }
     .vitrine-review-copy { font-size: 1.0625rem; line-height: 1.65; }
     .vitrine-faq-list { max-width: 48rem; }
+    .vitrine-faq-list .faq-item { padding: 1.35rem 0; }
+    .vitrine-faq-list .faq-header { width: 100%; text-align: left; }
+    .vitrine-faq-list .faq-content { padding: 1rem 0 .25rem; }
+    .vitrine-site-footer { background: #fff; color: #52615b; border-top: 1px solid #e7ece4; }
+    .vitrine-site-footer a { color: #29352c; text-decoration: none; }
+    .vitrine-site-footer a:hover, .vitrine-site-footer a:focus-visible { color: var(--primary, #527c22); text-decoration: underline; text-underline-offset: .2em; }
     .vitrine-faq-shell .faq-item { border: 0; border-radius: 0; margin: 0; background: transparent; overflow: visible; }
     .vitrine-faq-shell .faq-header { padding: 0; width: 100%; text-align: left; }
     .vitrine-faq-shell .faq-content { padding: 0.75rem 0 0; }
@@ -97,6 +112,7 @@ ${UTILITY_CSS}
       .vitrine-about-story { font-size: 1.125rem; }
       .vitrine-about-image { min-height: 42rem; }
       .vitrine-service-grid { gap: 2.5rem; }
+      .vitrine-about-actions { column-gap: 2.25rem; }
       .vitrine-hours-shell { max-width: 78rem; }
       .vitrine-hours-grid { max-width: 68rem; gap: 2.5rem; }
       .vitrine-hours-card, .vitrine-hours-map { min-height: 31rem; }
@@ -107,6 +123,7 @@ ${UTILITY_CSS}
       .vitrine-review-author { font-size: 1.125rem; }
       .vitrine-review-copy { font-size: 1.125rem; line-height: 1.68; }
       .vitrine-faq-list { max-width: 52rem; }
+      .vitrine-faq-list .faq-item { padding: 1.6rem 0; }
     }
 
     /* Physical keyboard keycap treatment for exported CTAs. */
