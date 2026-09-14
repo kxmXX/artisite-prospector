@@ -20,7 +20,7 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - Mouvement : navigation d’ancre douce native, un seul langage de révélation discret, jamais de
   scroll-jacking ; respecter `prefers-reduced-motion`.
 
-## État exact à `4.8.0-alpha.5`
+## État exact à `4.8.0-alpha.6`
 
 - [x] Ancres vitrine Services, À propos, Avis, Galerie et FAQ.
 - [x] Sections public paysagiste toujours peintes (pas de contenu blanc dû à `content-visibility`).
@@ -33,7 +33,7 @@ que chaque changement de produit.** Il complète le journal détaillé dans
   de 1440 px mesurée sur un viewport de 1440 px.
 - [x] Hero desktop 16:9 mesuré à 1440 × 810 px ; header encore visible à `scrollY = 4700`.
 - [x] Transition d’ancre issue du pattern InView de Motion Primitives, avec mouvement réduit.
-- [x] Version `4.8.0-alpha.5` synchronisée ; ce lot aligne Services, Galerie, Avis, Horaires et
+- [x] Version `4.8.0-alpha.6` synchronisée ; ce lot aligne Services, Galerie, Avis, Horaires et
   FAQ sur le même canevas 112rem que À propos et le header. Le hash de livraison reste
   vérifiable avec `git log -1 --oneline` après publication.
 
@@ -50,7 +50,7 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - [x] Vérifier l’absence du dock/pilule de téléphone sur **le rendu public vitrine** ; conserver le
   réglage déplaçable uniquement dans l’éditeur.
 - [x] Tester 1440 px et 390 px, puis l’export HTML autonome.
-- [x] Incrémenter en `4.8.0-alpha.5`, synchroniser les emplacements de version et publier le lot.
+- [x] Incrémenter en `4.8.0-alpha.6`, synchroniser les emplacements de version et publier le lot.
 
 ## Après la vitrine — contrôles de l’éditeur
 
@@ -76,7 +76,7 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 
 ## Dernière livraison validée
 
-- Lot `4.8.0-alpha.5` : proportions secondaires alignées sur la référence À propos sans modifier
+- Lot `4.8.0-alpha.6` : proportions secondaires alignées sur la référence À propos sans modifier
   son shell validé ; aperçu et export autonome partagent les mêmes règles.
 - Tests : 25/25 (`vitrine_conversion_path`, `hero_surface`, `exporter`, `gold`,
   `v440_fixes_and_dashboard`) + `git diff --check`.

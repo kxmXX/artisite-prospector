@@ -1,6 +1,6 @@
 # État de reprise Codex — 14 septembre 2026
 
-## LOT DE LIVRAISON — vitrine 4.8.0-alpha.5
+## LOT DE LIVRAISON — vitrine 4.8.0-alpha.6
 
 - Services, Galerie, Avis, Horaires & Lieu et FAQ partagent maintenant le même `vitrine-shell` 112rem que À propos et le header ; aperçu et export autonome restent synchronisés.
 - Les proportions internes ont été rééquilibrées : titres secondaires communs, cartes Services plus respirantes, Avis 96rem, Horaires 92rem, FAQ 80rem.
