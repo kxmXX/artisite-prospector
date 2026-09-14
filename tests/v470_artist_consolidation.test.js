@@ -172,10 +172,11 @@ test("v4.7.0 Consolidation: 100% Sendpage Benchmark Fidelity for Esprit Nature P
   assert.equal(project.branding.primaryColor, "#527c22");
   assert.equal(project.branding.buttonRadius, "9999px");
 
-  // 2. Sections Order & Sendpage Visibility
+  // 2. Sections Order & Sendpage Visibility. The quote simulator remains visible
+  // because every published primary CTA must have a real in-page destination.
   const visibleTypes = project.sections.filter(s => s.visibility !== false).map(s => s.type);
   assert.deepEqual(visibleTypes, [
-    "header", "hero", "about", "services", "gallery", "hours", "reviews", "faq", "footer"
+    "header", "hero", "about", "services", "gallery", "hours", "reviews", "faq", "footer", "quoteSimulator"
   ], "Visible sections must strictly follow Sendpage showcase order");
 
   // 3. Render HTML verification
@@ -187,7 +188,8 @@ test("v4.7.0 Consolidation: 100% Sendpage Benchmark Fidelity for Esprit Nature P
   assert.ok(html.includes("Montauban"), "Must render Montauban location subtitle");
   assert.ok(html.includes("9h - 12h / 14h - 18h"), "Must render 9h - 12h / 14h - 18h hours");
   assert.ok(html.includes("Fermé"), "Must render Fermé for dimanche");
-  assert.ok(html.includes("Carte Horaires et Lieu"), "Must render embedded Google Map in Horaires & Lieu");
+  assert.ok(html.includes("Carte de localisation"), "Must render the editable location visual in Horaires & Lieu");
+  assert.ok(html.includes("maps.google.com/?q="), "Must retain the route link for the location");
 
   // Screenshot 2: Hero
   assert.ok(html.includes("Donnez à vos extérieurs"), "Hero must render Sendpage title");
@@ -224,4 +226,3 @@ test("v4.7.0 Consolidation: 100% Sendpage Benchmark Fidelity for Esprit Nature P
   const dashMatches = html.match(/class="w-12 h-1 rounded-full/g) || [];
   assert.ok(dashMatches.length >= 4, "Signature green accent dashes must be rendered across sections");
 });
-

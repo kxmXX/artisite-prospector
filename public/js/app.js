@@ -61,6 +61,7 @@ export class App {
     this.activeSidebarTab = "sections";
     this.closerTab = "script";
     this.typographyTarget = "heading";
+    this._disposeStickyHeroVisibility = null;
 
     this.init();
   }
@@ -3737,6 +3738,24 @@ export class App {
     // Draggable contact/WhatsApp bar. Position is persisted without rerendering
     // so dragging never interrupts the canvas or steals scroll ownership.
     const stickyBar = document.querySelector("[data-sticky-call-bar]");
+    this._disposeStickyHeroVisibility?.();
+    this._disposeStickyHeroVisibility = null;
+    if (stickyBar && (state.currentView === "preview" || state.editorMode === "preview")) {
+      const hero = document.querySelector(".hero-fullscreen");
+      const updateStickyVisibility = () => {
+        const heroBottom = hero?.getBoundingClientRect().bottom ?? 0;
+        const obscured = heroBottom > window.innerHeight * 0.55;
+        stickyBar.classList.toggle("is-hero-obscured", obscured);
+        stickyBar.setAttribute("aria-hidden", String(obscured));
+      };
+      window.addEventListener("scroll", updateStickyVisibility, { passive: true });
+      window.addEventListener("resize", updateStickyVisibility, { passive: true });
+      updateStickyVisibility();
+      this._disposeStickyHeroVisibility = () => {
+        window.removeEventListener("scroll", updateStickyVisibility);
+        window.removeEventListener("resize", updateStickyVisibility);
+      };
+    }
     const stickyHandle = stickyBar?.querySelector(".sticky-drag-handle");
     if (stickyBar && stickyHandle && !stickyHandle.dataset.bound) {
       stickyHandle.dataset.bound = "true";

@@ -349,6 +349,12 @@ function generateSiteFromInput(input = {}, useDemoContent = false) {
     },
     settings: { showLiveStatus: true, unifiedMap: isPaysagiste }
   };
+  // The demonstration template uses a replaceable map visual. It is only
+  // attached to known demo content: newly generated client projects keep their
+  // own address-driven map instead of inheriting Montauban imagery.
+  if (useDemoContent && isPaysagiste) {
+    hoursSection.content.mapImage = "images/map-montauban.png";
+  }
 
   // Section 13: Location / Intervention Zone
   const isStorefront = isFoodTrade || isPersonalCare || isLiberal;

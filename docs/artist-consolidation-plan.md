@@ -72,6 +72,17 @@ puis présentation/services/galerie/FAQ. Voir la tête courte de codex-execution
 - Suite prioritaire : mise en forme de la vitrine, présentation/services/galerie/FAQ, puis
   mobile/export. Les lots techniques différés restent planifiés.
 
+### Sous-lot Horaires & Lieu terminé — 14 septembre 2026
+
+- Grille vitrine réparée : les deux colonnes desktop occupent chacune 6/12 ; la liste
+  d'horaires et la surface carte ne se réduisent plus à une fine bande.
+- La carte de la démo paysagiste est un média `mapImage` remplaçable dans l'éditeur.
+  Les projets d'une autre ville gardent une carte liée à leur adresse et un itinéraire Maps,
+  afin de ne pas afficher Montauban par défaut.
+- Navigation paysagiste de secours, dock de contact non-obstructif et absence de certification
+  inventée complètent ce sous-lot. Tests ciblés 12/12 et vérification statique réussis.
+- Suite : présentation/services/galerie, FAQ compacte, puis contrôles responsive et export.
+
 | Lot | Action | Validation requise | État |
 |---|---|---|---|
 | 1 | Audit, contexte durable, version/changelog honnêtes | Base, captures, architecture et risques tracés | Audit/plan terminés be8600c ; version4.8.0-alpha.1 intégrée non publiée |

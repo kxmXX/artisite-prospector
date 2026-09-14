@@ -2,6 +2,21 @@
 
 ## REPRISE COURTE — priorité vitrine (prévaut sur l'historique)
 
+- Sous-lot vitrine « Horaires & Lieu » terminé localement : la grille desktop possède
+  désormais ses deux colonnes réelles (6/12 + 6/12), sans écraser la carte. La démo
+  Montauban affiche une carte-image remplaçable dans l'éditeur ; les autres villes
+  restent liées à leur adresse via le lien Maps, sans hériter d'une fausse carte locale.
+- Header vitrine : navigation de secours Services / À propos / Avis / Galerie / FAQ
+  lorsqu'un template paysagiste n'a pas encore de liens. Les liens masqués réapparaissent
+  bien au breakpoint desktop. Le dock de contact se cache pendant le hero et revient après,
+  y compris depuis l'aperçu client ; préférence de mouvement réduit respectée.
+- Présentation : aucune mention « Artisan certifié » n'est inventée si ce champ est vide.
+- Tests ciblés : **12/12** (vitrine, hero, consolidation) + `git diff --check` réussis.
+  Vérification de la ressource carte locale : HTTP 200. Validation navigateur desktop/mobile
+  complète et export restent à faire ; ne pas prétendre à une conformité visuelle totale.
+- Prochaine action exacte : traiter la présentation/services/galerie (puis FAQ compacte),
+  en conservant leurs contrôles d'édition et en validant les largeurs desktop et mobile.
+
 - Commit vitrine dédié `cd32f5d` : parcours devis rétabli et aperçu client nettoyé.
   Les CTA convergent vers `#simulateur`, la section est visible par défaut pour les nouveaux
   projets et démos, le bandeau fixe utilise la même cible. Les contrôles de popover sont

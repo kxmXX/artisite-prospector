@@ -557,6 +557,17 @@ function renderSection(sec, project, options) {
 function renderHeader(sec, project, options = {}) {
   const c = sec.content;
   const isPaysagiste = project?.business?.tradeId === "paysagiste";
+  const visibleTypes = new Set((project.sections || [])
+    .filter(section => section.visibility !== false)
+    .map(section => section.type));
+  const defaultVitrineLinks = [
+    { label: "Services", target: "#services", type: "services" },
+    { label: "À propos", target: "#about", type: "about" },
+    { label: "Avis", target: "#avis", type: "reviews" },
+    { label: "Galerie", target: "#galerie", type: "gallery" },
+    { label: "FAQ", target: "#faq", type: "faq" }
+  ].filter(link => visibleTypes.has(link.type));
+  const navigationLinks = (c.links && c.links.length) ? c.links : (isPaysagiste ? defaultVitrineLinks : []);
   return `
     <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-black/5 transition-all">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
@@ -583,7 +594,7 @@ function renderHeader(sec, project, options = {}) {
               <button type="button" onclick="(window.app?.setVirtualPage ? window.app.setVirtualPage('devis') : window.artisiteSwitchPage?.('devis'))" data-tab-nav="devis" class="tab-nav-btn px-3 py-1 rounded-full text-xs font-semibold transition-all ${(options.activeVirtualPage || project._activeVirtualPage) === 'devis' ? 'bg-white text-zinc-950 shadow-xs font-bold' : 'text-zinc-600 hover:text-zinc-900'}">Devis</button>
               <button type="button" onclick="(window.app?.setVirtualPage ? window.app.setVirtualPage('contact') : window.artisiteSwitchPage?.('contact'))" data-tab-nav="contact" class="tab-nav-btn px-3 py-1 rounded-full text-xs font-semibold transition-all ${(options.activeVirtualPage || project._activeVirtualPage) === 'contact' ? 'bg-white text-zinc-950 shadow-xs font-bold' : 'text-zinc-600 hover:text-zinc-900'}">Contact & RDV</button>
             </div>
-          ` : (c.links || []).map(l => `<a href="${l.target}" class="hover:text-gray-900 transition-colors no-underline">${l.label}</a>`).join('')}
+          ` : navigationLinks.map(l => `<a href="${l.target}" class="hover:text-gray-900 transition-colors no-underline">${l.label}</a>`).join('')}
         </nav>
 
         <div class="flex items-center gap-3">
@@ -1103,7 +1114,7 @@ function renderAbout(sec, project, options = {}) {
 
   // Default: Editorial Split (Sendpage High Fidelity)
   const isPaysagiste = project.business?.tradeId === "paysagiste";
-  const certifiedBadge = c.certified || "Artisan certifié";
+  const certifiedBadge = c.certified ? String(c.certified) : "";
   const roleText = c.role || "Jardinier & Paysagiste";
   const storyText = c.story || "";
   const paragraphs = storyText.split(/\n\n+/).filter(Boolean);
@@ -1126,13 +1137,14 @@ function renderAbout(sec, project, options = {}) {
             <!-- Signature Green Accent Dash -->
             <div class="w-12 h-1 rounded-full mt-2.5 mb-5" style="background-color: var(--primary, #527c22);"></div>
 
-            <!-- Artisan Certifié Badge -->
-            <div>
-              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#f0f5eb] text-[#527c22] border border-[#527c22]/20">
-                <span class="font-bold">✓</span>
-                <span data-editable="certified">${certifiedBadge}</span>
-              </span>
-            </div>
+            ${certifiedBadge ? `
+              <div>
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#f0f5eb] text-[#527c22] border border-[#527c22]/20">
+                  <span class="font-bold">✓</span>
+                  <span data-editable="certified">${certifiedBadge}</span>
+                </span>
+              </div>
+            ` : ''}
 
             <!-- Role Subtitle -->
             <div class="text-gray-500 dark:text-zinc-400 font-medium text-sm sm:text-base pt-1 pb-2" data-editable="role">
@@ -1979,11 +1991,16 @@ function renderQuoteSimulator(sec, project) {
 }
 
 // 12. Hours
-function renderHours(sec, project) {
+function renderHours(sec, project, options = {}) {
   const c = sec.content || {};
   const hours = c.hours || {};
   const isPaysagiste = project?.business?.tradeId === "paysagiste";
   const isUnified = sec.variant === "unified-map" || sec.settings?.unifiedMap || isPaysagiste;
+  // Existing Esprit Nature demo projects predate `mapImage`; preserve their
+  // intended Montauban visual while every other city continues to use its own
+  // address-driven map until the editor supplies a replacement image.
+  const mapCity = c.city || project.business?.city || "";
+  const mapImage = c.mapImage || (isPaysagiste && /montauban/i.test(mapCity) ? "images/map-montauban.png" : "");
 
   if (isUnified) {
     const defaultDays = ["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi", "dimanche"];
@@ -2043,46 +2060,29 @@ function renderHours(sec, project) {
               ` : ''}
             </div>
 
-            <!-- Right Column: Interactive Map -->
-            <div class="lg:col-span-6 bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 shadow-sm overflow-hidden min-h-[380px] sm:min-h-[440px] relative flex items-center justify-center p-3">
-              ${isPaysagiste ? `
-                <img
-                  title="Carte Horaires et Lieu"
-                  alt="Carte Horaires et Lieu"
-                  class="w-full h-full object-contain rounded-2xl min-h-[360px]"
-                  loading="lazy"
-                  src="images/map-montauban.png"
-                  data-fallback-src="images/map-montauban.png"
-                  onerror="if(!this.dataset.fallbackApplied){this.dataset.fallbackApplied='true';this.src='images/map-montauban.png';}">
-                <!-- Zoom controls matching Sendpage -->
-                <div class="absolute top-5 right-5 z-10 flex flex-col bg-white border border-zinc-200 rounded-lg shadow-sm overflow-hidden pointer-events-auto">
-                  <button type="button" class="w-8 h-8 flex items-center justify-center text-zinc-700 hover:bg-zinc-100 font-bold border-b border-zinc-200 text-sm select-none" aria-label="Zoom avant">+</button>
-                  <button type="button" class="w-8 h-8 flex items-center justify-center text-zinc-700 hover:bg-zinc-100 font-bold text-sm select-none" aria-label="Zoom arrière">−</button>
-                </div>
-                <!-- Accessible Embed & Route Link for full platform and test compatibility -->
-                <iframe
-                  title="Carte Horaires et Lieu"
-                  class="hidden"
-                  loading="lazy"
-                  src="https://maps.google.com/maps?q=${encodeURIComponent(c.address || (c.city ? c.city + ', France' : (project.business?.city ? project.business.city + ', France' : 'Montauban, France')))}&t=&z=12&ie=UTF8&iwloc=&output=embed">
-                </iframe>
-                <div class="hidden">
-                  <a href="https://maps.google.com/?q=${encodeURIComponent(c.address || (c.city ? c.city + ', France' : (project.business?.city ? project.business.city + ', France' : 'Montauban, France')))}">Calculer mon itinéraire</a>
-                </div>
-              ` : `
+            <!-- Right Column: dynamic map, tied to the editable address/city. -->
+            <div class="lg:col-span-6 bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 shadow-sm overflow-hidden min-h-[380px] sm:min-h-[440px] relative">
+              ${mapImage ? renderEditableImage(mapImage, {
+                sectionId: sec.id,
+                fieldPath: "mapImage",
+                alt: `Carte de localisation — ${c.city || project.business?.city || "zone d'intervention"}`,
+                className: "w-full h-full min-h-[380px] sm:min-h-[440px] object-cover",
+                options,
+                tradeId: project.business?.tradeId
+              }) : `
                 <iframe
                   title="Carte Horaires et Lieu"
                   class="w-full h-full min-h-[380px] sm:min-h-[440px] border-0 filter saturate-[1.05]"
                   loading="lazy"
                   src="https://maps.google.com/maps?q=${encodeURIComponent(c.address || (c.city ? c.city + ', France' : (project.business?.city ? project.business.city + ', France' : 'Montauban, France')))}&t=&z=12&ie=UTF8&iwloc=&output=embed">
                 </iframe>
-                <div class="absolute bottom-3 left-3 z-10 pointer-events-auto">
-                  <a href="https://maps.google.com/?q=${encodeURIComponent(c.address || (c.city ? c.city + ', France' : (project.business?.city ? project.business.city + ', France' : 'Montauban, France')))}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-[11px] font-bold text-white bg-black/60 hover:bg-black/80 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/20 transition-all no-underline">
-                    <span>Calculer mon itinéraire</span>
-                    ${getIcon("externalLink", "w-3 h-3")}
-                  </a>
-                </div>
               `}
+              <div class="absolute bottom-3 left-3 z-10 pointer-events-auto">
+                <a href="https://maps.google.com/?q=${encodeURIComponent(c.address || (c.city ? c.city + ', France' : (project.business?.city ? project.business.city + ', France' : 'Montauban, France')))}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-[11px] font-bold text-white bg-black/60 hover:bg-black/80 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/20 transition-all no-underline">
+                  <span>Calculer mon itinéraire</span>
+                  ${getIcon("externalLink", "w-3 h-3")}
+                </a>
+              </div>
             </div>
           </div>
         </div>

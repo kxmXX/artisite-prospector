@@ -9,6 +9,12 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ### Consolidation non publiée — 14 septembre 2026 (4.8.0-alpha.1)
 
+- Vitrine : bloc « Horaires & Lieu » remis en deux colonnes sur desktop. La carte de la
+  démo est remplaçable dans l'éditeur ; les autres villes utilisent leur adresse et un lien
+  d'itinéraire au lieu d'une carte Montauban imposée.
+- Vitrine : navigation de secours pour le template paysagiste, dock de contact caché sur le
+  hero, respect de `prefers-reduced-motion` et absence de badge de certification par défaut.
+
 - Publication production sur Vercel : `artisite-prospector.vercel.app`.
 
 - Vitrine : appels à l'action devis actifs, cible unique et formulaire accessible. Sans
