@@ -338,6 +338,10 @@ export function renderEditor(state) {
 
         ${!isLivePreview ? `
         <aside class="studio-v3-inspector-panel" id="right-inspector-panel">
+          <div class="studio-v3-responsive-inspector-head">
+            <div><span>Édition</span><b>Propriétés de la section</b></div>
+            <button type="button" onclick="document.getElementById('right-inspector-panel')?.classList.remove('is-responsive-open')" aria-label="Fermer les propriétés">${getIcon("x", "w-4 h-4")}</button>
+          </div>
           <div class="studio-v3-inspector-shell">
             ${inspectorHTML}
           </div>

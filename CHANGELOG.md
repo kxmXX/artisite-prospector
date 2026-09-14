@@ -7,6 +7,14 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 15 septembre 2026 (4.8.0-alpha.15)
+
+- Éditeur V3 : la sélection de section synchronise désormais la ligne Structure, le canvas et l’inspecteur depuis un état unique.
+- Responsive : l’inspecteur devient un drawer utilisable sous 1280 px et reste accessible sur mobile au lieu d’être supprimé par CSS.
+- Réorganisation : drag-and-drop souris et flèches clavier utilisent les nouvelles `.studio-v3-sectionrow`; styles de drop ajoutés.
+- Contrôle réel : édition Services vérifiée à 1280/1024/390 px ; visibilité, drag, clavier, Undo et Assistant rejoués sans erreur console.
+- Couverture : 27/27 ciblés, 191/191 complets et `git diff --check`.
+
 ### Consolidation — 15 septembre 2026 (4.8.0-alpha.14)
 
 - V3 post-`f49ec7f` : Réglages du rail rendus immédiatement, preview appareil réellement contraint à 768/390 px et états actifs synchronisés.

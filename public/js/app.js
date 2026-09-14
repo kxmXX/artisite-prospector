@@ -1299,7 +1299,7 @@ export class App {
       state.activeSidebarTab = "sections";
     }
 
-    // 3. Highlight and open accordion in sidebar cards
+    // 3. Highlight legacy cards and the current V3 structure rows from the same selectedSectionId.
     document.querySelectorAll(".section-card").forEach(card => {
       const cardSecId = card.getAttribute("data-sec-id");
       const acc = document.getElementById(`accordion-${cardSecId}`);
@@ -1316,12 +1316,23 @@ export class App {
         if (chevron) chevron.classList.remove("rotate-180");
       }
     });
+    document.querySelectorAll(".studio-v3-sectionrow").forEach(row => {
+      row.classList.toggle("is-selected", row.getAttribute("data-sec-id") === sectionId);
+    });
 
-    // 4. Update Right Inspector panel directly without wiping canvas
+    const selectedSec = state.currentProject.sections.find(s => s.id === sectionId) || state.currentProject.sections[0];
+    const stageTitle = document.querySelector(".studio-v3-stagecontext b");
+    if (stageTitle && selectedSec) stageTitle.textContent = selectedSec.content?.title || selectedSec.type || "Section";
+
+    // 4. Update inspector content without destroying its responsive shell/header.
     const rightInspector = document.getElementById("right-inspector-panel");
     if (rightInspector) {
-      const selectedSec = state.currentProject.sections.find(s => s.id === sectionId) || state.currentProject.sections[0];
-      rightInspector.innerHTML = renderInspector(selectedSec, state.currentProject, state);
+      const inspectorShell = rightInspector.querySelector(".studio-v3-inspector-shell") || rightInspector;
+      inspectorShell.innerHTML = renderInspector(selectedSec, state.currentProject, state);
+      if (typeof window !== "undefined" && window.matchMedia?.("(max-width: 1280px)").matches) {
+        document.querySelector(".studio-v3-structure-panel")?.classList.remove("is-mobile-open");
+        rightInspector.classList.add("is-responsive-open");
+      }
     }
   }
 
@@ -4121,20 +4132,27 @@ export class App {
         const secId = grip.getAttribute("data-sec-id");
         e.dataTransfer.setData("text/plain", secId);
         e.dataTransfer.effectAllowed = "move";
-        const card = grip.closest(".section-card");
+        const card = grip.closest(".section-card, .studio-v3-sectionrow");
         if (card) card.classList.add("is-dragging");
+      });
+      grip.addEventListener("keydown", (e) => {
+        if (e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
+        e.preventDefault();
+        e.stopPropagation();
+        const secId = grip.getAttribute("data-sec-id");
+        if (secId) state.moveSection(secId, e.key === "ArrowUp" ? "up" : "down");
       });
 
       grip.addEventListener("dragend", () => {
         this._isDragging = false;
         setTimeout(() => { this._justDragged = false; }, 200);
-        document.querySelectorAll(".section-card").forEach(el => {
+        document.querySelectorAll(".section-card, .studio-v3-sectionrow").forEach(el => {
           el.classList.remove("is-dragging", "drop-above", "drop-below");
         });
       });
     });
 
-    document.querySelectorAll(".section-card").forEach(card => {
+    document.querySelectorAll(".section-card, .studio-v3-sectionrow").forEach(card => {
       card.addEventListener("dragover", (e) => {
         e.preventDefault();
         e.dataTransfer.dropEffect = "move";

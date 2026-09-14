@@ -1,5 +1,13 @@
 # État de reprise Codex — 15 septembre 2026
 
+## LOT DE LIVRAISON — interactions V3 4.8.0-alpha.15
+
+- Sélection : `section_selected` synchronise désormais canvas, lignes `.studio-v3-sectionrow`, contexte de scène et contenu de l’inspecteur sans détruire son shell.
+- Responsive : sous 1280 px, l’inspecteur devient un drawer explicite au lieu de disparaître ; à 390 px il remplace le panneau Structure ouvert et conserve les champs de section.
+- Réorganisation : le drag/drop et son nettoyage ciblent désormais à la fois le DOM historique et les lignes V3 ; les flèches clavier sur la poignée utilisent le même moteur d’état.
+- Validation navigateur : édition d’un champ Services réussie à 1280, 1024 et 390 px ; sélection, visibilité, drag souris, réordre clavier, Undo et Assistant validés sans erreur console. Tests : 27/27 ciblés, 191/191 complets, `git diff --check`.
+- Prochaine action : sélecteur d’images + contrôles CTA/popovers, puis audit des modales/focus/scroll.
+
 ## LOT DE LIVRAISON — stabilisation V3 4.8.0-alpha.14
 
 - Base auditée : `f49ec7f feat(ui): ship structural V3 product experience` récupéré depuis `origin/main`; les 184 tests historiques passaient mais ne couvraient pas les collisions et ruptures de navigation V3.

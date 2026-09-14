@@ -90,3 +90,21 @@ test('V3 device switch exposes stable viewport targets in editor markup', () => 
   assert.ok(editorSource.includes('data-viewport="tablet"'));
   assert.ok(editorSource.includes('data-viewport="mobile"'));
 });
+
+test('V3 selection and drag/drop bind to V3 structure rows, not only legacy cards', () => {
+  const appSource = fs.readFileSync(path.resolve(process.cwd(), 'public/js/app.js'), 'utf8');
+  assert.ok(appSource.includes('document.querySelectorAll(".studio-v3-sectionrow")'));
+  assert.ok(appSource.includes('grip.closest(".section-card, .studio-v3-sectionrow")'));
+  assert.ok(appSource.includes('document.querySelectorAll(".section-card, .studio-v3-sectionrow")'));
+  assert.ok(appSource.includes('state.moveSection(secId, e.key === "ArrowUp" ? "up" : "down")'));
+});
+
+test('V3 inspector becomes a responsive editing drawer below desktop width', () => {
+  const editorSource = fs.readFileSync(path.resolve(process.cwd(), 'public/js/components/editor.js'), 'utf8');
+  const appSource = fs.readFileSync(path.resolve(process.cwd(), 'public/js/app.js'), 'utf8');
+  assert.ok(editorSource.includes('studio-v3-responsive-inspector-head'));
+  assert.ok(css.includes('.studio-v3-inspector-panel.is-responsive-open'));
+  assert.ok(css.includes('width:calc(100vw - 16px)!important'));
+  assert.ok(appSource.includes('window.matchMedia?.("(max-width: 1280px)").matches'));
+  assert.ok(appSource.includes('rightInspector.classList.add("is-responsive-open")'));
+});

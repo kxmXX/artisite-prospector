@@ -65,8 +65,9 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - [x] P0 — Mobile : le dock V3 et la sticky call bar ne se superposent plus ; en conception la sticky client est masquée, en aperçu le dock éditeur est retiré.
 - [x] P1 — Console : correction du `getIcon()` qui sérialisait un objet en `width/height="[object Object]"`.
 - [x] P1 — Actions de structure : cibles critiques portées à 32 px minimum.
-- [ ] P0 — Vérifier l’accès aux contrôles de contenu lorsque l’inspecteur droit disparaît à 1280 px et moins.
-- [ ] P0/P1 — Rejouer sélection, visibilité, drag-and-drop, édition texte/image/CTA, Assistant et Undo dans la V3.
+- [x] P0 — Contrôles de contenu accessibles à 1280/1024/mobile via un inspecteur responsive V3 ; sélection d’une section ouvre la surface et mobile ferme le panneau Structure concurrent.
+- [x] P0/P1 — Sélection, visibilité, drag-and-drop souris, réordre clavier, édition texte, Assistant et Undo rejoués dans la V3.
+- [ ] P0/P1 — Rejouer le sélecteur d’images et les contrôles CTA/popovers, puis leurs chemins Undo.
 - [ ] P1 — Auditer modales, focus, scroll et responsive dashboard après stabilisation des fonctions d’édition.
 
 ## Stabilité async / backend — reprise après l’éditeur
@@ -100,4 +101,5 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - Lot `4.8.0-alpha.12` : génération photo IA protégée contre les réponses tardives et les changements de cible/projet ; 9/9 tests async ciblés, 183/183 complets.
 - Lot `4.8.0-alpha.13` : déduplication `in-flight` exacte des générations IA ; 10/10 backend ciblés, 184/184 complets.
 - Lot `4.8.0-alpha.14` : premier correctif V3 post-`f49ec7f` — Réglages, previews appareil, collisions toolbar/dock, SVG et cibles de structure stabilisés ; audit navigateur 1440/390, 39/39 ciblés, 189/189 complets et `git diff --check`.
-- Prochaine action unique : rétablir l’accès complet aux contrôles d’édition à 1280/1024 px puis rejouer les interactions section/inspector/Assistant avant de revenir au lot factuel IA.
+- Lot `4.8.0-alpha.15` : sélection V3 synchronisée, inspecteur responsive sous 1280 px, drag/drop V3 rebranché sur les nouvelles lignes et édition de contenu vérifiée à 1280/1024/390 ; 27/27 ciblés, 191/191 complets.
+- Prochaine action unique : auditer image picker + CTA/popovers puis modales/focus/scroll/dashboard responsive avant de revenir au lot factuel IA.
