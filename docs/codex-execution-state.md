@@ -2,6 +2,13 @@
 
 ## REPRISE COURTE — priorité vitrine (prévaut sur l'historique)
 
+- Sous-lot FAQ terminé localement : accordéon compact fermé au départ, déclencheurs natifs
+  au clavier avec `aria-expanded` / `aria-controls`, réponse masquée de façon cohérente et
+  focus visible. La galerie emploie désormais l'icône vectorielle de recherche, sans emoji.
+- Tests ciblés : **12/12** (vitrine, hero, consolidation) + `git diff --check` réussis.
+- Prochaine action exacte : vérification responsive groupée desktop/mobile de la vitrine puis
+  contrôles d'édition des sections présentation/services/galerie ; conserver l'export cohérent.
+
 - Sous-lot vitrine « Horaires & Lieu » terminé localement : la grille desktop possède
   désormais ses deux colonnes réelles (6/12 + 6/12), sans écraser la carte. La démo
   Montauban affiche une carte-image remplaçable dans l'éditeur ; les autres villes

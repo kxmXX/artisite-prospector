@@ -3697,8 +3697,18 @@ export class App {
         const item = header.closest(".faq-item");
         if (!item) return;
         const isOpen = item.classList.contains("active");
-        document.querySelectorAll(".faq-item").forEach(el => el.classList.remove("active"));
-        if (!isOpen) item.classList.add("active");
+        document.querySelectorAll(".faq-item").forEach(el => {
+          el.classList.remove("active");
+          el.querySelector(".faq-header")?.setAttribute("aria-expanded", "false");
+          const answer = el.querySelector(".faq-content");
+          if (answer) answer.hidden = true;
+        });
+        if (!isOpen) {
+          item.classList.add("active");
+          header.setAttribute("aria-expanded", "true");
+          const answer = item.querySelector(".faq-content");
+          if (answer) answer.hidden = false;
+        }
       };
     });
 

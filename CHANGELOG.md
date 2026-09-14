@@ -9,6 +9,9 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ### Consolidation non publiée — 14 septembre 2026 (4.8.0-alpha.1)
 
+- Vitrine : FAQ compacte et accessible au clavier, avec états ARIA synchronisés ; icône de
+  zoom de galerie harmonisée avec le système vectoriel.
+
 - Vitrine : bloc « Horaires & Lieu » remis en deux colonnes sur desktop. La carte de la
   démo est remplaçable dans l'éditeur ; les autres villes utilisent leur adresse et un lien
   d'itinéraire au lieu d'une carte Montauban imposée.

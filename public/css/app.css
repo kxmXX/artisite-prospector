@@ -558,11 +558,21 @@ body {
   transition: all 0.2s ease;
 }
 .faq-header {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
   font-weight: 600;
   cursor: pointer;
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+.faq-header:focus-visible {
+  outline: 2px solid var(--primary, #527c22);
+  outline-offset: 4px;
+  border-radius: 0.5rem;
 }
 .faq-content {
   display: none;

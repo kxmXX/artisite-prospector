@@ -83,6 +83,13 @@ puis présentation/services/galerie/FAQ. Voir la tête courte de codex-execution
   inventée complètent ce sous-lot. Tests ciblés 12/12 et vérification statique réussis.
 - Suite : présentation/services/galerie, FAQ compacte, puis contrôles responsive et export.
 
+### Sous-lot FAQ accessible terminé — 14 septembre 2026
+
+- FAQ compacte au chargement, navigation au clavier, état `aria-expanded` et association
+  explicite question/réponse. L'icône de loupe de galerie rejoint le système SVG commun.
+- Tests ciblés 12/12. Suite : contrôle responsive desktop/mobile et cohérence export,
+  avant de poursuivre les autres lots d'édition.
+
 | Lot | Action | Validation requise | État |
 |---|---|---|---|
 | 1 | Audit, contexte durable, version/changelog honnêtes | Base, captures, architecture et risques tracés | Audit/plan terminés be8600c ; version4.8.0-alpha.1 intégrée non publiée |

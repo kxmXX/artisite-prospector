@@ -72,6 +72,8 @@ test("v4.7.0 Consolidation: FAQ renders minimalist divider rows with rotating pl
   assert.ok(html.includes("divide-y divide-zinc-200/80"), "FAQ must use clean divider rows");
   assert.ok(html.includes("faq-item"), "FAQ must contain .faq-item elements");
   assert.ok(html.includes("faq-header"), "FAQ items must have .faq-header click targets");
+  assert.ok(html.includes('aria-expanded="false"'), "FAQ triggers must expose their collapsed state");
+  assert.ok(html.includes('aria-controls="faq-answer-'), "FAQ triggers must reference their answers");
 
   // 2. Circular toggle button
   assert.ok(html.includes("faq-icon-btn"), "FAQ must render .faq-icon-btn");

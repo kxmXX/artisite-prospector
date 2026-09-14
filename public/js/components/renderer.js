@@ -1654,7 +1654,7 @@ function renderGalleryCard(p, idx, sec, project, options, aspectClass) {
         ${renderEditableImage(photoUrl, { sectionId: sec.id, fieldPath: `photos.${idx}.url`, itemIndex: idx, alt: p.title || 'Photo', className: 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-500', options })}
         <div class="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
           <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-black/60 backdrop-blur text-white text-xs shadow-md">
-            🔍
+            ${getIcon("search", "w-4 h-4")}
           </span>
         </div>
       </div>
@@ -2213,12 +2213,12 @@ function renderFaq(sec, project) {
 
         <div class="divide-y divide-zinc-200/80 dark:divide-zinc-800 border-t border-b border-zinc-200/80 dark:border-zinc-800">
           ${(c.items || []).map((faq, idx) => `
-            <div class="faq-item group/faq transition-colors py-5 sm:py-6 ${idx === 0 ? 'active' : ''}">
-              <div class="faq-header flex items-center justify-between gap-4 cursor-pointer select-none">
+            <div class="faq-item group/faq transition-colors py-5 sm:py-6">
+              <button type="button" class="faq-header flex items-center justify-between gap-4 cursor-pointer select-none" aria-expanded="false" aria-controls="faq-answer-${sec.id}-${idx}">
                 <span class="text-base sm:text-lg font-bold text-zinc-900 dark:text-white group-hover/faq:text-emerald-600 dark:group-hover/faq:text-emerald-400 transition-colors leading-snug" data-editable="items.${idx}.q">${faq.q}</span>
-                <span class="faq-icon-btn shrink-0">+</span>
-              </div>
-              <div class="faq-content pt-3">
+                <span class="faq-icon-btn shrink-0" aria-hidden="true">+</span>
+              </button>
+              <div id="faq-answer-${sec.id}-${idx}" class="faq-content pt-3" hidden>
                 <p class="text-sm sm:text-base text-zinc-600 dark:text-zinc-400 leading-relaxed font-normal" data-editable="items.${idx}.a">${faq.a}</p>
               </div>
             </div>
