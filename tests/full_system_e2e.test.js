@@ -485,7 +485,7 @@ test("E2E Subsystem 7: Sticky Call Bar Docking, Drag Handle, Phone, WhatsApp & Q
     assert.ok(html.includes("sticky-drag-handle"), "Must contain drag handle button");
     assert.ok(html.includes("tel:0753196044") || html.includes("tel:07 53 19 60 44"), "Must contain direct phone call link");
     assert.ok(html.includes("wa.me/"), "Must contain direct WhatsApp link");
-    assert.ok(html.includes("#quoteSimulator"), "Must contain quick quote simulator link");
+    assert.ok(html.includes("#simulateur"), "Must contain quick quote simulator link");
   }
 
   // Verify CSS defines docking positions

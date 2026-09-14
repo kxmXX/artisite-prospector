@@ -102,7 +102,7 @@ function generateSiteFromInput(input = {}, useDemoContent = false) {
         { label: "Savoir-Faire", target: "#about" },
         { label: "Réalisations", target: "#realisations" },
         { label: "Avis Clients", target: "#reviews" },
-        { label: isFoodTrade ? "Réserver" : "Contact & Devis", target: "#quoteSimulator" },
+        { label: isFoodTrade ? "Réserver" : "Contact & Devis", target: "#simulateur" },
         { label: "Accès", target: "#location" }
       ]
     },
@@ -314,7 +314,9 @@ function generateSiteFromInput(input = {}, useDemoContent = false) {
     id: "sec-quote-simulator",
     type: "quoteSimulator",
     variant: "interactive-calculator",
-    visibility: !isPaysagiste,
+    // A visible conversion path is required whenever a visible CTA promises a quote.
+    // The form stays local until the project is connected to a real delivery endpoint.
+    visibility: true,
     content: {
       badge: "Devis Express en Ligne",
       title: "Simulez Votre Projet en 3 Clics",
@@ -950,7 +952,7 @@ export function createSectionData(type, variant, trade, business = {}) {
               ? `Planifiez votre projet dès maintenant pour garantir une disponibilité prioritaire sur notre calendrier d'intervention.`
               : `Notre équipe se déplace directement à ${city} pour évaluer vos travaux et vous remettre un devis gratuit sous 24h.`),
           ctaText: isRadar ? `Appel d'urgence (${phone})` : (isCampaign ? "Réserver mon créneau prioritaire" : `Contacter l'artisan (${phone})`),
-          ctaLink: isRadar ? `tel:${phone}` : "#quoteSimulator",
+          ctaLink: isRadar ? `tel:${phone}` : "#simulateur",
           currentBookings: isCampaign ? 18 : undefined,
           targetBookings: isCampaign ? 25 : undefined,
           priceText: isCampaign ? "À partir de 450€ TTC" : undefined,

@@ -1908,6 +1908,10 @@ function renderReviews(sec, project, options = {}) {
 // 11. Quote Simulator
 function renderQuoteSimulator(sec, project) {
   const c = sec.content;
+  const phone = project.business?.phone || c.phone || "";
+  const cleanPhone = phone.replace(/[^0-9]/g, "");
+  const whatsapp = (project.settings?.whatsappNumber || cleanPhone).replace(/[^0-9]/g, "");
+  const whatsappText = encodeURIComponent(`Bonjour ${project.business?.name || ""}, je souhaite demander un devis.`);
   return `
     <div id="simulateur" class="py-20" style="background: linear-gradient(180deg, var(--bg-sec) 0%, var(--bg) 100%);">
       <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1936,18 +1940,18 @@ function renderQuoteSimulator(sec, project) {
 
             <div class="grid sm:grid-cols-2 gap-6">
               <div>
-                <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-2">Votre Nom ou Entreprise</label>
-                <input type="text" required placeholder="Ex: M. Dupont" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 focus:outline-none focus:border-zinc-900 focus:bg-white">
+                <label for="quote-name-${sec.id}" class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-2">Votre Nom ou Entreprise</label>
+                <input id="quote-name-${sec.id}" name="name" type="text" required autocomplete="name" placeholder="Ex. Camille Martin" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 focus:outline-none focus:border-zinc-900 focus:bg-white">
               </div>
               <div>
-                <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-2">Votre Téléphone (pour devis)</label>
-                <input type="tel" required placeholder="06 XX XX XX XX" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 focus:outline-none focus:border-zinc-900 focus:bg-white">
+                <label for="quote-phone-${sec.id}" class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-2">Votre téléphone</label>
+                <input id="quote-phone-${sec.id}" name="phone" type="tel" required autocomplete="tel" inputmode="tel" placeholder="06 00 00 00 00" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 focus:outline-none focus:border-zinc-900 focus:bg-white">
               </div>
             </div>
 
             <div>
-              <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-2">Précisions sur votre demande (optionnel)</label>
-              <textarea rows="3" placeholder="Décrivez succinctement votre besoin ou contraintes..." class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 focus:outline-none focus:border-zinc-900 focus:bg-white"></textarea>
+              <label for="quote-details-${sec.id}" class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-2">Précisions sur votre demande <span class="normal-case font-medium">(facultatif)</span></label>
+              <textarea id="quote-details-${sec.id}" name="details" rows="3" placeholder="Décrivez votre besoin ou vos contraintes…" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 focus:outline-none focus:border-zinc-900 focus:bg-white"></textarea>
             </div>
 
             <div class="text-center pt-2">
@@ -1955,14 +1959,18 @@ function renderQuoteSimulator(sec, project) {
                 ${getIcon("send", "w-4 h-4")}
                 <span data-editable="ctaButton">${c.ctaButton || "Envoyer ma demande de chiffrage"}</span>
               </button>
-              <p class="text-xs text-gray-400 mt-3">✓ Vos données restent confidentielles et ne sont jamais transmises à des tiers.</p>
+              <p class="text-xs text-gray-500 mt-3">Cette démo prépare votre demande localement. Choisissez ensuite votre moyen de contact.</p>
             </div>
           </form>
 
           <div id="quote-calc-success" class="text-center py-8 space-y-3" style="display:none;">
             <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto text-2xl">✓</div>
-            <h3 class="font-heading text-2xl font-bold text-gray-900">Demande bien enregistrée !</h3>
-            <p class="text-gray-600 text-sm max-w-md mx-auto">Votre artisan vous recontactera sous 24h ouvrées pour vous transmettre votre chiffrage détaillé gratuit.</p>
+            <h3 class="font-heading text-2xl font-bold text-gray-900">Votre demande est prête</h3>
+            <p class="text-gray-600 text-sm max-w-md mx-auto">Pour l'envoyer réellement, contactez directement l'entreprise.</p>
+            <div class="flex flex-wrap justify-center gap-3 pt-2">
+              ${phone ? `<a href="tel:${cleanPhone}" class="btn-cta inline-flex items-center justify-center px-5 py-3 rounded-full text-sm font-bold text-white no-underline" style="background-color: var(--primary);">${getIcon("phone", "w-4 h-4")}&nbsp; Appeler ${phone}</a>` : ''}
+              ${whatsapp ? `<a href="https://wa.me/${whatsapp}?text=${whatsappText}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center px-5 py-3 rounded-full text-sm font-bold text-gray-800 border border-gray-300 no-underline">${getIcon("message", "w-4 h-4")}&nbsp; WhatsApp</a>` : ''}
+            </div>
           </div>
         </div>
       </div>
@@ -2438,7 +2446,7 @@ function renderCustomBlock(sec, project, options = {}) {
                 </div>
               </div>
 
-              <a href="${c.ctaLink || '#quoteSimulator'}" class="btn-cta w-full text-center block text-white font-bold py-3 shadow-md" style="background-color: var(--primary);">
+              <a href="${c.ctaLink || '#simulateur'}" class="btn-cta w-full text-center block text-white font-bold py-3 shadow-md" style="background-color: var(--primary);">
                 <span data-editable="ctaText">${c.ctaText || "Réserver mon créneau prioritaire"}</span>
               </a>
             </div>
@@ -3265,9 +3273,9 @@ export function renderStickyCallBar(project, options = {}) {
         ` : ''}
 
         <!-- Quick Quote Link -->
-        <a href="#quoteSimulator" class="flex items-center justify-center gap-1.5 py-2 px-3 rounded-full bg-zinc-800/80 hover:bg-zinc-700/80 text-zinc-200 font-medium transition-all border border-white/10 active:scale-95" aria-label="Demander un devis sous 24 heures">
+        <a href="#simulateur" class="flex items-center justify-center gap-1.5 py-2 px-3 rounded-full bg-zinc-800/80 hover:bg-zinc-700/80 text-zinc-200 font-medium transition-all border border-white/10 active:scale-95" aria-label="Demander un devis">
           ${getIcon("clipboard", "w-3.5 h-3.5 text-amber-400")}
-          <span>Devis 24h</span>
+          <span>Devis</span>
         </a>
 
       </div>

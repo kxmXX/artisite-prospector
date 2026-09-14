@@ -3560,28 +3560,6 @@ export class App {
     this.rootEl.innerHTML = `
       <div class="relative min-h-screen bg-zinc-950">
         
-        ${isClientDemo ? "" : `
-        <!-- Floating Commercial Pitch Ribbon for Michel -->
-        <div class="fixed top-3 left-1/2 transform -translate-x-1/2 z-50 bg-zinc-950/90 text-white px-4 py-2 rounded-full shadow-lg backdrop-blur-md border border-zinc-800 flex items-center gap-3.5 text-xs">
-          <div class="flex items-center gap-2 font-medium text-zinc-300">
-            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-            <span>Proposition : <strong class="text-white">${escapeHtml(project.business?.name || '')}</strong></span>
-          </div>
-
-          <div class="h-3.5 w-[1px] bg-zinc-800"></div>
-
-          <button type="button" onclick="window.app.openEditor()" class="text-zinc-400 hover:text-white font-medium flex items-center gap-1 transition-colors">
-            ${getIcon("edit", "w-3.5 h-3.5")}
-            <span>Retour Éditeur</span>
-          </button>
-
-          <button type="button" onclick="window.app.openCloserModal()" class="px-2.5 py-1 rounded-full bg-white text-zinc-950 hover:bg-zinc-100 font-medium flex items-center gap-1 shadow-xs transition-colors">
-            ${getIcon("sparkles", "w-3.5 h-3.5")}
-            <span>Script Appel</span>
-          </button>
-        </div>
-        `}
-
         <!-- The Clean Site Canvas without any editor chrome -->
         <div>
           ${siteHTML}
@@ -3807,6 +3785,9 @@ export class App {
 
     // Accessible CTA popovers & Direct Buttons
     document.querySelectorAll("[data-cta-popover-wrapper]").forEach(wrapper => {
+      // The same CTA markup is used by the public site. Public links must keep
+      // their native navigation; only the editor has contextual controls.
+      if (wrapper.dataset.uiTarget !== "true") return;
       const setOpen = (open) => wrapper.setAttribute("aria-expanded", String(open));
       wrapper.addEventListener("mouseenter", () => setOpen(true));
       wrapper.addEventListener("mouseleave", () => {
