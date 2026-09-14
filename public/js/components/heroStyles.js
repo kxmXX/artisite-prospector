@@ -3,7 +3,7 @@ export const HERO_STYLES = `
 .artisite-root .hero-fullscreen {
   position: relative; isolation: isolate; overflow: hidden;
   display: flex; flex-direction: column; justify-content: center;
-  height: min(calc(100svh - 6.25rem), 56.25vw);
+  height: min(calc(100svh - 5rem), 56.25vw);
   min-height: 42rem; padding: clamp(3rem, 5.5vw, 6rem) 1.25rem 2rem;
   color: #fff; background: #182119;
 }

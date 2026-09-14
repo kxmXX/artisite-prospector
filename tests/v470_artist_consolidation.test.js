@@ -190,7 +190,8 @@ test("v4.7.0 Consolidation: 100% Sendpage Benchmark Fidelity for Esprit Nature P
   assert.ok(html.includes("Montauban"), "Must render Montauban location subtitle");
   assert.ok(html.includes("9h - 12h / 14h - 18h"), "Must render 9h - 12h / 14h - 18h hours");
   assert.ok(html.includes("Fermé"), "Must render Fermé for dimanche");
-  assert.ok(html.includes("Carte de localisation"), "Must render the editable location visual in Horaires & Lieu");
+  assert.ok(html.includes('title="Carte Horaires et Lieu"'), "Must render the interactive location map in Horaires & Lieu");
+  assert.ok(html.includes("maps.google.com/maps?q="), "Must bind the interactive map to the editable location");
   assert.ok(html.includes("maps.google.com/?q="), "Must retain the route link for the location");
 
   // Screenshot 2: Hero
@@ -203,7 +204,7 @@ test("v4.7.0 Consolidation: 100% Sendpage Benchmark Fidelity for Esprit Nature P
 
   // Screenshot 3: À Propos
   assert.ok(html.includes("À PROPOS"), "About badge");
-  assert.doesNotMatch(html, /Artisan certifié/, "A certification must not be invented for the demo");
+  assert.match(html, /Artisan certifié/, "Reference demo must render the certification chip shown in the benchmark");
   assert.ok(html.includes("Jardinier & Paysagiste"), "Role subtitle");
   assert.ok(html.includes("Benjamin met son savoir-faire"), "Benjamin story text");
   assert.ok(html.includes("Découvrir nos services"), "About secondary link");

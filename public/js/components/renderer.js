@@ -569,13 +569,17 @@ function renderHeader(sec, project, options = {}) {
   const visibleTypes = new Set((project.sections || [])
     .filter(section => section.visibility !== false)
     .map(section => section.type));
+  const configuredVitrineLinks = Array.isArray(c.links) ? c.links : [];
   const defaultVitrineLinks = [
     { label: "Services", target: "#services", type: "services" },
     { label: "À propos", target: "#about", type: "about" },
     { label: "Avis", target: "#avis", type: "reviews" },
     { label: "Galerie", target: "#galerie", type: "gallery" },
     { label: "FAQ", target: "#faq", type: "faq" }
-  ].filter(link => visibleTypes.has(link.type));
+  ].map(link => {
+    const configured = configuredVitrineLinks.find(item => item?.target === link.target);
+    return configured?.label ? { ...link, label: configured.label } : link;
+  }).filter(link => visibleTypes.has(link.type));
   // The vitrine has a single scrolling page: its primary navigation must always
   // expose the visible editorial destinations, rather than inheriting a partial
   // generic navigation from an older template.
@@ -587,7 +591,7 @@ function renderHeader(sec, project, options = {}) {
       <div class="max-w-7xl vitrine-shell mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between ${isPaysagiste ? 'vitrine-site-header-inner' : ''}">
         <a href="#" class="flex items-center gap-3 group no-underline select-none">
           ${isPaysagiste ? `
-            <span class="font-heading text-xl sm:text-2xl font-black tracking-tight text-gray-900 block leading-tight no-underline" data-editable="brandName">${c.brandName || project.business?.name || 'Esprit Nature'}</span>
+            <span class="font-heading text-lg font-bold tracking-tight text-gray-900 block leading-tight no-underline vitrine-brand-name" data-editable="brandName">${c.brandName || project.business?.name || 'Esprit Nature'}</span>
           ` : `
             <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-md transition-transform group-hover:scale-105 flex-shrink-0" style="background-color: var(--primary);">
               ${c.brandName ? c.brandName.charAt(0).toUpperCase() : 'A'}
@@ -599,7 +603,7 @@ function renderHeader(sec, project, options = {}) {
           `}
         </a>
 
-        <nav class="hidden md:flex items-center gap-7 text-sm font-semibold text-gray-700 ${isPaysagiste ? 'vitrine-site-nav' : ''}">
+        <nav class="hidden md:flex items-center gap-7 text-sm font-medium text-gray-700 ${isPaysagiste ? 'vitrine-site-nav' : ''}">
           ${project.branding?.navigationMode === "multi-tab" ? `
             <div class="flex items-center gap-1.5 bg-zinc-100/90 p-1 rounded-full border border-zinc-200/80" data-navigation-mode="multi-tab">
               <button type="button" onclick="(window.app?.setVirtualPage ? window.app.setVirtualPage('home') : window.artisiteSwitchPage?.('home'))" data-tab-nav="home" class="tab-nav-btn px-3 py-1 rounded-full text-xs font-semibold transition-all ${(options.activeVirtualPage || project._activeVirtualPage || 'home') === 'home' ? 'bg-white text-zinc-950 shadow-xs font-bold' : 'text-zinc-600 hover:text-zinc-900'}">Accueil</button>
@@ -626,7 +630,7 @@ function renderHeader(sec, project, options = {}) {
           ${isButtonHidden(sec, 'ctaText') || isButtonHidden(sec, 'primary') ? '' : `
             <div class="cta-button-wrapper group/cta relative" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-ctaText" data-cta-popover-wrapper data-section-id="${sec.id}" data-button-type="ctaText">
               ${renderButtonActionBadge(sec, 'ctaText', options, project)}
-              <a href="#simulateur" class="btn-cta inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold text-white shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 no-underline ${isPaysagiste ? 'vitrine-header-cta' : ''}" style="background-color: var(--primary);">
+              <a href="#simulateur" class="btn-cta inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white shadow-sm hover:shadow-md transition-all transform hover:-translate-y-0.5 no-underline ${isPaysagiste ? 'vitrine-header-cta' : ''}" style="background-color: var(--primary);">
                 ${getIcon("phone", "w-4 h-4 text-white")}
                 <span data-editable="ctaText">${c.ctaText || "Demander un devis"}</span>
               </a>
@@ -2015,6 +2019,10 @@ function renderHours(sec, project, options = {}) {
   // address-driven map until the editor supplies a replacement image.
   const mapCity = c.city || project.business?.city || "";
   const mapImage = c.mapImage || (isPaysagiste && /montauban/i.test(mapCity) ? "images/map-montauban.png" : "");
+  const mapQuery = c.address || (c.city ? `${c.city}, France` : (project.business?.city ? `${project.business.city}, France` : "Montauban, France"));
+  // Vitrine defaults to a real embedded map. The reference image remains available
+  // as an explicit editor-selectable visual mode for agencies that want it.
+  const useInteractiveMap = c.mapMode !== "image" || !mapImage;
 
   if (isUnified) {
     const defaultDays = ["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi", "dimanche"];
@@ -2076,23 +2084,25 @@ function renderHours(sec, project, options = {}) {
 
             <!-- Right Column: dynamic map, tied to the editable address/city. -->
             <div class="lg:col-span-6 bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 shadow-sm overflow-hidden relative vitrine-hours-map">
-              ${mapImage ? renderEditableImage(mapImage, {
+              ${useInteractiveMap ? `
+                <iframe
+                  title="Carte Horaires et Lieu"
+                  class="w-full h-full border-0 filter saturate-[1.05]"
+                  loading="lazy"
+                  allowfullscreen
+                  referrerpolicy="no-referrer-when-downgrade"
+                  src="https://maps.google.com/maps?q=${encodeURIComponent(mapQuery)}&t=&z=12&ie=UTF8&iwloc=&output=embed">
+                </iframe>
+              ` : renderEditableImage(mapImage, {
                 sectionId: sec.id,
                 fieldPath: "mapImage",
                 alt: `Carte de localisation — ${c.city || project.business?.city || "zone d'intervention"}`,
                 className: "w-full h-full object-cover",
                 options,
                 tradeId: project.business?.tradeId
-              }) : `
-                <iframe
-                  title="Carte Horaires et Lieu"
-                  class="w-full h-full border-0 filter saturate-[1.05]"
-                  loading="lazy"
-                  src="https://maps.google.com/maps?q=${encodeURIComponent(c.address || (c.city ? c.city + ', France' : (project.business?.city ? project.business.city + ', France' : 'Montauban, France')))}&t=&z=12&ie=UTF8&iwloc=&output=embed">
-                </iframe>
-              `}
+              })}
               <div class="absolute bottom-3 left-3 z-10 pointer-events-auto">
-                <a href="https://maps.google.com/?q=${encodeURIComponent(c.address || (c.city ? c.city + ', France' : (project.business?.city ? project.business.city + ', France' : 'Montauban, France')))}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-[11px] font-bold text-white bg-black/60 hover:bg-black/80 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/20 transition-all no-underline">
+                <a href="https://maps.google.com/?q=${encodeURIComponent(mapQuery)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-[11px] font-bold text-white bg-black/60 hover:bg-black/80 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/20 transition-all no-underline">
                   <span>Calculer mon itinéraire</span>
                   ${getIcon("externalLink", "w-3 h-3")}
                 </a>
@@ -2211,10 +2221,10 @@ function renderFaq(sec, project) {
       <div class="max-w-7xl vitrine-shell mx-auto px-4 sm:px-6 lg:px-8 vitrine-faq-shell">
         <div class="text-center space-y-2 mb-12 sm:mb-16">
           <div class="text-xs font-bold uppercase tracking-wider text-[#527c22] dark:text-[#8FA382]" data-editable="badge">
-            ${c.badge || 'QUESTIONS FRÉQUENTES'}
+            ${c.badge || 'FAQ'}
           </div>
           <h2 class="font-heading text-3xl sm:text-4xl lg:text-5xl font-extrabold text-zinc-900 dark:text-white tracking-tight vitrine-section-title" data-editable="title">
-            ${c.title || 'FAQ'}
+            ${c.title || 'Questions fréquentes'}
           </h2>
           <!-- Green Accent Dash -->
           <div class="w-12 h-1 rounded-full mx-auto mt-2.5 mb-5" style="background-color: var(--primary, #527c22);"></div>

@@ -156,7 +156,7 @@ function generateSiteFromInput(input = {}, useDemoContent = false) {
     content: {
       badge: isPaysagiste ? "À PROPOS" : "Notre Histoire & Philosophie",
       title: isPaysagiste ? name : (trade.aboutTitle || `À propos de ${name}`),
-      certified: trade.aboutCertified || "",
+      certified: useDemoContent ? (trade.aboutCertified || "") : "",
       story: trade.aboutStory.replace(/notre entreprise/g, name),
       owner: trade.aboutOwner || "",
       role: isPaysagiste ? (trade.aboutRole || "Jardinier & Paysagiste") : (trade.aboutRole || trade.label),
@@ -338,12 +338,15 @@ function generateSiteFromInput(input = {}, useDemoContent = false) {
     id: "sec-hours",
     type: "hours",
     variant: isPaysagiste ? "unified-map" : "table-card",
-    visibility: Object.keys(business.openingHours).length > 0,
+    visibility: (useDemoContent && isPaysagiste) || Object.keys(business.openingHours).length > 0,
     content: {
       badge: isPaysagiste ? "HORAIRES" : "Disponibilités",
       title: isPaysagiste ? "Horaires & Lieu" : "Horaires d'Ouverture & Accueil",
-      subtitle: city ? `Horaires communiqués pour ${city}.` : "Horaires communiqués par le professionnel.",
+      subtitle: isPaysagiste ? city : (city ? `Horaires communiqués pour ${city}.` : "Horaires communiqués par le professionnel."),
       hours: business.openingHours,
+      city,
+      address: business.address || "",
+      mapMode: "interactive",
       note: "",
       phone
     },
@@ -387,8 +390,8 @@ function generateSiteFromInput(input = {}, useDemoContent = false) {
     variant: "accordion",
     visibility: true,
     content: {
-      badge: isPaysagiste ? "QUESTIONS FRÉQUENTES" : "Foire Aux Questions",
-      title: isPaysagiste ? "FAQ" : "Questions Fréquentes",
+      badge: isPaysagiste ? "FAQ" : "Foire Aux Questions",
+      title: isPaysagiste ? "Questions fréquentes" : "Questions Fréquentes",
       subtitle: isPaysagiste ? "" : "Tout ce que vous devez savoir avant de nous confier votre projet.",
       items: (trade.faq || []).map((item, idx) => ({
         id: `faq-${idx + 1}`,

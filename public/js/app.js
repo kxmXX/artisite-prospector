@@ -2330,6 +2330,30 @@ export class App {
     state.updateSectionContent(sectionId, "photos", photos);
   }
 
+  addReviewItem(sectionId) {
+    if (!state.currentProject) return;
+    const sec = state.currentProject.sections.find(s => s.id === sectionId);
+    if (!sec || !sec.content) return;
+    const reviews = Array.isArray(sec.content.reviews) ? [...sec.content.reviews] : [];
+    reviews.push({
+      id: `rev-${Date.now()}`,
+      author: "Nouveau client",
+      city: state.currentProject.business?.city || "",
+      rating: 5,
+      date: "",
+      text: "Ajoutez ici le témoignage du client."
+    });
+    state.updateSectionContent(sectionId, "reviews", reviews);
+  }
+
+  removeReviewItem(sectionId, idx) {
+    if (!state.currentProject) return;
+    const sec = state.currentProject.sections.find(s => s.id === sectionId);
+    if (!sec || !sec.content || !Array.isArray(sec.content.reviews)) return;
+    const reviews = sec.content.reviews.filter((_, i) => i !== idx);
+    state.updateSectionContent(sectionId, "reviews", reviews);
+  }
+
   addFaqItem(sectionId) {
     if (!state.currentProject) return;
     const sec = state.currentProject.sections.find(s => s.id === sectionId);

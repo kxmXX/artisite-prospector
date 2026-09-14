@@ -661,6 +661,161 @@ function renderSectionAccordionContent(sec, project, variants) {
         </div>
       ` : ''}
 
+      <!-- Vitrine template: header identity + one-page navigation -->
+      ${sec.type === 'header' ? `
+        <div class="space-y-2.5 pt-2 border-t border-zinc-200/60">
+          <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Identité & Navigation Vitrine</label>
+          <div>
+            <label class="block text-[10px] text-zinc-500 mb-1">Nom affiché :</label>
+            <input type="text" value="${escapeHtml(c.brandName || '')}"
+                   data-field="brandName"
+                   oninput="window.app.liveUpdateField('${sectionId}', 'brandName', this.value)"
+                   onchange="window.app.commitFieldUpdate('${sectionId}', 'brandName', this.value)"
+                   class="w-full bg-white border border-zinc-200 rounded-md px-2.5 py-1 text-xs text-zinc-900">
+          </div>
+          ${Array.isArray(c.links) && c.links.length ? `
+            <div class="space-y-1.5">
+              <div class="text-[10px] text-zinc-500">Libellés du menu :</div>
+              ${c.links.map((link, linkIdx) => `
+                <div class="grid grid-cols-[1fr_auto] gap-2 items-center">
+                  <input type="text" value="${escapeHtml(link.label || '')}"
+                         data-field="links.${linkIdx}.label"
+                         oninput="window.app.liveUpdateField('${sectionId}', 'links.${linkIdx}.label', this.value)"
+                         onchange="window.app.commitFieldUpdate('${sectionId}', 'links.${linkIdx}.label', this.value)"
+                         class="w-full bg-white border border-zinc-200 rounded-md px-2.5 py-1 text-xs text-zinc-900">
+                  <span class="text-[9px] font-mono text-zinc-400">${escapeHtml(link.target || '')}</span>
+                </div>
+              `).join('')}
+            </div>
+          ` : ''}
+        </div>
+      ` : ''}
+
+      <!-- Vitrine template: About copy, CTA labels and portrait -->
+      ${sec.type === 'about' ? `
+        <div class="space-y-2.5 pt-2 border-t border-zinc-200/60">
+          <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">À propos — contenu du template</label>
+          <div class="grid grid-cols-2 gap-2">
+            <input type="text" value="${escapeHtml(c.certified || '')}" placeholder="Badge certification"
+                   data-field="certified"
+                   oninput="window.app.liveUpdateField('${sectionId}', 'certified', this.value)"
+                   onchange="window.app.commitFieldUpdate('${sectionId}', 'certified', this.value)"
+                   class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-[11px]">
+            <input type="text" value="${escapeHtml(c.role || '')}" placeholder="Métier / rôle"
+                   data-field="role"
+                   oninput="window.app.liveUpdateField('${sectionId}', 'role', this.value)"
+                   onchange="window.app.commitFieldUpdate('${sectionId}', 'role', this.value)"
+                   class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-[11px]">
+          </div>
+          <textarea rows="7" data-field="story" placeholder="Histoire / présentation"
+                    oninput="window.app.liveUpdateField('${sectionId}', 'story', this.value)"
+                    onchange="window.app.commitFieldUpdate('${sectionId}', 'story', this.value)"
+                    class="w-full bg-white border border-zinc-200 rounded px-2 py-1.5 text-[11px] leading-relaxed">${escapeHtml(c.story || '')}</textarea>
+          <div class="grid grid-cols-2 gap-2">
+            <input type="text" value="${escapeHtml(c.aboutCta || '')}" placeholder="CTA devis"
+                   data-field="aboutCta"
+                   oninput="window.app.liveUpdateField('${sectionId}', 'aboutCta', this.value)"
+                   onchange="window.app.commitFieldUpdate('${sectionId}', 'aboutCta', this.value)"
+                   class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-[11px]">
+            <input type="text" value="${escapeHtml(c.aboutLink || '')}" placeholder="Lien services"
+                   data-field="aboutLink"
+                   oninput="window.app.liveUpdateField('${sectionId}', 'aboutLink', this.value)"
+                   onchange="window.app.commitFieldUpdate('${sectionId}', 'aboutLink', this.value)"
+                   class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-[11px]">
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="w-16 h-16 rounded-lg overflow-hidden border border-zinc-200 bg-zinc-100 shrink-0">
+              <img src="${c.image || ''}" alt="Portrait" class="w-full h-full object-cover">
+            </div>
+            <button type="button" onclick="window.app.openImagePicker('${sectionId}', 'image')"
+                    class="text-[10.5px] font-medium text-zinc-800 bg-zinc-100 hover:bg-zinc-200 px-2.5 py-1 rounded border border-zinc-200">Remplacer le portrait</button>
+          </div>
+        </div>
+      ` : ''}
+
+      <!-- Vitrine template: reviews are first-class editable content -->
+      ${sec.type === 'reviews' ? `
+        <div class="space-y-2.5 pt-2 border-t border-zinc-200/60">
+          <div class="flex items-center justify-between">
+            <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Avis clients (${(c.reviews || []).length})</label>
+            <button type="button" onclick="window.app.addReviewItem('${sectionId}')" class="text-[10px] font-bold text-zinc-800 bg-zinc-100 hover:bg-zinc-200 px-2 py-0.5 rounded border border-zinc-200">+ Ajouter</button>
+          </div>
+          ${(c.reviews || []).map((review, reviewIdx) => `
+            <div class="p-2.5 rounded-lg bg-zinc-50 border border-zinc-200 space-y-1.5">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold text-zinc-700 uppercase">Avis #${reviewIdx + 1}</span>
+                <button type="button" onclick="window.app.removeReviewItem('${sectionId}', ${reviewIdx})" class="text-red-600 text-[10px]">🗑️</button>
+              </div>
+              <div class="grid grid-cols-[1fr_72px] gap-1.5">
+                <input type="text" value="${escapeHtml(review.author || '')}" placeholder="Nom"
+                       data-field="reviews.${reviewIdx}.author"
+                       oninput="window.app.liveUpdateField('${sectionId}', 'reviews.${reviewIdx}.author', this.value)"
+                       onchange="window.app.commitFieldUpdate('${sectionId}', 'reviews.${reviewIdx}.author', this.value)"
+                       class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-[11px]">
+                <select onchange="window.app.updateSectionContent('${sectionId}', 'reviews.${reviewIdx}.rating', Number(this.value))"
+                        class="w-full bg-white border border-zinc-200 rounded px-1.5 py-1 text-[11px]">
+                  ${[5,4,3,2,1].map(star => `<option value="${star}" ${Number(review.rating || 5) === star ? 'selected' : ''}>${star}★</option>`).join('')}
+                </select>
+              </div>
+              <input type="text" value="${escapeHtml(review.city || '')}" placeholder="Ville / contexte"
+                     data-field="reviews.${reviewIdx}.city"
+                     oninput="window.app.liveUpdateField('${sectionId}', 'reviews.${reviewIdx}.city', this.value)"
+                     onchange="window.app.commitFieldUpdate('${sectionId}', 'reviews.${reviewIdx}.city', this.value)"
+                     class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-[10.5px]">
+              <textarea rows="3" placeholder="Texte de l'avis"
+                        data-field="reviews.${reviewIdx}.text"
+                        oninput="window.app.liveUpdateField('${sectionId}', 'reviews.${reviewIdx}.text', this.value)"
+                        onchange="window.app.commitFieldUpdate('${sectionId}', 'reviews.${reviewIdx}.text', this.value)"
+                        class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-[11px] leading-snug">${escapeHtml(review.text || '')}</textarea>
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
+
+      <!-- Vitrine template: hours, address and interactive/static map mode -->
+      ${sec.type === 'hours' ? `
+        <div class="space-y-2.5 pt-2 border-t border-zinc-200/60">
+          <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Horaires & carte</label>
+          <div class="grid grid-cols-2 gap-2">
+            <input type="text" value="${escapeHtml(c.city || project.business?.city || '')}" placeholder="Ville"
+                   data-field="city"
+                   oninput="window.app.liveUpdateField('${sectionId}', 'city', this.value)"
+                   onchange="window.app.commitFieldUpdate('${sectionId}', 'city', this.value)"
+                   class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-[11px]">
+            <input type="text" value="${escapeHtml(c.address || '')}" placeholder="Adresse / zone"
+                   data-field="address"
+                   oninput="window.app.liveUpdateField('${sectionId}', 'address', this.value)"
+                   onchange="window.app.commitFieldUpdate('${sectionId}', 'address', this.value)"
+                   class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-[11px]">
+          </div>
+          <div>
+            <label class="block text-[10px] text-zinc-500 mb-1">Carte :</label>
+            <select onchange="window.app.updateSectionContent('${sectionId}', 'mapMode', this.value)"
+                    class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-[11px]">
+              <option value="interactive" ${(c.mapMode || 'interactive') === 'interactive' ? 'selected' : ''}>Interactive Google Maps</option>
+              <option value="image" ${c.mapMode === 'image' ? 'selected' : ''}>Image personnalisée</option>
+            </select>
+          </div>
+          <div class="grid grid-cols-2 gap-1.5">
+            ${['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'].map(day => `
+              <div>
+                <label class="block text-[9px] capitalize text-zinc-400 mb-0.5">${day}</label>
+                <input type="text" value="${escapeHtml(c.hours?.[day] || '')}"
+                       data-field="hours.${day}"
+                       oninput="window.app.liveUpdateField('${sectionId}', 'hours.${day}', this.value)"
+                       onchange="window.app.commitFieldUpdate('${sectionId}', 'hours.${day}', this.value)"
+                       class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-[10.5px]">
+              </div>
+            `).join('')}
+          </div>
+          <div class="flex items-center gap-2">
+            ${c.mapImage ? `<div class="w-20 h-12 rounded overflow-hidden border border-zinc-200 bg-zinc-100"><img src="${c.mapImage}" alt="Carte" class="w-full h-full object-cover"></div>` : ''}
+            <button type="button" onclick="window.app.openImagePicker('${sectionId}', 'mapImage')"
+                    class="text-[10.5px] font-medium text-zinc-800 bg-zinc-100 hover:bg-zinc-200 px-2.5 py-1 rounded border border-zinc-200">Choisir l'image de carte</button>
+          </div>
+        </div>
+      ` : ''}
+
       <!-- Quote text if quoteBlock -->
       ${c.quote !== undefined ? `
         <div class="space-y-1">
@@ -726,6 +881,13 @@ function renderSectionAccordionContent(sec, project, variants) {
                         oninput="window.app.liveUpdateField('${sectionId}', 'services.${sIdx}.desc', this.value)"
                         onchange="window.app.commitFieldUpdate('${sectionId}', 'services.${sIdx}.desc', this.value)"
                         class="w-full bg-white border border-zinc-200 rounded px-2 py-1 text-[11px] text-zinc-600 focus:border-zinc-900 focus:outline-none leading-snug">${escapeHtml(srv.desc)}</textarea>
+              <div class="flex items-center gap-2">
+                <div class="w-12 h-10 rounded overflow-hidden border border-zinc-200 bg-zinc-100 shrink-0">
+                  <img src="${srv.image || ''}" alt="${escapeHtml(srv.title || 'Service')}" class="w-full h-full object-cover">
+                </div>
+                <button type="button" onclick="window.app.openImagePicker('${sectionId}', 'services.${sIdx}.image')"
+                        class="text-[10px] font-medium text-zinc-700 bg-white hover:bg-zinc-100 px-2 py-1 rounded border border-zinc-200">Remplacer l'image</button>
+              </div>
               <div class="grid grid-cols-2 gap-1.5">
                 <input type="text" value="${escapeHtml(srv.price || '')}"
                        placeholder="Tarif (ex: Sur devis)"

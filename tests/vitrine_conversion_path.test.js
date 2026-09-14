@@ -66,11 +66,22 @@ test("new paysagiste vitrines do not invent a certification", () => {
   assert.doesNotMatch(renderWebsiteHTML(project), /Artisan certifié/);
 });
 
-test("the demo map visual remains replaceable in the editor", () => {
+test("the demo hours block defaults to an interactive map and keeps image mode editable", async () => {
   const project = generateDemoSite({ name: "Esprit Nature", tradeId: "paysagiste", city: "Montauban" });
-  const html = renderWebsiteHTML(project, { isEditor: true });
-  assert.match(html, /fieldPath: "mapImage"|openImagePicker\('[^']+', 'mapImage'/);
-  assert.match(html, /images\/map-montauban\.png/);
+  const hours = project.sections.find(section => section.type === "hours");
+  assert.equal(hours.visibility, true);
+  assert.equal(hours.content.mapMode, "interactive");
+  assert.equal(hours.content.subtitle, "Montauban");
+
+  const html = renderWebsiteHTML(project, { isEditor: false });
+  assert.match(html, /title="Carte Horaires et Lieu"/);
+  assert.match(html, /maps\.google\.com\/maps\?q=Montauban%2C%20France/);
+  assert.match(html, /allowfullscreen/);
+
+  const editorSource = await readFile(new URL("../public/js/components/editor.js", import.meta.url), "utf8");
+  assert.match(editorSource, /Interactive Google Maps/);
+  assert.match(editorSource, /Choisir l'image de carte/);
+  assert.match(editorSource, /openImagePicker\('\$\{sectionId\}', 'mapImage'\)/);
 });
 
 test("the hours and location template keeps a real mobile stack", () => {
@@ -123,7 +134,7 @@ test("paysagiste vitrine keeps its fixed one-page navigation and generous editor
   assert.match(css, /\.vitrine-about-image \{ min-height: 32rem; \}/);
   assert.match(css, /max-width: 1023px[^}]*vitrine-about-grid[^}]*grid-template-columns: minmax\(0, 1fr\)/s);
   assert.match(css, /max-width: 639px[^}]*vitrine-about-image[^}]*min-height: 0/s);
-  assert.match(css, /scroll-margin-top: 6rem/);
+  assert.match(css, /scroll-margin-top: 5rem/);
   assert.match(html, /vitrine-site-nav/);
   assert.match(html, /vitrine-site-footer/);
   assert.doesNotMatch(html, /sticky-call-bar/);
@@ -153,11 +164,55 @@ test("standalone vitrine export retains navigation offsets and editorial proport
   assert.match(html, /\.vitrine-hours-grid \{ max-width: 92rem; \}/);
   assert.match(html, /\.max-w-7xl\.vitrine-faq-shell \{ max-width: 112rem; \}/);
   assert.match(html, /\.vitrine-faq-list \{ max-width: 80rem; \}/);
-  assert.match(html, /scroll-margin-top: 6rem/);
+  assert.match(html, /scroll-margin-top: 5rem/);
+  assert.ok(html.includes('.md\\:flex { display: flex !important; }'), "standalone desktop navigation must override hidden");
+  assert.match(html, /vitrine-site-header-inner \{ min-height: 5rem; max-width: 80rem !important; \}/);
   assert.match(html, /\.lg\\:col-span-6 \{ grid-column: span 6 \/ span 6; \}/);
   assert.match(html, /\.vitrine-faq-shell \.faq-item \{ border: 0;/);
   assert.match(html, /href="#services"/);
   assert.match(html, /href="#faq"/);
+});
+
+test("Esprit Nature demo matches the reference About and FAQ copy hierarchy", () => {
+  const project = generateDemoSite({ name: "Esprit Nature", tradeId: "paysagiste", city: "Montauban" });
+  const about = project.sections.find(section => section.type === "about");
+  const faq = project.sections.find(section => section.type === "faq");
+  const html = renderWebsiteHTML(project);
+
+  assert.equal(about.content.certified, "Artisan certifié");
+  assert.equal(faq.content.badge, "FAQ");
+  assert.equal(faq.content.title, "Questions fréquentes");
+  assert.match(html, /Artisan certifié/);
+  assert.match(html, /data-editable="badge">\s*FAQ\s*<\/div>/);
+  assert.match(html, /data-editable="title">\s*Questions fréquentes\s*<\/h2>/);
+});
+
+test("paysagiste navigation labels stay editable without losing required one-page destinations", () => {
+  const project = generateDemoSite({ name: "Esprit Nature", tradeId: "paysagiste", city: "Montauban" });
+  const header = project.sections.find(section => section.type === "header");
+  header.content.links[0].label = "Prestations";
+  const html = renderWebsiteHTML(project);
+
+  assert.match(html, />Prestations<\/a>/);
+  for (const href of ["#services", "#about", "#avis", "#galerie", "#faq"]) {
+    assert.match(html, new RegExp(`href="${href}"`));
+  }
+});
+
+test("editor exposes the vitrine template content controls", async () => {
+  const editorSource = await readFile(new URL("../public/js/components/editor.js", import.meta.url), "utf8");
+  const appSource = await readFile(new URL("../public/js/app.js", import.meta.url), "utf8");
+
+  for (const marker of [
+    "Identité & Navigation Vitrine",
+    "À propos — contenu du template",
+    "Avis clients (",
+    "Horaires & carte",
+    "services.${sIdx}.image",
+    "Choisir l'image de carte"
+  ]) assert.ok(editorSource.includes(marker), `missing vitrine editor control: ${marker}`);
+  assert.match(appSource, /addReviewItem\(sectionId\)/);
+  assert.match(appSource, /removeReviewItem\(sectionId, idx\)/);
 });
 
 test("vitrine keeps every anchored section paintable while editor mode stays explicit", async () => {

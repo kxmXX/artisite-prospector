@@ -72,15 +72,15 @@ ${UTILITY_CSS}
     /* Vitrine 1.1 — keep the public export visually aligned with the editor
        preview. These are deliberately local to the commercial template. */
     .max-w-7xl.vitrine-shell { max-width: 112rem; }
-    .site-section[id], #services, #about, #avis, #galerie, #faq, #horaires { scroll-margin-top: 6rem; }
+    .site-section[id], #services, #about, #avis, #galerie, #faq, #horaires { scroll-margin-top: 5rem; }
     .vitrine-site-header { background: rgba(255, 255, 255, .98); }
     .vitrine-template.public-mode > .site-section[data-section-type="header"] { position: sticky; top: 0; z-index: 90; }
     .vitrine-template.public-mode > .site-section[data-section-type="header"] .vitrine-site-header { position: static; }
-    .vitrine-site-header-inner { min-height: 6.25rem; }
-    .vitrine-site-nav { gap: 2.75rem; font-size: 1rem; }
+    .vitrine-site-header-inner { min-height: 5rem; max-width: 80rem !important; }
+    .vitrine-site-nav { gap: 2.35rem; font-size: .875rem; font-weight: 500; }
     .vitrine-site-nav a { color: #262626; text-decoration: none; }
     .vitrine-site-nav a:hover, .vitrine-site-nav a:focus-visible { color: var(--primary, #527c22); }
-    .vitrine-header-cta { min-height: 3.25rem; padding: 0 1.75rem; font-size: 1rem; }
+    .vitrine-header-cta { min-height: 2.75rem; padding: 0 1.5rem; font-size: .875rem; font-weight: 600; }
     .vitrine-about-image { min-height: 32rem; }
     .vitrine-about-actions { column-gap: 1.75rem; row-gap: 1rem; }
     .vitrine-about-cta { min-height: 3.75rem; white-space: nowrap; }
