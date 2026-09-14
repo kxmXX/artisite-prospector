@@ -64,3 +64,8 @@ test("the demo map visual remains replaceable in the editor", () => {
   assert.match(html, /fieldPath: "mapImage"|openImagePicker\('[^']+', 'mapImage'/);
   assert.match(html, /images\/map-montauban\.png/);
 });
+
+test("desktop vitrine navigation keeps a deliberate gap between links", async () => {
+  const css = await readFile(new URL("../public/css/app.css", import.meta.url), "utf8");
+  assert.match(css, /\.gap-7 \{ gap: 1\.75rem; \}/);
+});

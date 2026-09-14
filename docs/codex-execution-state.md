@@ -2,6 +2,16 @@
 
 ## REPRISE COURTE — priorité vitrine (prévaut sur l'historique)
 
+- Sous-lot responsive desktop : aucune largeur horizontale excédentaire à 1280 px ; les
+  grilles services et galerie sont réellement sur trois colonnes, la carte conserve sa
+  largeur et les sections restent trouvables. Correction de l'utilitaire `gap-7` manquant :
+  les liens du menu vitrine ne sont plus collés. Contrôle automatisé ajouté.
+- Validation ciblée : **13/13** (vitrine, hero, consolidation) + `git diff --check` réussis.
+  L'outil de navigateur local n'a pas offert de viewport 390 px dans ce sous-lot : la
+  validation visuelle mobile exacte reste à faire, sans prétendre l'avoir réalisée.
+- Prochaine action exacte : vérifier et corriger les contrôles d'édition de présentation,
+  services et galerie en mode éditeur, en gardant les mêmes données dans l'export.
+
 - Sous-lot FAQ terminé localement : accordéon compact fermé au départ, déclencheurs natifs
   au clavier avec `aria-expanded` / `aria-controls`, réponse masquée de façon cohérente et
   focus visible. La galerie emploie désormais l'icône vectorielle de recherche, sans emoji.
