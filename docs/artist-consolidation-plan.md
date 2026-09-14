@@ -83,6 +83,12 @@ puis présentation/services/galerie/FAQ. Voir la tête courte de codex-execution
   inventée complètent ce sous-lot. Tests ciblés 12/12 et vérification statique réussis.
 - Suite : présentation/services/galerie, FAQ compacte, puis contrôles responsive et export.
 
+### Sous-lot mobile Horaires & Lieu — 14 septembre 2026
+
+- La grille est explicitement mono-colonne avant le breakpoint desktop ; la carte ne peut plus
+  être comprimée sous 380 px dans cette composition. L'icône de position est harmonisée au
+  système SVG. Test de rendu ajouté ; validation sur appareil/mobile navigateur reste distincte.
+
 ### Sous-lot FAQ accessible terminé — 14 septembre 2026
 
 - FAQ compacte au chargement, navigation au clavier, état `aria-expanded` et association

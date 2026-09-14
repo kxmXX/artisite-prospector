@@ -72,6 +72,19 @@ test("the demo map visual remains replaceable in the editor", () => {
   assert.match(html, /images\/map-montauban\.png/);
 });
 
+test("the hours and location template keeps a real mobile stack", () => {
+  const project = generateDemoSite({ name: "Esprit Nature", tradeId: "paysagiste", city: "Montauban" });
+  const hours = project.sections.find(section => section.type === "hours");
+  hours.visibility = true;
+
+  const html = renderWebsiteHTML(project);
+
+  assert.match(html, /grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch/);
+  assert.match(html, /lg:col-span-6[^>]*min-h-\[380px\] sm:min-h-\[440px\]/);
+  assert.match(html, /<svg[^>]*text-\[#527c22\][^>]*>/);
+  assert.doesNotMatch(html, />📍</);
+});
+
 test("desktop vitrine navigation keeps a deliberate gap between links", async () => {
   const css = await readFile(new URL("../public/css/app.css", import.meta.url), "utf8");
   assert.match(css, /\.gap-7 \{ gap: 1\.75rem; \}/);

@@ -15,6 +15,12 @@
 - Validation ciblée : **13/13** (vitrine, hero, consolidation) + `git diff --check` réussis.
   L'outil de navigateur local n'a pas offert de viewport 390 px dans ce sous-lot : la
   validation visuelle mobile exacte reste à faire, sans prétendre l'avoir réalisée.
+- Sous-lot mobile « Horaires & Lieu » : le template impose une pile à une colonne avant le
+  breakpoint desktop, puis deux colonnes réelles 6/12. La carte conserve donc sa hauteur
+  minimale de 380 px sur téléphone au lieu d'être comprimée. L'icône de localisation suit
+  aussi le système SVG (plus d'emoji isolé). Test de rendu ciblé ajouté ; validation sur un
+  navigateur mobile réel reste à faire, l'environnement de prévisualisation local ayant refusé
+  sa connexion isolée sur le port de test.
 - Prochaine action exacte : vérifier et corriger les contrôles d'édition de présentation,
   services et galerie en mode éditeur, en gardant les mêmes données dans l'export.
 

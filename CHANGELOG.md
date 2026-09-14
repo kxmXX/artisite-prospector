@@ -21,6 +21,8 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 - Vitrine : bloc « Horaires & Lieu » remis en deux colonnes sur desktop. La carte de la
   démo est remplaçable dans l'éditeur ; les autres villes utilisent leur adresse et un lien
   d'itinéraire au lieu d'une carte Montauban imposée.
+- Vitrine mobile : le même bloc s'empile désormais explicitement avant le breakpoint desktop,
+  avec une carte d'au moins 380 px de haut ; l'icône de localisation est vectorielle.
 - Vitrine : navigation de secours pour le template paysagiste, dock de contact caché sur le
   hero, respect de `prefers-reduced-motion` et absence de badge de certification par défaut.
 
