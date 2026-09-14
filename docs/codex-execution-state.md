@@ -1,4 +1,27 @@
-# État de reprise Codex — 13 septembre 2026
+# État de reprise Codex — 14 septembre 2026
+
+## État courant — lecture JSON harmonisée
+
+Cette section prévaut sur tous les états historiques ci-dessous.
+
+- Sous-lot terminé : server/apiHandler.js et nouveau tests/request_body.test.js.
+- Corps Node, chaînes/Buffer et objets pré-parsés : objet JSON requis, JSON malformé
+  rejeté400, plafond2 Mio UTF-8 rejeté413. Corps brut vide conservé comme objet vide.
+- Fragments multioctets conservés ; erreurs/abandon traités. Dépassement : mémoire libérée,
+  données suivantes ignorées sans détruire le socket avant la réponse413.
+- Objets pré-parsés mesurés après sérialisation : la taille brute initiale (espaces inclus)
+  n'est plus disponible ; sa limite reste aussi à configurer au niveau de l'hébergeur.
+- Tests : request_body, generation_cache, server **9/9**, syntaxe et diff --check réussis.
+  Aucun réseau, aucune suite globale répétée, aucun navigateur requis pour ce lot backend.
+- Branche inchangée ; aucun agent relancé, aucun push, version4.8.0-alpha.1 non publiée.
+- Aucun échec ciblé restant. Lots UI, partage, faits générés et réponse IA obsolète restent ouverts.
+
+**Prochaine action exacte** : reprendre la protection contre les réponses IA tardives dans
+public/js/app.js : repérer uniquement le chemin de génération/enrichissement asynchrone,
+empêcher une réponse obsolète d'écraser un projet modifié ou changé entre-temps,
+et ajouter un test ciblé avec promesse différée. Ne pas réauditer ni refactoriser globalement.
+
+## Historique — cache génération
 
 ## Dernière mise à jour — cache génération corrigé
 

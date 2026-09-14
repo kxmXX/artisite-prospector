@@ -7,6 +7,12 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation non publiée — 14 septembre 2026 (4.8.0-alpha.1)
+
+- Lecture JSON API cohérente entre Node et serverless : erreurs400 explicites, limite2 Mio
+  en octets, conservation des caractères UTF-8 fragmentés, gestion des requêtes interrompues.
+- Validation ciblée :9/9 tests, sans appel réseau. Pas de publication.
+
 ## [4.2.0] - 2026-09-07
 
 ### Ajouté

@@ -139,3 +139,13 @@ Les états seront mis à jour avec les preuves effectives dans le rapport final,
 - 8/8 tests ciblés réussis ; nouveau test cache simulé sans réseau. Pas de suite globale répétée.
 - Restent : parseur JSON commun, limites en octets, races/déduplication, prompt factuel et auth.
 - Prochaine action : harmoniser readBodyJSON Node/serverless et tester les erreurs de parsing/tailles.
+
+### Sous-lot lecture JSON terminé — 14 septembre 2026
+
+- Contrat objet JSON commun aux corps Node et pré-parsés ; JSON invalide400, plafond2 Mio
+  mesuré en octets413 ; fragments UTF-8 correctement assemblés et interruptions traitées.
+- 9/9 tests ciblés (request_body, generation_cache, server), syntaxe et diff --check réussis.
+  Aucun réseau ni agent, pas de push. Limite pré-parsée mesurée sur JSON resérialisé,
+  pas sur le corps brut déjà consommé par l'hébergeur.
+- Prochain sous-lot du lot2 : empêcher les réponses IA tardives d'écraser les modifications
+  utilisateur dans app.js, avec scénario de réponse différée. Les lots suivants restent ouverts.
