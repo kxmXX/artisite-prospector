@@ -20,7 +20,7 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - Mouvement : navigation d’ancre douce native, un seul langage de révélation discret, jamais de
   scroll-jacking ; respecter `prefers-reduced-motion`.
 
-## État exact à `4.8.0-alpha.4`
+## État exact à `4.8.0-alpha.5`
 
 - [x] Ancres vitrine Services, À propos, Avis, Galerie et FAQ.
 - [x] Sections public paysagiste toujours peintes (pas de contenu blanc dû à `content-visibility`).
@@ -33,9 +33,9 @@ que chaque changement de produit.** Il complète le journal détaillé dans
   de 1440 px mesurée sur un viewport de 1440 px.
 - [x] Hero desktop 16:9 mesuré à 1440 × 810 px ; header encore visible à `scrollY = 4700`.
 - [x] Transition d’ancre issue du pattern InView de Motion Primitives, avec mouvement réduit.
-- [x] Version `4.8.0-alpha.4` synchronisée et livrée sur `main`. Le hash de livraison est
-  toujours vérifiable avec `git log -1 --oneline` afin que cette checklist ne devienne jamais
-  incohérente après un amendement documentaire.
+- [x] Version `4.8.0-alpha.5` synchronisée ; ce lot aligne Services, Galerie, Avis, Horaires et
+  FAQ sur le même canevas 112rem que À propos et le header. Le hash de livraison reste
+  vérifiable avec `git log -1 --oneline` après publication.
 
 ## Prochain lot — vitrine de référence
 
@@ -44,12 +44,13 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - [x] Vérifier le hero : image couvrante 16:9, titre lisible, hauteur proche d’un viewport.
 - [x] Vérifier À propos : largeur utile accrue, texte/image à proportions éditoriales et deux CTA
   sans chevauchement.
-- [ ] Vérifier Services, Galerie, Horaires, Avis et FAQ sur les captures desktop.
+- [x] Vérifier Services, Galerie, Horaires, Avis et FAQ sur les captures desktop : tous les
+  shells mesurent 1440 px sur un viewport 1440 px, comme À propos et le header.
 - [x] Vérifier le footer vitrine : pas de contact vide, liens utiles uniquement, contraste lisible.
 - [x] Vérifier l’absence du dock/pilule de téléphone sur **le rendu public vitrine** ; conserver le
   réglage déplaçable uniquement dans l’éditeur.
 - [x] Tester 1440 px et 390 px, puis l’export HTML autonome.
-- [ ] Incrémenter en `4.8.0-alpha.5`, mettre à jour les cinq emplacements de version et pousser.
+- [x] Incrémenter en `4.8.0-alpha.5`, synchroniser les emplacements de version et publier le lot.
 
 ## Après la vitrine — contrôles de l’éditeur
 
@@ -75,10 +76,15 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 
 ## Dernière livraison validée
 
-- Commit précédent : `8a1d447 fix(vitrine): align public composition`.
-- Tests du lot alpha.4 : 25/25 (`vitrine_conversion_path`, `hero_surface`, `exporter`, `gold`,
+- Lot `4.8.0-alpha.5` : proportions secondaires alignées sur la référence À propos sans modifier
+  son shell validé ; aperçu et export autonome partagent les mêmes règles.
+- Tests : 25/25 (`vitrine_conversion_path`, `hero_surface`, `exporter`, `gold`,
   `v440_fixes_and_dashboard`) + `git diff --check`.
-- Contrôle local : shell 1440/1440 px, hero 1440 × 810 px, header fixe à 4700 px de scroll,
-  transition `vitrine-section-arrival` active et dock public absent.
-- Anomalie ouverte : comparaison visuelle détaillée Services/Galerie encore à effectuer ; puis
-  reprendre les contrôles éditeur de fonds, typo, rayon et animations configurables.
+- Suite complète : 169/170. L’unique échec est `audit_leaders` sur le libellé historique « Devis 24h » du Sticky Call Bar plombier ; la fonction concernée n’est pas modifiée par ce lot.
+- Contrôle Chrome/CDP desktop : header, Services, À propos, Avis, Galerie, Horaires et FAQ =
+  1440/1440 px ; section header `sticky`, `top: 0` après 4700 px de scroll.
+- Contrôle 390 px : shells et document = 390 px, aucun débordement horizontal. La grille et
+  l'image À propos ont été corrigées uniquement sous les breakpoints concernés, sans modifier
+  les proportions desktop validées.
+- Prochaine action unique : reprendre les réglages fonctionnels de l'éditeur (fonds, typographie,
+  rayon de boutons, animations), sans rouvrir les proportions vitrine sauf nouvelle régression.

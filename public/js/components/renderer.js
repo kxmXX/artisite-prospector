@@ -1397,12 +1397,12 @@ function renderServices(sec, project, options = {}) {
   const isPaysagiste = project.business?.tradeId === "paysagiste";
   return `
     <div id="services" class="py-20 lg:py-28" style="background-color: var(--bg-sec);">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-7xl vitrine-shell mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center max-w-3xl mx-auto space-y-2 mb-12 sm:mb-16">
           <div class="text-xs font-bold uppercase tracking-wider text-[#527c22] dark:text-[#8FA382]" data-editable="badge">
             ${c.badge}
           </div>
-          <h2 class="font-heading text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight" data-editable="title">
+          <h2 class="font-heading text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight vitrine-section-title" data-editable="title">
             ${c.title}
           </h2>
           <!-- Green Accent Dash -->
@@ -1427,7 +1427,7 @@ function renderServices(sec, project, options = {}) {
                   <span class="hidden" data-editable="services.${idx}.tag">${srv.tag}</span>
                 ` : ''}
               </div>
-              <div class="p-7 sm:p-8 flex-1 flex flex-col justify-between space-y-4">
+              <div class="vitrine-service-card-body flex-1 flex flex-col justify-between space-y-4">
                 <div>
                   <h3 class="font-heading text-2xl font-bold text-gray-900 dark:text-white leading-snug" data-editable="services.${idx}.title">${srv.title}</h3>
                   <p class="text-gray-600 dark:text-zinc-400 text-base mt-3 leading-relaxed" data-editable="services.${idx}.desc">${srv.desc}</p>
@@ -1704,10 +1704,10 @@ function renderGallery(sec, project, options = {}) {
 
     return `
       <div id="galerie" class="py-20 lg:py-28" style="background-color: var(--bg-sec);">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl vitrine-shell mx-auto px-4 sm:px-6 lg:px-8">
           <div class="text-center max-w-2xl mx-auto space-y-2 mb-12">
             <div class="text-xs font-bold uppercase tracking-wider text-[#527c22] dark:text-[#8FA382]" data-editable="badge">${c.badge || 'NOS RÉALISATIONS'}</div>
-            <h2 class="font-heading text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white" data-editable="title">${c.title || 'Galerie'}</h2>
+            <h2 class="font-heading text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white vitrine-section-title" data-editable="title">${c.title || 'Galerie'}</h2>
             <div class="w-12 h-1 rounded-full mx-auto mt-2.5 mb-5" style="background-color: var(--primary, #527c22);"></div>
             <p class="text-gray-600 dark:text-zinc-400 text-sm sm:text-base" data-editable="subtitle">${c.subtitle || 'Découvrez en images la qualité de nos interventions et le soin apporté à chaque projet.'}</p>
           </div>
@@ -1735,10 +1735,10 @@ function renderGallery(sec, project, options = {}) {
   // Default: Sendpage 3-column Editorial Grid
   return `
     <div id="galerie" class="py-20 lg:py-28" style="background-color: var(--bg-sec);">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-7xl vitrine-shell mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center max-w-2xl mx-auto space-y-2 mb-12 sm:mb-16">
           <div class="text-xs font-bold uppercase tracking-wider text-[#527c22] dark:text-[#8FA382]" data-editable="badge">${c.badge || 'NOS RÉALISATIONS'}</div>
-          <h2 class="font-heading text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight" data-editable="title">${c.title || 'Galerie'}</h2>
+          <h2 class="font-heading text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight vitrine-section-title" data-editable="title">${c.title || 'Galerie'}</h2>
           <!-- Green Accent Dash -->
           <div class="w-12 h-1 rounded-full mx-auto mt-2.5 mb-5" style="background-color: var(--primary, #527c22);"></div>
           ${c.subtitle ? `<p class="text-gray-600 dark:text-zinc-400 text-sm sm:text-base max-w-xl mx-auto" data-editable="subtitle">${c.subtitle}</p>` : ''}
@@ -1804,7 +1804,7 @@ function renderReviews(sec, project, options = {}) {
             <div class="text-xs font-bold uppercase tracking-wider text-[#527c22] dark:text-[#8FA382]" data-editable="badge">
               ${c.badge || 'TÉMOIGNAGES'}
             </div>
-            <h2 class="font-heading text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight" data-editable="title">
+            <h2 class="font-heading text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight vitrine-section-title" data-editable="title">
               ${c.title || 'Ce que disent nos clients'}
             </h2>
             <!-- Signature Green Accent Dash -->
@@ -2030,12 +2030,12 @@ function renderHours(sec, project, options = {}) {
 
     return `
       <div id="horaires" class="py-20 lg:py-28 bg-white dark:bg-zinc-950 border-t border-black/5">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 vitrine-hours-shell">
+        <div class="max-w-7xl vitrine-shell mx-auto px-4 sm:px-6 lg:px-8 vitrine-hours-shell">
           <div class="text-center max-w-2xl mx-auto space-y-2 mb-12 sm:mb-16">
             <div class="text-xs font-bold uppercase tracking-wider text-[#527c22] dark:text-[#8FA382]" data-editable="badge">
               ${c.badge || 'HORAIRES'}
             </div>
-            <h2 class="font-heading text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight" data-editable="title">
+            <h2 class="font-heading text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight vitrine-section-title" data-editable="title">
               ${c.title || 'Horaires & Lieu'}
             </h2>
             <!-- Signature Green Accent Dash -->
@@ -2208,12 +2208,12 @@ function renderFaq(sec, project) {
   const c = sec.content || {};
   return `
     <div id="faq" class="py-20 lg:py-28 bg-white dark:bg-zinc-950">
-      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 vitrine-faq-shell">
+      <div class="max-w-7xl vitrine-shell mx-auto px-4 sm:px-6 lg:px-8 vitrine-faq-shell">
         <div class="text-center space-y-2 mb-12 sm:mb-16">
           <div class="text-xs font-bold uppercase tracking-wider text-[#527c22] dark:text-[#8FA382]" data-editable="badge">
             ${c.badge || 'QUESTIONS FRÉQUENTES'}
           </div>
-          <h2 class="font-heading text-3xl sm:text-4xl lg:text-5xl font-extrabold text-zinc-900 dark:text-white tracking-tight" data-editable="title">
+          <h2 class="font-heading text-3xl sm:text-4xl lg:text-5xl font-extrabold text-zinc-900 dark:text-white tracking-tight vitrine-section-title" data-editable="title">
             ${c.title || 'FAQ'}
           </h2>
           <!-- Green Accent Dash -->

@@ -94,6 +94,8 @@ test("desktop vitrine navigation keeps a deliberate gap between links", async ()
 
 test("paysagiste vitrine keeps its fixed one-page navigation and generous editorial proportions", async () => {
   const project = generateDemoSite({ name: "Esprit Nature", tradeId: "paysagiste", city: "Montauban" });
+  const hours = project.sections.find(section => section.type === "hours");
+  if (hours) hours.visibility = true;
   const html = renderWebsiteHTML(project);
   const css = await readFile(new URL("../public/css/app.css", import.meta.url), "utf8");
 
@@ -106,7 +108,21 @@ test("paysagiste vitrine keeps its fixed one-page navigation and generous editor
   assert.match(html, /lg:col-span-6 order-2/);
   assert.match(html, /vitrine-about-image/);
   assert.match(css, /\.max-w-7xl\.vitrine-shell \{ max-width: 112rem; \}/);
+  assert.match(html, /vitrine-site-header[\s\S]{0,420}max-w-7xl vitrine-shell/, "header must share the About canvas");
+  for (const id of ["services", "about", "galerie", "avis", "horaires", "faq"]) {
+    const start = html.indexOf(`id="${id}"`);
+    assert.notEqual(start, -1, `${id} must be rendered`);
+    assert.match(html.slice(start, start + 420), /max-w-7xl vitrine-shell/, `${id} must share the About canvas`);
+  }
+  assert.match(html, /vitrine-section-title/);
+  assert.match(html, /vitrine-service-card-body/);
+  assert.match(css, /\.vitrine-review-grid \{ max-width: 96rem; \}/);
+  assert.match(css, /\.vitrine-hours-grid \{ max-width: 92rem; \}/);
+  assert.match(css, /\.max-w-7xl\.vitrine-faq-shell \{ max-width: 112rem; \}/);
+  assert.match(css, /\.vitrine-faq-list \{ max-width: 80rem; \}/);
   assert.match(css, /\.vitrine-about-image \{ min-height: 32rem; \}/);
+  assert.match(css, /max-width: 1023px[^}]*vitrine-about-grid[^}]*grid-template-columns: minmax\(0, 1fr\)/s);
+  assert.match(css, /max-width: 639px[^}]*vitrine-about-image[^}]*min-height: 0/s);
   assert.match(css, /scroll-margin-top: 6rem/);
   assert.match(html, /vitrine-site-nav/);
   assert.match(html, /vitrine-site-footer/);
@@ -133,6 +149,10 @@ test("standalone vitrine export retains navigation offsets and editorial proport
   const html = exportStandaloneHTML(project);
 
   assert.match(html, /\.max-w-7xl\.vitrine-shell \{ max-width: 112rem; \}/);
+  assert.match(html, /\.vitrine-review-grid \{ max-width: 96rem; \}/);
+  assert.match(html, /\.vitrine-hours-grid \{ max-width: 92rem; \}/);
+  assert.match(html, /\.max-w-7xl\.vitrine-faq-shell \{ max-width: 112rem; \}/);
+  assert.match(html, /\.vitrine-faq-list \{ max-width: 80rem; \}/);
   assert.match(html, /scroll-margin-top: 6rem/);
   assert.match(html, /\.lg\\:col-span-6 \{ grid-column: span 6 \/ span 6; \}/);
   assert.match(html, /\.vitrine-faq-shell \.faq-item \{ border: 0;/);

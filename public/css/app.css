@@ -43,11 +43,18 @@ html {
 .vitrine-about-actions { column-gap: 1.75rem; row-gap: 1rem; }
 .vitrine-about-cta { min-height: 3.75rem; white-space: nowrap; }
 .vitrine-about-link { min-height: 3.25rem; white-space: nowrap; }
+@media (max-width: 1023px) { .vitrine-about-grid { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 639px) {
+  .vitrine-about-image { min-height: 0; }
+  .vitrine-about-cta, .vitrine-about-link { max-width: 100%; white-space: normal; text-align: center; }
+}
+.vitrine-section-title { font-size: clamp(2.5rem, 4vw, 3.5rem); line-height: 1.08; }
 .vitrine-service-grid { gap: 2rem; }
-.vitrine-review-grid { max-width: 80rem; }
-.vitrine-faq-shell { max-width: 62rem; }
-.vitrine-hours-shell { max-width: 72rem; }
-.vitrine-hours-grid { max-width: 64rem; }
+.vitrine-service-card-body { padding: 2rem; }
+.vitrine-review-grid { max-width: 96rem; }
+.max-w-7xl.vitrine-faq-shell { max-width: 112rem; }
+.max-w-7xl.vitrine-hours-shell { max-width: 112rem; }
+.vitrine-hours-grid { max-width: 92rem; }
 .vitrine-hours-card,
 .vitrine-hours-map { min-height: 25rem; }
 .vitrine-hours-card { padding: 2rem; }
@@ -56,7 +63,7 @@ html {
 .vitrine-review-card { min-height: 18.5rem; padding: 2rem; }
 .vitrine-review-author { font-size: 1.0625rem; }
 .vitrine-review-copy { font-size: 1.0625rem; line-height: 1.65; }
-.vitrine-faq-list { max-width: 48rem; }
+.vitrine-faq-list { max-width: 80rem; }
 .vitrine-faq-list .faq-item { padding: 1.35rem 0; }
 .vitrine-faq-list .faq-header { width: 100%; text-align: left; }
 .vitrine-faq-list .faq-content { padding: 1rem 0 .25rem; }
@@ -81,8 +88,8 @@ html {
   .vitrine-about-image { min-height: 42rem; }
   .vitrine-service-grid { gap: 2.5rem; }
   .vitrine-about-actions { column-gap: 2.25rem; }
-  .vitrine-hours-shell { max-width: 78rem; }
-  .vitrine-hours-grid { max-width: 68rem; gap: 2.5rem; }
+  .max-w-7xl.vitrine-hours-shell { max-width: 112rem; }
+  .vitrine-hours-grid { max-width: 92rem; gap: 2.5rem; }
   .vitrine-hours-card,
   .vitrine-hours-map { min-height: 31rem; }
   .vitrine-hours-card { padding: 2.5rem; }
@@ -91,7 +98,7 @@ html {
   .vitrine-review-card { min-height: 20.5rem; padding: 2.25rem; }
   .vitrine-review-author { font-size: 1.125rem; }
   .vitrine-review-copy { font-size: 1.125rem; line-height: 1.68; }
-  .vitrine-faq-list { max-width: 52rem; }
+  .vitrine-faq-list { max-width: 80rem; }
   .vitrine-faq-list .faq-item { padding: 1.6rem 0; }
 }
 

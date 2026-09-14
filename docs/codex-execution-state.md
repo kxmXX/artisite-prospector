@@ -1,5 +1,14 @@
 # État de reprise Codex — 14 septembre 2026
 
+## LOT DE LIVRAISON — vitrine 4.8.0-alpha.5
+
+- Services, Galerie, Avis, Horaires & Lieu et FAQ partagent maintenant le même `vitrine-shell` 112rem que À propos et le header ; aperçu et export autonome restent synchronisés.
+- Les proportions internes ont été rééquilibrées : titres secondaires communs, cartes Services plus respirantes, Avis 96rem, Horaires 92rem, FAQ 80rem.
+- Correctif mobile ajouté sans toucher au desktop : grille À propos forcée en une colonne avant 1024 px, hauteur minimale de l’image retirée sous 640 px et CTA autorisés à revenir à la ligne. À 390 px, `scrollWidth = 390` et aucun élément ne déborde.
+- Validation : 25/25 (`vitrine_conversion_path`, `hero_surface`, `exporter`, `gold`, `v440_fixes_and_dashboard`) + `git diff --check`. Chrome/CDP : tous les shells ciblés = 1440/1440 px ; header `sticky`, `top: 0` après 4700 px de scroll.
+- Suite complète : 169/170 ; seul `audit_leaders` échoue encore sur le texte historique « Devis 24h » du Sticky Call Bar plombier, code hors périmètre et inchangé dans ce lot.
+- Prochaine action exacte : reprendre les réglages fonctionnels de l’éditeur (fonds, typographie, rayon des boutons, animations), sans rouvrir les proportions vitrine sauf régression mesurée.
+
 ## LOT VALIDÉ LOCAL — vitrine 4.8.0-alpha.4
 
 - Cause racine du manque de largeur : `.vitrine-shell` était déclaré avant `.max-w-7xl` avec la

@@ -7,6 +7,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 14 septembre 2026 (4.8.0-alpha.5)
+
+- Vitrine paysagiste : Services, Galerie, Avis, Horaires & Lieu et FAQ utilisent désormais le même canevas public `112rem` que le bloc À propos et le header, sans modifier sa géométrie desktop validée.
+- Proportions : titres secondaires harmonisés, cartes Services plus respirantes, grille Avis portée à 96rem, grille Horaires à 92rem et liste FAQ à 80rem ; l’export HTML autonome embarque les mêmes règles.
+- Responsive : la grille À propos est contrainte à une vraie colonne avant 1024 px et son image 4:5 n’impose plus de largeur minimale sur téléphone ; à 390 px, le document reste à 390 px sans débordement horizontal.
+- Validation : 25/25 tests ciblés + `git diff --check`. Contrôle Chrome/CDP à 1440 × 810 px : header, Services, À propos, Avis, Galerie, Horaires et FAQ ont tous un shell de 1440 px ; le header reste `sticky` à `scrollY = 4700`.
+
 ### Consolidation non publiée — 14 septembre 2026 (4.8.0-alpha.4)
 
 - Vitrine : correction de la vraie contrainte de largeur. La règle `.max-w-7xl` écrasait le
