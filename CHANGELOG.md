@@ -9,6 +9,10 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ### Consolidation non publiée — 14 septembre 2026 (4.8.0-alpha.1)
 
+- Vitrine : appels à l'action devis actifs, cible unique et formulaire accessible. Sans
+  connexion d'envoi configurée, la confirmation dirige explicitement vers téléphone/WhatsApp.
+- Aperçu client allégé : suppression du ruban commercial interne qui masquait le header.
+
 - Vitrine plein cadre : photo, voile et contenu correctement superposés ; titre/sous-titre
   blancs et composition responsive commune à l'éditeur, l'aperçu et l'export HTML.
 

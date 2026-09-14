@@ -62,6 +62,16 @@ reste à confirmer (viewport outil instable). Ni conformité complète ni WCAG g
 Prochaine action : parcours devis/contact (#simulateur vs #quoteSimulator et cible visible),
 puis présentation/services/galerie/FAQ. Voir la tête courte de codex-execution-state.md.
 
+### Sous-lot parcours devis vitrine terminé — 14 septembre 2026
+
+- Commit `cd32f5d` : CTA/hyperliens et bandeau vers `#simulateur`, simulateur visible sur
+  nouvelles vitrines et démos ; popovers CTA limités à l'éditeur, aperçu client sans ruban
+  commercial. Le formulaire ne revendique aucun envoi sans endpoint et termine par appel/WhatsApp.
+- 16/16 tests ciblés ; navigateur5186 confirme l'arrivée au formulaire, puis la confirmation
+  locale et les actions de contact. Projets déjà personnalisés préservés sans migration forcée.
+- Suite prioritaire : mise en forme de la vitrine, présentation/services/galerie/FAQ, puis
+  mobile/export. Les lots techniques différés restent planifiés.
+
 | Lot | Action | Validation requise | État |
 |---|---|---|---|
 | 1 | Audit, contexte durable, version/changelog honnêtes | Base, captures, architecture et risques tracés | Audit/plan terminés be8600c ; version4.8.0-alpha.1 intégrée non publiée |

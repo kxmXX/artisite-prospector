@@ -2,6 +2,21 @@
 
 ## REPRISE COURTE — priorité vitrine (prévaut sur l'historique)
 
+- Commit vitrine dédié `cd32f5d` : parcours devis rétabli et aperçu client nettoyé.
+  Les CTA convergent vers `#simulateur`, la section est visible par défaut pour les nouveaux
+  projets et démos, le bandeau fixe utilise la même cible. Les contrôles de popover sont
+  désormais strictement réservés à l'éditeur : ils ne bloquent plus les liens publics.
+- Le formulaire a des labels/auto-remplissage ; il ne prétend plus envoyer une demande sans
+  endpoint. Après validation locale, il propose appel et WhatsApp. Aucune donnée saisie
+  n'est transmise par ce parcours.
+- Vérifications : 16/16 ciblés (génération, rendu, hero, parcours devis), syntaxe app/renderer
+  et diff OK. Navigateur neuf localhost5186 : CTA -> #simulateur à scrollY5360, formulaire
+  visible, soumission affiche les deux actions de contact ; barre « Proposition » absente.
+- L'ancienne origine5184 conservait un projet local 9/16 : aucune migration destructrice n'a
+  été appliquée aux projets existants. Une démo créée/rechargée sur une origine neuve est10/16.
+- Prochaine action vitrine : présentation/services/galerie selon captures, puis FAQ compacte,
+  puis vérification mobile390 et export. Ne pas rouvrir les lots backend différés à ce stade.
+
 - Demande utilisateur : vitrine fonctionnelle conforme aux captures AVANT le reste.
   Ordre détaillé révisé dans artist-consolidation-plan.md. Aucun lot supprimé.
 - Dernier sous-lot : hero plein cadre, renderer.js + heroStyles.js commun aux rendus et
