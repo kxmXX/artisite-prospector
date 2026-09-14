@@ -7,6 +7,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 14 septembre 2026 (4.8.0-alpha.12)
+
+- IA image : une génération asynchrone est désormais liée au projet, à la section, au champ et à l’index qui l’ont déclenchée ; une réponse tardive n’est plus réutilisable sur une autre cible.
+- Changement de cible/projet ou fermeture du sélecteur : la génération en attente est invalidée et le candidat précédent est effacé.
+- Application : le visuel généré est revérifié contre la cible active avant toute mutation ; la mise à jour d’image conserve le chemin d’historique existant.
+- Validation : 9/9 sur `ai_stale_response`, 183/183 sur la suite complète et `git diff --check`.
+
 ### Consolidation — 14 septembre 2026 (4.8.0-alpha.11)
 
 - Template vitrine : le simulateur de devis expose maintenant dans la sidebar ses libellés, listes de prestations/tailles/délais et son CTA.

@@ -56,6 +56,13 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - [x] Le délai souhaité est réellement rendu dans le formulaire public lorsqu’il possède des options.
 - [x] Footer éditable depuis la sidebar : nom, description, téléphone, email, adresse et copyright.
 
+## Stabilité async / backend — reprise après l’éditeur
+
+- [x] Protéger la génération photo IA : résultat lié à projet/section/champ/index, réponse tardive ignorée après changement de cible ou de projet, application revérifiée avant mutation.
+- [ ] Dédupliquer les requêtes de génération IA simultanées qui portent la même clé de contexte, sans partager une réponse entre contextes différents.
+- [ ] Revoir les prompts de génération restants pour ne pas transformer des exemples en faits client non vérifiés.
+- [ ] Contre-audit sécurité / performance et limites de partage avant toute revendication multi-utilisateur.
+
 ## Procédure de chaque commit
 
 1. Relire `AGENTS.md`, cette checklist et `docs/codex-execution-state.md`.
@@ -77,4 +84,5 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - Lot `4.8.0-alpha.9` : références stables `#E…` pour les cibles éditables et résolution Copilot champ par champ ; 11/11 tests ciblés, 178/178 complets.
 - Lot `4.8.0-alpha.10` : suppression/restauration + Undo, drag-and-drop câblé jusqu’à `reorderSections`, poignée accessible et focus contrasté ; 36/36 tests ciblés, 180/180 complets.
 - Lot `4.8.0-alpha.11` : simulateur de devis et footer complétés comme champs de template éditables ; 16/16 tests vitrine ciblés, 180/180 complets.
-- Prochaine action unique : audit de couverture final des champs vitrine puis contrôle visuel de l’éditeur, sans modifier la composition publique validée.
+- Lot `4.8.0-alpha.12` : génération photo IA protégée contre les réponses tardives et les changements de cible/projet ; 9/9 tests async ciblés, 183/183 complets.
+- Prochaine action unique : dédupliquer les requêtes de génération IA simultanées identiques côté API, avec modèle simulé et sans appel réseau.

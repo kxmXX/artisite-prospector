@@ -1,5 +1,12 @@
 # État de reprise Codex — 14 septembre 2026
 
+## LOT DE LIVRAISON — stabilité IA 4.8.0-alpha.12
+
+- `generateAIPhoto()` capture désormais le projet et la cible image d’origine ; `beginAIRequest("image-photo")` invalide la réponse après changement de projet ou modification du projet pendant l’attente.
+- La cible active (section/champ/index) est revérifiée après chaque attente réseau/JSON/fallback. Changer de cible ou fermer le modal invalide aussi la génération en cours.
+- `applyGeneratedAIPhoto()` refuse un candidat généré pour une autre cible et ne peut donc plus injecter une ancienne image dans un nouveau champ.
+- Tests : 9/9 `ai_stale_response`, 183/183 complets, `git diff --check`. Prochaine action : déduplication des requêtes de génération IA simultanées identiques côté API, avec modèle simulé.
+
 ## LOT DE LIVRAISON — template 4.8.0-alpha.11
 
 - Le simulateur de devis devient un vrai bloc de template éditable : labels, listes prestation/taille/délai et CTA sont pilotables depuis la sidebar.

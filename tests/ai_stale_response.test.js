@@ -102,3 +102,79 @@ test('wizard completion cannot open a project after its drawer closes', async t 
   assert.equal(state.currentProject, original);
   assert.equal(state.projects.length, 1);
 });
+
+
+function setupImageGeneration(t) {
+  const app = Object.create(App.prototype);
+  app.showToast = () => {};
+  const project = generateSite({ name: 'Image Original', tradeId: 'paysagiste', city: 'Montauban' });
+  state.currentProject = project;
+  state.projects = [project];
+  state.currentView = 'editor';
+  state.activeDrawer = 'image_modal';
+  state.undoStack = []; state.redoStack = [];
+  const hero = project.sections.find(s => s.type === 'hero');
+  state.activeImageMeta = { sectionId: hero.id, fieldPath: 'heroImage', itemIndex: null, currentUrl: hero.content.heroImage || '', sectionType: 'hero' };
+  const elements = {
+    'ai-image-prompt-input': { value: 'Jardin premium au coucher du soleil' },
+    'btn-generate-ai-photo': { disabled: false, innerHTML: '' },
+    'ai-image-output-container': { classList: { remove() {} } },
+    'ai-generated-preview-img': { src: '' }
+  };
+  document.getElementById = id => elements[id] || null;
+  document.querySelector = () => null;
+  const originalFetch = globalThis.fetch;
+  let resolve;
+  globalThis.fetch = () => new Promise(r => { resolve = r; });
+  t.after(() => {
+    globalThis.fetch = originalFetch;
+    app._aiRequests?.forEach(r => r.dispose());
+    state.activeImageMeta = null;
+  });
+  return {
+    app, project, hero, elements,
+    respond: (imageUrl = 'https://example.test/generated.jpg') => resolve({ ok: true, json: async () => ({ imageUrl }) })
+  };
+}
+
+test('delayed AI photo is ignored after image target changes', async t => {
+  const { app, project, elements, respond } = setupImageGeneration(t);
+  const services = project.sections.find(s => s.type === 'services');
+  const pending = app.generateAIPhoto();
+  state.activeImageMeta = { sectionId: services.id, fieldPath: 'services.0.image', itemIndex: null, currentUrl: '', sectionType: 'services' };
+  respond();
+  await pending;
+  assert.notEqual(app.lastGeneratedAIPhotoUrl, 'https://example.test/generated.jpg');
+  assert.equal(elements['ai-generated-preview-img'].src, '');
+});
+
+test('delayed AI photo is ignored after project changes', async t => {
+  const { app, respond } = setupImageGeneration(t);
+  const pending = app.generateAIPhoto();
+  state.setCurrentProject(generateSite({ name: 'Other image project', tradeId: 'plombier' }));
+  respond();
+  await pending;
+  assert.notEqual(app.lastGeneratedAIPhotoUrl, 'https://example.test/generated.jpg');
+});
+
+test('AI photo remains bound to its original target through apply', async t => {
+  const { app, project, hero, elements, respond } = setupImageGeneration(t);
+  const generatedUrl = 'https://example.test/hero-generated.jpg';
+  const pending = app.generateAIPhoto();
+  respond(generatedUrl);
+  await pending;
+  assert.equal(app.lastGeneratedAIPhotoUrl, generatedUrl);
+  assert.equal(elements['ai-generated-preview-img'].src, generatedUrl);
+
+  const services = project.sections.find(s => s.type === 'services');
+  const serviceBefore = services.content.services[0]?.image;
+  state.activeImageMeta = { sectionId: services.id, fieldPath: 'services.0.image', itemIndex: null, currentUrl: serviceBefore || '', sectionType: 'services' };
+  app.applyGeneratedAIPhoto();
+  assert.equal(project.sections.find(s => s.id === services.id).content.services[0]?.image, serviceBefore, 'generated hero image must not leak into a new target');
+
+  state.activeImageMeta = { sectionId: hero.id, fieldPath: 'heroImage', itemIndex: null, currentUrl: hero.content.heroImage || '', sectionType: 'hero' };
+  app.lastGeneratedAIPhotoUrl = generatedUrl;
+  app.lastGeneratedAIPhotoMeta = { projectId: project.id, sectionId: hero.id, fieldPath: 'heroImage', itemIndex: null, sectionType: 'hero' };
+  app.applyGeneratedAIPhoto();
+  assert.equal(state.currentProject.sections.find(s => s.id === hero.id).content.heroImage, generatedUrl, 'matching target should receive generated image');
+});
