@@ -26,6 +26,8 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 - Vitrine 1.1 : navigation fixe unifiée Services / À propos / Avis / Galerie / FAQ, ancres
   compensées sous le header, composition élargie, présentation 6/6 à photo dominante et
   cartes Services agrandies sans retirer les champs d'édition.
+- Vitrine 1.1 : avis plus respirants et FAQ élargie, avec séparateurs simples et zones de
+  lecture plus généreuses, tout en conservant l'accordéon clavier et les données éditables.
 - Vitrine : navigation de secours pour le template paysagiste, dock de contact caché sur le
   hero, respect de `prefers-reduced-motion` et absence de badge de certification par défaut.
 

@@ -1790,8 +1790,8 @@ function renderReviews(sec, project, options = {}) {
   if (isPaysagiste) {
     return `
       <div id="avis" class="py-20 lg:py-28 bg-white dark:bg-zinc-950 border-t border-black/5">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="text-center max-w-2xl mx-auto space-y-2 mb-8">
+        <div class="max-w-7xl vitrine-shell mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="text-center max-w-3xl mx-auto space-y-2 mb-12 sm:mb-16">
             <div class="text-xs font-bold uppercase tracking-wider text-[#527c22] dark:text-[#8FA382]" data-editable="badge">
               ${c.badge || 'TÉMOIGNAGES'}
             </div>
@@ -1808,7 +1808,7 @@ function renderReviews(sec, project, options = {}) {
           </div>
 
           <!-- Centered Google Rating Summary Bar matching Sendpage -->
-          <div class="flex items-center justify-center gap-2.5 mb-12">
+          <div class="flex flex-wrap items-center justify-center gap-2.5 mb-14 sm:mb-16" data-review-summary>
             <svg class="w-5 h-5 inline-block shrink-0" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17Z"/>
               <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24Z"/>
@@ -1824,10 +1824,10 @@ function renderReviews(sec, project, options = {}) {
           </div>
 
           <!-- 3-Column Reviews Grid matching Sendpage Screenshot -->
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-7xl mx-auto vitrine-review-grid">
             ${(c.reviews || []).map((r, idx) => `
-              <div class="bg-white dark:bg-zinc-900 p-6 sm:p-7 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-between space-y-4">
-                <div class="space-y-3">
+              <div class="bg-white dark:bg-zinc-900 p-7 sm:p-8 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-between space-y-5">
+                <div class="space-y-4">
                   <div class="flex items-start justify-between">
                     <div class="flex items-center gap-3">
                       <div class="w-10 h-10 rounded-full bg-[#edf4e8] text-[#527c22] font-bold text-sm flex items-center justify-center shrink-0">
@@ -1847,7 +1847,7 @@ function renderReviews(sec, project, options = {}) {
                       <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98Z"/>
                     </svg>
                   </div>
-                  <p class="text-sm text-gray-600 dark:text-zinc-300 leading-relaxed font-normal" data-editable="reviews.${idx}.text">« ${r.text} »</p>
+                  <p class="text-base text-gray-600 dark:text-zinc-300 leading-relaxed font-normal" data-editable="reviews.${idx}.text">« ${r.text} »</p>
                 </div>
                 <span class="hidden" data-editable="reviews.${idx}.city">${r.city}</span>
               </div>
@@ -2199,7 +2199,7 @@ function renderFaq(sec, project) {
   const c = sec.content || {};
   return `
     <div id="faq" class="py-20 lg:py-28 bg-white dark:bg-zinc-950">
-      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 vitrine-faq-shell">
         <div class="text-center space-y-2 mb-12 sm:mb-16">
           <div class="text-xs font-bold uppercase tracking-wider text-[#527c22] dark:text-[#8FA382]" data-editable="badge">
             ${c.badge || 'QUESTIONS FRÉQUENTES'}
@@ -2216,9 +2216,9 @@ function renderFaq(sec, project) {
           ` : ''}
         </div>
 
-        <div class="divide-y divide-zinc-200/80 dark:divide-zinc-800 border-t border-b border-zinc-200/80 dark:border-zinc-800">
+        <div class="divide-y divide-zinc-200/80 dark:divide-zinc-800">
           ${(c.items || []).map((faq, idx) => `
-            <div class="faq-item group/faq transition-colors py-5 sm:py-6">
+            <div class="faq-item group/faq transition-colors py-6 sm:py-7">
               <button type="button" class="faq-header flex items-center justify-between gap-4 cursor-pointer select-none" aria-expanded="false" aria-controls="faq-answer-${sec.id}-${idx}">
                 <span class="text-base sm:text-lg font-bold text-zinc-900 dark:text-white group-hover/faq:text-emerald-600 dark:group-hover/faq:text-emerald-400 transition-colors leading-snug" data-editable="items.${idx}.q">${faq.q}</span>
                 <span class="faq-icon-btn shrink-0" aria-hidden="true">+</span>

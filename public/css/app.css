@@ -28,6 +28,8 @@ html {
 .site-section[id], #services, #about, #avis, #galerie, #faq, #horaires { scroll-margin-top: 6rem; }
 .vitrine-about-image { min-height: 32rem; }
 .vitrine-service-grid { gap: 2rem; }
+.vitrine-review-grid { max-width: 80rem; }
+.vitrine-faq-shell { max-width: 62rem; }
 @media (min-width: 1024px) {
   .vitrine-about-grid { gap: 5rem; }
   .vitrine-about-title { font-size: 3.75rem; line-height: 1.08; }

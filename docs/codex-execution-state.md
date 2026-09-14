@@ -32,6 +32,13 @@
 - Prochaine action exacte : aligner la densité des avis et de la FAQ sur les captures,
   puis vérifier le rendu exporté avant de toucher aux outils d'édition secondaires.
 
+- Sous-lot vitrine 1.1 — Avis / FAQ : résumé Google souple, cartes d'avis et texte agrandis,
+  espacement élargi. FAQ rapprochée de la référence par des rangées simples sans cadre externe
+  et un rythme vertical accru. Les réponses restent `aria-expanded` / clavier et les champs
+  éditables sont inchangés. Tests de rendu ciblés : **17/17**, diff propre.
+- Prochaine action exacte : vérifier le rendu public/export de cette composition et les ancres
+  sur les sections longues, puis seulement reprendre les outils d'édition secondaires.
+
 - Sous-lot FAQ terminé localement : accordéon compact fermé au départ, déclencheurs natifs
   au clavier avec `aria-expanded` / `aria-controls`, réponse masquée de façon cohérente et
   focus visible. La galerie emploie désormais l'icône vectorielle de recherche, sans emoji.

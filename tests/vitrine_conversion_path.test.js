@@ -107,3 +107,14 @@ test("paysagiste vitrine keeps its fixed one-page navigation and generous editor
   assert.match(css, /\.vitrine-about-image \{ min-height: 32rem; \}/);
   assert.match(css, /scroll-margin-top: 6rem/);
 });
+
+test("paysagiste reviews and FAQ preserve the spacious vitrine rhythm", () => {
+  const project = generateDemoSite({ name: "Esprit Nature", tradeId: "paysagiste", city: "Montauban" });
+  const html = renderWebsiteHTML(project);
+
+  assert.match(html, /data-review-summary/);
+  assert.match(html, /vitrine-review-grid/);
+  assert.match(html, /text-base text-gray-600 dark:text-zinc-300 leading-relaxed/);
+  assert.match(html, /vitrine-faq-shell/);
+  assert.match(html, /faq-item group\/faq transition-colors py-6 sm:py-7/);
+});
