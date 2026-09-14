@@ -3,7 +3,8 @@ export const HERO_STYLES = `
 .artisite-root .hero-fullscreen {
   position: relative; isolation: isolate; overflow: hidden;
   display: flex; flex-direction: column; justify-content: center;
-  min-height: 85svh; padding: clamp(4rem, 8vw, 8rem) 1.25rem 2rem;
+  height: min(calc(100svh - 6.25rem), 56.25vw);
+  min-height: 42rem; padding: clamp(3rem, 5.5vw, 6rem) 1.25rem 2rem;
   color: #fff; background: #182119;
 }
 .hero-fullscreen > .hero-background,
@@ -26,6 +27,9 @@ export const HERO_STYLES = `
 .artisite-root .hero-fullscreen .hero-scroll-discover { color: #fff; }
 .hero-fullscreen .hero-discover { margin-top: 3rem; }
 .hero-fullscreen .liquid-glass-badge { max-width: 100%; white-space: normal; }
+@media (max-width: 767px) {
+  .artisite-root .hero-fullscreen { height: auto; min-height: 78svh; padding-top: 4rem; }
+}
 @media (max-width: 600px) {
   .hero-fullscreen .cta-button-wrapper { width: 100%; }
   .hero-fullscreen .btn-cta { width: 100%; white-space: normal; }

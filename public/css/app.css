@@ -24,9 +24,15 @@ html {
 
 /* Shared generous canvas for the commercial vitrine. The editor retains its
    own constraints; this only widens the public-facing story on large screens. */
-.vitrine-shell { max-width: 112rem; }
+.max-w-7xl.vitrine-shell { max-width: 112rem; }
 .site-section[id], #services, #about, #avis, #galerie, #faq, #horaires { scroll-margin-top: 6rem; }
 .vitrine-site-header { background: rgba(255, 255, 255, .98); }
+.vitrine-template.public-mode > .site-section[data-section-type="header"] {
+  position: sticky; top: 0; z-index: 90;
+}
+.vitrine-template.public-mode > .site-section[data-section-type="header"] .vitrine-site-header {
+  position: static;
+}
 .vitrine-site-header-inner { min-height: 6.25rem; }
 .vitrine-site-nav { gap: 2.75rem; font-size: 1rem; }
 .vitrine-site-nav a { color: #262626; text-decoration: none; }
@@ -58,6 +64,16 @@ html {
 .vitrine-site-footer a { color: #29352c; text-decoration: none; }
 .vitrine-site-footer a:hover,
 .vitrine-site-footer a:focus-visible { color: var(--primary, #527c22); text-decoration: underline; text-underline-offset: .2em; }
+.vitrine-template.public-mode .site-section:target > * {
+  animation: vitrine-section-arrival 440ms cubic-bezier(.16, 1, .3, 1) both;
+}
+@keyframes vitrine-section-arrival {
+  from { opacity: .72; transform: translateY(1.1rem); filter: blur(3px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vitrine-template.public-mode .site-section:target > * { animation: none; }
+}
 @media (min-width: 1024px) {
   .vitrine-about-grid { gap: 5rem; }
   .vitrine-about-title { font-size: 3.75rem; line-height: 1.08; }

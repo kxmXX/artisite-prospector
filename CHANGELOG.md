@@ -7,7 +7,16 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
-### Consolidation non publiée — 14 septembre 2026 (4.8.0-alpha.3)
+### Consolidation non publiée — 14 septembre 2026 (4.8.0-alpha.4)
+
+- Vitrine : correction de la vraie contrainte de largeur. La règle `.max-w-7xl` écrasait le
+  shell vitrine ; la spécificité est désormais explicite, ce qui fait passer le contenu de
+  1280 à 1440 px sur un viewport de 1440 px et réduit effectivement les marges latérales.
+- Hero paysagiste : composition desktop calculée en 16:9 (`1440 × 810` vérifié), tout en
+  conservant une hauteur mobile adaptée. Le header reste réellement fixe sur toute la page.
+- Transitions : arrivée d’ancre native inspirée du pattern InView de Motion Primitives
+  (translation, opacité et flou pendant 440 ms), sans scroll-jacking et désactivée avec
+  `prefers-reduced-motion`.
 
 - Vitrine paysagiste : header élargi à liens noirs explicites, CTA calibré, surface de lecture
   portée à 112rem et actions « À propos » séparées sans risque de chevauchement.

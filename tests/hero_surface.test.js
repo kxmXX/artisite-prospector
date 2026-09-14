@@ -24,4 +24,6 @@ test('fullscreen hero shares explicit layers and responsive styles across delive
   assert.match(HERO_STYLES, /z-index: 0/);
   assert.match(HERO_STYLES, /z-index: 1/);
   assert.match(HERO_STYLES, /z-index: 2/);
+  assert.match(HERO_STYLES, /56\.25vw/);
+  assert.match(HERO_STYLES, /min-height: 42rem/);
 });

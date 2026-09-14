@@ -7,6 +7,15 @@ V4.3 PRO sur l'accueil et v4.7 dans les tests : cette divergence sera supprimée
 
 ## Avancement courant — 4.8.0-alpha.2
 
+### Correction géométrique effective — 4.8.0-alpha.4
+
+- Le plafond réel à 80rem a été supprimé par un sélecteur plus spécifique ; la vitrine utilise
+  désormais toute la largeur à 1440 px et conserve 64 px de marge par côté à 1920 px.
+- Hero desktop 16:9, header fixé au niveau de la section entière et transition d’ancre native
+  intégrée depuis les principes Motion Primitives du dépôt UI Intelligence.
+- Validation bornée : 25 tests ciblés et trois viewports (1440, 1920, 390). Le prochain sous-lot
+  compare Services/Galerie aux captures, puis revient aux outils d’édition prioritaires.
+
 ### Lot vitrine de référence — 4.8.0-alpha.3
 
 - Header du template paysagiste : liens noir explicites, espacement accru et CTA vert calibré.

@@ -1,5 +1,19 @@
 # État de reprise Codex — 14 septembre 2026
 
+## LOT VALIDÉ LOCAL — vitrine 4.8.0-alpha.4
+
+- Cause racine du manque de largeur : `.vitrine-shell` était déclaré avant `.max-w-7xl` avec la
+  même spécificité ; le navigateur conservait donc 80rem malgré l’annonce de 112rem. Le sélecteur
+  `.max-w-7xl.vitrine-shell` rend maintenant la largeur effective.
+- Hero desktop : hauteur `min(100svh - 6.25rem, 56.25vw)`, soit 1440 × 810 px mesurés ; mobile
+  conserve un minimum de 78svh. Header porté par la section sticky, visible à 4700 px de scroll.
+- Pattern intégré depuis `/Users/kevinmokai/Projects/ui-intelligence` : transition InView adaptée
+  en CSS natif pour les destinations d’ancre (440 ms, translation 1.1rem, flou 3px), sans reprise
+  du code React tiers et avec fallback `prefers-reduced-motion`.
+- Tests exécutés : 25/25 (`vitrine_conversion_path`, `hero_surface`, `exporter`, `gold`,
+  `v440_fixes_and_dashboard`) et contrôle Playwright 1440/1920/390 px. Prochaine action exacte :
+  proportions Services/Galerie, puis lot éditeur fonds/typo/rayon/animations.
+
 ## LOT PRÊT À PUBLIER — vitrine 4.8.0-alpha.3
 
 - Références appliquées : profil premium minimal, composition éditoriale ample et navigation

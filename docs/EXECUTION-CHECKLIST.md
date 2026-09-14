@@ -20,7 +20,7 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - Mouvement : navigation d’ancre douce native, un seul langage de révélation discret, jamais de
   scroll-jacking ; respecter `prefers-reduced-motion`.
 
-## État exact à `4.8.0-alpha.3`
+## État exact à `4.8.0-alpha.4`
 
 - [x] Ancres vitrine Services, À propos, Avis, Galerie et FAQ.
 - [x] Sections public paysagiste toujours peintes (pas de contenu blanc dû à `content-visibility`).
@@ -29,7 +29,11 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - [x] FAQ accessible au clavier (`aria-expanded`, `aria-controls`).
 - [x] Vitrine sans badge de certification inventé sur une nouvelle génération.
 - [x] Header noir, surface 112rem, CTA À propos séparés, footer vitrine et dock public retiré.
-- [x] Version `4.8.0-alpha.3` synchronisée et livrée sur `main`. Le hash de livraison est
+- [x] Contrainte `.max-w-7xl` neutralisée par une règle vitrine plus spécifique : largeur réelle
+  de 1440 px mesurée sur un viewport de 1440 px.
+- [x] Hero desktop 16:9 mesuré à 1440 × 810 px ; header encore visible à `scrollY = 4700`.
+- [x] Transition d’ancre issue du pattern InView de Motion Primitives, avec mouvement réduit.
+- [x] Version `4.8.0-alpha.4` synchronisée et livrée sur `main`. Le hash de livraison est
   toujours vérifiable avec `git log -1 --oneline` afin que cette checklist ne devienne jamais
   incohérente après un amendement documentaire.
 
@@ -37,7 +41,7 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 
 - [x] Vérifier le header public à 1440 px : liens noirs, espacement large, CTA vert, aucune couleur
   navigateur visitée/bleue/violette.
-- [ ] Vérifier le hero : image couvrante 16:9, titre lisible, hauteur proche d’un viewport.
+- [x] Vérifier le hero : image couvrante 16:9, titre lisible, hauteur proche d’un viewport.
 - [x] Vérifier À propos : largeur utile accrue, texte/image à proportions éditoriales et deux CTA
   sans chevauchement.
 - [ ] Vérifier Services, Galerie, Horaires, Avis et FAQ sur les captures desktop.
@@ -45,7 +49,7 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - [x] Vérifier l’absence du dock/pilule de téléphone sur **le rendu public vitrine** ; conserver le
   réglage déplaçable uniquement dans l’éditeur.
 - [x] Tester 1440 px et 390 px, puis l’export HTML autonome.
-- [ ] Incrémenter en `4.8.0-alpha.4`, mettre à jour les cinq emplacements de version et pousser.
+- [ ] Incrémenter en `4.8.0-alpha.5`, mettre à jour les cinq emplacements de version et pousser.
 
 ## Après la vitrine — contrôles de l’éditeur
 
@@ -71,10 +75,10 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 
 ## Dernière livraison validée
 
-- Commit : `83cb290 fix(vitrine): enforce reference proportions`
-- Tests : 20/20 (`vitrine_conversion_path`, `exporter`, `v440_fixes_and_dashboard`) + `git diff --check`.
-- Contrôle local : Horaires 528 × 541 px par colonne à 1440 px ; Avis 400 × 328–342 px.
-- Anomalie ouverte : les captures de l’utilisateur signalent encore un header violet, une largeur
-  insuffisante, des CTA qui se chevauchent, un footer non conforme et un dock public visible.
-  Ces points font partie du lot `alpha.3` et ont été corrigés ; la prochaine
-  vérification porte sur le hero, Services et Galerie.
+- Commit précédent : `8a1d447 fix(vitrine): align public composition`.
+- Tests du lot alpha.4 : 25/25 (`vitrine_conversion_path`, `hero_surface`, `exporter`, `gold`,
+  `v440_fixes_and_dashboard`) + `git diff --check`.
+- Contrôle local : shell 1440/1440 px, hero 1440 × 810 px, header fixe à 4700 px de scroll,
+  transition `vitrine-section-arrival` active et dock public absent.
+- Anomalie ouverte : comparaison visuelle détaillée Services/Galerie encore à effectuer ; puis
+  reprendre les contrôles éditeur de fonds, typo, rayon et animations configurables.

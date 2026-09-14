@@ -71,9 +71,11 @@ ${UTILITY_CSS}
 
     /* Vitrine 1.1 — keep the public export visually aligned with the editor
        preview. These are deliberately local to the commercial template. */
-    .vitrine-shell { max-width: 112rem; }
+    .max-w-7xl.vitrine-shell { max-width: 112rem; }
     .site-section[id], #services, #about, #avis, #galerie, #faq, #horaires { scroll-margin-top: 6rem; }
     .vitrine-site-header { background: rgba(255, 255, 255, .98); }
+    .vitrine-template.public-mode > .site-section[data-section-type="header"] { position: sticky; top: 0; z-index: 90; }
+    .vitrine-template.public-mode > .site-section[data-section-type="header"] .vitrine-site-header { position: static; }
     .vitrine-site-header-inner { min-height: 6.25rem; }
     .vitrine-site-nav { gap: 2.75rem; font-size: 1rem; }
     .vitrine-site-nav a { color: #262626; text-decoration: none; }
@@ -102,6 +104,9 @@ ${UTILITY_CSS}
     .vitrine-site-footer { background: #fff; color: #52615b; border-top: 1px solid #e7ece4; }
     .vitrine-site-footer a { color: #29352c; text-decoration: none; }
     .vitrine-site-footer a:hover, .vitrine-site-footer a:focus-visible { color: var(--primary, #527c22); text-decoration: underline; text-underline-offset: .2em; }
+    .vitrine-template.public-mode .site-section:target > * { animation: vitrine-section-arrival 440ms cubic-bezier(.16, 1, .3, 1) both; }
+    @keyframes vitrine-section-arrival { from { opacity: .72; transform: translateY(1.1rem); filter: blur(3px); } to { opacity: 1; transform: translateY(0); filter: blur(0); } }
+    @media (prefers-reduced-motion: reduce) { .vitrine-template.public-mode .site-section:target > * { animation: none; } }
     .vitrine-faq-shell .faq-item { border: 0; border-radius: 0; margin: 0; background: transparent; overflow: visible; }
     .vitrine-faq-shell .faq-header { padding: 0; width: 100%; text-align: left; }
     .vitrine-faq-shell .faq-content { padding: 0.75rem 0 0; }
