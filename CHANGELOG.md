@@ -7,6 +7,14 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.40) — Lot 4d : le bloc d'élément se replie aussi
+
+- L'élément sélectionné affichait six rangées de réglages au même niveau. Désormais l'espacement et la forme — les deux qui font l'essentiel du travail — restent immédiats, et l'opacité, le fond, la bordure et l'ombre passent derrière « Réglages avancés : opacité, fond, bordure, ombre », replié par défaut, avec indicateur +/− et état retenu au nouveau rendu.
+- La grille des réglages reste déclarée **une seule fois** : elle est partagée en deux groupes nommés, aucune rangée n'est recopiée. Le test qui vérifiait « parcourue une fois » vérifie maintenant « déclarée une seule fois, partagée, partage nommé » — il n'a pas été supprimé.
+- **Vérifié à l'écran** : le bloc affiche espacement et angles, la divulgation repliée, et le bouton « Revenir au style du thème » ; le résumé « Réglages avancés : opacité, fond, bordure, ombre » est bien rendu.
+- Tests : **386/386**.
+- Reste sur 4d : le groupe « Mise en page » de section et les réglages globaux du projet.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.39) — Le bloc « Position et taille » est vérifié à l'écran
 
 - **Vérifié à l'écran** : après sélection d'un élément dans la liste, le panneau affiche « POSITION ET TAILLE » avec la pastille « flux normal » et les cinq champs — X, Y, Largeur, Hauteur, Rotation — tous à `auto` tant que rien n'est saisi. La règle « flux par défaut, position libre en option » est donc **visible**, et pas seulement testée.

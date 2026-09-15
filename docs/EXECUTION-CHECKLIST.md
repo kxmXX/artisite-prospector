@@ -146,14 +146,16 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
       et injectés par le rendu (une seule feuille pour éditeur, aperçu et export). *Reste* : courbe et
       direction réglables, vocabulaire de répétition du menu texte encore `once / twice / infinite`,
       outil tester/rejouer/arrêter/réinitialiser, et neutralisation des motions pendant un transform libre.
-- [ ] **Lot 4d — Divulgation progressive de l'inspecteur** : entamé en `4.9.0-alpha.29` avec une
-      primitive partagée (`disclosure`, `<details>/<summary>` natifs, focus clavier, état retenu au
-      nouveau rendu) appliquée au rythme de l'animation de section. *Reste* : appliquer le patron aux
-      états, aux réglages d'élément et aux groupes de composants.
+- [ ] **Lot 4d — Divulgation progressive de l'inspecteur** : primitive partagée depuis `4.9.0-alpha.29`
+      (`disclosure`, `<details>/<summary>` natifs, focus clavier, état retenu au nouveau rendu), appliquée au
+      rythme de l'animation de section puis aux réglages d'élément — espacement et angles immédiats,
+      opacité / fond / bordure / ombre repliés (`4.9.0-alpha.40`). *Reste* : le groupe « Mise en page » de
+      section et les réglages globaux du projet.
 - [ ] **Passe anti-slop (skill Impeccable)** : surfaces du navigateur thématisées en `4.9.0-alpha.30`
       (sélection, curseur de saisie, barres de défilement, chiffres tabulaires, anneau de focus unique),
-      portée bornée à `.studio-editor` et vérifiée par test. *Reste* : « glass et blur comme décoration »
-      dans les menus flottants, glyphes résiduels dans le chrome, PRODUCT.md et DESIGN.md à écrire.
+      portée bornée à `.studio-editor` ; **tous** les glyphes du chrome et du rendu remplacés par des icônes
+      dessinées (`4.9.0-alpha.32` → `.34`). *Reste* : « glass et blur comme décoration » dans les menus
+      flottants, unification du vocabulaire de boutons, PRODUCT.md et DESIGN.md à écrire.
 - [x] **Lot 8 — Undo/Redo exhaustif** (`4.9.0-alpha.4`) : 11 commandes mutaient avant de prendre
       l'instantané (l'annulation ne restaurait rien) et 20 commandes n'avaient aucun historique ;
       toutes prennent désormais leur instantané **avant** la mutation, y compris les six

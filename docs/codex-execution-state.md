@@ -1633,3 +1633,11 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Fausse alerte rectifiée : le canevas « perturbé » que j'ai cru voir (contour en pointillés, badge, boutons Remplacer/Anim) est le chrome de sélection d'élément, comportement attendu. Mauvaise lecture de ma part.
 - Tests : 386/386, aucun code modifié dans ce lot.
 - Bilan de vérification visuelle à ce stade : lots 4a, 4b, 4c, 5a, 5b, 7a, 7b, 7c confirmés à l'écran ; lot 4d confirmé pour son premier bloc (repli) ; lot 6 confirmé pour l'affichage, pas pour l'écriture. Non vérifiés : 3b, 7 (courbe/direction/tester), 2d.
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.40 (lot 4d : le bloc d'élément se replie)
+
+- Fait : les six rangées du bloc d'élément sont partagées en deux groupes — espacement et angles immédiats, opacité / fond / bordure / ombre derrière une divulgation repliée. La grille `ELEMENT_SCALE_ROWS` reste déclarée une fois et n'est pas recopiée.
+- Vérifié à l'écran : le bloc replié apparaît avec son indicateur, à côté de la divulgation équivalente du bloc animation. Lot 4d couvre maintenant deux surfaces sur quatre.
+- Le test qui comptait les parcours de la grille a été réécrit (déclaration unique, partage nommé, divulgation présente) plutôt que supprimé.
+- Tests : 386/386. `node --check` sur l'inspecteur, `scripts/build-utilities.mjs` relancé.
+- Suite : terminer 4d (mise en page de section, réglages globaux), puis 6 (position libre, boîtes unifiées), 3b, 7, export 2d. Validations demandées à l'utilisateur : geste de déplacement, écriture d'un champ de position, rendu mobile, export cassé.

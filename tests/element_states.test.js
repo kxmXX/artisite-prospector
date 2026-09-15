@@ -127,8 +127,11 @@ test('l inspecteur edite le style de base ou un etat, avec la meme grille', () =
   assert.ok(inspectorSource.includes('setSelectedElementStateValue'), 'les réglages doivent pouvoir viser un état');
   assert.ok(inspectorSource.includes('setSelectedElementStyle'), 'les réglages doivent pouvoir viser le style de base');
   assert.ok(inspectorSource.includes('clearSelectedElementState'), 'un état doit pouvoir être effacé');
-  assert.ok(inspectorSource.includes('ELEMENT_SCALE_ROWS'), 'une seule grille pilote les six réglages');
-  assert.equal(inspectorSource.split('ELEMENT_SCALE_ROWS').length - 1, 2,
-    'la grille est déclarée une fois et parcourue une fois : pas de duplication des rangées');
+  // Une seule grille déclarée, parcourue deux fois : une fois pour les réglages
+  // immédiats, une fois pour ceux qui s'ouvrent à la demande. Aucune rangée recopiée.
+  assert.equal(inspectorSource.split('const ELEMENT_SCALE_ROWS').length - 1, 1, 'une seule déclaration de grille');
+  assert.ok(inspectorSource.includes('ELEMENT_SCALE_ROWS.filter'), 'la grille doit être partagée, pas recopiée');
+  assert.ok(inspectorSource.includes('ESSENTIAL_STYLE_ROWS'), 'le partage essentiel / avancé doit être nommé');
+  assert.ok(inspectorSource.includes("disclosure('element-advanced'"), 'le reste doit être derrière la divulgation');
 });
 

@@ -160,12 +160,21 @@ function elementStyleControlsHTML(project, layoutKey, activeState) {
     ? 'window.app.clearSelectedElementStyle()'
     : 'window.app.clearSelectedElementState()';
 
+  // Divulgation progressive : l'auteur regle d'abord l'espacement et la forme, qui font
+  // l'essentiel du travail ; le reste s'ouvre a la demande (mode Operate de la skill).
+  const ESSENTIAL_STYLE_ROWS = ["padding", "radius"];
+  const essentialRows = ELEMENT_SCALE_ROWS.filter(function (entry) { return ESSENTIAL_STYLE_ROWS.indexOf(entry[0]) >= 0; })
+    .map(function (entry) { return row(entry[0], entry[1]); }).join('');
+  const advancedRows = ELEMENT_SCALE_ROWS.filter(function (entry) { return ESSENTIAL_STYLE_ROWS.indexOf(entry[0]) < 0; })
+    .map(function (entry) { return row(entry[0], entry[1]); }).join('');
+
   return '<div class="p-2.5 bg-zinc-50 border border-zinc-200 rounded-lg space-y-2">' +
     '<label class="block text-ui-xs font-medium text-zinc-500 uppercase tracking-wider">Élément sélectionné</label>' +
     '<div class="text-ui-2xs font-mono text-zinc-400">' + escapeHtml(layoutKey) + '</div>' +
     stateRow +
     (stateName === 'default' ? '' : '<p class="text-ui-2xs text-zinc-500">Les réglages suivants ne s\'appliquent qu\'à l\'état « ' + ELEMENT_STATE_LABELS[stateName] + ' ».</p>') +
-    ELEMENT_SCALE_ROWS.map(function (entry) { return row(entry[0], entry[1]); }).join('') +
+    essentialRows +
+    disclosure('element-advanced', 'R\u00e9glages avanc\u00e9s : opacit\u00e9, fond, bordure, ombre', advancedRows) +
     '<button type="button" onclick="' + reset + '" class="w-full py-1.5 rounded-md border border-zinc-200 bg-white text-ui-2xs font-semibold text-zinc-600">' +
       (stateName === 'default' ? 'Revenir au style du thème' : 'Effacer cet état') + '</button>' +
   '</div>';
