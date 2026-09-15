@@ -56,3 +56,14 @@ test('le catalogue vit dans un seul fichier', () => {
       'une surface ne doit plus déclarer son propre catalogue : ' + relative);
   }
 });
+
+test('chaque animation du catalogue est réellement jouable par le rendu', () => {
+  // Un catalogue qui promet un effet absent du CSS est un mensonge à l'auteur.
+  const css = ['public/css/app.css', 'public/js/components/heroStyles.js']
+    .map((relative) => fs.readFileSync(new URL('../' + relative, import.meta.url), 'utf8'))
+    .join('\n');
+  const missing = motion.motionPresetIds()
+    .filter((id) => id !== 'none')
+    .filter((id) => !css.includes('data-motion="' + id + '"') && !css.includes("data-motion='" + id + "'"));
+  assert.deepEqual(missing, [], 'animations annoncées mais absentes du rendu');
+});

@@ -1461,3 +1461,22 @@ Vérifications : tests/motion_presets.test.js (6 tests) ; 346/346 tests complets
 
 Reste (7b) : brancher les surfaces, exposer durée, délai, courbe et direction, et les actions
 tester / rejouer / arrêter / réinitialiser. Le catalogue existe mais n'est pas encore utilisé.
+
+---
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.23 (catalogue vérifié)
+
+Contrôle de couverture CSS sur les quatorze animations du catalogue : deux d'entre elles — bounce
+(« Rebond d'appel ») et glow (« Halo ») — n'ont AUCUNE règle de rendu pour les sections ; elles
+appartiennent au mécanisme des animations de bouton (btn-motion-*). Les avoir listées aurait promis à
+l'auteur des effets jamais joués.
+
+Retirées. Le catalogue compte douze animations, toutes réellement jouables, et un nouveau test compare
+chaque identifiant aux règles data-motion="..." du CSS : annoncer une animation absente fait échouer
+la suite.
+
+Leçon : un catalogue est une promesse. Vérifier que chaque entrée est tenue par le rendu avant de
+l'exposer vaut mieux que de découvrir l'écart après branchement.
+
+Vérifications : 7 tests sur le catalogue, 347/347 au total. Le catalogue n'est toujours pas branché
+sur les surfaces (lot 7b à faire).

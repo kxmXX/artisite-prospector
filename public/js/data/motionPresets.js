@@ -28,8 +28,8 @@ export const MOTION_PRESETS = Object.freeze([
   { id: "magnetic", label: "Magnétique", kind: "attention", description: "L'élément se rapproche légèrement du curseur.", durationMs: 800, easing: "ease-out" },
   { id: "pulse", label: "Pulsation", kind: "attention", description: "L'élément bat doucement pour attirer l'œil.", durationMs: 1600, easing: "ease-in-out" },
   { id: "shimmer", label: "Reflet", kind: "attention", description: "Un reflet traverse l'élément.", durationMs: 2000, easing: "linear" },
-  { id: "bounce", label: "Rebond d'appel", kind: "attention", description: "L'élément rebondit pour signaler une action.", durationMs: 1200, easing: "ease-in-out" },
-  { id: "glow", label: "Halo", kind: "attention", description: "L'élément s'éclaire brièvement.", durationMs: 1800, easing: "ease-in-out" },
+  // « Rebond d'appel » et « Halo » existent pour les boutons (btn-motion-*), pas pour
+  // les sections : les inclure ici aurait promis des effets que le rendu ne joue pas.
   { id: "progress-fill", label: "Barre qui se remplit", kind: "attention", description: "Une barre de progression se remplit.", durationMs: 1400, easing: "ease-out" }
 ]);
 

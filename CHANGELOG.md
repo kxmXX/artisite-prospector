@@ -7,6 +7,20 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.23) — Le catalogue ne promet que du réel
+
+- **Défaut trouvé dans mon propre travail avant de le brancher** : le catalogue livré au lot précédent
+  annonçait **« Rebond d'appel » et « Halo »**, deux effets qui n'existent **pas** dans le rendu des
+  sections — ils appartiennent à la famille des animations de bouton (`btn-motion-*`). Les afficher
+  dans la liste des animations de section aurait promis à l'auteur des effets qui ne se jouent jamais.
+- **Les deux entrées sont retirées** du catalogue (douze animations, toutes jouables) et un test
+  **interdit désormais d'annoncer une animation absente du CSS** : il compare chaque identifiant du
+  catalogue aux règles `data-motion="…"` réellement présentes. C'est le garde-fou qui empêche cette
+  classe de mensonge de revenir.
+- **QA** : `tests/motion_presets.test.js` passe de 6 à 7 tests. **347/347 tests**.
+- *Rappel de portée* : le catalogue n'est toujours **pas** branché sur les surfaces (lot 7b). Rien ne
+  change pour l'auteur à ce stade.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.22) — Lot 7a : catalogue d'animations unique
 
 - **Cause racine traitée** : l'audit relevait **six surfaces d'animation avec six catalogues
