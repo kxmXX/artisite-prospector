@@ -1150,11 +1150,11 @@ input, textarea, select, [contenteditable] {
 }
 
 /* High-end 2026 glassmorphism for sticky dock */
+/* Surface opaque : le flou decoratif etait une signature de « slop », pas un effet
+   au service d'une intention. La profondeur vient de l'ombre, pas du verre. */
 .sticky-dock-glass {
-  background: rgba(24, 24, 27, 0.88) !important;
+  background: #18181b !important;
   border: 1px solid rgba(255, 255, 255, 0.22) !important;
-  backdrop-filter: blur(16px) saturate(130%) contrast(108%) brightness(104%) !important;
-  -webkit-backdrop-filter: blur(16px) saturate(130%) contrast(108%) brightness(104%) !important;
   box-shadow:
     0 16px 40px rgba(0, 0, 0, 0.55),
     0 2px 8px rgba(0, 0, 0, 0.2),
@@ -1179,9 +1179,7 @@ input, textarea, select, [contenteditable] {
   position: sticky;
   top: 1rem;
   z-index: 80 !important;
-  background: rgba(255, 255, 255, 0.96);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: #ffffff;
   border: 1px solid #e4e4e7;
   border-radius: 9999px;
   padding: 5px 10px;

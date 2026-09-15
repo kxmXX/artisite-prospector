@@ -1683,3 +1683,11 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Un test existant encodait la valeur figee du keycap : reecrit sur le contrat (respecter les variables) pour qu'il ne casse plus a chaque changement de jeton.
 - Tests : 391 → 392. `scripts/build-utilities.mjs` relance, capture de controle prise.
 - Reste : glass/blur decoratif des menus flottants, PRODUCT.md/DESIGN.md, desambiguisation des libelles Bouton, geste de deplacement (validation utilisateur), puis 4d, 3b, 7, export 2d.
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.46 (fin du verre decoratif dans le chrome)
+
+- Fait : huit surfaces du chrome passent en opaque — cinq menus flottants sombres, pilule de retour, barre du haut, panneau de structure, en-tete du panneau de proprietes, et le `.sticky-dock-glass` dont le commentaire assumait le glassmorphism.
+- Conserve : voile de modale (effet intentionnel) et en-tete du site publie (design du client, hors perimetre).
+- Non verifie a l'ecran : la barre de section est masquee des qu'un autre outil est actif (chrome contextuel), donc mon clic sur « Anim » a ete bloque. Changement mecanique (95 % -> 100 %), garde par test.
+- Tests : 392 → 393. `scripts/build-utilities.mjs` relance : les classes devenues inutiles disparaissent de la couche utilitaire.
+- Reste : desambiguiser les libelles « Bouton », PRODUCT.md/DESIGN.md, geste de deplacement (validation utilisateur), puis 4d, 3b, 7, export 2d.

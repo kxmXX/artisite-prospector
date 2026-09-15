@@ -9,7 +9,7 @@ import { INSPIRATION_PATTERNS } from "../data/inspiration.js";
 import { escapeHtml } from "../utils/html.js";
 
 function hexToRgbText(hex) {
-  const raw = String(hex || "").replace("#", "");
+ const raw = String(hex || "").replace("#", "");
   if (!/^[0-9a-f]{6}$/i.test(raw)) return "rgb(24, 24, 27)";
   return `rgb(${parseInt(raw.slice(0, 2), 16)}, ${parseInt(raw.slice(2, 4), 16)}, ${parseInt(raw.slice(4, 6), 16)})`;
 }
@@ -234,7 +234,7 @@ export function renderEditor(state) {
 
           <!-- In-situ Live Preview Client Floating Pill (Docked at bottom so header and theme toggles remain completely accessible) -->
           ${isLivePreview ? `
-            <div class="studio-v3-preview-return fixed bottom-5 left-1/2 transform -translate-x-1/2 z-50 bg-zinc-950/95 text-white px-5 py-2.5 rounded-full shadow-2xl border border-zinc-700 flex items-center gap-4 text-xs backdrop-blur animate-fade-in">
+            <div class="studio-v3-preview-return fixed bottom-5 left-1/2 transform -translate-x-1/2 z-50 bg-zinc-950 text-white px-5 py-2.5 rounded-full shadow-2xl border border-zinc-700 flex items-center gap-4 text-xs  animate-fade-in">
               <span class="flex items-center gap-2 font-bold text-zinc-200">
                 <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
                 <span>Aperçu Client Démo en direct</span>
@@ -294,7 +294,7 @@ export function renderEditor(state) {
                 <span>Couleur</span>
                 <span id="ftb-state-badge" class="hidden px-1.5 py-0.5 rounded bg-amber-400 text-zinc-950 text-ui-2xs font-bold" title="Les réglages s'appliquent à cet état"></span>
               </button>
-              <div id="ftb-color-menu" class="hidden absolute left-0 top-full mt-2 w-52 bg-zinc-900/95 backdrop-blur-md border border-white/20 rounded-xl p-2.5 shadow-2xl z-50 text-white text-ui-sm">
+              <div id="ftb-color-menu" class="hidden absolute left-0 top-full mt-2 w-52 bg-zinc-900 border border-white/20 rounded-xl p-2.5 shadow-2xl z-50 text-white text-ui-sm">
                 <div class="text-ui-2xs font-bold uppercase tracking-wider text-zinc-400 mb-1.5">État modifié</div>
                 <div class="flex flex-wrap gap-1 mb-2.5" role="group" aria-label="État auquel s'appliquent les réglages">
                   <button type="button" data-ftb-state="default" class="motion-loop-btn is-active" onclick="window.app.setActiveTextState('default')">Principal</button>
@@ -327,7 +327,7 @@ export function renderEditor(state) {
               <button type="button" id="ftb-anim-btn" onclick="window.app.toggleTextMotionMenu()" class="ftb-btn text-amber-400 font-semibold flex items-center gap-1 px-1.5" title="Appliquer une animation à ce texte">
                 ${getIcon("sparkles", "w-3.5 h-3.5")}<span>Anim</span>
               </button>
-              <div id="ftb-anim-menu" class="hidden absolute left-0 top-full mt-2 w-56 bg-zinc-900/95 backdrop-blur-md border border-white/20 rounded-xl p-2.5 shadow-2xl z-50 text-white text-ui-sm">
+              <div id="ftb-anim-menu" class="hidden absolute left-0 top-full mt-2 w-56 bg-zinc-900 border border-white/20 rounded-xl p-2.5 shadow-2xl z-50 text-white text-ui-sm">
                 <div class="text-ui-2xs font-bold uppercase tracking-wider text-zinc-400 mb-1.5">Animation de l’élément · texte</div>
                 <div class="grid grid-cols-2 gap-1.5">
                   ${MOTION_PRESETS.map((motion) => `

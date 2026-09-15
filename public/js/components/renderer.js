@@ -308,7 +308,7 @@ const motionAttr = imgMotion && imgMotion !== "none" ? ` data-motion="${imgMotio
             ${getIcon("sparkles", "w-3.5 h-3.5 text-amber-500")}
             <span>Anim</span>
           </button>
-          <div id="img-motion-menu-${sectionId}-${String(fieldPath).replace(/\./g, '-')}-${indexParam !== 'null' ? indexParam : '0'}" class="hidden absolute left-0 bottom-full mb-2 w-56 bg-zinc-900/95 backdrop-blur-md border border-white/20 rounded-xl p-2.5 shadow-2xl z-50 text-white text-[11px]">
+          <div id="img-motion-menu-${sectionId}-${String(fieldPath).replace(/\./g, '-')}-${indexParam !== 'null' ? indexParam : '0'}" class="hidden absolute left-0 bottom-full mb-2 w-56 bg-zinc-900 border border-white/20 rounded-xl p-2.5 shadow-2xl z-50 text-white text-[11px]">
             <div class="text-[9px] font-bold uppercase tracking-wider text-zinc-400 mb-1.5 flex items-center justify-between">
               <span>Animation de l’image · élément</span>
               <span class="text-amber-400 font-mono">${imgMotion || 'aucune'}</span>
@@ -668,7 +668,7 @@ function renderSection(sec, project, options) {
           <button type="button" class="btn-sec-ctrl btn-sec-bg" title="Changer le style de fond" onclick="event.stopPropagation(); window.app.toggleSectionBgMenu('${sec.id}')" data-action="toggle-bg" data-id="${sec.id}">
             ${getIcon("palette", "w-3.5 h-3.5")}
           </button>
-          <div id="sec-bg-popover-${sec.id}" data-section-id="${sec.id}" class="sec-bg-popover hidden absolute left-0 top-full mt-2 w-56 bg-zinc-900/95 backdrop-blur-md border border-white/20 rounded-xl p-2.5 shadow-2xl z-50 text-white text-xs">
+          <div id="sec-bg-popover-${sec.id}" data-section-id="${sec.id}" class="sec-bg-popover hidden absolute left-0 top-full mt-2 w-56 bg-zinc-900 border border-white/20 rounded-xl p-2.5 shadow-2xl z-50 text-white text-xs">
             <div class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 mb-2 flex items-center justify-between">
               <span>Couleur de Fond</span>
               <span class="text-amber-400 font-mono">${sec.settings?.bgTheme || 'white'}</span>
@@ -694,7 +694,7 @@ function renderSection(sec, project, options) {
             ${getIcon("sparkles", "w-3.5 h-3.5 text-amber-400")}
             <span class="sec-ctrl-text">Anim</span>
           </button>
-          <div id="sec-motion-popover-${sec.id}" data-section-id="${sec.id}" class="sec-motion-popover hidden absolute left-0 top-full mt-2 w-56 bg-zinc-900/95 backdrop-blur-md border border-white/20 rounded-xl p-2.5 shadow-2xl z-50 text-white text-xs">
+          <div id="sec-motion-popover-${sec.id}" data-section-id="${sec.id}" class="sec-motion-popover hidden absolute left-0 top-full mt-2 w-56 bg-zinc-900 border border-white/20 rounded-xl p-2.5 shadow-2xl z-50 text-white text-xs">
             <div class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 mb-2 flex items-center justify-between">
               <span>Style d’animation</span>
               <span class="text-amber-400 font-mono font-bold">${sec.settings?.motionPreset || sec.motionPreset || 'défaut'}</span>

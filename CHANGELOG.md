@@ -7,6 +7,14 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.46) — Le chrome perd son verre décoratif
+
+- Craft-floor : « le verre et le flou comme décoration plutôt que comme effet précis ». Le chrome de l'éditeur en portait huit : les cinq menus flottants sombres (`bg-zinc-900/95 backdrop-blur-md`), la pilule de retour à l'aperçu, la barre du haut, le panneau de structure, l'en-tête du panneau de propriétés, et — le plus explicite — un `.sticky-dock-glass` dont le commentaire assumait le « glassmorphism ».
+- Correctif : surfaces opaques, flou retiré. Les valeurs ne bougent presque pas (95 % → 100 % d'opacité) : c'est la suppression d'une signature visuelle, pas un changement de composition. La profondeur reste portée par les ombres, qui existaient déjà.
+- Conservé volontairement : le **voile des modales** (`rgba(20,27,25,.32)` + `blur(18px)`) et l'en-tête du **site publié** (`bg-white/95 backdrop-blur-md`). Le premier est un effet au service d'une intention — détacher une boîte de dialogue du contenu ; le second appartient au design du site du client, hors périmètre.
+- Tests : 1 nouveau ; 392 → **393/393**.
+- Vérification : par test et par revue des valeurs. Je n'ai **pas** pu ouvrir un menu flottant à l'écran : la barre de section est masquée dès qu'un autre outil est actif (chrome contextuel), et mon clic a été bloqué — je le dis plutôt que de prétendre l'avoir vu.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.45) — Un seul vocabulaire de boutons, par les jetons
 
 - Constat : les familles de boutons du chrome (`studio-v3-*`, `motion-loop-btn`, `btn-keycap`) réécrivaient chacune leurs valeurs — `height:34px`, `border-radius:10px`, `transition:.16s ease`, `border-radius:.5rem`, `opacity:.28`. Rien de visible à l'écran, mais autant d'occasions de diverger à la prochaine retouche.

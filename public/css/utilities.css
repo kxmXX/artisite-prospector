@@ -1,6 +1,6 @@
 /* GÉNÉRÉ PAR scripts/build-utilities.mjs — NE PAS ÉDITER À LA MAIN.
    Couche d'utilitaires de l'application (éditeur, aperçu, dashboard).
-   374 règles. Relancer : npm run build:css */
+   373 règles. Relancer : npm run build:css */
 
 .-bottom-6 { bottom: calc(-1 * 1.5rem); }
 .-left-6 { left: calc(-1 * 1.5rem); }
@@ -59,7 +59,6 @@
 .bg-zinc-900\/80 { background-color: rgba(24, 24, 27, 0.8); }
 .bg-zinc-900\/90 { background-color: rgba(24, 24, 27, 0.9); }
 .bg-zinc-950\/80 { background-color: rgba(9, 9, 11, 0.8); }
-.bg-zinc-950\/95 { background-color: rgba(9, 9, 11, 0.95); }
 .border-\[\#527c22\]\/20 { border-color: rgba(82, 124, 34, 0.2); }
 .border-0 { border-width: 0px; }
 .border-amber-200\/60 { border-color: rgba(253, 230, 138, 0.6); }

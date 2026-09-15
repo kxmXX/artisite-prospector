@@ -132,3 +132,16 @@ test('les familles de boutons partagent un seul vocabulaire', () => {
   assert.ok(!/\.motion-loop-btn[^}]*border-radius:\s*\.5rem/.test(app), 'plus de rayon arbitraire sur les pastilles');
   assert.ok(!app.includes('border-radius: var(--btn-radius, var(--cta-radius, 8px))'), 'le keycap ne fige plus 8px');
 });
+
+test('le chrome de l editeur n a plus de verre decoratif', () => {
+  const editor = read('public/js/components/editor.js');
+  const renderer = read('public/js/components/renderer.js');
+  assert.ok(!editor.includes('backdrop-blur'), 'plus de flou decoratif dans les menus de texte');
+  assert.ok(!renderer.includes('bg-zinc-900/95 backdrop-blur-md'), 'plus de flou dans les menus de section');
+  const app = read('public/css/app.css');
+  assert.ok(!/\.canva-dock\s*\{[^}]*backdrop-filter/.test(app), 'le dock Canva doit etre opaque');
+  assert.ok(!/\.sticky-dock-glass\s*\{[^}]*backdrop-filter/.test(app), 'le dock collant doit etre opaque');
+  const studio = read('public/css/studio-v3.css');
+  assert.ok(!studio.includes('backdrop-filter:blur(14px)'), 'le panneau de structure doit etre opaque');
+  assert.ok(!studio.includes('backdrop-filter:blur(18px)'), 'la barre du haut doit etre opaque');
+});
