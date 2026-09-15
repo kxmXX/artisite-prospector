@@ -1496,3 +1496,21 @@ Vérifications : 8 tests sur le catalogue, 348/348 au total.
 Reste (7b) : les cinq autres surfaces (menu de section du canevas, texte, image, bouton, réglages
 globaux), l'exposition de durée, délai et courbe, et les actions tester / rejouer / arrêter /
 réinitialiser.
+
+---
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.25 (accessibilité du mouvement vérifiée)
+
+Contrôle des douze animations du catalogue sous prefers-reduced-motion : toutes sont neutralisées par
+une règle générique présente dans les dix blocs réduits du produit. Aucun écart, donc aucune
+correction.
+
+Cette vérification devient un test permanent : elle échouera si une animation ajoutée au catalogue
+pouvait se jouer malgré la demande système de réduire les mouvements. C'était une propriété vérifiée à
+la main (et exigée par AGENTS.md) ; elle est désormais garantie par la suite.
+
+Vérifications : 9 tests sur le catalogue, 349/349 au total.
+
+Reste : lot 7b sur les cinq autres surfaces (canevas, image, texte, bouton, réglages globaux) — la
+tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n'a rien modifié, l'arbre
+étant resté propre.

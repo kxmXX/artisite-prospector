@@ -7,6 +7,18 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.25) — L'accessibilité du mouvement devient vérifiée
+
+- **Contrôle mené sur les douze animations du catalogue** : chacune est bien neutralisée quand le
+  système demande de réduire les mouvements. Le produit tient donc sa promesse — dix blocs
+  `prefers-reduced-motion` couvrent les animations d'éléments par une règle générique. Aucun écart
+  trouvé, donc aucune correction à apporter : le résultat est celui d'une vérification, pas d'une
+  réparation.
+- **Cette vérification devient permanente** : un test échoue désormais si une animation du catalogue
+  pouvait se jouer malgré `prefers-reduced-motion`. C'était jusqu'ici une propriété vérifiée à la main
+  et rappelée dans les règles du dépôt ; elle est maintenant garantie par la suite.
+- **QA** : `tests/motion_presets.test.js` passe de 8 à 9 tests. **349/349 tests**.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.24) — Lot 7b : l'inspecteur lit le catalogue
 
 - **Première surface branchée** : la liste d'animations de la section dans l'inspecteur ne déclare plus

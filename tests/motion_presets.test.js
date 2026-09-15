@@ -74,3 +74,22 @@ test('l inspecteur affiche le catalogue au lieu de sa propre liste', () => {
   assert.ok(!inspector.includes("['fade-in', 'Fade']"), 'la liste locale doit avoir disparu');
   assert.ok(!inspector.includes("'Shimmer'"), 'plus aucun nom anglais brut dans l’interface');
 });
+
+test('chaque animation du catalogue est neutralisee si le systeme demande de reduire les mouvements', () => {
+  // Promesse d'accessibilite du produit, et exigence explicite des regles du depot :
+  // toute animation doit avoir une alternative quand prefers-reduced-motion est actif.
+  const css = ['public/css/app.css', 'public/css/studio-v3.css', 'public/js/components/heroStyles.js']
+    .map((relative) => fs.readFileSync(new URL('../' + relative, import.meta.url), 'utf8'))
+    .join('\n');
+  const blocks = [...css.matchAll(/@media\s*\(prefers-reduced-motion[^)]*\)\s*\{([\s\S]*?)\n\}/g)].map((match) => match[1]);
+  assert.ok(blocks.length > 0, 'le produit doit déclarer au moins un bloc reduced-motion');
+  const reduced = blocks.join('\n');
+  assert.match(reduced, /animation\s*:\s*none\s*!important/, 'une règle générique doit couper les animations');
+  assert.ok(/\[data-motion|\.motion-preset/.test(reduced), 'la règle doit couvrir les animations d éléments');
+  const uncovered = motion.motionPresetIds().filter((id) => id !== 'none').filter((id) => {
+    const specific = reduced.includes('data-motion="' + id + '"');
+    const generic = /\[data-motion[^\]]*\]|\.motion-preset/.test(reduced);
+    return !specific && !generic;
+  });
+  assert.deepEqual(uncovered, [], 'animations jouées malgré la demande de réduction : ' + uncovered.join(', '));
+});
