@@ -1619,7 +1619,9 @@ export class App {
     const sec = state.currentProject.sections.find(s => s.id === sectionId);
     if (!sec || !sec.content) return;
 
-    // 1. Update in-memory state data directly using setDeepValue
+    // 1. Capture the pre-edit value before the live preview mutates it.
+    this.beginFieldEdit(sectionId, path);
+    // 2. Update in-memory state data directly using setDeepValue
     setDeepValue(sec.content, path, value);
 
     // 2. Direct canvas DOM update: find the matching element with data-editable="path"
@@ -1645,13 +1647,39 @@ export class App {
     }
   }
 
+  // A live-preview field edit mutates state on every keystroke, so the undo
+  // snapshot must come from the value that existed before the edit began.
+  beginFieldEdit(sectionId, path, value) {
+    const key = `${sectionId}::${path}`;
+    if (this._fieldEditSnapshot?.key === key) return this._fieldEditSnapshot;
+    const sec = state.currentProject?.sections.find(s => s.id === sectionId);
+    const original = value !== undefined ? value : (sec ? getDeepValue(sec.content, path) : undefined);
+    this._fieldEditSnapshot = { key, sectionId, path, value: original };
+    return this._fieldEditSnapshot;
+  }
+
+  commitInlineFieldUpdate(sectionId, path, initialValue, value) {
+    if (!state.currentProject || value === initialValue) return false;
+    const sec = state.currentProject.sections.find(s => s.id === sectionId);
+    if (!sec?.content) return false;
+    this.beginFieldEdit(sectionId, path, initialValue);
+    this.commitFieldUpdate(sectionId, path, value);
+    return true;
+  }
+
   commitFieldUpdate(sectionId, path, value) {
     if (!state.currentProject) return;
     const sec = state.currentProject.sections.find(s => s.id === sectionId);
     if (!sec || !sec.content) return;
 
-    setDeepValue(sec.content, path, value);
+    const edit = this._fieldEditSnapshot;
+    const sameEdit = edit?.key === `${sectionId}::${path}`;
+    // Rebuild the pre-edit value so pushHistory stores it in Undo and Redo can
+    // return to the committed value. Without this, Undo is a silent no-op.
+    if (sameEdit) setDeepValue(sec.content, path, edit.value);
     state.pushHistory(`Modification ${path}`);
+    setDeepValue(sec.content, path, value);
+    if (sameEdit) this._fieldEditSnapshot = null;
     state.saveToStorage();
     this.updateUndoRedoUI();
 
@@ -4611,31 +4639,31 @@ export class App {
       rotateHandle.style.top = "2px";
       rotateHandle.style.right = "2px";
     }
-    if (alignBar && keys.length > 1 && !selectionLocked) {
-      const toolbarWidth = alignBar.offsetWidth || 276;
-      const desiredLeft = Math.max(8, Math.min(window.innerWidth - toolbarWidth - 8, (left + right - toolbarWidth) / 2));
-      const desiredTop = Math.max(8, Math.min(window.innerHeight - 38, bottom + 10 + (controlsInside ? 44 : 0)));
-      alignBar.style.left = `${desiredLeft - left}px`;
-      alignBar.style.top = `${desiredTop - top}px`;
-      alignBar.style.translate = "0 0";
-    }
-    if (layerBar) {
-      const toolbarWidth = layerBar.offsetWidth || 250;
-      const desiredLeft = Math.max(8, Math.min(window.innerWidth - toolbarWidth - 8, (left + right - toolbarWidth) / 2));
-      const baseTop = (keys.length > 1 && !selectionLocked ? bottom + 50 : bottom + 10) + (controlsInside ? 44 : 0);
-      const desiredTop = Math.max(8, Math.min(window.innerHeight - 38, baseTop));
-      layerBar.style.left = `${desiredLeft - left}px`;
-      layerBar.style.top = `${desiredTop - top}px`;
-      layerBar.style.translate = "0 0";
-    }
+    const toolbarStack = [
+      keys.length > 1 && !selectionLocked ? alignBar : null,
+      layerBar,
+      responsiveBar?.classList.contains("is-open") ? responsiveBar : null
+    ].filter(Boolean);
+    const toolbarGap = 6;
+    const toolbarMetrics = toolbarStack.map(bar => {
+      bar.style.maxWidth = `${Math.max(240, window.innerWidth - 16)}px`;
+      return { bar, width: Math.min(bar.offsetWidth || 280, window.innerWidth - 16), height: bar.offsetHeight || 38 };
+    });
+    const stackHeight = toolbarMetrics.reduce((sum, item) => sum + item.height, 0) + Math.max(0, toolbarMetrics.length - 1) * toolbarGap;
+    const belowTop = bottom + 10 + (controlsInside ? 44 : 0);
+    const aboveTop = top - stackHeight - 10;
+    const stackTop = belowTop + stackHeight <= window.innerHeight - 8
+      ? belowTop
+      : Math.max(8, aboveTop);
+    let toolbarTop = stackTop;
+    toolbarMetrics.forEach(({ bar, width, height }) => {
+      const desiredLeft = Math.max(8, Math.min(window.innerWidth - width - 8, (left + right - width) / 2));
+      bar.style.left = `${desiredLeft - left}px`;
+      bar.style.top = `${toolbarTop - top}px`;
+      bar.style.translate = "0 0";
+      toolbarTop += height + toolbarGap;
+    });
     if (responsiveBar) {
-      const toolbarWidth = responsiveBar.offsetWidth || 320;
-      const desiredLeft = Math.max(8, Math.min(window.innerWidth - toolbarWidth - 8, (left + right - toolbarWidth) / 2));
-      const extra = (keys.length > 1 && !selectionLocked ? 90 : 50) + (controlsInside ? 44 : 0);
-      const desiredTop = Math.max(8, Math.min(window.innerHeight - 38, bottom + extra));
-      responsiveBar.style.left = `${desiredLeft - left}px`;
-      responsiveBar.style.top = `${desiredTop - top}px`;
-      responsiveBar.style.translate = "0 0";
       responsiveBar.classList.toggle("is-disabled", selectionLocked);
       responsiveBar.querySelectorAll("[data-freeform-copy]").forEach(button => { button.hidden = button.dataset.freeformCopy === state.viewport; });
       const inheritButton = responsiveBar.querySelector("[data-freeform-inherit-desktop]");
@@ -5747,7 +5775,7 @@ export class App {
 
       el.oninput = () => {
         const field = el.getAttribute("data-editable");
-        const value = el.innerText;
+        const value = el.innerText.trim();
         const secWrapper = el.closest(".editor-section-wrapper");
         const secId = secWrapper?.getAttribute("data-section-id");
         if (secId && field && state.currentProject) {
@@ -5770,12 +5798,13 @@ export class App {
       el.onblur = () => {
         const field = el.getAttribute("data-editable");
         const value = el.innerText.trim();
-        const initialValue = el.dataset.initialValue;
+        const initialValue = el.dataset.initialValue || "";
         const secWrapper = el.closest(".editor-section-wrapper");
         const secId = secWrapper?.getAttribute("data-section-id");
-        if (secId && field && value !== initialValue) {
-          this.commitFieldUpdate(secId, field, value);
+        if (secId && field) {
+          this.commitInlineFieldUpdate(secId, field, initialValue, value);
         }
+        if (el.innerText !== value) el.innerText = value;
       };
 
       el.onkeydown = (e) => {

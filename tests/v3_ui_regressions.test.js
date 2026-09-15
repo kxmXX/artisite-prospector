@@ -476,7 +476,7 @@ test('Freeform responsive tools adapt selected layouts across breakpoints withou
   assert.ok(appSource.includes('this._freeformViewportSyncTimer = setTimeout(() => {'));
   assert.ok(appSource.includes('this.applyFreeformReparenting();'));
   assert.ok(appSource.includes('const responsiveBar = overlay.querySelector(".freeform-responsivebar")'));
-  assert.ok(appSource.includes('responsiveBar.style.left = `${desiredLeft - left}px`'));
+  assert.ok(appSource.includes('bar.style.left = `${desiredLeft - left}px`'));
   assert.ok(!appSource.match(/copyShareUrl[\s\S]{0,900}responsiveBar\.style\.left/));
   assert.ok(css.includes('.freeform-responsivebar'));
   assert.ok(appSource.includes('data-freeform-responsive-toggle'));

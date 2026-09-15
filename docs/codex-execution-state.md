@@ -1,3 +1,24 @@
+## LOT DE LIVRAISON — édition visuelle fiable 4.8.0-alpha.43 — 15 septembre 2026
+
+- Cause racine corrigée : `commitFieldUpdate` mutant l’état avant `pushHistory`, chaque modification de texte, de cellule et de champ inspecteur enregistrait un instantané déjà modifié ; Undo était donc un no-op silencieux pour une grande partie de l’édition.
+- Correctif : `beginFieldEdit` capture la valeur d’avant-édition (au focus ou à la première frappe), `commitFieldUpdate` restaure cette valeur avant de pousser l’historique puis applique le résultat. Undo annule, Redo rétablit, testé sur une cellule `data-editable` du tableau.
+- Contrôles : les barres alignement/calques/responsive partagent une pile unique mesurée qui bascule au-dessus de la sélection quand le bas du canevas est occupé, avec défilement horizontal borné.
+- Chrome : le dock de contact client et les repères Freeform sont retirés du mode édition et de l’aperçu.
+- Tactile : boutons et poignées passent à 44 px sous `pointer:coarse`.
+- Mouvement : animations suspendues pendant un transform Freeform pour stabiliser les mesures de sélection et de magnétisme.
+- Détecteur Impeccable exécuté sur `studio-v3.css` et `app.js` : deux avertissements préexistants consignés (transition de largeur du canevas, dégradé indigo).
+- Tests : 3 nouveaux tests d’intégrité d’interaction, 36/36 ciblés éditeur/V3 puis 249/249 complets ; `git diff --check` et `node --check` propres.
+- Prochaine action exacte : traiter l’aperçu mobile/tablette simulé (container queries) puis la transition de largeur du canevas, avant rotation/redimensionnement d’objets tournés.
+
+## LOT EN COURS — remise en état éditeur visuel Canva / Figma — après 4.8.0-alpha.42
+
+- Priorité utilisateur : ratisser largement les aberrations graphiques et fonctionnelles de l’éditeur (boutons, cellules, overlays, gestes Freeform, responsive simulé et animations), avant le bundling.
+- Checklist : nouveau bloc P0 ajouté avec audit 1440/1024/390, collisions, modèle spatial des cellules, feedback/persistance, animations, matrice souris/tactile/clavier et simplification des commandes.
+- Audit navigateur initial à 1280 : en mode Desktop, le site est comprimé dans la zone centrale et le header casse ; en mode Mobile simulé à 390 px, les media queries suivent encore la fenêtre 1280 px, donc navigation desktop et gros CTA débordent hors du canvas. Le dock de contact client et le launcher IA recouvrent aussi la surface d’édition.
+- Audit code P0 confirmé : l’édition inline mute l’état avant la création de l’historique, rendant Undo potentiellement inopérant ; les trois barres Freeform peuvent converger au même Y près du bas ; cibles tactiles resize trop petites ; animations et mesures Freeform peuvent se disputer la géométrie.
+- Skill Impeccable : installé globalement dans `/Users/kevinmokai/.dsh/skills/impeccable` depuis `pbakaus/impeccable`, puis chargé dans la session.
+- Premier lot prévu : transaction Undo réelle pour l’édition inline/cellules, placement anti-collision des barres Freeform, cibles tactiles, neutralisation du chrome client en édition et garde-fous de mouvement pendant les transforms.
+
 ## LOT DE LIVRAISON — terminal IA fidèle au réseau 4.8.0-alpha.42 — 15 septembre 2026
 
 - Progression : les étapes ne sont plus cochées par délais décoratifs ; rédaction, assemblage, design et finalisation avancent selon la réponse réseau et la construction effective du projet.

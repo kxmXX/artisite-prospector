@@ -7,6 +7,15 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 15 septembre 2026 (4.8.0-alpha.43)
+
+- Historique : l’édition inline du canevas et des cellules, comme la saisie dans l’inspecteur et la barre latérale, capturent désormais la valeur d’avant-édition. Undo annule réellement la modification et Redo la rétablit, au lieu d’enregistrer un instantané déjà modifié.
+- Contrôles Freeform : les barres d’alignement, de calques et de responsive partagent une pile mesurée qui bascule au-dessus de la sélection quand le bas du canevas est occupé ; plus de convergence au même point.
+- Chrome éditeur : le dock de contact client et les repères Freeform n’apparaissent plus pendant l’édition ni au-dessus de l’aperçu.
+- Tactile : boutons et poignées des contrôles libres portent à 44 px sous pointeur grossier.
+- Animations : les transitions et animations sont suspendues pendant un déplacement/redimensionnement pour stabiliser la géométrie mesurée.
+- QA : 36/36 tests ciblés éditeur/V3, 249/249 complets, détecteur Impeccable exécuté (deux avertissements préexistants consignés), syntaxe et `git diff --check` propres.
+
 ### Consolidation — 15 septembre 2026 (4.8.0-alpha.42)
 
 - Wizard : les six étapes du terminal suivent désormais le cycle réel de la requête et de la construction du projet ; aucun minuteur ne valide la rédaction avant la réponse réseau.

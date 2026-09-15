@@ -44,7 +44,24 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - [~] Persistance serveur et audit SEO réel — exclus explicitement par l’utilisateur pour cette mission.
 - [~] Avis Google fictifs / badges associés — conservation explicitement demandée par l’utilisateur.
 
-Prochaine action exacte : mesurer le poids et les requêtes du chargement actuel avant toute décision de bundling, sans lancer de migration Vite sans gain démontré.
+## P0 — reprise qualité de l’éditeur visuel Canva / Figma
+
+- [~] Auditer largement les gestes réels : premier passage desktop 1280 et mobile simulé 390 effectué (`4.8.0-alpha.43`). Restent tablette, rotation et rotation+scale, multi-sélection tactile et parité export.
+- [x] Éliminer les superpositions de chrome et les layouts cassés : dock de contact client masqué en édition, pile Freeform mesurée anti-collision, repères libres exclus de l’aperçu (`4.8.0-alpha.43`).
+- [~] Repenser l’édition des cellules autour d’un modèle spatial cohérent : historique d’édition réparé (Undo/Redo réels sur cellules et champs) dans `4.8.0-alpha.43` ; limites spatiales et sortie de mode restent à traiter.
+- [x] Rendre chaque outil réellement opérant et lisible : l’édition inline et l’inspecteur enregistrent à nouveau une transaction annulable (`4.8.0-alpha.43`).
+- [~] Fiabiliser les animations : transitions et animations suspendues pendant un transform Freeform (`4.8.0-alpha.43`) ; restent l’aperçu fiable des presets et une politique unique de `transform-origin`.
+- [ ] Ajouter une matrice de non-régression navigateur couvrant souris, tactile et clavier, plutôt que de considérer la présence du code comme une fonctionnalité livrée.
+- [ ] Réduire la complexité d’usage : actions principales immédiatement compréhensibles, commandes avancées regroupées sans barre illisible ni vocabulaire technique ambigu.
+
+### Constats ouverts issus de l’audit et du détecteur
+
+- `#canvas-container` anime `width` (`studio-v3.css:157`) : l’aperçu appareil provoque du layout thrash, piste probable des saccades ressenties ; migrer vers `transform: scale` ou une transition non bloquante.
+- Aperçu mobile/tablette simulé : les media queries suivent la fenêtre réelle, pas la largeur du canevas ; la navigation desktop déborde donc dans le cadre 390 px. Envisager des container queries `@container` pour le rendu éditeur.
+- Rotation/redimensionnement d’objets déjà tournés ou scalés : géométrie mesurée en AABB écran mais écrite en coordonnées locales ; à unifier avec un `transform-origin` unique.
+- Dégradé indigo résiduel (`app.js:3605`) signalé par le détecteur comme marqueur de palette IA.
+
+Prochaine action exacte : audit navigateur large de l’éditeur Esprit Nature sur 1440/1024/390, inventaire des aberrations mesurées, puis premier lot P0 sur les collisions et gestes de base. Le bundling passe après la remise en état fonctionnelle de l’éditeur.
 
 ## État exact à `4.8.0-alpha.8`
 
