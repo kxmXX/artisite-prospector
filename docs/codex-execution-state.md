@@ -1748,3 +1748,12 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Bilan : les quinze methodes sans autre point d'entree sont toutes accessibles depuis le panneau. Le gabarit mort (837 lignes) peut etre supprime au prochain tour sans perte de fonction.
 - Tests : 402 → 403. `node --check` sur l'inspecteur.
 - Reste : suppression des 837 lignes, puis lot 7, export 2d, PRODUCT.md/DESIGN.md. Toujours en attente : validation utilisateur du geste de deplacement et du mobile.
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.54 (boucle de section restauree ; suppression annulee)
+
+- Restaure : la boucle d'animation de section (once/twice/infinite) etait sans interface vivante (0 occurrence de data-section-loop dans renderer.js). Elle est desormais dans l'inspecteur, sous les presets.
+- Suppression des 843 lignes inertes tentee : 6 tests sont tombes. Trois validaient des chaines du code mort (lissee aux emplacements vivants : inspecteur, libelles d'animation, apercu au survol). Trois decrivaient des capacites qui n'existaient que la : controles de carte des horaires, controles de contenu de la vitrine.
+- Cause de mon erreur : l'inventaire du tour 51 listait les appels `window.app.X(`, pas les libelles et marqueurs du balisage. Il etait donc incomplet.
+- Decision : editor.js restaure (git checkout). Une suppression ne se justifie que si aucune fonction ne disparait. La boucle de section, elle, est gardee — c'est un gain reel.
+- Tests : 403/403. Les tests qui validaient le code mort sont desormais signales comme dette : ils doivent pointer vers le vivant.
+- Reste : reprendre la suppression avec un inventaire complet (appels + libelles), reimplementer les controles de carte et de vitrine, puis lot 7, export 2d, PRODUCT.md/DESIGN.md.

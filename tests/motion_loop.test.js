@@ -8,6 +8,7 @@ import { renderWebsiteHTML } from '../public/js/components/renderer.js';
 const appSource = fs.readFileSync(new URL('../public/js/app.js', import.meta.url), 'utf8');
 const appCss = fs.readFileSync(new URL('../public/css/app.css', import.meta.url), 'utf8');
 const editorSource = fs.readFileSync(new URL('../public/js/components/editor.js', import.meta.url), 'utf8');
+const inspectorSource = fs.readFileSync(new URL('../public/js/components/inspector.js', import.meta.url), 'utf8');
 const rendererSource = fs.readFileSync(new URL('../public/js/components/renderer.js', import.meta.url), 'utf8');
 
 function projectWithLoops() {
@@ -57,7 +58,7 @@ test('loop controls exist and are shared by the three menus', () => {
   assert.ok(appSource.includes('syncMotionLoopButtons'));
   assert.ok(appSource.includes('elementMotionLoops'));
   assert.ok(appSource.includes('imageMotionLoops'));
-  assert.ok(editorSource.includes('data-section-loop'));
+  assert.ok(inspectorSource.includes('data-section-loop'), 'la boucle de section est dans l inspecteur');
   assert.ok(editorSource.includes('data-text-loop'));
   assert.ok(rendererSource.includes('data-image-loop'));
   assert.ok(editorSource.includes('mission-loop') || editorSource.includes('motion-loop-row'));
@@ -65,7 +66,7 @@ test('loop controls exist and are shared by the three menus', () => {
 });
 
 test('the editor names the block and the element distinctly', () => {
-  assert.ok(editorSource.includes('Animation de la section'), 'section-level motion is labelled explicitly');
+  assert.ok(inspectorSource.includes('Animation de la section'), 'section-level motion is labelled explicitly');
   assert.ok(editorSource.includes('Animation de l’élément'), 'element-level motion is labelled explicitly');
   assert.ok(rendererSource.includes('Animation de l’image'), 'image-level motion is labelled explicitly');
   assert.ok(!editorSource.includes('Animation du bloc'), 'the ambiguous block label is gone');
@@ -78,6 +79,6 @@ test('every preset previews its own motion on hover', () => {
   assert.ok(appCss.includes('.motion-option[data-motion-preview]:hover, .motion-chip[data-motion-preview]:hover { animation: none !important; }'), 'reduced motion disables previews');
   assert.ok(editorSource.includes('data-motion-preview='), 'editor menus wire the preview');
   assert.ok(rendererSource.includes('data-motion-preview='), 'image menu wires the preview');
-  assert.ok(editorSource.includes('Survolez un style pour le voir jouer'), 'the editor explains the hover preview in plain words');
+  assert.ok(editorSource.includes('Survolez une animation pour la voir jouer'), 'the editor explains the hover preview in plain words');
   assert.ok(rendererSource.includes('motion-preview-hint'), 'the image menu explains the hover preview');
 });

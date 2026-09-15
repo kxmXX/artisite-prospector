@@ -7,6 +7,14 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.54) — La boucle d'animation de section retrouve une interface, et une suppression ratée
+
+- **Capacité restaurée** : la boucle d'animation de section (Une fois / ×2 / Boucle) n'avait **aucune** interface vivante — le popover du canevas ne contient aucun `data-section-loop` (vérifié : 0 occurrence dans `renderer.js`). Elle n'existait que dans le gabarit mort. Elle est maintenant dans le panneau de propriétés, sous les presets d'animation.
+- **Suppression tentée puis annulée**, et c'est le point important : j'ai supprimé les 843 lignes inertes, et six tests sont tombés. En les examinant, j'ai découvert qu'ils **validaient le code mort** — ils assertaient des chaînes qui ne vivaient que dans le gabarit. C'est ainsi que 837 lignes ont survécu si longtemps : la suite de tests les protégeait.
+- Trois de ces tests pointaient vers des équivalents vivants (libellés d'animation, aperçu au survol) : corrigés pour viser l'inspecteur. Mais trois autres décrivaient des capacités qui n'existaient **que** là — contrôles de carte des horaires, contrôles de contenu de la vitrine. Mon inventaire du tour précédent listait les **appels** du code mort, pas ses **libellés** : il était donc incomplet.
+- Décision : **restaurer `editor.js`**. Une suppression ne se justifie que si aucune fonction ne disparaît. Je garde ce que le tour a produit de bon — la boucle de section dans l'inspecteur — et je reprends la suppression avec un inventaire qui couvre aussi le balisage.
+- Tests : **403/403**. Deux tests réécrits vers les emplacements vivants, aucun supprimé, aucune assertion affaiblie sans le dire.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.53) — Lot 3b : plus aucune capacité orpheline
 
 - Les trois derniers réglages enfermés dans le gabarit jamais rendu sont réimplantés : le **format de la galerie** (4/3, 16/9, carré, avec l'état actif), la **nature de chaque entrée** (photo ↔ comparatif Avant/Après), et la **restauration des boutons masqués** (principal, téléphone) — sans elle, retirer un bouton était définitif dans l'interface.

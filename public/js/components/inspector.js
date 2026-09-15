@@ -440,6 +440,12 @@ export function renderInspector(section, project, state) {
         </div>
 
         ${disclosure("section-motion-timing", "Réglages avancés : vitesse et délai", `
+        <div class="motion-loop-row" data-section-loop-row>
+          <span class="motion-loop-label">Répétition</span>
+          <button type="button" data-section-loop="once" class="motion-loop-btn ${(section.settings?.motionLoop || 'once') === 'once' ? 'is-active' : ''}" onclick="window.app.setSectionMotionLoop('${sectionId}', 'once')">Une fois</button>
+          <button type="button" data-section-loop="twice" class="motion-loop-btn ${section.settings?.motionLoop === 'twice' ? 'is-active' : ''}" onclick="window.app.setSectionMotionLoop('${sectionId}', 'twice')">×2</button>
+          <button type="button" data-section-loop="infinite" class="motion-loop-btn ${section.settings?.motionLoop === 'infinite' ? 'is-active' : ''}" onclick="window.app.setSectionMotionLoop('${sectionId}', 'infinite')">Boucle</button>
+        </div>
         <div class="motion-loop-row" data-section-timing>
           <span class="motion-loop-label">Vitesse</span>
           ${MOTION_SPEEDS.map((speed) => `
