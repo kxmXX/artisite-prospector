@@ -237,3 +237,26 @@ test('assombrissement, tailles et motifs sont accessibles depuis l inspecteur', 
     'pas d assombrissement hors du hero');
   state.selectedElementKey = null;
 });
+
+test('galerie et boutons masques sont reglables depuis l inspecteur', async () => {
+  const { renderInspector } = await import('../public/js/components/inspector.js');
+  const { generateSite } = await import('../public/js/engine/generator.js');
+  const { state } = await import('../public/js/state.js');
+  const base = generateSite({ name: 'Controle Galerie', tradeId: 'plombier' });
+  state.currentProject = base;
+  const gallery = base.sections.find((s) => s.type === 'gallery');
+  const html = renderInspector(gallery, base, state);
+  assert.equal((html.match(/setGalleryAspectRatio/g) || []).length, 3, 'trois formats proposes');
+  for (const ratio of ['4/3', '16/9', '1/1']) {
+    assert.ok(html.includes("'" + ratio + "'"), 'le format ' + ratio + ' doit etre propose');
+  }
+  const clone = JSON.parse(JSON.stringify(base));
+  const target = clone.sections.find((s) => s.type === 'hero') || clone.sections[0];
+  target.settings = Object.assign({}, target.settings, { hiddenButtons: ['primary'] });
+  state.currentProject = clone;
+  const restored = renderInspector(target, clone, state);
+  assert.ok(restored.includes("restoreButton('" + target.id + "', 'primary')"), 'un bouton masque doit pouvoir etre restaure');
+  const untouched = base.sections.find((s) => s.type === 'hero') || base.sections[0];
+  assert.ok(!renderInspector(untouched, base, state).includes('restoreButton'), 'aucune restauration quand rien n est masque');
+  state.selectedElementKey = null;
+});

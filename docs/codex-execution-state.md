@@ -1740,3 +1740,11 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Mesure : assombrissement present pour le hero, absent ailleurs ; 3 curseurs ; 6 motifs.
 - Tests : 401 → 402. `node --check` sur l'inspecteur.
 - Reste avant suppression des 837 lignes : toggleGalleryItemType, setGalleryAspectRatio, restoreButton. Puis suppression, lot 7, export 2d, PRODUCT.md/DESIGN.md. Toujours en attente : validation utilisateur du geste de deplacement et du mobile.
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.53 (lot 3b : plus aucune capacite orpheline)
+
+- Reimplemente : format de galerie (4/3, 16/9, carre), nature d'une entree (photo / comparatif avant-apres), restauration des boutons masques (principal, telephone).
+- Mesure : 3 formats, 2 restaurations quand primary+phone sont masques, aucune sinon.
+- Bilan : les quinze methodes sans autre point d'entree sont toutes accessibles depuis le panneau. Le gabarit mort (837 lignes) peut etre supprime au prochain tour sans perte de fonction.
+- Tests : 402 → 403. `node --check` sur l'inspecteur.
+- Reste : suppression des 837 lignes, puis lot 7, export 2d, PRODUCT.md/DESIGN.md. Toujours en attente : validation utilisateur du geste de deplacement et du mobile.

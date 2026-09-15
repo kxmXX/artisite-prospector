@@ -7,6 +7,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.53) — Lot 3b : plus aucune capacité orpheline
+
+- Les trois derniers réglages enfermés dans le gabarit jamais rendu sont réimplantés : le **format de la galerie** (4/3, 16/9, carré, avec l'état actif), la **nature de chaque entrée** (photo ↔ comparatif Avant/Après), et la **restauration des boutons masqués** (principal, téléphone) — sans elle, retirer un bouton était définitif dans l'interface.
+- Vérifié sur la sortie réelle de l'inspecteur : 3 formats proposés pour la galerie, 2 restaurations quand les deux boutons sont masqués, aucune quand rien n'est masqué.
+- **Bilan du lot 3b, côté capacités** : les quinze méthodes qui n'avaient d'autre point d'entrée que le code mort sont désormais accessibles depuis le panneau — listes (avis, services, FAQ, galerie, points forts), assombrissement du hero, tailles de champ, motifs d'inspiration, format et nature de la galerie, restauration des boutons. **Les 837 lignes peuvent être supprimées sans rien perdre** : c'est le prochain tour.
+- Tests : 1 nouveau ; 402 → **403/403**.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.52) — Lot 3b : les trois derniers réglages morts reprennent vie
 
 - Suite de l'inventaire : après les listes, restaient trois capacités enfermées dans le gabarit jamais rendu — **l'assombrissement du hero**, les **curseurs de taille** de titre / sous-titre / texte, et les **motifs d'inspiration**.

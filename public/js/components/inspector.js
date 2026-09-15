@@ -103,6 +103,56 @@ const FIELD_SIZE_ROWS = [
  * Reglages de contenu qui n'existaient que dans le gabarit mort : assombrissement
  * du hero, taille des champs, et motifs d'inspiration.
  */
+const GALLERY_RATIOS = [
+  { id: "4/3", label: "4/3" },
+  { id: "16/9", label: "16/9" },
+  { id: "1/1", label: "Carré" }
+];
+
+/**
+ * Galerie : format d'image et nature de chaque entree.
+ * Ces deux controles vivaient dans le gabarit jamais rendu — on pouvait voir la
+ * galerie mais ni choisir son format, ni basculer une entree en comparatif.
+ */
+function sectionGalleryHTML(section, sectionId) {
+  const photos = section?.content?.photos;
+  if (!Array.isArray(photos)) return "";
+  const current = section?.settings?.aspectRatio || "4/3";
+  const isBeforeAfter = (item) => item?.type === "beforeAfter" || (item?.beforeImage && item?.afterImage);
+  return `
+    <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-xl space-y-2">
+      <label class="text-ui-xs font-bold uppercase tracking-wider text-zinc-700">Format de la galerie</label>
+      <div class="flex flex-wrap gap-1">
+        ${GALLERY_RATIOS.map((ratio) => `
+          <button type="button" class="motion-loop-btn ${current === ratio.id ? 'is-active' : ''}"
+                  onclick="window.app.setGalleryAspectRatio('${sectionId}', '${ratio.id}')">${ratio.label}</button>`).join("")}
+      </div>
+      ${photos.length ? `<div class="space-y-1">${photos.map((photo, index) => `
+        <div class="flex items-center justify-between gap-2 text-ui-xs text-zinc-600">
+          <span>#${index + 1} ${isBeforeAfter(photo) ? "Comparatif Avant/Après" : "Photo"}</span>
+          <button type="button" class="text-ui-2xs text-zinc-600 font-semibold border border-zinc-200 rounded-md px-1.5 py-0.5 bg-white"
+                  onclick="window.app.toggleGalleryItemType('${sectionId}', ${index})">${isBeforeAfter(photo) ? "En photo" : "En comparatif"}</button>
+        </div>`).join("")}</div>` : ''}
+    </div>`;
+}
+
+/**
+ * Boutons masques : le seul endroit pour les remettre.
+ * Sans ce bloc, retirer un bouton etait definitif dans l'interface.
+ */
+function sectionButtonsHTML(section, sectionId) {
+  const hidden = Array.isArray(section?.settings?.hiddenButtons) ? section.settings.hiddenButtons : [];
+  const targets = [["primary", "Bouton principal"], ["phone", "Bouton téléphone"]].filter((pair) => hidden.includes(pair[0]));
+  if (!targets.length) return "";
+  return `
+    <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-xl space-y-2">
+      <label class="text-ui-xs font-bold uppercase tracking-wider text-zinc-700">Boutons masqués</label>
+      ${targets.map((pair) => `
+        <button type="button" class="w-full py-1 bg-white hover:bg-zinc-100 text-zinc-700 rounded-lg text-ui-xs font-semibold border border-zinc-200"
+                onclick="window.app.restoreButton('${sectionId}', '${pair[0]}')">Restaurer : ${pair[1]}</button>`).join("")}
+    </div>`;
+}
+
 function sectionContentSettingsHTML(section, sectionId) {
   const settings = section?.settings || {};
   const darkening = settings.overlayDarkening !== undefined ? settings.overlayDarkening : 45;
@@ -349,6 +399,8 @@ export function renderInspector(section, project, state) {
       ${sectionElementsHTML(section, project, state.selectedElementKey)}
       ${sectionListsHTML(section, sectionId)}
       ${sectionContentSettingsHTML(section, sectionId)}
+      ${sectionGalleryHTML(section, sectionId)}
+      ${sectionButtonsHTML(section, sectionId)}
 
       ${variants.length > 1 ? `
         <div class="p-2.5 bg-zinc-50 border border-zinc-200 rounded-lg space-y-1">
