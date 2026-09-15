@@ -7,6 +7,14 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.57) — Lot 3b soldé : les 843 lignes inertes sont supprimées
+
+- **Suppression effectuée** : `renderSectionAccordionContent` (843 lignes) et le `<template id="studio-v3-section-capabilities">` qui le portait. `editor.js` passe de **1856 à 1013 lignes**. Aucune référence ne subsiste, aucun appel.
+- Elle n'a été possible qu'après trois tours de préparation : (1) inventaire des 31 capacités du gabarit, (2) réimplantation de celles qui n'avaient **aucun** autre point d'entrée — listes, assombrissement du hero, tailles de champ, motifs d'inspiration, boucle d'animation de section, carte des horaires, format et nature de galerie, restauration des boutons masqués, (3) **déblocage des tests** qui validaient le code mort et l'auraient protégé indéfiniment.
+- Un test restait : il cherchait le libellé « Interactive Google Maps » dans l'éditeur. Repointé vers l'inspecteur, où le contrôle vit désormais sous le nom « Carte interactive ».
+- Tests : **403/403** après suppression, aucune assertion supprimée. Le contenu retiré vivait dans un `<template>`, que les navigateurs ne rendent pas : l'interface visible ne pouvait pas changer, et la suite couvre le rendu de l'éditeur.
+- Dette restante, signalée : `updateListField` (éditer le champ d'une entrée de liste) n'a toujours pas d'interface vivante.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.56) — Deux tests cessent de protéger du code mort
 
 - **Cause profonde du lot 3b** : deux tests assertaient des chaînes qui ne vivaient que dans le gabarit jamais rendu (`renderSectionAccordionContent`). L'un cherchait les **titres de groupes** du panneau mort ; l'autre lisait le HTML **rendu**, où un `<template>` apparaît même s'il n'est jamais affiché. Voilà pourquoi 837 lignes inertes ont survécu : **la suite de tests les protégeait**.

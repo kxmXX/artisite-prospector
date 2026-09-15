@@ -79,9 +79,10 @@ test("the demo hours block defaults to an interactive map and keeps image mode e
   assert.match(html, /allowfullscreen/);
 
   const editorSource = await readFile(new URL("../public/js/components/editor.js", import.meta.url), "utf8");
-  assert.match(editorSource, /Interactive Google Maps/);
-  assert.match(editorSource, /Choisir l'image de carte/);
-  assert.match(editorSource, /openImagePicker\('\$\{sectionId\}', 'mapImage'\)/);
+  const mapSource = await readFile(new URL("../public/js/components/inspector.js", import.meta.url), "utf8");
+  assert.match(mapSource, /Carte interactive/);
+  assert.match(mapSource, /Choisir l'image de carte/);
+  assert.match(mapSource, /openImagePicker\('\$\{sectionId\}', 'mapImage'\)/);
 });
 
 test("the hours and location template keeps a real mobile stack", () => {

@@ -1773,3 +1773,11 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Effet : la suppression du gabarit ne cassera plus ces tests pour la bonne raison. Dette signalee : updateListField reste sans interface vivante.
 - Tests : 403/403, aucune assertion supprimee.
 - Reste : suppression des 843 lignes (prochain tour, cette fois sure), updateListField, puis lot 7, export 2d, PRODUCT.md/DESIGN.md.
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.57 (lot 3b : 843 lignes inertes supprimees)
+
+- Fait : renderSectionAccordionContent (843 lignes) et son template supprimes. editor.js : 1856 -> 1013 lignes. Zero reference, zero appel.
+- Preparation en trois tours : inventaire des 31 capacites, reimplementation de celles sans autre point d'entree, puis deblocage des tests qui validaient le code mort.
+- Un test restait (libelle 'Interactive Google Maps'/'Choisir l'image de carte') : repoins vers l'inspecteur, ou le controle vit sous 'Carte interactive'.
+- Tests : 403/403. Le contenu retire etait dans un template, non rendu par les navigateurs : l'interface visible ne pouvait pas changer.
+- Dette : updateListField sans interface vivante. Reste : lot 7 (courbe, direction, tester/rejouer), export 2d, PRODUCT.md/DESIGN.md, et la validation utilisateur du geste de deplacement et du mobile.
