@@ -19,6 +19,7 @@ import { getTradeFallbackDataUrl } from "./data/imageFallbacks.js";
 import { ensureFontCatalog } from "./data/fonts.js";
 import { getIcon } from "./components/icons.js";
 import { createEspritNatureDemoProject } from "./data/sampleProjects.js";
+import { getDefaultTemplateIdForTrade, getSiteTemplate, instantiateSiteTemplate } from "./data/templates.js";
 
 function escapeHtml(str) {
   if (!str) return "";
@@ -386,6 +387,12 @@ export class App {
 
   closeWizard() {
     state.closeDrawer();
+  }
+
+  syncWizardTemplateStyle(templateId) {
+    const template = getSiteTemplate(templateId);
+    const preset = document.getElementById("wiz-preset");
+    if (preset && template?.presetId) preset.value = template.presetId;
   }
 
   openCloserModal(projectId) {
@@ -1174,7 +1181,8 @@ export class App {
     const city = document.getElementById("wiz-city")?.value || "Montauban";
     const phone = document.getElementById("wiz-phone")?.value || "07 82 14 39 50";
     const region = document.getElementById("wiz-region")?.value || "Occitanie";
-    const presetId = document.getElementById("wiz-preset")?.value || null;
+    const templateId = document.querySelector('input[name="wiz-template"]:checked')?.value || getDefaultTemplateIdForTrade(tradeId);
+    const presetId = document.getElementById("wiz-preset")?.value || getSiteTemplate(templateId).presetId;
     const ambiance = document.getElementById("wiz-ambiance")?.value || "mineral";
     const tone = document.getElementById("wiz-tone")?.value || "artisan";
     const customColor = document.getElementById("wiz-color")?.value?.trim() || document.getElementById("wiz-color-picker")?.value || null;
@@ -1221,7 +1229,7 @@ export class App {
     setTimeout(() => {
       if (!request.current()) { request.dispose(); return; }
       const validColor = customColor && /^#[0-9a-f]{6}$/i.test(customColor) ? customColor : undefined;
-      const newProject = generateSite({
+      const newProject = instantiateSiteTemplate(templateId, {
         name,
         tradeId,
         city,
@@ -1333,7 +1341,8 @@ export class App {
 
     this.showToast(`Génération du site pour ${name}...`, "info");
 
-    const newProject = generateSite({
+    const templateId = getDefaultTemplateIdForTrade(tradeId);
+    const newProject = instantiateSiteTemplate(templateId, {
       name,
       tradeId,
       city,

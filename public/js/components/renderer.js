@@ -3,6 +3,11 @@ import { HERO_STYLES } from "./heroStyles.js";
 import { getTradeFallbackDataUrl } from "../data/imageFallbacks.js";
 import { getUiId, getSectionUiId, getUiCode } from "../data/uiIds.js";
 
+function usesReferenceVitrineTemplate(project) {
+  if (project?.templateId) return project.templateId === "esprit-reference";
+  return project?.business?.tradeId === "paysagiste";
+}
+
 function escapeHtml(str) {
   if (!str) return "";
   return String(str)
@@ -363,7 +368,7 @@ export function renderWebsiteHTML(project, options = { isEditor: false, isStanda
   const isPaperGrain = !!(project.branding?.paperGrain || project.branding?.stylePreset === 'editorial-terroir' || project.branding?.stylePreset === 'papercraft-mineral');
   const socialProofHTML = renderSocialProofToast(project, options);
 
-  const isVitrineTemplate = project.business?.tradeId === "paysagiste";
+  const isVitrineTemplate = usesReferenceVitrineTemplate(project);
   // The vitrine reference has one deliberate contact CTA per section. Its editor
   // still exposes the draggable dock, but the public site must not overlay content.
   const stickyBarHTML = options.includeStickyBar === false || (isVitrineTemplate && !options.isEditor)
@@ -669,7 +674,7 @@ function renderSection(sec, project, options) {
 // 1. Header
 function renderHeader(sec, project, options = {}) {
   const c = sec.content;
-  const isPaysagiste = project?.business?.tradeId === "paysagiste";
+  const isPaysagiste = usesReferenceVitrineTemplate(project);
   const visibleTypes = new Set((project.sections || [])
     .filter(section => section.visibility !== false)
     .map(section => section.type));
@@ -915,7 +920,7 @@ function renderHero(sec, project, options = {}) {
             `}
           </div>
 
-          ${project.business?.tradeId === 'paysagiste' ? '' : `
+          ${usesReferenceVitrineTemplate(project) ? '' : `
             <div class="pt-4 flex flex-wrap items-center justify-center gap-6 text-xs text-white/80 font-medium">
               <span class="flex items-center gap-1.5 text-emerald-400 font-bold">
                 ${getIcon("checkCircle", "w-4 h-4")}
@@ -1241,7 +1246,7 @@ function renderAbout(sec, project, options = {}) {
   }
 
   // Default: Editorial Split (Sendpage High Fidelity)
-  const isPaysagiste = project.business?.tradeId === "paysagiste";
+  const isPaysagiste = usesReferenceVitrineTemplate(project);
   const certifiedBadge = c.certified ? String(c.certified) : "";
   const roleText = c.role || "Jardinier & Paysagiste";
   const storyText = c.story || "";
@@ -1508,7 +1513,7 @@ function renderServices(sec, project, options = {}) {
   }
 
   // Default Variant: 3-Columns Cards (Sendpage High Fidelity)
-  const isPaysagiste = project.business?.tradeId === "paysagiste";
+  const isPaysagiste = usesReferenceVitrineTemplate(project);
   return `
     <div id="services" class="py-20 lg:py-28" style="background-color: var(--bg-sec);">
       <div class="max-w-7xl vitrine-shell mx-auto px-4 sm:px-6 lg:px-8">
@@ -1715,7 +1720,7 @@ function renderRealisations(sec, project, options = {}) {
 function renderGalleryCard(p, idx, sec, project, options, aspectClass) {
   const isBeforeAfter = p.type === 'beforeAfter' || (p.beforeImage && p.afterImage);
   const tradeId = project?.business?.tradeId || 'paysagiste';
-  const isPaysagiste = tradeId === 'paysagiste';
+  const isPaysagiste = usesReferenceVitrineTemplate(project);
 
   if (isBeforeAfter) {
     const beforeSrc = p.beforeImage || getTradeFallbackDataUrl(tradeId, 'beforeAfter', 'Avant');
@@ -1908,7 +1913,12 @@ function renderReviews(sec, project, options = {}) {
     `;
   }
 
-  const isPaysagiste = project?.business?.tradeId === "paysagiste";
+  const isPaysagiste = usesReferenceVitrineTemplate(project);
+  const reviews = Array.isArray(c.reviews) ? c.reviews : [];
+  const hasReviews = reviews.length > 0;
+  const averageRating = hasReviews
+    ? Math.round((reviews.reduce((sum, review) => sum + (Number(review.rating) || 0), 0) / reviews.length) * 10) / 10
+    : 0;
 
   if (isPaysagiste) {
     return `
@@ -1923,14 +1933,19 @@ function renderReviews(sec, project, options = {}) {
             </h2>
             <!-- Signature Green Accent Dash -->
             <div class="w-12 h-1 rounded-full mx-auto mt-2.5 mb-5" style="background-color: var(--primary, #527c22);"></div>
-            ${c.subtitle ? `
+            ${hasReviews && c.subtitle ? `
               <p class="text-gray-600 dark:text-zinc-400 text-sm sm:text-base max-w-xl mx-auto" data-editable="subtitle">
                 ${c.subtitle}
+              </p>
+            ` : !hasReviews ? `
+              <p class="text-gray-600 dark:text-zinc-400 text-sm sm:text-base max-w-xl mx-auto">
+                Ajoutez ici uniquement des avis clients dont la provenance a été vérifiée.
               </p>
             ` : ''}
           </div>
 
-          <!-- Centered Google Rating Summary Bar matching Sendpage -->
+          ${hasReviews ? `
+          <!-- Centered rating summary uses only the reviews actually present in project data. -->
           <div class="flex flex-wrap items-center justify-center gap-2.5 mb-14 vitrine-review-summary" data-review-summary>
             <svg class="w-5 h-5 inline-block shrink-0" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17Z"/>
@@ -1939,16 +1954,21 @@ function renderReviews(sec, project, options = {}) {
               <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98Z"/>
             </svg>
             <div class="flex items-center text-[#f59e0b] gap-0.5 text-sm">
-              ${renderRatingStars(5, { editor: options.isEditor, sectionId: sec.id, reviewIndex: -1 })}
+              ${renderRatingStars(Math.round(averageRating), { editor: options.isEditor, sectionId: sec.id, reviewIndex: -1 })}
             </div>
-            <span class="text-xs font-semibold text-zinc-600 dark:text-zinc-400 ml-1">5.0/5 — 5 avis</span>
-            <span class="hidden" data-editable="overallRating">${c.overallRating || '5.0'}</span>
-            <span class="hidden" data-editable="totalReviews">${c.totalReviews || '5 avis'}</span>
+            <span class="text-xs font-semibold text-zinc-600 dark:text-zinc-400 ml-1">${averageRating.toFixed(1)}/5 — ${reviews.length} avis</span>
+            <span class="hidden" data-editable="overallRating">${averageRating.toFixed(1)}</span>
+            <span class="hidden" data-editable="totalReviews">${reviews.length} avis</span>
           </div>
+          ` : `
+          <div class="vitrine-review-summary mb-14 text-center" data-review-empty>
+            <span class="inline-flex items-center px-3 py-1.5 rounded-full bg-[#edf4e8] text-[#527c22] text-xs font-semibold">Avis clients à renseigner</span>
+          </div>
+          `}
 
-          <!-- 3-Column Reviews Grid matching Sendpage Screenshot -->
+          <!-- 3-column structure is retained even while verified reviews are not yet supplied. -->
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-7xl mx-auto vitrine-review-grid">
-            ${(c.reviews || []).map((r, idx) => `
+            ${hasReviews ? reviews.map((r, idx) => `
               <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-between space-y-5 vitrine-review-card" data-layout-node="review-card-${idx}" data-layout-label="Avis ${idx + 1}">
                 <div class="space-y-4">
                   <div class="flex items-start justify-between">
@@ -1973,6 +1993,13 @@ function renderReviews(sec, project, options = {}) {
                   <p class="text-gray-600 dark:text-zinc-300 font-normal vitrine-review-copy" data-editable="reviews.${idx}.text">« ${r.text} »</p>
                 </div>
                 <span class="hidden" data-editable="reviews.${idx}.city">${r.city}</span>
+              </div>
+            `).join('') : Array.from({ length: 3 }, (_, idx) => `
+              <div class="vitrine-review-card flex min-h-[18.5rem] items-center justify-center rounded-2xl border border-dashed border-zinc-300 bg-zinc-50/70 p-8 text-center" data-review-placeholder="${idx + 1}">
+                <div>
+                  <div class="font-semibold text-zinc-700">Avis client à renseigner</div>
+                  <p class="mt-2 text-sm text-zinc-500">Ajoutez uniquement un témoignage dont la provenance a été vérifiée.</p>
+                </div>
               </div>
             `).join('')}
           </div>
@@ -2131,7 +2158,8 @@ function renderQuoteSimulator(sec, project) {
 function renderHours(sec, project, options = {}) {
   const c = sec.content || {};
   const hours = c.hours || {};
-  const isPaysagiste = project?.business?.tradeId === "paysagiste";
+  const hasProvidedHours = Object.values(hours).some(value => String(value || "").trim());
+  const isPaysagiste = usesReferenceVitrineTemplate(project);
   const isUnified = sec.variant === "unified-map" || sec.settings?.unifiedMap || isPaysagiste;
   // Existing Esprit Nature demo projects predate `mapImage`; preserve their
   // intended Montauban visual while every other city continues to use its own
@@ -2178,8 +2206,9 @@ function renderHours(sec, project, options = {}) {
             <div class="lg:col-span-6 bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 shadow-sm flex flex-col justify-between vitrine-hours-card">
               <div class="divide-y divide-zinc-100 dark:divide-zinc-800/80">
                 ${defaultDays.map(day => {
-                  const time = hours[day] || (day === "dimanche" ? "Fermé" : "9h - 12h / 14h - 18h");
+                  const time = hours[day] || "À renseigner";
                   const isClosed = time.toLowerCase().includes("fermé");
+                  const isPending = !hours[day];
                   return `
                     <div class="flex items-center justify-between vitrine-hours-row">
                       <div class="flex items-center gap-3">
@@ -2188,11 +2217,12 @@ function renderHours(sec, project, options = {}) {
                         </svg>
                         <span class="font-semibold text-gray-900 dark:text-white">${dayLabels[day] || day}</span>
                       </div>
-                      <span class="${isClosed ? 'text-zinc-400 dark:text-zinc-500 italic' : 'text-gray-700 dark:text-zinc-300 font-medium'}" data-editable="hours.${day}">${time}</span>
+                      <span class="${isPending || isClosed ? 'text-zinc-400 dark:text-zinc-500 italic' : 'text-gray-700 dark:text-zinc-300 font-medium'}" data-editable="hours.${day}">${time}</span>
                     </div>
                   `;
                 }).join('')}
               </div>
+              ${!hasProvidedHours ? `<div class="mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-800 text-center text-xs text-zinc-500">Horaires à renseigner avant publication.</div>` : ''}
               ${c.note ? `
                 <div class="mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-800 text-center text-xs text-gray-400 dark:text-zinc-500 flex items-center justify-center gap-2">
                   <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -2437,7 +2467,7 @@ function renderCta(sec, project, options = {}) {
 // 16. Footer
 function renderFooter(sec, project) {
   const c = sec.content;
-  const isPaysagiste = project.business?.tradeId === "paysagiste";
+  const isPaysagiste = usesReferenceVitrineTemplate(project);
   if (isPaysagiste) {
     const phone = c.phone || project.business?.phone || '';
     const email = c.email || project.business?.email || '';

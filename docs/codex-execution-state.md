@@ -1,3 +1,14 @@
+## LOT DE LIVRAISON — registre de templates 4.8.0-alpha.33 — 15 septembre 2026
+
+- Wizard : trois bases explicites avant génération — Esprit Nature Référence 1:1, Artisan Moderne, Local Chaleureux. Carte active visible, 3 colonnes desktop et pile mobile scrollable.
+- Données : `templateId/templateName` persistent dans le projet. Quick Generate choisit une base par défaut selon le métier ; le wizard respecte le choix utilisateur.
+- Référence : même ordre/variants/visibilité que la démo canonique, identité prospect réinjectée, aucun `freeformLayout` copié et `certified` reste vide sans preuve.
+- Renderer : la composition de référence dépend maintenant du template explicite ; un paysagiste peut utiliser Artisan Moderne sans hériter de la vitrine Esprit Nature.
+- Factualité : une référence sans avis/horaires conserve les blocs mais rend 3 slots `Avis client à renseigner` et 7 lignes `À renseigner`; aucune note 5.0/5 ni horaires par défaut inventés. L'ancien test étoiles utilise désormais la fixture démo qui contient réellement des avis.
+- QA Chrome : 1440 wizard 3×201 px dans modal 860 px ; 390 wizard 336 px par carte et scroll interne. Créations réelles Artisan Moderne/Esprit Référence ; référence preview 1440/1440, toutes sections pleine largeur, zéro erreur console.
+- Validation : 28/28 ciblés, 232/232 complets et `git diff --check`.
+- Prochaine action unique : bibliothèque — sélection multi + suppression groupée explicite, puis verrouiller une validation visuelle template anti-régression.
+
 ## LOT DE LIVRAISON — démo canonique et historique SPA 4.8.0-alpha.32 — 15 septembre 2026
 
 - Cause racine du signalement vitrine : `openVitrineDemo()` relisait `proj-esprit-nature` dans `localStorage`. Une copie de projet modifiée/freeform pouvait donc devenir la démo publique de référence.

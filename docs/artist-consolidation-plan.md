@@ -38,14 +38,15 @@ V4.3 PRO sur l'accueil et v4.7 dans les tests : cette divergence sera supprimée
 - Ensuite seulement : reprendre les contrôles d’édition encore prioritaires (typo, fonds,
   rayon, animations) sans modifier les données personnalisées des vitrines.
 
-## État de consolidation courant — après 4.8.0-alpha.32
+## État de consolidation courant — après 4.8.0-alpha.33
 
 Cette section prévaut sur le tableau historique des lots 5–13 ci-dessous sans le supprimer.
 
 - Incident qualité du 15/09 : la vitrine "Voir la vitrine" réutilisait la copie Esprit Nature persistée ; des modifications freeform pouvaient donc dégrader la démo de référence. Alpha.32 sépare désormais la démo canonique de la bibliothèque et lui garantit une instance fraîche.
 - Navigation SPA : dashboard, éditeur, aperçu projet et vitrine disposent maintenant de routes internes avec historique Retour/Avancer ; `Voir le site` vise le projet courant.
 - Vitrine/hero/FAQ/personnalisation/export/responsive : les sous-lots historiques restent livrés, mais ils doivent maintenant être protégés par une validation visuelle de template avant tout nouveau chantier Figma lourd.
-- Prochaine priorité produit : registre de templates explicite dans le wizard, Esprit Nature 1:1 comme première template, puis directions alternatives réellement distinctes ; ensuite QA visuel et nettoyage bibliothèque.
+- Templates : registre livré dans le wizard avec Esprit Nature 1:1, Artisan Moderne et Local Chaleureux. Une instance de référence reprend la composition sans copier les données de démo ; Avis/Horaires sans faits sont explicitement à renseigner.
+- Prochaine priorité produit : QA visuel anti-régression de la template + nettoyage de bibliothèque (sélection/suppression groupée), puis audit des overlays éditeur.
 - Restent ouverts après stabilisation template : robustesse texte/image/CTA/groupe, audit factuel des prompts/fallbacks, limites partage/multi-utilisateur et contre-audit sécurité/performance.
 - Dette suivie : concentration de logique dans `app.js` et duplication du runtime de reparenting editor/export. Aucun refactor lourd sans besoin mesuré.
 

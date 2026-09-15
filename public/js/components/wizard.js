@@ -1,6 +1,7 @@
 import { TRADES } from "../data/trades.js";
 import { STYLE_PRESETS } from "../data/styles.js";
 import { getIcon } from "./icons.js";
+import { SITE_TEMPLATES } from "../data/templates.js";
 
 /**
  * Intelligent Creation Wizard with Mode Rapide & Mode Avancé + AI Generation Terminal.
@@ -9,6 +10,13 @@ import { getIcon } from "./icons.js";
 export function renderWizardModal() {
   const tradeOptions = TRADES.map(t => `<option value="${t.id}">${t.label} (${t.category})</option>`).join('');
   const presetOptions = STYLE_PRESETS.map(p => `<option value="${p.id}">${p.name} — ${p.description}</option>`).join('');
+  const templateOptions = SITE_TEMPLATES.map((template, index) => `
+    <label class="wizard-template-option">
+      <input type="radio" name="wiz-template" value="${template.id}" ${index === 0 ? 'checked' : ''} onchange="window.app.syncWizardTemplateStyle('${template.id}')">
+      <span class="wizard-template-badge">${template.badge}</span>
+      <b>${template.name}</b>
+      <small>${template.description}</small>
+    </label>`).join('');
 
   return `
     <div id="wizard-modal" class="studio-system-modal fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
@@ -43,6 +51,12 @@ export function renderWizardModal() {
         <!-- Form Body -->
         <form id="wizard-form" onsubmit="window.app.handleWizardSubmit(event)" class="p-6 space-y-4 text-xs">
           
+          <fieldset class="wizard-template-fieldset">
+            <legend>Template de départ</legend>
+            <p>Choisissez la base visuelle. Elle est instanciée proprement puis reste entièrement modifiable.</p>
+            <div class="wizard-template-grid">${templateOptions}</div>
+          </fieldset>
+
           <!-- Enterprise Name -->
           <div>
             <label class="block text-[11px] font-medium text-zinc-600 mb-1">

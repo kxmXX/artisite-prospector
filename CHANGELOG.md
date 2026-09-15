@@ -7,6 +7,14 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 15 septembre 2026 (4.8.0-alpha.33)
+
+- Templates : registre explicite avec `Esprit Nature — Référence 1:1`, `Artisan Moderne` et `Local Chaleureux`; le wizard choisit la base avant génération et persiste `templateId/templateName`.
+- Référence 1:1 : la composition, les variants et les sections visibles de la démo canonique sont instanciés sans copier son état freeform ni ses données client; le nom, la ville, le téléphone et les contenus métier viennent du nouveau projet.
+- Alternatives : un paysagiste peut désormais choisir une direction non-Esprit Nature ; `templateId` pilote le renderer au lieu de forcer tous les paysagistes dans la même composition.
+- Factualité : les sections Avis/Horaires restent présentes dans la template de référence mais affichent des emplacements `à renseigner` quand les données ne sont pas fournies; suppression des fallbacks publics `5.0/5 — 5 avis` et `9h - 12h / 14h - 18h` dans ce cas.
+- QA Chrome : picker 3 colonnes propre à 1440, pile scrollable à 390 sans overflow; création Artisan Moderne puis Esprit Référence testées réellement. La référence est pleine largeur 1440/1440, 3 slots avis transparents, 7 horaires `À renseigner`, zéro erreur console. Validation : 28/28 ciblés puis 232/232 complets et `git diff --check`.
+
 ### Consolidation — 15 septembre 2026 (4.8.0-alpha.32)
 
 - Démo canonique : `Voir la vitrine` instancie désormais une copie fraîche de la référence Esprit Nature au lieu de relire `proj-esprit-nature` depuis `localStorage`; les déplacements/freeform ou contenus cassés d'une copie de bibliothèque ne contaminent plus la vitrine de référence.

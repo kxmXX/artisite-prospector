@@ -3,13 +3,13 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import { state } from "../public/js/state.js";
-import { generateSite } from "../public/js/engine/generator.js";
+import { generateSite, generateDemoSite } from "../public/js/engine/generator.js";
 import { renderWebsiteHTML } from "../public/js/components/renderer.js";
 import { renderEditor } from "../public/js/components/editor.js";
 import { FONT_CATALOG } from "../public/js/data/fonts.js";
 
 test("v4.1.0 Enhancements: Google Reviews 5-star rating uses filled amber stars and supports overall rating editing", () => {
-  const p = generateSite({ name: "Jardin Pro", tradeId: "paysagiste", city: "Toulouse" });
+  const p = generateDemoSite({ name: "Jardin Pro", tradeId: "paysagiste", city: "Toulouse" });
   state.addProject(p, true);
 
   const editorHTML = renderWebsiteHTML(p, { isEditor: true });

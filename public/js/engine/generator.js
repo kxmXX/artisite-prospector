@@ -78,7 +78,7 @@ function generateSiteFromInput(input = {}, useDemoContent = false) {
   ];
   const statsItems = [];
 
-  const isPaysagiste = trade.id === "paysagiste";
+  const isPaysagiste = input.templateId ? input.templateId === "esprit-reference" : trade.id === "paysagiste";
 
   // Section 1: Header
   const headerSection = {
