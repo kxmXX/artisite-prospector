@@ -107,3 +107,12 @@ test('l inspecteur liste les elements de la section', async () => {
   assert.ok(html.includes('Elements de la section'), 'la liste doit etre rendue');
   assert.ok(html.includes('selectElementForEditing('), 'les elements doivent etre selectionnables');
 });
+
+test('la selection d un element a un seul indicateur, partage avec la selection libre', () => {
+  const app = read('public/js/app.js');
+  assert.ok(app.includes('highlightSelectedElement(layoutKey) {'), 'l indicateur doit etre partage');
+  assert.ok(app.includes('this.highlightSelectedElement(layoutKey);'), 'la liste doit l appliquer');
+  assert.ok(app.includes('classList.add("is-freeform-selected")'), 'meme classe que la selection libre');
+  const studio = read('public/css/studio-v3.css');
+  assert.ok(studio.includes('[data-layout-key].is-freeform-selected'), 'le style doit exister');
+});

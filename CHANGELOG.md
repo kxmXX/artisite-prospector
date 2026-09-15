@@ -7,6 +7,14 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.43) — Un seul indicateur de sélection d'élément
+
+- Constat : sélectionner un élément dans la liste remplissait le panneau de propriétés mais **ne montrait rien sur le canevas**. L'auteur ne savait pas quel élément il réglait. Les deux chemins de sélection — liste et sélection libre — n'avaient pas le même retour visuel.
+- Correctif : `highlightSelectedElement` applique la **même classe** que la sélection libre (`.is-freeform-selected`, le style de canevas déjà existant) et retire l'ancienne. Une seule source de sélection (`state.selectedElementKey`), un seul indicateur pour les deux chemins.
+- Tests : 1 nouveau ; 390 → **391/391**.
+- **Non vérifié visuellement**, et je le dis plutôt que de le laisser croire : je n'ai pas réuni les conditions d'une capture concluante. Sélectionner une section par sa ligne n'a pas rafraîchi le panneau — il affichait encore « Menu » alors que Hero était visé — et l'élément que j'ai fini par sélectionner se trouvait derrière le panneau.
+- Anomalie relevée au passage, à instruire : le panneau de propriétés peut rester sur la **section précédente** après un clic sur une ligne de section. `renderInspector` ne lève pourtant **aucune** erreur sur les 16 sections d'un projet de référence — la cause est donc dans le chemin d'événement (`handleSectionNavigation` / `selectSection`), pas dans le rendu.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.42) — La liste des éléments vient du rendu, images et boutons compris
 
 - Défaut trouvé en vérifiant : la liste « Éléments de la section » était dérivée des champs du **contenu**. Or plusieurs champs ne produisent aucun élément décorable (`blockType`, `ctaLink`, une provenance d'image, un compteur) : leurs clés étaient proposées alors qu'elles ne correspondent à **rien** sur le canevas — l'auteur aurait réglé un élément invisible.

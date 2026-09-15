@@ -1658,3 +1658,11 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Libelles enrichis (nom de marque, telephone, image principale, reservations, objectif).
 - Tests : 388 → 390. `node --check` sur les deux fichiers, `scripts/build-utilities.mjs` relance.
 - Reste : geste de deplacement, boites de selection unifiees, gestes par appareil ; puis 3b, 4d (mise en page, reglages globaux), 7, export 2d.
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.43 (indicateur de selection unifie)
+
+- Fait : `highlightSelectedElement` applique la classe `.is-freeform-selected` (celle de la selection libre) quand on choisit un element dans la liste, avec nettoyage de l'ancienne. Un seul indicateur pour les deux chemins.
+- Non verifie visuellement : la section visee n'a pas rafraichi le panneau et l'element teste etait masque par le panneau. A reprendre.
+- Anomalie relevee, a instruire : apres un clic sur une ligne de section, le panneau peut rester sur la section precedente. Diagnostic : `renderInspector` rend les 16 sections sans erreur, donc le defaut est dans `handleSectionNavigation` / `selectSection`, pas dans le rendu. Piste : la ligne declenche `toggleSectionAccordion` avant la selection.
+- Tests : 390 → 391. `node --check` sur app.js, `scripts/build-utilities.mjs` relance.
+- Reste : instruire le panneau en retard, verifier l'indicateur a l'ecran, geste de deplacement (validation utilisateur), boites de selection unifiees cote multi-selection ; puis 4d, 3b, 7, export 2d.

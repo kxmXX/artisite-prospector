@@ -1621,13 +1621,30 @@ export class App {
   }
 
   /**
-   * Selection d'un element depuis la liste de la section : meme etat que la
-   * selection libre, pour n'avoir qu'une seule source de selection d'element.
+   * Un seul indicateur de selection d'element sur le canevas.
+   *
+   * La selection libre et la liste des elements doivent montrer exactement la meme
+   * chose : meme classe, donc meme style. Avant, choisir un element dans la liste
+   * remplissait le panneau sans rien montrer sur le canevas — l'auteur ne savait pas
+   * ce qu'il etait en train de regler.
+   */
+  highlightSelectedElement(layoutKey) {
+    const canvas = document.getElementById("canvas-container");
+    if (!canvas) return;
+    canvas.querySelectorAll("[data-layout-key].is-freeform-selected").forEach(el => el.classList.remove("is-freeform-selected"));
+    if (!layoutKey) return;
+    canvas.querySelector('[data-layout-key="' + layoutKey + '"]')?.classList.add("is-freeform-selected");
+  }
+
+  /**
+   * Selection d'un element depuis la liste de la section : meme etat et meme
+   * indicateur que la selection libre, pour n'avoir qu'une seule source.
    */
   selectElementForEditing(layoutKey) {
     if (!layoutKey) return;
     state.selectedElementKey = layoutKey;
     state.elementStyleState = "default";
+    this.highlightSelectedElement(layoutKey);
     this.refreshInspectorPanel();
   }
 
