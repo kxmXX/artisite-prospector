@@ -1652,6 +1652,23 @@ export class App {
     this.updateStageContext();
   }
 
+  /** Deplie ou replie la liste des elements d'une section, sans re-rendu complet. */
+  toggleStructureSection(sectionId) {
+    const list = document.getElementById("structure-elements-" + sectionId);
+    if (!list) return;
+    const hidden = list.classList.toggle("hidden");
+    state._openStructureSection = hidden ? null : sectionId;
+    document.querySelector('[data-structure-toggle="' + sectionId + '"]')?.setAttribute("aria-expanded", hidden ? "false" : "true");
+  }
+
+  /** Selection depuis l'arbre : meme chemin que depuis la liste du panneau. */
+  selectStructureElement(sectionId, layoutKey) {
+    if (sectionId && state.selectedSectionId !== sectionId) {
+      state.setSelectedSection(sectionId);
+      this.updateSelectedSectionUI();
+    }
+    this.setElementSelection(layoutKey);
+  }
   /** Selection d'un element depuis la liste de la section. */
   selectElementForEditing(layoutKey) {
     if (!layoutKey) return;

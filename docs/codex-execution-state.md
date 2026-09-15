@@ -1716,3 +1716,11 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Verifie a l'ecran : selection depuis la liste -> contour en pointilles sur le canevas et bloc « Element selectionne » (l'indicateur unifie de alpha.43 est enfin visible sur capture) ; changement de section -> panneau sur la nouvelle section, element relache.
 - Tests : 396 → 398. `node --check` sur app.js.
 - Reste sur 3b : arbre des elements dans le panneau Structure ; remplacement des 830 lignes inertes de renderSectionAccordionContent (capacites uniques a reimplementer d'abord : boucle d'animation de section, motifs d'inspiration, assombrissement du hero, curseurs de taille). Puis lot 7, export 2d, PRODUCT.md/DESIGN.md.
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.50 (lot 3b : arbre des elements dans la structure)
+
+- Fait : chaque section du panneau Structure se deplie pour montrer ses elements ; un clic selectionne l'element par le meme chemin que la liste du panneau (setElementSelection).
+- Module partage `public/js/data/elementLabels.js` : noms lisibles + numerotation. L'inspecteur n'a plus sa table locale (test a l'appui), donc les deux panneaux ne peuvent plus diverger.
+- Defaut que j'ai introduit et corrige dans le meme tour : le bouton de depliage etait un 6e enfant d'une grille a 5 colonnes, ce qui cassait l'alignement des lignes suivantes. Colonne ajoutee, place reservee meme sans element. Verifie par deux captures.
+- Tests : 398 → 400. `node --check` sur les quatre fichiers, `scripts/build-utilities.mjs` relance.
+- Reste sur 3b : les 830 lignes inertes de renderSectionAccordionContent (reimplementer d'abord les capacites uniques). Puis lot 7, export 2d, PRODUCT.md/DESIGN.md, et la validation utilisateur du geste de deplacement.

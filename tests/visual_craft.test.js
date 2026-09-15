@@ -176,3 +176,28 @@ test('changer de section relache l element selectionne', () => {
     'la selection d element doit etre relachee quand la section change');
   assert.ok(body.includes('this.setElementSelection(null'), 'par le point d ecriture unique');
 });
+
+test('l arbre des elements est accessible depuis le panneau de structure', () => {
+  const editor = read('public/js/components/editor.js');
+  const app = read('public/js/app.js');
+  assert.ok(editor.includes('collectSectionElements(project, s)'), 'chaque section expose ses elements');
+  assert.ok(editor.includes('window.app.toggleStructureSection('), 'la liste doit pouvoir se deplier');
+  assert.ok(editor.includes('window.app.selectStructureElement('), 'un element doit etre selectionnable');
+  assert.ok(editor.includes('aria-controls="structure-elements-'), 'le bouton doit designer sa liste');
+  assert.ok(app.includes('toggleStructureSection(sectionId) {'), 'la bascule doit exister');
+  assert.ok(app.includes('selectStructureElement(sectionId, layoutKey) {'), 'la selection doit exister');
+  const css = read('public/css/studio-v3.css');
+  assert.ok(css.includes('.studio-v3-elements-list'), 'la liste doit etre stylee');
+});
+
+test('les deux panneaux nomment les elements de la meme facon', async () => {
+  const editor = read('public/js/components/editor.js');
+  const inspector = read('public/js/components/inspector.js');
+  assert.ok(editor.includes('numberedLabels') && inspector.includes('numberedLabels'), 'les deux doivent partager les libelles');
+  assert.ok(!inspector.includes('const ELEMENT_LABELS = {'), 'plus de table locale dans l inspecteur');
+  const { elementLabelFor, numberedLabels } = await import('../public/js/data/elementLabels.js');
+  assert.equal(elementLabelFor('ctaText', 'button'), 'Texte du bouton');
+  assert.equal(elementLabelFor('inconnu', 'image'), 'inconnu', 'un champ inconnu s affiche tel quel');
+  assert.equal(elementLabelFor('', 'button'), 'Bouton', 'sans champ, la nature suffit');
+  assert.deepEqual(numberedLabels([{ field: 'title' }, { field: 'title' }, { field: 'text' }]), ['Titre 1', 'Titre 2', 'Texte']);
+});

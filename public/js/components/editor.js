@@ -1,6 +1,7 @@
 import { getIcon } from "./icons.js";
 import { MOTION_PRESETS, MOTION_SPEEDS, MOTION_DELAYS } from "../data/motionPresets.js";
-import { renderWebsiteHTML, renderStickyCallBar } from "./renderer.js";
+import { renderWebsiteHTML, renderStickyCallBar, collectSectionElements } from "./renderer.js";
+import { numberedLabels } from "../data/elementLabels.js";
 import { renderInspector } from "./inspector.js";
 import { STYLE_PRESETS } from "../data/styles.js";
 import { FONT_CATALOG, ensureFontCatalog } from "../data/fonts.js";
@@ -188,6 +189,9 @@ export function renderEditor(state) {
                 const isSel = s.id === state.selectedSectionId;
                 const isVis = s.visibility !== false;
                 const isStructural = ["header", "hero", "cta", "footer"].includes(s.type);
+                const elements = collectSectionElements(project, s);
+                const labels = numberedLabels(elements);
+                const isOpen = state._openStructureSection === s.id;
                 return `
                   <div class="studio-v3-sectionrow ${isSel ? 'is-selected' : ''} ${!isVis ? 'is-hidden' : ''}" data-sec-id="${s.id}">
                     <span class="studio-v3-order">${String(index + 1).padStart(2, '0')}</span>
@@ -197,8 +201,17 @@ export function renderEditor(state) {
                       <span><b>${getSectionFriendlyTitle(s)}</b><small>${s.type}</small></span>
                     </button>
                     ${isStructural ? '' : `<button type="button" onclick="event.stopPropagation(); window.app.toggleSectionVisibility('${s.id}')" class="studio-v3-rowaction" title="${isVis ? 'Masquer' : 'Afficher'}">${getIcon(isVis ? "eye" : "eyeOff", "w-3.5 h-3.5")}</button>`}
+                    <button type="button" class="studio-v3-rowaction" data-structure-toggle="${s.id}" ${elements.length ? `aria-expanded="${isOpen ? 'true' : 'false'}" aria-controls="structure-elements-${s.id}" title="Éléments de la section" onclick="event.stopPropagation(); window.app.toggleStructureSection('${s.id}')"` : 'aria-hidden="true" tabindex="-1" style="visibility:hidden"'}>${getIcon("chevronDown", "w-3.5 h-3.5")}</button>
                     <button type="button" onclick="window.app.handleSectionNavigation('${s.id}', event)" class="studio-v3-rowarrow" aria-label="Inspecter">${getIcon("chevronRight", "w-3.5 h-3.5")}</button>
-                  </div>`;
+                  </div>
+                  ${elements.length ? `
+                  <div class="studio-v3-elements-list ${isOpen ? '' : 'hidden'}" id="structure-elements-${s.id}">
+                    ${elements.map((element, elementIndex) => `
+                      <button type="button" class="studio-v3-element ${element.key === state.selectedElementKey ? 'is-selected' : ''}"
+                              onclick="window.app.selectStructureElement('${s.id}', '${element.key}')">
+                        <span>${labels[elementIndex]}</span>
+                      </button>`).join('')}
+                  </div>` : ''}`;
               }).join('')}
             </div>
           `}

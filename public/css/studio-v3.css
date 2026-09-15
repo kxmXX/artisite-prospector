@@ -102,7 +102,7 @@
 .studio-v3-sectionlist,.studio-v3-panelbody { min-height:0;overflow-y:auto;overscroll-behavior:contain; }
 .studio-v3-sectionlist { padding:9px 9px 20px; }
 .studio-v3-sectionrow {
-  min-height:52px;display:grid;grid-template-columns:24px 20px minmax(0,1fr) 32px 32px;align-items:center;gap:2px;
+  min-height:52px;display:grid;grid-template-columns:24px 20px minmax(0,1fr) 32px 32px 32px;align-items:center;gap:2px;
   padding:2px 5px;border-radius:10px;color:#48524f;position:relative;transition:background .14s ease,color .14s ease;
 }
 .studio-v3-sectionrow:hover { background:#f0efea; }
@@ -658,3 +658,15 @@ body.freeform-transforming #canvas-container [data-layout-key].is-freeform-selec
 /* Barre d'onglets sans barre de défilement visible (le contenu reste défilable). */
 .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* --- Arbre des elements (panneau de structure) ---
+   Une ligne par element sous sa section : on va droit au bon reglage sans passer
+   par le canevas. Meme vocabulaire visuel que les lignes de section, en plus discret. */
+.studio-v3-elements-list { margin:2px 0 8px 46px;display:flex;flex-direction:column;gap:2px; }
+.studio-v3-element {
+  display:flex;align-items:center;gap:8px;padding:5px 9px;border:0;border-radius:var(--ui-radius-sm);
+  background:transparent;color:var(--ui-muted);font-size:11px;font-weight:500;text-align:left;cursor:pointer;
+  transition:var(--ui-transition-control);
+}
+.studio-v3-element:hover { color:var(--v3-ink);background:rgba(24,32,31,.06); }
+.studio-v3-element.is-selected { color:var(--v3-ink);background:var(--ui-sage);font-weight:600; }

@@ -7,6 +7,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.50) — Lot 3b : l'arbre des éléments dans la structure
+
+- Fait : chaque section du panneau Structure peut se **déplier** pour montrer ses éléments — « Nom de marque », « Téléphone », « Texte du bouton 1 / 2 »… Cliquer un élément le sélectionne exactement comme depuis le panneau de propriétés : même point d'écriture, même indicateur sur le canevas.
+- Un **module partagé**, `public/js/data/elementLabels.js`, porte les noms lisibles et leur numérotation : le panneau de propriétés et l'arbre de la structure nomment désormais le même élément de la même façon. L'inspecteur n'a plus sa table locale — un test l'interdit, pour qu'elles ne divergent pas.
+- **Vérifié à l'écran, et le contrôle a servi deux fois** : la première capture a montré l'arbre fonctionnel **et** un défaut que j'avais introduit — mon nouveau bouton était un sixième enfant dans une grille à cinq colonnes, ce qui faisait passer les chevrons des sections suivantes à la ligne. Corrigé (colonne ajoutée, place réservée même sans élément), la seconde capture confirme l'alignement.
+- Tests : 2 nouveaux ; 398 → **400/400**.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.49) — Lot 3b : une seule source de sélection d'élément
 
 - Fait : `setElementSelection(layoutKey, options)` devient le **seul point d'écriture** de la sélection d'élément. Quatre chemins la renseignaient chacun de leur côté — la liste des éléments, le clic sur le canevas, le nettoyage, et la sélection libre. Un test garantit qu'il ne reste qu'**une seule affectation directe** dans tout le fichier.

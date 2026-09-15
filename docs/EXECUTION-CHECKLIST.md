@@ -157,11 +157,12 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
       requête média et non d'un état, d'où un panneau bloqué sur la section précédente. Elle est désormais
       portée par `state.inspectorPanelOpen` ; **vérifié à l'écran** — le panneau affiche bien la section
       choisie. Conséquence assumée : il ne s'ouvre plus tout seul sous 1280 px, l'auteur l'ouvre par le bouton.
-- [ ] **Lot 3b — Source de sélection unique** (`4.9.0-alpha.49`) : `setElementSelection` est le seul point
-      d'écriture de la sélection d'élément — les quatre chemins (liste, clic canevas, nettoyage, sélection
-      libre) y passent, et deux désynchronisations sont corrigées : le nettoyage de la sélection libre et le
-      changement de section. *Reste* : l'arbre des éléments dans le panneau Structure, et le remplacement des
-      830 lignes inertes de `renderSectionAccordionContent`.
+- [ ] **Lot 3b — Sélection unique et arbre des éléments** (`4.9.0-alpha.49` → `.50`) : `setElementSelection`
+      est le seul point d'écriture de la sélection d'élément (quatre chemins y passent), et deux
+      désynchronisations sont corrigées — nettoyage de la sélection libre, changement de section. Chaque
+      section du panneau Structure se déplie pour montrer ses éléments, nommés par un module partagé avec le
+      panneau de propriétés. *Reste* : le remplacement des 830 lignes inertes de
+      `renderSectionAccordionContent`.
 - [ ] **Passe anti-slop (skill Impeccable)** : surfaces du navigateur thématisées en `4.9.0-alpha.30`
       (sélection, curseur de saisie, barres de défilement, chiffres tabulaires, anneau de focus unique),
       portée bornée à `.studio-editor` ; **tous** les glyphes du chrome et du rendu remplacés par des icônes
