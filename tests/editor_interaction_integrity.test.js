@@ -85,3 +85,50 @@ test('freeform transforms share one centre origin that scale cannot change', () 
   assert.ok(appSource.includes('centerOffsetY'));
   assert.ok(appSource.includes('(renderedWidth * baseScaleX * (scaleGroupX - 1)) / 2'));
 });
+
+test('section motion previews are visible and speed scales every preset', () => {
+  const appCss = fs.readFileSync(new URL('../public/css/app.css', import.meta.url), 'utf8');
+
+  // Section previews must opt out of the editor opacity guard, otherwise the
+  // fade-based presets (fade, zoom, reveal, shimmer) render as no-ops.
+  assert.ok(appSource.includes('secEl.classList.add("motion-preview")'));
+  assert.ok(appSource.includes('_sectionMotionPreviewTimer'));
+
+  // Each preset keeps its designed timing while the speed multiplier applies.
+  assert.ok(appCss.includes('--motion-duration: 650ms;'));
+  assert.ok(appCss.includes('--motion-duration: 850ms;'));
+  assert.ok(appCss.includes('animation-duration: calc(var(--motion-duration, 0.85s) * var(--anim-duration-multiplier, 1.0)) !important;'));
+  assert.ok(appCss.includes('animation: sectionPulse calc(2.2s * var(--anim-duration-multiplier, 1.0)) ease-in-out infinite !important;'));
+  assert.ok(appCss.includes('animation: textPulse calc(1.6s * var(--anim-duration-multiplier, 1.0)) ease-in-out infinite !important;'));
+});
+
+test('previewSectionMotion opts the block out of the editor opacity guard', () => {
+  const app = Object.create(App.prototype);
+  const classes = new Set();
+  const el = {
+    offsetWidth: 100,
+    dataset: {},
+    classList: {
+      add: (...names) => names.forEach(name => classes.add(name)),
+      remove: (...names) => names.forEach(name => classes.delete(name)),
+      contains: name => classes.has(name)
+    },
+    setAttribute(key, value) { this.attrs = this.attrs || {}; this.attrs[key] = value; },
+    getAttribute(key) { return (this.attrs || {})[key] ?? null; }
+  };
+  const originalGet = globalThis.document.getElementById;
+  const originalQuery = globalThis.document.querySelector;
+  globalThis.document.getElementById = id => (id === 'section-sec1' ? el : null);
+  globalThis.document.querySelector = () => null;
+  try {
+    app.previewSectionMotion('sec1', 'fade-in');
+    assert.equal(el.attrs['data-motion'], 'fade-in');
+    assert.ok(classes.has('motion-preview'), 'preview must bypass the editor opacity guard');
+    assert.ok(classes.has('is-revealed'), 'preview must restart the reveal animation');
+    assert.ok(app._sectionMotionPreviewTimer, 'non-pulse previews restore the guard afterwards');
+  } finally {
+    globalThis.document.getElementById = originalGet;
+    globalThis.document.querySelector = originalQuery;
+    clearTimeout(app._sectionMotionPreviewTimer);
+  }
+});

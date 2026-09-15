@@ -7,6 +7,12 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 15 septembre 2026 (4.8.0-alpha.46)
+
+- Aperçu des animations de section : la prévisualisation ajoutait `is-revealed` sans `motion-preview`, si bien que le garde-fou d’édition `opacity:1!important` écrasait le fondu. Les presets basés sur l’opacité (Fade, Zoom, Reveal, Shimmer) paraissaient donc morts. L’aperçu bascule désormais sous `motion-preview`, puis restaure le garde-fou.
+- Vitesse : le multiplicateur de rythme écrasait les durées propres à chaque preset par une base unique de 0,85 s. Chaque preset conserve maintenant son temps via `--motion-duration`, que la vitesse multiplie ; Pulse, TextPulse et ImgPulse, déclarés en `!important`, honorent eux aussi le multiplicateur.
+- QA : test comportemental sur l’aperçu de section, test sur la vitesse par preset, 252/252 tests complets, syntaxe et `git diff --check` propres.
+
 ### Consolidation — 15 septembre 2026 (4.8.0-alpha.45)
 
 - Transformations libres : rotation et échelle partagent désormais une origine unique au centre de l’élément. Auparavant l’ajout d’une échelle faisait passer l’origine de `50% 50%` à `0 0`, si bien qu’un élément déjà redimensionné se mettait soudain à pivoter autour de son coin.

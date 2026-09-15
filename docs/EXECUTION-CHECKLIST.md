@@ -50,7 +50,7 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - [x] Éliminer les superpositions de chrome et les layouts cassés : dock de contact client masqué en édition, pile Freeform mesurée anti-collision, repères libres exclus de l’aperçu (`4.8.0-alpha.43`).
 - [~] Repenser l’édition des cellules autour d’un modèle spatial cohérent : historique d’édition réparé (Undo/Redo réels sur cellules et champs) dans `4.8.0-alpha.43` ; limites spatiales et sortie de mode restent à traiter.
 - [x] Rendre chaque outil réellement opérant et lisible : l’édition inline et l’inspecteur enregistrent à nouveau une transaction annulable (`4.8.0-alpha.43`).
-- [~] Fiabiliser les animations : transitions et animations suspendues pendant un transform Freeform (`4.8.0-alpha.43`) ; restent l’aperçu fiable des presets et une politique unique de `transform-origin`.
+- [x] Fiabiliser les animations : origine unique (`4.8.0-alpha.45`), aperçu de section réellement visible et vitesse appliquée à chaque preset (`4.8.0-alpha.46`). Reste à neutraliser les motions pendant un transform libre, au-delà de la suspension déjà posée.
 - [ ] Ajouter une matrice de non-régression navigateur couvrant souris, tactile et clavier, plutôt que de considérer la présence du code comme une fonctionnalité livrée.
 - [ ] Réduire la complexité d’usage : actions principales immédiatement compréhensibles, commandes avancées regroupées sans barre illisible ni vocabulaire technique ambigu.
 

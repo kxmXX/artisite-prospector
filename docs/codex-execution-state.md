@@ -1,3 +1,11 @@
+## LOT DE LIVRAISON — aperçu d’animation fidèle 4.8.0-alpha.46 — 15 septembre 2026
+
+- Cause racine : `previewSectionMotion` ajoutait `is-revealed` mais jamais `motion-preview`. Or `#canvas-container [data-motion]:not(.motion-preview){opacity:1!important}` (spécificité d’identifiant, `!important`) gagne sur les animations : le fondu des presets Fade/Zoom/Reveal/Shimmer était donc entièrement écrasé. Les presets à base de transform (Slide, Spring) semblaient marcher, ce qui expliquait l’impression d’animations « partiellement en panne ».
+- Correctif : la prévisualisation de section passe sous `motion-preview` (comme le faisait déjà l’aperçu de texte/image), déclenche l’animation, puis retire la classe après 1,2 s pour restaurer le garde-fou ; Pulse reste actif.
+- Vitesse : le sélecteur Rapide/Naturel/Posé écrasait toutes les durées par une base unique de 0,85 s. Chaque preset expose maintenant `--motion-duration` (650/700/750/850/500 ms) et le multiplicateur s’applique dessus. Pulse, TextPulse et ImgPulse, dont la durée est dans un raccourci `!important`, intègrent directement `calc(durée * var(--anim-duration-multiplier))`.
+- Tests : test comportemental sur `previewSectionMotion` (classe `motion-preview` + minuterie de restauration), assertions sur la vitesse par preset ; 7/7 tests d’intégrité, 252/252 complets.
+- Prochaine action exacte : neutraliser les motions pendant un transform libre et auditer l’interaction `filter`/`drop-shadow` de Pulse avec le redimensionnement.
+
 ## LOT DE LIVRAISON — transformations libres cohérentes 4.8.0-alpha.45 — 15 septembre 2026
 
 - Cause racine : `freeformDeclarations` et `applyFreeformLiveStyle` n’émettaient `transform-origin:0 0` que lorsqu’une échelle existait. Un élément tourné pivotait donc au centre tant qu’il n’était pas mis à l’échelle, puis basculait sur son coin dès qu’une échelle apparaissait — le même geste produisait deux comportements.

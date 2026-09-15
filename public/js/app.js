@@ -2920,8 +2920,20 @@ export class App {
     const motion = preset === "none" ? "" : preset;
     secEl.setAttribute("data-motion", motion);
     secEl.classList.remove("is-revealed");
+    // `motion-preview` opts the block out of the editor opacity guard, so the
+    // fade-based presets are actually visible while previewing.
+    secEl.classList.add("motion-preview");
+    if (preset === "pulse") secEl.classList.add("btn-pulse-active");
+    else secEl.classList.remove("btn-pulse-active");
     void secEl.offsetWidth; // trigger DOM reflow to restart CSS animation
     secEl.classList.add("is-revealed");
+    if (this._sectionMotionPreviewTimer) clearTimeout(this._sectionMotionPreviewTimer);
+    if (preset !== "pulse") {
+      this._sectionMotionPreviewTimer = setTimeout(() => {
+        secEl.classList.remove("motion-preview");
+        secEl.classList.add("is-revealed");
+      }, 1200);
+    }
   }
 
   setSectionMotion(secId, preset) {

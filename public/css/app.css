@@ -2334,52 +2334,61 @@ p[data-motion], div[data-motion], section[data-motion], h1[data-motion], h2[data
 
 [data-motion="fade-in"].is-revealed,
 .motion-preview[data-motion="fade-in"] {
+  --motion-duration: 650ms;
   animation: motion-fade-in 650ms cubic-bezier(0.16, 1, 0.3, 1) both;
   opacity: 1 !important;
 }
 [data-motion="slide-up"].is-revealed,
 .motion-preview[data-motion="slide-up"] {
+  --motion-duration: 700ms;
   animation: motion-slide-up 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
   opacity: 1 !important;
 }
 [data-motion="slide-in"].is-revealed,
 .motion-preview[data-motion="slide-in"] {
+  --motion-duration: 700ms;
   animation: motion-slide-in 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
   opacity: 1 !important;
 }
 [data-motion="spring"].is-revealed,
 .motion-preview[data-motion="spring"] {
+  --motion-duration: 750ms;
   animation: motion-spring 750ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
   opacity: 1 !important;
 }
 [data-motion="progress-fill"].is-revealed,
 .motion-preview[data-motion="progress-fill"] {
+  --motion-duration: 750ms;
   animation: motion-progress-fill 750ms cubic-bezier(0.16, 1, 0.3, 1) both;
   transform-origin: left;
   opacity: 1 !important;
 }
 [data-motion="reveal"].is-revealed,
 .motion-preview[data-motion="reveal"] {
+  --motion-duration: 750ms;
   animation: motion-reveal 750ms cubic-bezier(0.16, 1, 0.3, 1) both;
   opacity: 1 !important;
 }
 [data-motion="stagger"].is-revealed,
 .motion-preview[data-motion="stagger"] {
+  --motion-duration: 750ms;
   animation: motion-stagger 750ms cubic-bezier(0.16, 1, 0.3, 1) both;
   opacity: 1 !important;
 }
 [data-motion="shimmer"].is-revealed,
 .motion-preview[data-motion="shimmer"] {
+  --motion-duration: 850ms;
   animation: motion-shimmer 850ms ease-out both;
   opacity: 1 !important;
 }
 [data-motion="pulse"].is-revealed,
 .motion-preview[data-motion="pulse"] {
-  animation: sectionPulse 2.2s ease-in-out infinite !important;
+  animation: sectionPulse calc(2.2s * var(--anim-duration-multiplier, 1.0)) ease-in-out infinite !important;
   opacity: 1 !important;
 }
 [data-motion="zoom-in"].is-revealed,
 .motion-preview[data-motion="zoom-in"] {
+  --motion-duration: 700ms;
   animation: motion-zoom-in 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
   opacity: 1 !important;
 }
@@ -2681,6 +2690,7 @@ p[data-motion], div[data-motion], section[data-motion], h1[data-motion], h2[data
 /* Additional 60fps Motion: Magnetic */
 [data-motion="magnetic"].is-revealed,
 .motion-preview[data-motion="magnetic"] {
+  --motion-duration: 500ms;
   animation: motion-magnetic 500ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
   opacity: 1 !important;
 }
@@ -3098,7 +3108,7 @@ p[data-motion], div[data-motion], section[data-motion], h1[data-motion], h2[data
 .site-section[data-motion="pulse"],
 .editor-section-wrapper[data-motion="pulse"],
 .motion-preview[data-motion="pulse"] {
-  animation: sectionPulse 2.2s ease-in-out infinite !important;
+  animation: sectionPulse calc(2.2s * var(--anim-duration-multiplier, 1.0)) ease-in-out infinite !important;
   opacity: 1 !important;
 }
 @keyframes sectionPulse {
@@ -3557,7 +3567,7 @@ p[data-motion], div[data-motion], section[data-motion], h1[data-motion], h2[data
 [data-editable][data-motion="pulse"],
 .btn-pulse-active[data-editable] {
   display: inline-block;
-  animation: textPulse 1.6s ease-in-out infinite !important;
+  animation: textPulse calc(1.6s * var(--anim-duration-multiplier, 1.0)) ease-in-out infinite !important;
 }
 @keyframes textPulse {
   0%, 100% {
@@ -3572,7 +3582,7 @@ p[data-motion], div[data-motion], section[data-motion], h1[data-motion], h2[data
 
 img[data-motion="pulse"],
 .group\/img[data-motion="pulse"] img {
-  animation: imgPulse 1.8s ease-in-out infinite !important;
+  animation: imgPulse calc(1.8s * var(--anim-duration-multiplier, 1.0)) ease-in-out infinite !important;
 }
 @keyframes imgPulse {
   0%, 100% {
@@ -3638,7 +3648,7 @@ img[data-motion="pulse"],
   --anim-duration-multiplier: 1.0;
 }
 [data-motion]:not([data-motion="pulse"]) {
-  animation-duration: calc(0.85s * var(--anim-duration-multiplier, 1.0)) !important;
+  animation-duration: calc(var(--motion-duration, 0.85s) * var(--anim-duration-multiplier, 1.0)) !important;
 }
 [data-motion="pulse"] {
   animation-duration: calc(1.8s * var(--anim-duration-multiplier, 1.0)) !important;
