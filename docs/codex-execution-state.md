@@ -1691,3 +1691,12 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Non verifie a l'ecran : la barre de section est masquee des qu'un autre outil est actif (chrome contextuel), donc mon clic sur « Anim » a ete bloque. Changement mecanique (95 % -> 100 %), garde par test.
 - Tests : 392 → 393. `scripts/build-utilities.mjs` relance : les classes devenues inutiles disparaissent de la couche utilitaire.
 - Reste : desambiguiser les libelles « Bouton », PRODUCT.md/DESIGN.md, geste de deplacement (validation utilisateur), puis 4d, 3b, 7, export 2d.
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.47 (libelles d'elements distincts)
+
+- Probleme : jusqu'a neuf libelles identiques dans la section Services, et deux « Texte du bouton » dans le menu. Impossible de savoir quel element on reglait.
+- Causes : un bouton n'a pas de data-editable (le champ est dans aria-controls du popover contextuel) ; et dans une section a listes plusieurs elements partagent le meme nom de champ.
+- Correctif : lecture du champ depuis la liaison du popover, puis numerotation des libelles en collision. Libelles ajoutes : Etiquette, Description courte, Lien, Type de bloc.
+- Mesure sur un projet de reference : zero doublon dans hero, header et services (contre 1 et 12 avant).
+- Tests : 393 → 395, dont un test qui parcourt toutes les sections et refuse tout libelle en double.
+- Reste : PRODUCT.md/DESIGN.md, geste de deplacement (validation utilisateur), puis 4d, 3b, 7, export 2d.

@@ -139,3 +139,32 @@ test('la liste ne propose plus les champs sans element decore', async () => {
     assert.ok(!keys.includes(ghostKey), 'cle fantome encore proposee : ' + ghost);
   }
 });
+
+test('les boutons de la section portent un champ identifiable, pas un libelle generique', async () => {
+  const { generateSite } = await import('../public/js/engine/generator.js');
+  const { collectSectionElements } = await import('../public/js/components/renderer.js');
+  const project = generateSite({ name: 'Controle Boutons', tradeId: 'plombier' });
+  const withButtons = project.sections.filter((s) => collectSectionElements(project, s).some((e) => e.kind === 'button'));
+  assert.ok(withButtons.length > 0, 'le projet de reference doit avoir des boutons positionnables');
+  for (const section of withButtons) {
+    for (const button of collectSectionElements(project, section).filter((e) => e.kind === 'button')) {
+      assert.ok(button.field, 'un bouton doit porter un champ : ' + button.key);
+    }
+  }
+});
+
+test('deux elements de la meme section ne portent jamais le meme libelle', async () => {
+  const { renderInspector } = await import('../public/js/components/inspector.js');
+  const { generateSite } = await import('../public/js/engine/generator.js');
+  const { state } = await import('../public/js/state.js');
+  const project = generateSite({ name: 'Controle Doublons', tradeId: 'restaurateur' });
+  state.currentProject = project;
+  state.currentView = 'editor';
+  for (const section of project.sections) {
+    const html = renderInspector(section, project, state);
+    const labels = [...html.matchAll(/selectElementForEditing\('[^']+'\)">([^<]+)</g)].map((m) => m[1]);
+    const duplicates = labels.filter((label, index) => labels.indexOf(label) !== index);
+    assert.deepEqual(duplicates, [], 'libelles en double dans ' + section.type + ' : ' + duplicates.join(', '));
+  }
+  state.selectedElementKey = null;
+});

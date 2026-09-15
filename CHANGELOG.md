@@ -7,6 +7,14 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.47) — Chaque élément de la section porte un nom distinct
+
+- Constat : la liste « Éléments de la section » affichait jusqu'à neuf fois le même libellé dans la section Services (« Titre », « Texte »…). Deux boutons du menu portaient tous deux « Texte du bouton ». Impossible de savoir lequel on réglait.
+- Deux causes, deux correctifs : (1) un bouton n'a pas de `data-editable`, son champ dort dans la liaison du popover contextuel (`aria-controls="cta-popover-<section>-<champ>"`) — cette information est maintenant lue, ce qui nomme « Bouton principal », « Texte du bouton » au lieu du générique « Bouton » ; (2) dans une section à listes, plusieurs éléments partagent le même nom de champ — ils sont désormais **numérotés** (« Titre 1 », « Titre 2 »…).
+- Libellés complétés : Étiquette, Description courte, Lien, Type de bloc.
+- Résultat mesuré sur un projet de référence : **zéro doublon** dans les trois sections testées (hero, header, services).
+- Tests : 2 nouveaux, dont un qui parcourt **toutes** les sections d'un projet et refuse tout libellé en double ; 393 → **395/395**.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.46) — Le chrome perd son verre décoratif
 
 - Craft-floor : « le verre et le flou comme décoration plutôt que comme effet précis ». Le chrome de l'éditeur en portait huit : les cinq menus flottants sombres (`bg-zinc-900/95 backdrop-blur-md`), la pilule de retour à l'aperçu, la barre du haut, le panneau de structure, l'en-tête du panneau de propriétés, et — le plus explicite — un `.sticky-dock-glass` dont le commentaire assumait le « glassmorphism ».

@@ -3615,7 +3615,15 @@ export function collectSectionElements(project, section) {
     const imageField = /\sdata-image-field="([^"]+)"/.exec(attrs);
     const isImage = tag === "img" || !!imageField || /img|image|photo|logo|avatar/i.test(attrs);
     const isButton = !isImage && (/cta|btn|button/i.test(attrs) || tag === "button");
-    const field = editable ? editable[1] : (imageField ? imageField[1] : "");
+    // Un bouton n'a pas de `data-editable` : son champ se lit dans la liaison du
+    // popover contextuel (`cta-popover-<section>-<champ>`). Sans cela, plusieurs
+    // boutons de la meme section portaient tous le libelle generique « Bouton ».
+    const controls = /\saria-controls="([^"]+)"/.exec(attrs);
+    const controlsPrefix = "cta-popover-" + section.id + "-";
+    const controlField = controls && controls[1].indexOf(controlsPrefix) === 0
+      ? controls[1].slice(controlsPrefix.length)
+      : "";
+    const field = editable ? editable[1] : (imageField ? imageField[1] : controlField);
     found.set(key, { key, field, kind: isImage ? "image" : (isButton ? "button" : "text") });
   }
   return [...found.values()];
