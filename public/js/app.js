@@ -4078,6 +4078,7 @@ export class App {
         </div>
         <button type="button" class="freeform-move-handle" data-freeform-action="move" aria-label="Déplacer la sélection">${getIcon("move", "w-3.5 h-3.5")}</button>
         ${["nw","n","ne","e","se","s","sw","w"].map(handle => `<button type="button" class="freeform-resize-handle freeform-resize-${handle}" data-freeform-action="resize" data-freeform-handle="${handle}" aria-label="Redimensionner ${handle}"></button>`).join("")}
+        <button type="button" class="freeform-rotate-handle" data-freeform-rotate aria-label="Faire pivoter la sélection" title="Faire pivoter · Shift = pas de 15°">↻</button>
         <div class="freeform-layerbar" role="toolbar" aria-label="Ordre et verrouillage du calque">
           <button type="button" data-freeform-layer="back" title="Envoyer à l’arrière-plan" aria-label="Envoyer à l’arrière-plan">⇤</button>
           <button type="button" data-freeform-layer="backward" title="Reculer d’un plan" aria-label="Reculer d’un plan">−</button>
@@ -4103,6 +4104,7 @@ export class App {
       overlay.querySelectorAll("[data-freeform-action]").forEach(handle => {
         handle.addEventListener("pointerdown", event => this.startFreeformInteraction(event, handle.dataset.freeformAction, handle.dataset.freeformHandle || ""));
       });
+      overlay.querySelector("[data-freeform-rotate]")?.addEventListener("pointerdown", event => this.startFreeformRotation(event));
       overlay.querySelector("[data-freeform-reset]")?.addEventListener("click", event => {
         event.preventDefault();
         event.stopPropagation();
@@ -4268,12 +4270,17 @@ export class App {
     const label = overlay.querySelector("[data-freeform-label]");
     const labelBar = overlay.querySelector(".freeform-selection-label");
     const moveHandle = overlay.querySelector(".freeform-move-handle");
+    const rotateHandle = overlay.querySelector(".freeform-rotate-handle");
     const alignBar = overlay.querySelector(".freeform-alignbar");
     const layerBar = overlay.querySelector(".freeform-layerbar");
     const controlsInside = top < 36;
     const controlsTop = controlsInside ? Math.max(8 - top, 4) : -31;
     if (labelBar) labelBar.style.top = `${controlsTop}px`;
     if (moveHandle) moveHandle.style.top = controlsInside ? `${controlsTop + 42}px` : "-15px";
+    if (rotateHandle) {
+      rotateHandle.style.top = controlsInside ? `${controlsTop + 42}px` : "-15px";
+      rotateHandle.style.right = right > window.innerWidth - 48 ? "4px" : "-38px";
+    }
     if (alignBar && keys.length > 1 && !selectionLocked) {
       const toolbarWidth = alignBar.offsetWidth || 276;
       const desiredLeft = Math.max(8, Math.min(window.innerWidth - toolbarWidth - 8, (left + right - toolbarWidth) / 2));
@@ -4293,9 +4300,11 @@ export class App {
     }
     if (label) {
       const primaryLabel = this._freeformSelectedElement?.dataset?.layoutLabel || `#${keys[0]}`;
+      const primaryRotation = Number(this.getFreeformLayout(this._freeformSelectedKey, state.viewport)?.rotation) || 0;
+      const rotationText = Math.abs(primaryRotation) > 0.01 ? ` · ${Math.round(primaryRotation)}°` : "";
       label.textContent = keys.length > 1
-        ? `${keys.length} éléments · ${Math.round(right - left)}×${Math.round(bottom - top)}`
-        : `${primaryLabel} · ${Math.round(right - left)}×${Math.round(bottom - top)}`;
+        ? `${keys.length} éléments · ${Math.round(right - left)}×${Math.round(bottom - top)}${rotationText}`
+        : `${primaryLabel} · ${Math.round(right - left)}×${Math.round(bottom - top)}${rotationText}`;
     }
     const groupButton = overlay.querySelector("[data-freeform-group]");
     const ungroupButton = overlay.querySelector("[data-freeform-ungroup]");
@@ -4332,6 +4341,8 @@ export class App {
       target.style.setProperty("scale", `${Number.isFinite(scaleX) && scaleX > 0.02 ? scaleX : 1} ${Number.isFinite(scaleY) && scaleY > 0.02 ? scaleY : 1}`, "important");
       target.style.setProperty("transform-origin", "0 0", "important");
     }
+    const rotation = Number(layout.rotation);
+    if (Number.isFinite(rotation)) target.style.setProperty("rotate", `${rotation}deg`, "important");
     if (updateOverlay) this.updateFreeformOverlay();
   }
 
@@ -4401,6 +4412,70 @@ export class App {
       yLines.push(...rectAxisLines(rect, "y", meta));
     });
     return { xLines, yLines };
+  }
+
+  startFreeformRotation(event) {
+    const keys = this.getFreeformSelectedKeys();
+    const canvas = document.getElementById("canvas-container");
+    if (!canvas || !keys.length || this.isFreeformSelectionLocked(keys)) return;
+    const entries = keys.map(key => {
+      const target = canvas.querySelector(`[data-layout-key="${key}"]`);
+      return target?.isConnected ? { key, target, base: { ...this.getFreeformLayout(key, state.viewport) }, rect: target.getBoundingClientRect() } : null;
+    }).filter(Boolean);
+    if (!entries.length) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const pointerId = event.pointerId;
+    const left = Math.min(...entries.map(entry => entry.rect.left));
+    const top = Math.min(...entries.map(entry => entry.rect.top));
+    const right = Math.max(...entries.map(entry => entry.rect.right));
+    const bottom = Math.max(...entries.map(entry => entry.rect.bottom));
+    const center = { x: (left + right) / 2, y: (top + bottom) / 2 };
+    const startAngle = Math.atan2(event.clientY - center.y, event.clientX - center.x);
+    let liveUpdates = Object.fromEntries(entries.map(entry => [entry.key, { ...entry.base }]));
+    this._freeformOverlay?.classList.add("is-transforming");
+    document.body.classList.add("freeform-transforming", "freeform-rotating");
+
+    const onMove = moveEvent => {
+      if (pointerId != null && moveEvent.pointerId != null && moveEvent.pointerId !== pointerId) return;
+      const currentAngle = Math.atan2(moveEvent.clientY - center.y, moveEvent.clientX - center.x);
+      let delta = (currentAngle - startAngle) * 180 / Math.PI;
+      delta = ((delta + 540) % 360) - 180;
+      if (moveEvent.shiftKey) delta = Math.round(delta / 15) * 15;
+      const radians = delta * Math.PI / 180;
+      const cos = Math.cos(radians);
+      const sin = Math.sin(radians);
+      liveUpdates = {};
+      entries.forEach(entry => {
+        const baseRotation = Number(entry.base.rotation) || 0;
+        let x = Number(entry.base.x) || 0;
+        let y = Number(entry.base.y) || 0;
+        if (entries.length > 1) {
+          const entryCenter = { x: entry.rect.left + entry.rect.width / 2, y: entry.rect.top + entry.rect.height / 2 };
+          const vx = entryCenter.x - center.x;
+          const vy = entryCenter.y - center.y;
+          const desiredCenter = { x: center.x + vx * cos - vy * sin, y: center.y + vx * sin + vy * cos };
+          x += desiredCenter.x - entryCenter.x;
+          y += desiredCenter.y - entryCenter.y;
+        }
+        const layout = { ...entry.base, x, y, rotation: baseRotation + delta };
+        liveUpdates[entry.key] = layout;
+        this.applyFreeformLiveStyle(entry.target, layout, false);
+      });
+      this.updateFreeformOverlay();
+    };
+    const onUp = upEvent => {
+      if (pointerId != null && upEvent?.pointerId != null && upEvent.pointerId !== pointerId) return;
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onUp);
+      this._freeformOverlay?.classList.remove("is-transforming");
+      document.body.classList.remove("freeform-transforming", "freeform-rotating");
+      state.setFreeformLayouts(liveUpdates, state.viewport, keys.length > 1 ? "Rotation sélection libre" : "Rotation élément libre");
+    };
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+    window.addEventListener("pointercancel", onUp);
   }
 
   startFreeformInteraction(event, action = "move", handle = "", options = {}) {

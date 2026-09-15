@@ -7,6 +7,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 15 septembre 2026 (4.8.0-alpha.24)
+
+- Rotation libre : poignée dédiée sur le cadre de sélection, angle persistant dans `freeformLayout` et rendu identique en éditeur, preview et export.
+- Précision : Shift verrouille le delta de rotation par pas de 15° ; l’angle est normalisé dans l’état et compatible Undo/Redo.
+- Multi-sélection : plusieurs calques pivotent autour de leur centre commun, chacun conservant son angle relatif et son propre offset.
+- UX : le libellé bleu du cadre ne bloque plus les clics sur le contenu placé derrière ; seuls ses boutons capturent les événements. QA Chrome : 28° persistants après reload, 13° + Shift → +15°, rotation collective validée sans erreur console. Validation : 38/38 ciblés, 213/213 complets et `git diff --check`.
+
 ### Consolidation — 15 septembre 2026 (4.8.0-alpha.23)
 
 - Calques : commandes Premier plan / Avancer / Reculer / Arrière-plan persistées dans le `freeformLayout` du breakpoint actif.

@@ -1,5 +1,14 @@
 # État de reprise Codex — 15 septembre 2026
 
+## LOT DE LIVRAISON — rotation libre 4.8.0-alpha.24
+
+- Poignée : contrôle de rotation séparé du Move/resize ; masqué automatiquement si la sélection est verrouillée.
+- Persistance : `rotation` est normalisée et stockée par breakpoint avec x/y/scale/z ; le renderer utilise la propriété CSS `rotate` pour préserver les transforms existants.
+- Groupe/multi : la sélection pivote autour de son centre commun et chaque membre reçoit son angle + ses nouveaux offsets en une seule mutation Undo.
+- Précision : Shift quantifie le delta à 15°. Le libellé de sélection est pointer-transparent hors boutons pour ne plus masquer les calques voisins.
+- QA Chrome : 28° → reload = 28°, Shift +13° = +15°, groupe +15° avec orbite des deux éléments ; zéro erreur console. Validation automatisée : 38/38 ciblés, 213/213 complets et `git diff --check`.
+- Prochaine action : snapping pendant le resize et guides d’espacement/équidistance.
+
 ## LOT DE LIVRAISON — ordre et verrouillage des calques 4.8.0-alpha.23
 
 - Ordre : chaque sélection expose arrière-plan / reculer / avancer / premier plan ; les valeurs `z` sont stockées dans le layout du breakpoint actif et passent par une mutation batch Undo-compatible.

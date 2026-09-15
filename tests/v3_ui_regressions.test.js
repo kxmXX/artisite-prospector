@@ -139,7 +139,7 @@ test('Freeform foundation keeps stable layout keys across editor/public render a
   assert.equal(publicTitle?.[1], editorTitle[1], 'public render must keep the exact same layout key');
 
   project.freeformLayout = {
-    desktop: { [editorTitle[1]]: { x: 24, y: -12, width: 420, height: 96, z: 3, scaleX: 1.2, scaleY: 0.8 } },
+    desktop: { [editorTitle[1]]: { x: 24, y: -12, width: 420, height: 96, z: 3, scaleX: 1.2, scaleY: 0.8, rotation: 22.5 } },
     tablet: { [editorTitle[1]]: { x: 8, y: 4, width: 360 } },
     mobile: { [editorTitle[1]]: { x: 0, y: 6, width: 310 } }
   };
@@ -152,6 +152,7 @@ test('Freeform foundation keeps stable layout keys across editor/public render a
   assert.ok(cssOut.includes('translate:24px -12px!important'));
   assert.ok(cssOut.includes('width:420px!important'));
   assert.ok(cssOut.includes('scale:1.2 0.8!important'));
+  assert.ok(cssOut.includes('rotate:22.5deg!important'));
   const standalone = exportStandaloneHTML(project);
   assert.ok(standalone.includes(`data-layout-key="${editorTitle[1]}"`));
   assert.ok(standalone.includes('translate:24px -12px!important'));
@@ -170,8 +171,8 @@ test('Freeform layout persistence is breakpoint-scoped and Undo restores the pre
     state.currentProject = project;
     state.undoStack = [];
     state.redoStack = [];
-    state.setFreeformLayout('E_TEST', 'desktop', { x: 31, y: 14, width: 280, height: 80, scaleX: 1.25, scaleY: 0.75 }, 'Move test');
-    assert.deepEqual(state.currentProject.freeformLayout.desktop.E_TEST, { x: 31, y: 14, width: 280, height: 80, scaleX: 1.25, scaleY: 0.75 });
+    state.setFreeformLayout('E_TEST', 'desktop', { x: 31, y: 14, width: 280, height: 80, scaleX: 1.25, scaleY: 0.75, rotation: 30 }, 'Move test');
+    assert.deepEqual(state.currentProject.freeformLayout.desktop.E_TEST, { x: 31, y: 14, width: 280, height: 80, scaleX: 1.25, scaleY: 0.75, rotation: 30 });
     assert.equal(state.currentProject.freeformLayout.tablet.E_TEST, undefined);
     assert.equal(state.undoStack.length, 1);
     state.undo();
@@ -341,4 +342,18 @@ test('Freeform layer controls persist z-order and lock all destructive transform
   assert.ok(stateSource.includes('setFreeformLocked(layoutKeys = [], locked = true'));
   assert.ok(css.includes('.freeform-selection-box.is-locked'));
   assert.ok(css.includes('.freeform-layerbar'));
+});
+
+test('Freeform rotation persists, supports group orbiting and Shift angle snapping', () => {
+  const appSource = fs.readFileSync(path.resolve(process.cwd(), 'public/js/app.js'), 'utf8');
+  const rendererSource = fs.readFileSync(path.resolve(process.cwd(), 'public/js/components/renderer.js'), 'utf8');
+  assert.ok(appSource.includes('data-freeform-rotate'));
+  assert.ok(appSource.includes('startFreeformRotation(event)'));
+  assert.ok(appSource.includes('if (moveEvent.shiftKey) delta = Math.round(delta / 15) * 15'));
+  assert.ok(appSource.includes('desiredCenter.x - entryCenter.x'));
+  assert.ok(appSource.includes('rotation: baseRotation + delta'));
+  assert.ok(rendererSource.includes('rotate:${Math.round(rotation * 100) / 100}deg!important'));
+  assert.ok(css.includes('.freeform-rotate-handle'));
+  assert.ok(css.includes('body.freeform-rotating'));
+  assert.ok(css.includes('.freeform-selection-label button{pointer-events:auto'));
 });

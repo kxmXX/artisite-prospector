@@ -81,7 +81,8 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - [x] Déplacement phase 2a — drag direct du corps sélectionné avec seuil 5 px, suivi 1:1 sans transition, snapping bords/centres et Alt pour désactiver temporairement l’accroche.
 - [ ] Déplacement phase 2b — débordement contrôlé entre zones/sections et reparenting explicite.
 - [x] Redimensionnement phase 1 — 8 poignées côtés/coins, dimensions min et aperçu direct, persistées à la fin du geste.
-- [ ] Redimensionnement phase 2 — ratio verrouillable, rotation et contraintes de taille avancées.
+- [x] Redimensionnement phase 2a — rotation libre persistante sur élément ou sélection, orbite collective autour du centre et Shift = pas de 15°.
+- [ ] Redimensionnement phase 2b — ratio individuel verrouillable et contraintes de taille avancées.
 - [x] Multi-sélection phase 1 — Shift-clic ajoute/retire des cibles, cadre englobant unique, déplacement souris/clavier et Reset collectifs en une mutation Undo.
 - [x] Multi-sélection phase 2a — marquee par glisser dans le vide, aperçu des cibles touchées, Shift additif et respect des groupes.
 - [ ] Multi-sélection phase 2b — ajout/retrait tactile accessible et auto-scroll de bord pendant le marquee.
@@ -116,6 +117,8 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 7. Noter ici : commit, tests réellement exécutés, anomalies connues et prochaine action unique.
 
 ## Dernière livraison validée
+
+- Lot `4.8.0-alpha.24` : rotation libre persistante, poignée dédiée, Shift 15°, rotation/orbite collective et parité preview/export ; le libellé du cadre laisse désormais passer les clics hors boutons. QA Chrome validé, 38/38 ciblés, 213/213 complets et `git diff --check`.
 
 - Lot `4.8.0-alpha.23` : ordre de calques + verrouillage persistant ; premier plan/arrière-plan/±1 par breakpoint, verrou global Undo-compatible et blocage des transformations. QA Chrome : z-index 0→1, verrouillage bloque drag/clavier, déverrouillage restaure le drag ; 37/37 ciblés, 212/212 complets et `git diff --check`.
 

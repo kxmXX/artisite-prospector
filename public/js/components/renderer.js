@@ -77,6 +77,7 @@ function freeformDeclarations(layout = {}) {
   const z = Number(layout.z);
   const scaleX = Number(layout.scaleX);
   const scaleY = Number(layout.scaleY);
+  const rotation = Number(layout.rotation);
   const declarations = [
     'position:relative!important',
     `translate:${x}px ${y}px!important`,
@@ -87,6 +88,7 @@ function freeformDeclarations(layout = {}) {
   if ((Number.isFinite(scaleX) && scaleX > 0.02) || (Number.isFinite(scaleY) && scaleY > 0.02)) {
     declarations.push(`scale:${Number.isFinite(scaleX) && scaleX > 0.02 ? scaleX : 1} ${Number.isFinite(scaleY) && scaleY > 0.02 ? scaleY : 1}!important`, 'transform-origin:0 0!important');
   }
+  if (Number.isFinite(rotation) && Math.abs(rotation) > 0.001) declarations.push(`rotate:${Math.round(rotation * 100) / 100}deg!important`);
   if (Number.isFinite(z)) declarations.push(`z-index:${Math.max(-10, Math.min(999, Math.round(z)))}!important`);
   return declarations.join(';');
 }
