@@ -67,3 +67,10 @@ test('chaque animation du catalogue est réellement jouable par le rendu', () =>
     .filter((id) => !css.includes('data-motion="' + id + '"') && !css.includes("data-motion='" + id + "'"));
   assert.deepEqual(missing, [], 'animations annoncées mais absentes du rendu');
 });
+
+test('l inspecteur affiche le catalogue au lieu de sa propre liste', () => {
+  const inspector = fs.readFileSync(new URL('../public/js/components/inspector.js', import.meta.url), 'utf8');
+  assert.ok(inspector.includes('MOTION_PRESETS.map'), 'l’inspecteur doit lire le catalogue unique');
+  assert.ok(!inspector.includes("['fade-in', 'Fade']"), 'la liste locale doit avoir disparu');
+  assert.ok(!inspector.includes("'Shimmer'"), 'plus aucun nom anglais brut dans l’interface');
+});

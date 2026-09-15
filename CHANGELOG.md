@@ -7,6 +7,19 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.24) — Lot 7b : l'inspecteur lit le catalogue
+
+- **Première surface branchée** : la liste d'animations de la section dans l'inspecteur ne déclare plus
+  ses dix entrées ni ses noms anglais — elle lit `MOTION_PRESETS`. L'auteur voit donc désormais
+  « Apparition en fondu », « Montée douce », « Rebond »… au lieu de « Fade », « Slide », « Spring ».
+- **Deux animations de plus** deviennent accessibles à cet endroit (« Entrée latérale », « Barre qui se
+  remplit ») : le catalogue vérifié au lot précédent garantit qu'elles sont réellement jouables.
+- **QA** : test ajouté — l'inspecteur doit lire le catalogue et ne plus contenir de nom anglais brut.
+  **348/348 tests**.
+- *Reste (7b)* : les cinq autres surfaces (menu de section du canevas, texte, image, bouton, réglages
+  globaux), l'exposition de la durée, du délai et de la courbe, et les actions tester / rejouer /
+  arrêter / réinitialiser.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.23) — Le catalogue ne promet que du réel
 
 - **Défaut trouvé dans mon propre travail avant de le brancher** : le catalogue livré au lot précédent

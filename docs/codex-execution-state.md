@@ -1480,3 +1480,19 @@ l'exposer vaut mieux que de découvrir l'écart après branchement.
 
 Vérifications : 7 tests sur le catalogue, 347/347 au total. Le catalogue n'est toujours pas branché
 sur les surfaces (lot 7b à faire).
+
+---
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.24 (lot 7b, première surface)
+
+L'inspecteur lit MOTION_PRESETS au lieu de sa liste locale de dix entrées avec noms anglais. Effet
+visible : les libellés passent en français et deux animations jouables de plus sont proposées.
+
+Un test verrouille la bascule : l'inspecteur doit contenir MOTION_PRESETS.map et plus aucun nom anglais
+brut.
+
+Vérifications : 8 tests sur le catalogue, 348/348 au total.
+
+Reste (7b) : les cinq autres surfaces (menu de section du canevas, texte, image, bouton, réglages
+globaux), l'exposition de durée, délai et courbe, et les actions tester / rejouer / arrêter /
+réinitialiser.

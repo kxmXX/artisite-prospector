@@ -11,6 +11,7 @@ import { escapeHtml } from "../utils/html.js";
 import { SECTION_WIDTHS, SECTION_SPACING, SECTION_ALIGN, getSectionLayout } from "../engine/sectionStyle.js";
 import { ELEMENT_PADDING, ELEMENT_RADIUS, ELEMENT_OPACITY, ELEMENT_BACKGROUND, ELEMENT_BORDER, ELEMENT_SHADOW, getElementStyle } from "../engine/elementStyle.js";
 import { ELEMENT_STATES, ELEMENT_STATE_LABELS, getElementState } from "../engine/elementStates.js";
+import { MOTION_PRESETS } from "../data/motionPresets.js";
 
 const ELEMENT_SCALE_ROWS = [
   ["padding", ELEMENT_PADDING],
@@ -166,18 +167,7 @@ export function renderInspector(section, project, state) {
         </div>
 
         <div class="grid grid-cols-4 gap-1">
-          ${[
-            ['none', 'Aucune'],
-            ['fade-in', 'Fade'],
-            ['slide-up', 'Slide'],
-            ['spring', 'Spring'],
-            ['reveal', 'Reveal'],
-            ['stagger', 'Stagger'],
-            ['shimmer', 'Shimmer'],
-            ['pulse', 'Pulse'],
-            ['magnetic', 'Magnetic'],
-            ['zoom-in', 'Zoom']
-          ].map(([preset, label]) => `
+          ${MOTION_PRESETS.map((motion) => [motion.id, motion.label]).map(([preset, label]) => `
             <button type="button"
                     onmouseenter="window.app.previewSectionMotion('${sectionId}', '${preset}')"
                     onclick="window.app.setSectionMotion('${sectionId}', '${preset}')"
