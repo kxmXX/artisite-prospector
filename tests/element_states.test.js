@@ -91,3 +91,11 @@ test('hors style principal, la couleur alimente bien les etats', () => {
   assert.ok(appSource.includes('this._activeTextState = "default"'), 'sortir de l édition revient au style principal');
 });
 
+
+test('l etat actif reste visible quand le menu est ferme', () => {
+  assert.ok(editorSource.includes('id="ftb-state-badge"'),
+    'la barre doit rappeler l état choisi hors du menu');
+  assert.ok(/ftb-state-badge[\s\S]{0,400}classList\.toggle\("hidden"/.test(appSource),
+    'le rappel doit apparaître et disparaître avec l état choisi');
+});
+

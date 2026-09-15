@@ -7,6 +7,15 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.12) — Sécurité d'usage des états
+
+- **Trou de sécurité d'usage corrigé, introduit par le lot précédent** : une fois un état choisi
+  (« Survol », « Focus »…), fermer le menu faisait disparaître toute trace de ce choix. L'auteur
+  pouvait ensuite régler une couleur en croyant modifier le style principal alors qu'il modifiait un
+  survol. La barre d'outils affiche désormais une **pastille d'état** tant que l'état actif n'est pas
+  « Principal ».
+- **QA** : test ajouté (présence du rappel et de sa bascule). **323/323 tests**.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.11) — Lot 5b : les états sont éditables
 
 - **Sélecteur d'état dans le menu couleur du texte** : « Principal · Survol · Focus · Actif ·

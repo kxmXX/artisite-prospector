@@ -1216,3 +1216,18 @@ Vérifications : 322/322 tests ; les 5 tests du modèle (5a) passent inchangés.
 
 Reste (5b, second temps) : aperçu immédiat de l'état sans survol réel, bouton « Revenir au style
 principal » hors du menu, extension des états aux autres propriétés que la couleur.
+
+---
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.12 (sécurité d'usage des états)
+
+Défaut trouvé par relecture du lot précédent, pas par un test : une fois un état choisi dans le menu
+couleur, fermer le menu faisait disparaître toute indication. L'auteur pouvait donc croire régler le
+style principal alors qu'il écrivait dans un état. La barre d'outils porte désormais une pastille
+d'état (fond ambré, libellé français) tant que l'état actif n'est pas « Principal » ; elle disparaît
+avec le retour au principal, y compris en sortant de l'édition.
+
+Vérifications : 323/323 tests.
+
+Reste (5b, second temps) : aperçu immédiat de l'état sans survol réel, bouton « Revenir au style
+principal » hors du menu, extension des états aux autres propriétés que la couleur.

@@ -290,6 +290,7 @@ export function renderEditor(state) {
               <button type="button" id="ftb-color-btn" onclick="window.app.toggleTextColorMenu()" class="ftb-btn text-zinc-300 font-semibold flex items-center gap-1 px-1.5" title="Changer la couleur du texte">
                 <span id="ftb-color-indicator" class="w-2.5 h-2.5 rounded-full border border-white/40 bg-white"></span>
                 <span>Couleur</span>
+                <span id="ftb-state-badge" class="hidden px-1.5 py-0.5 rounded bg-amber-400 text-zinc-950 text-ui-2xs font-bold" title="Les réglages s'appliquent à cet état"></span>
               </button>
               <div id="ftb-color-menu" class="hidden absolute left-0 top-full mt-2 w-52 bg-zinc-900/95 backdrop-blur-md border border-white/20 rounded-xl p-2.5 shadow-2xl z-50 text-white text-ui-sm">
                 <div class="text-ui-2xs font-bold uppercase tracking-wider text-zinc-400 mb-1.5">État modifié</div>

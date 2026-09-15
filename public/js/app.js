@@ -2494,6 +2494,14 @@ export class App {
     document.querySelectorAll("[data-ftb-state]").forEach(button => {
       button.classList.toggle("is-active", button.dataset.ftbState === active);
     });
+    // Tant qu'un état est choisi, la barre doit le rappeler : sans cela, l'auteur
+    // pourrait modifier un survol en croyant régler le style principal.
+    const badge = document.getElementById("ftb-state-badge");
+    if (badge) {
+      const label = active === "default" ? "" : ELEMENT_STATE_LABELS[active];
+      badge.textContent = label;
+      badge.classList.toggle("hidden", !label);
+    }
   }
 
   setActiveTextColor(color) {
