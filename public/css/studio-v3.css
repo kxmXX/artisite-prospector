@@ -624,8 +624,13 @@
 .freeform-selection-label span{overflow:hidden;text-overflow:ellipsis}
 .freeform-selection-label button{border:0;border-radius:4px;background:rgba(255,255,255,.17);color:#fff;padding:3px 5px;font:700 9px/1 sans-serif;cursor:pointer}
 .freeform-selection-label button[hidden]{display:none!important}
-.freeform-selection-box.is-multi .freeform-resize-handle{display:none}
+.freeform-selection-box.is-multi:not(.is-group) .freeform-resize-handle{display:none}
 .freeform-selection-box.is-group{border-style:solid;box-shadow:0 0 0 1px rgba(255,255,255,.9),0 0 0 4px rgba(37,99,235,.14)}
+.freeform-alignbar{position:absolute;left:50%;top:calc(100% + 10px);translate:-50% 0;display:none;align-items:center;gap:3px;padding:4px;border:1px solid rgba(24,32,31,.14);border-radius:8px;background:#fff;color:#334155;box-shadow:0 8px 24px rgba(15,23,42,.16);pointer-events:auto;white-space:nowrap}
+.freeform-selection-box.is-multi .freeform-alignbar{display:flex}
+.freeform-alignbar button{min-width:26px;height:26px;border:0;border-radius:5px;background:transparent;color:#334155;font:700 9px/1 ui-monospace,SFMono-Regular,Menlo,monospace;cursor:pointer}
+.freeform-alignbar button:hover,.freeform-alignbar button:focus-visible{background:#e8eefc;color:#1d4ed8;outline:none}
+.freeform-alignbar span{width:1px;height:16px;background:#d8dee9;margin:0 1px}
 .freeform-move-handle{
   position:absolute;left:50%;top:-15px;translate:-50% -50%;width:30px;height:24px;border:1px solid #1d4ed8;border-radius:7px;
   background:#fff;color:#1d4ed8;display:grid;place-items:center;pointer-events:auto;touch-action:none;cursor:grab;box-shadow:0 3px 10px rgba(15,23,42,.14)

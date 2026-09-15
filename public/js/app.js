@@ -4074,6 +4074,18 @@ export class App {
         </div>
         <button type="button" class="freeform-move-handle" data-freeform-action="move" aria-label="Déplacer la sélection">${getIcon("move", "w-3.5 h-3.5")}</button>
         ${["nw","n","ne","e","se","s","sw","w"].map(handle => `<button type="button" class="freeform-resize-handle freeform-resize-${handle}" data-freeform-action="resize" data-freeform-handle="${handle}" aria-label="Redimensionner ${handle}"></button>`).join("")}
+        <div class="freeform-alignbar" role="toolbar" aria-label="Aligner et distribuer la sélection">
+          <button type="button" data-freeform-align="left" title="Aligner à gauche" aria-label="Aligner à gauche">L</button>
+          <button type="button" data-freeform-align="center" title="Centrer horizontalement" aria-label="Centrer horizontalement">C</button>
+          <button type="button" data-freeform-align="right" title="Aligner à droite" aria-label="Aligner à droite">R</button>
+          <span></span>
+          <button type="button" data-freeform-align="top" title="Aligner en haut" aria-label="Aligner en haut">T</button>
+          <button type="button" data-freeform-align="middle" title="Centrer verticalement" aria-label="Centrer verticalement">M</button>
+          <button type="button" data-freeform-align="bottom" title="Aligner en bas" aria-label="Aligner en bas">B</button>
+          <span></span>
+          <button type="button" data-freeform-distribute="horizontal" title="Distribuer horizontalement" aria-label="Distribuer horizontalement">H↔</button>
+          <button type="button" data-freeform-distribute="vertical" title="Distribuer verticalement" aria-label="Distribuer verticalement">V↕</button>
+        </div>
       `;
       document.body.appendChild(overlay);
       overlay.querySelectorAll("[data-freeform-action]").forEach(handle => {
@@ -4093,6 +4105,20 @@ export class App {
         event.preventDefault();
         event.stopPropagation();
         this.ungroupFreeformSelection();
+      });
+      overlay.querySelectorAll("[data-freeform-align]").forEach(button => {
+        button.addEventListener("click", event => {
+          event.preventDefault();
+          event.stopPropagation();
+          this.alignFreeformSelection(button.dataset.freeformAlign);
+        });
+      });
+      overlay.querySelectorAll("[data-freeform-distribute]").forEach(button => {
+        button.addEventListener("click", event => {
+          event.preventDefault();
+          event.stopPropagation();
+          this.distributeFreeformSelection(button.dataset.freeformDistribute);
+        });
       });
     }
     this._freeformOverlay = overlay;
@@ -4198,10 +4224,19 @@ export class App {
     const label = overlay.querySelector("[data-freeform-label]");
     const labelBar = overlay.querySelector(".freeform-selection-label");
     const moveHandle = overlay.querySelector(".freeform-move-handle");
+    const alignBar = overlay.querySelector(".freeform-alignbar");
     const controlsInside = top < 36;
     const controlsTop = controlsInside ? Math.max(8 - top, 4) : -31;
     if (labelBar) labelBar.style.top = `${controlsTop}px`;
     if (moveHandle) moveHandle.style.top = controlsInside ? `${controlsTop + 42}px` : "-15px";
+    if (alignBar && keys.length > 1) {
+      const toolbarWidth = alignBar.offsetWidth || 276;
+      const desiredLeft = Math.max(8, Math.min(window.innerWidth - toolbarWidth - 8, (left + right - toolbarWidth) / 2));
+      const desiredTop = Math.max(8, Math.min(window.innerHeight - 38, bottom + 10));
+      alignBar.style.left = `${desiredLeft - left}px`;
+      alignBar.style.top = `${desiredTop - top}px`;
+      alignBar.style.translate = "0 0";
+    }
     if (label) label.textContent = keys.length > 1
       ? `${keys.length} éléments · ${Math.round(right - left)}×${Math.round(bottom - top)}`
       : `#${keys[0]} · ${Math.round(right - left)}×${Math.round(bottom - top)}`;
@@ -4226,6 +4261,12 @@ export class App {
     if (Number.isFinite(Number(layout.height)) && Number(layout.height) > 0) {
       target.style.setProperty("height", `${layout.height}px`, "important");
     }
+    const scaleX = Number(layout.scaleX);
+    const scaleY = Number(layout.scaleY);
+    if ((Number.isFinite(scaleX) && scaleX > 0.02) || (Number.isFinite(scaleY) && scaleY > 0.02)) {
+      target.style.setProperty("scale", `${Number.isFinite(scaleX) && scaleX > 0.02 ? scaleX : 1} ${Number.isFinite(scaleY) && scaleY > 0.02 ? scaleY : 1}`, "important");
+      target.style.setProperty("transform-origin", "0 0", "important");
+    }
     if (updateOverlay) this.updateFreeformOverlay();
   }
 
@@ -4240,7 +4281,8 @@ export class App {
     const canvas = document.getElementById("canvas-container");
     const elements = keys.map(key => canvas?.querySelector(`[data-layout-key="${key}"]`)).filter(el => el?.isConnected);
     if (!elements.length || !keys.length) return;
-    if (action === "resize" && keys.length > 1) return;
+    const exactGroup = this.getExactFreeformGroup(keys);
+    if (action === "resize" && keys.length > 1 && !exactGroup) return;
     event.preventDefault();
     event.stopPropagation();
     const entries = keys.map((key, index) => {
@@ -4267,6 +4309,52 @@ export class App {
         liveUpdates = {};
         entries.forEach(entry => {
           const layout = { ...entry.base, x: (Number(entry.base.x) || 0) + dx, y: (Number(entry.base.y) || 0) + dy };
+          liveUpdates[entry.key] = layout;
+          this.applyFreeformLiveStyle(entry.target, layout, false);
+        });
+      } else if (entries.length > 1) {
+        const originalWidth = Math.max(1, selectionRect.right - selectionRect.left);
+        const originalHeight = Math.max(1, selectionRect.bottom - selectionRect.top);
+        let nextLeft = selectionRect.left;
+        let nextTop = selectionRect.top;
+        let nextRight = selectionRect.right;
+        let nextBottom = selectionRect.bottom;
+        const minGroupWidth = 48;
+        const minGroupHeight = 32;
+        if (handle.includes("e")) nextRight = Math.max(nextLeft + minGroupWidth, selectionRect.right + rawDx);
+        if (handle.includes("s")) nextBottom = Math.max(nextTop + minGroupHeight, selectionRect.bottom + rawDy);
+        if (handle.includes("w")) nextLeft = Math.min(nextRight - minGroupWidth, selectionRect.left + rawDx);
+        if (handle.includes("n")) nextTop = Math.min(nextBottom - minGroupHeight, selectionRect.top + rawDy);
+
+        let scaleGroupX = (nextRight - nextLeft) / originalWidth;
+        let scaleGroupY = (nextBottom - nextTop) / originalHeight;
+        if (moveEvent.shiftKey && (handle.includes("e") || handle.includes("w")) && (handle.includes("n") || handle.includes("s"))) {
+          const uniform = Math.abs(scaleGroupX - 1) >= Math.abs(scaleGroupY - 1) ? scaleGroupX : scaleGroupY;
+          scaleGroupX = uniform;
+          scaleGroupY = uniform;
+          const nextWidth = originalWidth * uniform;
+          const nextHeight = originalHeight * uniform;
+          if (handle.includes("w")) nextLeft = selectionRect.right - nextWidth;
+          else nextRight = selectionRect.left + nextWidth;
+          if (handle.includes("n")) nextTop = selectionRect.bottom - nextHeight;
+          else nextBottom = selectionRect.top + nextHeight;
+        }
+
+        liveUpdates = {};
+        entries.forEach(entry => {
+          const relativeLeft = entry.rect.left - selectionRect.left;
+          const relativeTop = entry.rect.top - selectionRect.top;
+          const desiredLeft = nextLeft + relativeLeft * scaleGroupX;
+          const desiredTop = nextTop + relativeTop * scaleGroupY;
+          const baseScaleX = Number(entry.base.scaleX) > 0 ? Number(entry.base.scaleX) : 1;
+          const baseScaleY = Number(entry.base.scaleY) > 0 ? Number(entry.base.scaleY) : 1;
+          const layout = {
+            ...entry.base,
+            x: (Number(entry.base.x) || 0) + (desiredLeft - entry.rect.left),
+            y: (Number(entry.base.y) || 0) + (desiredTop - entry.rect.top),
+            scaleX: baseScaleX * scaleGroupX,
+            scaleY: baseScaleY * scaleGroupY
+          };
           liveUpdates[entry.key] = layout;
           this.applyFreeformLiveStyle(entry.target, layout, false);
         });
@@ -4303,7 +4391,7 @@ export class App {
       this._freeformOverlay?.classList.remove("is-transforming");
       state.setFreeformLayouts(liveUpdates, state.viewport, action === "move"
         ? (keys.length > 1 ? "Déplacement sélection libre" : "Déplacement élément libre")
-        : "Redimensionnement élément libre");
+        : (keys.length > 1 ? "Redimensionnement groupe libre" : "Redimensionnement élément libre"));
     };
     window.addEventListener("pointermove", onMove);
     window.addEventListener("pointerup", onUp, { once: true });
@@ -4318,6 +4406,72 @@ export class App {
       updates[key] = { ...current, x: (Number(current.x) || 0) + dx, y: (Number(current.y) || 0) + dy };
     });
     state.setFreeformLayouts(updates, state.viewport, keys.length > 1 ? "Déplacement clavier sélection libre" : "Déplacement clavier élément libre");
+  }
+
+  alignFreeformSelection(mode = "left") {
+    const keys = this.getFreeformSelectedKeys();
+    const canvas = document.getElementById("canvas-container");
+    if (!canvas || keys.length < 2) return;
+    const entries = keys.map(key => {
+      const element = canvas.querySelector(`[data-layout-key="${key}"]`);
+      return element ? { key, element, rect: element.getBoundingClientRect(), layout: { ...this.getFreeformLayout(key, state.viewport) } } : null;
+    }).filter(Boolean);
+    if (entries.length < 2) return;
+    const bounds = {
+      left: Math.min(...entries.map(entry => entry.rect.left)),
+      top: Math.min(...entries.map(entry => entry.rect.top)),
+      right: Math.max(...entries.map(entry => entry.rect.right)),
+      bottom: Math.max(...entries.map(entry => entry.rect.bottom))
+    };
+    const centerX = (bounds.left + bounds.right) / 2;
+    const centerY = (bounds.top + bounds.bottom) / 2;
+    const updates = {};
+    entries.forEach(entry => {
+      let dx = 0;
+      let dy = 0;
+      if (mode === "left") dx = bounds.left - entry.rect.left;
+      else if (mode === "center") dx = centerX - (entry.rect.left + entry.rect.width / 2);
+      else if (mode === "right") dx = bounds.right - entry.rect.right;
+      else if (mode === "top") dy = bounds.top - entry.rect.top;
+      else if (mode === "middle") dy = centerY - (entry.rect.top + entry.rect.height / 2);
+      else if (mode === "bottom") dy = bounds.bottom - entry.rect.bottom;
+      updates[entry.key] = {
+        ...entry.layout,
+        x: (Number(entry.layout.x) || 0) + dx,
+        y: (Number(entry.layout.y) || 0) + dy
+      };
+    });
+    state.setFreeformLayouts(updates, state.viewport, `Alignement ${mode}`);
+  }
+
+  distributeFreeformSelection(axis = "horizontal") {
+    const keys = this.getFreeformSelectedKeys();
+    const canvas = document.getElementById("canvas-container");
+    if (!canvas || keys.length < 3) return;
+    const entries = keys.map(key => {
+      const element = canvas.querySelector(`[data-layout-key="${key}"]`);
+      return element ? { key, element, rect: element.getBoundingClientRect(), layout: { ...this.getFreeformLayout(key, state.viewport) } } : null;
+    }).filter(Boolean);
+    if (entries.length < 3) return;
+    const horizontal = axis === "horizontal";
+    entries.sort((a, b) => horizontal ? a.rect.left - b.rect.left : a.rect.top - b.rect.top);
+    const firstStart = horizontal ? entries[0].rect.left : entries[0].rect.top;
+    const lastEnd = horizontal ? entries.at(-1).rect.right : entries.at(-1).rect.bottom;
+    const totalSize = entries.reduce((sum, entry) => sum + (horizontal ? entry.rect.width : entry.rect.height), 0);
+    const gap = (lastEnd - firstStart - totalSize) / (entries.length - 1);
+    const updates = {};
+    let cursor = firstStart;
+    entries.forEach(entry => {
+      const currentStart = horizontal ? entry.rect.left : entry.rect.top;
+      const delta = cursor - currentStart;
+      updates[entry.key] = {
+        ...entry.layout,
+        x: (Number(entry.layout.x) || 0) + (horizontal ? delta : 0),
+        y: (Number(entry.layout.y) || 0) + (horizontal ? 0 : delta)
+      };
+      cursor += (horizontal ? entry.rect.width : entry.rect.height) + gap;
+    });
+    state.setFreeformLayouts(updates, state.viewport, horizontal ? "Distribution horizontale" : "Distribution verticale");
   }
 
   resetFreeformSelection() {

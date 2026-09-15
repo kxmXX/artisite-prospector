@@ -139,7 +139,7 @@ test('Freeform foundation keeps stable layout keys across editor/public render a
   assert.equal(publicTitle?.[1], editorTitle[1], 'public render must keep the exact same layout key');
 
   project.freeformLayout = {
-    desktop: { [editorTitle[1]]: { x: 24, y: -12, width: 420, height: 96, z: 3 } },
+    desktop: { [editorTitle[1]]: { x: 24, y: -12, width: 420, height: 96, z: 3, scaleX: 1.2, scaleY: 0.8 } },
     tablet: { [editorTitle[1]]: { x: 8, y: 4, width: 360 } },
     mobile: { [editorTitle[1]]: { x: 0, y: 6, width: 310 } }
   };
@@ -151,6 +151,7 @@ test('Freeform foundation keeps stable layout keys across editor/public render a
   assert.ok(cssOut.includes('#canvas-container[data-viewport="mobile"] .artisite-root.public-mode'));
   assert.ok(cssOut.includes('translate:24px -12px!important'));
   assert.ok(cssOut.includes('width:420px!important'));
+  assert.ok(cssOut.includes('scale:1.2 0.8!important'));
   const standalone = exportStandaloneHTML(project);
   assert.ok(standalone.includes(`data-layout-key="${editorTitle[1]}"`));
   assert.ok(standalone.includes('translate:24px -12px!important'));
@@ -169,8 +170,8 @@ test('Freeform layout persistence is breakpoint-scoped and Undo restores the pre
     state.currentProject = project;
     state.undoStack = [];
     state.redoStack = [];
-    state.setFreeformLayout('E_TEST', 'desktop', { x: 31, y: 14, width: 280, height: 80 }, 'Move test');
-    assert.deepEqual(state.currentProject.freeformLayout.desktop.E_TEST, { x: 31, y: 14, width: 280, height: 80 });
+    state.setFreeformLayout('E_TEST', 'desktop', { x: 31, y: 14, width: 280, height: 80, scaleX: 1.25, scaleY: 0.75 }, 'Move test');
+    assert.deepEqual(state.currentProject.freeformLayout.desktop.E_TEST, { x: 31, y: 14, width: 280, height: 80, scaleX: 1.25, scaleY: 0.75 });
     assert.equal(state.currentProject.freeformLayout.tablet.E_TEST, undefined);
     assert.equal(state.undoStack.length, 1);
     state.undo();
@@ -238,5 +239,18 @@ test('Freeform multi-select exposes Shift selection, group controls and collecti
   assert.ok(appSource.includes('state.deleteFreeformGroup(group.id'));
   assert.ok(appSource.includes('state.setFreeformLayouts(liveUpdates'));
   assert.ok(appSource.includes('keys.length > 1 ? "Déplacement sélection libre"'));
-  assert.ok(css.includes('.freeform-selection-box.is-multi .freeform-resize-handle{display:none}'));
+  assert.ok(css.includes('.freeform-selection-box.is-multi:not(.is-group) .freeform-resize-handle{display:none}'));
+});
+
+test('Freeform grouped resize uses non-reflow scale and alignment/distribution stay batched', () => {
+  const appSource = fs.readFileSync(path.resolve(process.cwd(), 'public/js/app.js'), 'utf8');
+  const rendererSource = fs.readFileSync(path.resolve(process.cwd(), 'public/js/components/renderer.js'), 'utf8');
+  assert.ok(appSource.includes('baseScaleX * scaleGroupX'));
+  assert.ok(appSource.includes('baseScaleY * scaleGroupY'));
+  assert.ok(appSource.includes('moveEvent.shiftKey'));
+  assert.ok(appSource.includes('alignFreeformSelection(mode = "left")'));
+  assert.ok(appSource.includes('distributeFreeformSelection(axis = "horizontal")'));
+  assert.ok(appSource.includes('state.setFreeformLayouts(updates, state.viewport, `Alignement ${mode}`)'));
+  assert.ok(rendererSource.includes('scale:${Number.isFinite(scaleX)'));
+  assert.ok(css.includes('.freeform-selection-box.is-multi .freeform-alignbar{display:flex}'));
 });

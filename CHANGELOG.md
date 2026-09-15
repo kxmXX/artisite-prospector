@@ -7,6 +7,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 15 septembre 2026 (4.8.0-alpha.19)
+
+- Groupes : le cadre d’un groupe possède de nouveau ses huit poignées ; le resize met à l’échelle les membres autour de leur position relative sans provoquer de reflow de la section.
+- Ratio : Shift sur une poignée d’angle applique une mise à l’échelle uniforme du groupe ; `scaleX/scaleY` est persisté par breakpoint et réinjecté en preview/export.
+- Alignement : gauche/centre/droite/haut/milieu/bas et distribution horizontale/verticale sont disponibles sur toute multi-sélection et passent par une seule mutation Undo.
+- QA navigateur : groupe À propos `282,03 → 362,03 px`, `scaleX=1.2837` conservé après reload ; distribution V `20/69 → 44,5/44,5` et H `128/68 → 98/98`, zéro erreur console. Validation : 24/24 ciblés, 199/199 complets et `git diff --check`.
+
 ### Consolidation — 15 septembre 2026 (4.8.0-alpha.18)
 
 - Canva/Figma : Shift-clic multi-sélection avec cadre englobant et actions adaptées à plusieurs éléments.

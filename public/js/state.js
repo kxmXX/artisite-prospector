@@ -390,9 +390,13 @@ class AppStateManager {
     const width = Number(nextLayout.width);
     const height = Number(nextLayout.height);
     const z = Number(nextLayout.z);
+    const scaleX = Number(nextLayout.scaleX);
+    const scaleY = Number(nextLayout.scaleY);
     if (Number.isFinite(width) && width > 0) normalized.width = Math.round(width * 100) / 100;
     if (Number.isFinite(height) && height > 0) normalized.height = Math.round(height * 100) / 100;
     if (Number.isFinite(z)) normalized.z = Math.max(-10, Math.min(999, Math.round(z)));
+    if (Number.isFinite(scaleX) && scaleX > 0.02) normalized.scaleX = Math.round(scaleX * 10000) / 10000;
+    if (Number.isFinite(scaleY) && scaleY > 0.02) normalized.scaleY = Math.round(scaleY * 10000) / 10000;
 
     const current = this.currentProject.freeformLayout?.[safeViewport]?.[layoutKey] || null;
     if (JSON.stringify(current) === JSON.stringify(normalized)) return;
@@ -433,9 +437,13 @@ class AppStateManager {
       const width = Number(nextLayout.width);
       const height = Number(nextLayout.height);
       const z = Number(nextLayout.z);
+      const scaleX = Number(nextLayout.scaleX);
+      const scaleY = Number(nextLayout.scaleY);
       if (Number.isFinite(width) && width > 0) normalized.width = Math.round(width * 100) / 100;
       if (Number.isFinite(height) && height > 0) normalized.height = Math.round(height * 100) / 100;
       if (Number.isFinite(z)) normalized.z = Math.max(-10, Math.min(999, Math.round(z)));
+      if (Number.isFinite(scaleX) && scaleX > 0.02) normalized.scaleX = Math.round(scaleX * 10000) / 10000;
+      if (Number.isFinite(scaleY) && scaleY > 0.02) normalized.scaleY = Math.round(scaleY * 10000) / 10000;
       return normalized;
     };
     const normalizedEntries = entries.map(([key, value]) => [key, normalize(value)]);

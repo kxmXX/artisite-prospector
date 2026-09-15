@@ -82,10 +82,12 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - [x] Redimensionnement phase 1 — 8 poignées côtés/coins, dimensions min et aperçu direct, persistées à la fin du geste.
 - [ ] Redimensionnement phase 2 — ratio verrouillable, rotation et contraintes de taille avancées.
 - [x] Multi-sélection phase 1 — Shift-clic ajoute/retire des cibles, cadre englobant unique, déplacement souris/clavier et Reset collectifs en une mutation Undo.
-- [ ] Multi-sélection phase 2 — cadre de sélection par glisser dans le vide et redimensionnement collectif.
+- [ ] Multi-sélection phase 2 — cadre de sélection par glisser dans le vide (marquee) et ajout/retrait tactile accessible.
 - [x] Groupes phase 1 — Grouper/Dégrouper persistant, clic sur un membre resélectionne le groupe, déplacement collectif sans perdre les géométries individuelles.
-- [ ] Groupes phase 2 — redimensionnement du groupe, groupes imbriqués et ordre/z-index contrôlable.
-- [ ] Alignement — aligner gauche/centre/droite/haut/milieu/bas, distribuer horizontalement/verticalement et afficher guides intelligents.
+- [x] Groupes phase 2a — redimensionnement collectif persistant par scale autour du cadre, ratio uniforme avec Shift et Undo batch unique.
+- [ ] Groupes phase 2b — groupes imbriqués et ordre/z-index contrôlable.
+- [x] Alignement phase 1 — gauche/centre/droite/haut/milieu/bas et distribution horizontale/verticale en mutation batch.
+- [ ] Alignement phase 2 — guides intelligents et snapping pendant le drag/resize.
 - [x] Responsive phase 1 — positions/dimensions isolées par desktop/tablette/mobile ; le viewport simulé gagne sur la taille réelle du navigateur.
 - [ ] Responsive phase 2 — héritage/adaptation assistée et commandes de copie/reset entre breakpoints.
 - [x] Persistance phase 1 — transformations enregistrées dans l’état projet, sauvegarde locale, Undo/Redo, preview et export standalone.
@@ -126,5 +128,6 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - Lot `4.8.0-alpha.16` : chemins d’images imbriquées corrigés, modales V3 bornées au viewport et focus d’ouverture fiabilisé ; validation navigateur 1440/1024/390, 9/9 ciblés, 193/193 complets.
 - Lot `4.8.0-alpha.17` : fondation Canva/Figma — clés de layout stables, sélection texte/image/CTA, Move + 8 poignées de resize, clavier/Reset/Undo et layouts distincts desktop/tablette/mobile avec parité preview/export ; 37/37 ciblés, 196/196 complets et `git diff --check`.
 - Lot `4.8.0-alpha.18` : Shift multi-sélection, cadre englobant, groupes persistants Grouper/Dégrouper, déplacement/Reset collectifs et batch Undo unique ; barre d’actions maintenue dans le viewport ; 23/23 ciblés, 198/198 complets et `git diff --check`.
+- Lot `4.8.0-alpha.19` : resize collectif de groupe par scale persistant, Shift ratio, alignements 6 axes et distributions H/V ; QA navigateur avec reload/persistance ; 24/24 ciblés, 199/199 complets et `git diff --check`.
 - Prochaine action unique : redimensionnement collectif des groupes puis alignement/distribution dans un commit séparé.
 - Prochaine action unique : démarrer la fondation Canva/Figma — modèle de layout libre persistant + sélection universelle + premier déplacement/redimensionnement sur cibles stables, avant multi-sélection/groupes.

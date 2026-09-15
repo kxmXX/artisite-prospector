@@ -1,5 +1,14 @@
 # État de reprise Codex — 15 septembre 2026
 
+## LOT DE LIVRAISON — resize groupe et alignement 4.8.0-alpha.19
+
+- Resize groupe : une sélection groupée expose les huit poignées ; la transformation conserve le layout naturel et applique `scaleX/scaleY` autour de l'origine de chaque membre, avec déplacement relatif du membre quand le bord nord/ouest bouge.
+- Ratio : Shift sur une poignée d'angle verrouille une échelle uniforme ; les facteurs sont normalisés dans `state.js`, sauvegardés par breakpoint et rendus par le CSS libre jusque dans l'export.
+- Alignement : six commandes d'alignement et deux distributions H/V sont batchées via `setFreeformLayouts`, donc une opération = un point Undo.
+- Validation navigateur : groupe À propos élargi de +80 px (`282,03 → 362,03`), `scaleX=1.2837` sur les deux membres après reload ; distribution verticale ramenée à deux gaps de 44,5 px et horizontale à deux gaps de 98 px, sans erreur console.
+- Tests : 24/24 ciblés (`state` + `v3_ui_regressions`), 199/199 complets et `git diff --check`.
+- Prochaine action : drag direct du corps sélectionné + guides/snapping, puis marquee de multi-sélection.
+
 ## LOT DE LIVRAISON — multi-sélection et groupes 4.8.0-alpha.18
 
 - Sélection : Shift-clic ajoute/retire une cible et le cadre libre devient l’union visuelle de la sélection ; les poignées de resize individuel sont masquées tant que plusieurs éléments sont sélectionnés.

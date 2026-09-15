@@ -69,6 +69,8 @@ function freeformDeclarations(layout = {}) {
   const width = Number(layout.width);
   const height = Number(layout.height);
   const z = Number(layout.z);
+  const scaleX = Number(layout.scaleX);
+  const scaleY = Number(layout.scaleY);
   const declarations = [
     'position:relative!important',
     `translate:${x}px ${y}px!important`,
@@ -76,6 +78,9 @@ function freeformDeclarations(layout = {}) {
   ];
   if (Number.isFinite(width) && width > 0) declarations.push(`width:${Math.round(width * 100) / 100}px!important`, 'max-width:none!important');
   if (Number.isFinite(height) && height > 0) declarations.push(`height:${Math.round(height * 100) / 100}px!important`);
+  if ((Number.isFinite(scaleX) && scaleX > 0.02) || (Number.isFinite(scaleY) && scaleY > 0.02)) {
+    declarations.push(`scale:${Number.isFinite(scaleX) && scaleX > 0.02 ? scaleX : 1} ${Number.isFinite(scaleY) && scaleY > 0.02 ? scaleY : 1}!important`, 'transform-origin:0 0!important');
+  }
   if (Number.isFinite(z)) declarations.push(`z-index:${Math.max(-10, Math.min(999, Math.round(z)))}!important`);
   return declarations.join(';');
 }
