@@ -4066,8 +4066,13 @@ export class App {
       overlay.className = "freeform-selection-box";
       overlay.setAttribute("aria-hidden", "true");
       overlay.innerHTML = `
-        <div class="freeform-selection-label"><span data-freeform-label>Élément</span><button type="button" data-freeform-reset title="Réinitialiser position et taille">Reset</button></div>
-        <button type="button" class="freeform-move-handle" data-freeform-action="move" aria-label="Déplacer l'élément">${getIcon("move", "w-3.5 h-3.5")}</button>
+        <div class="freeform-selection-label">
+          <span data-freeform-label>Élément</span>
+          <button type="button" data-freeform-group title="Grouper la sélection">Grouper</button>
+          <button type="button" data-freeform-ungroup title="Dégrouper la sélection">Dégrouper</button>
+          <button type="button" data-freeform-reset title="Réinitialiser position et taille">Reset</button>
+        </div>
+        <button type="button" class="freeform-move-handle" data-freeform-action="move" aria-label="Déplacer la sélection">${getIcon("move", "w-3.5 h-3.5")}</button>
         ${["nw","n","ne","e","se","s","sw","w"].map(handle => `<button type="button" class="freeform-resize-handle freeform-resize-${handle}" data-freeform-action="resize" data-freeform-handle="${handle}" aria-label="Redimensionner ${handle}"></button>`).join("")}
       `;
       document.body.appendChild(overlay);
@@ -4077,68 +4082,140 @@ export class App {
       overlay.querySelector("[data-freeform-reset]")?.addEventListener("click", event => {
         event.preventDefault();
         event.stopPropagation();
-        if (!this._freeformSelectedKey) return;
-        state.clearFreeformLayout(this._freeformSelectedKey, state.viewport, "Réinitialisation élément libre");
+        this.resetFreeformSelection();
+      });
+      overlay.querySelector("[data-freeform-group]")?.addEventListener("click", event => {
+        event.preventDefault();
+        event.stopPropagation();
+        this.groupFreeformSelection();
+      });
+      overlay.querySelector("[data-freeform-ungroup]")?.addEventListener("click", event => {
+        event.preventDefault();
+        event.stopPropagation();
+        this.ungroupFreeformSelection();
       });
     }
     this._freeformOverlay = overlay;
     return overlay;
   }
 
-  selectFreeformTarget(target) {
-    if (!target || !target.dataset?.layoutKey) return;
-    this._freeformSelectedKey = target.dataset.layoutKey;
-    this._freeformSelectedElement = target;
+  getFreeformSelectedKeys() {
+    const keys = Array.isArray(this._freeformSelectedKeys) ? this._freeformSelectedKeys.filter(Boolean) : [];
+    if (keys.length) return [...new Set(keys)];
+    return this._freeformSelectedKey ? [this._freeformSelectedKey] : [];
+  }
+
+  getFreeformGroupForKey(layoutKey) {
+    if (!layoutKey) return null;
+    return Object.values(state.currentProject?.freeformGroups || {}).find(group => Array.isArray(group?.members) && group.members.includes(layoutKey)) || null;
+  }
+
+  getExactFreeformGroup(layoutKeys = this.getFreeformSelectedKeys()) {
+    const keys = [...new Set(layoutKeys.filter(Boolean))].sort();
+    if (keys.length < 2) return null;
+    return Object.values(state.currentProject?.freeformGroups || {}).find(group => {
+      const members = Array.isArray(group?.members) ? [...new Set(group.members)].sort() : [];
+      return members.length === keys.length && members.every((key, index) => key === keys[index]);
+    }) || null;
+  }
+
+  selectFreeformKeys(layoutKeys = [], primaryKey = null) {
+    const canvas = document.getElementById("canvas-container");
+    if (!canvas) return;
+    const keys = [...new Set(layoutKeys.filter(Boolean))].filter(key => canvas.querySelector(`[data-layout-key="${key}"]`));
+    if (!keys.length) {
+      this.clearFreeformSelection();
+      return;
+    }
+    this._freeformSelectedKeys = keys;
+    this._freeformSelectedKey = primaryKey && keys.includes(primaryKey) ? primaryKey : keys[0];
+    this._freeformSelectedElement = canvas.querySelector(`[data-layout-key="${this._freeformSelectedKey}"]`);
+    document.querySelectorAll("#canvas-container [data-layout-key].is-freeform-selected").forEach(el => el.classList.remove("is-freeform-selected"));
+    keys.forEach(key => canvas.querySelector(`[data-layout-key="${key}"]`)?.classList.add("is-freeform-selected"));
     const overlay = this.ensureFreeformOverlay();
     overlay.classList.add("is-visible");
     overlay.setAttribute("aria-hidden", "false");
-    target.classList.add("is-freeform-selected");
-    document.querySelectorAll("#canvas-container [data-layout-key].is-freeform-selected").forEach(el => {
-      if (el !== target) el.classList.remove("is-freeform-selected");
-    });
     this.updateFreeformOverlay();
   }
 
+  selectFreeformTarget(target, options = {}) {
+    if (!target || !target.dataset?.layoutKey) return;
+    const key = target.dataset.layoutKey;
+    if (options.additive) {
+      const current = this.getFreeformSelectedKeys();
+      const next = current.includes(key) ? current.filter(item => item !== key) : [...current, key];
+      this.selectFreeformKeys(next, key);
+      return;
+    }
+    const group = options.ignoreGroup ? null : this.getFreeformGroupForKey(key);
+    this.selectFreeformKeys(group?.members?.length ? group.members : [key], key);
+  }
+
   clearFreeformSelection() {
-    this._freeformSelectedElement?.classList?.remove("is-freeform-selected");
+    document.querySelectorAll("#canvas-container [data-layout-key].is-freeform-selected").forEach(el => el.classList.remove("is-freeform-selected"));
+    this._freeformSelectedElements = [];
+    this._freeformSelectedKeys = [];
     this._freeformSelectedElement = null;
     this._freeformSelectedKey = null;
     if (this._freeformOverlay) {
-      this._freeformOverlay.classList.remove("is-visible");
+      this._freeformOverlay.classList.remove("is-visible", "is-multi", "is-group");
       this._freeformOverlay.setAttribute("aria-hidden", "true");
     }
   }
 
   updateFreeformOverlay() {
     const overlay = this._freeformOverlay;
-    let target = this._freeformSelectedElement;
-    if ((!target || !target.isConnected) && this._freeformSelectedKey) {
-      target = document.querySelector(`#canvas-container [data-layout-key="${this._freeformSelectedKey}"]`);
-      this._freeformSelectedElement = target || null;
-    }
-    if (!overlay || !target?.isConnected || state.editorMode === "preview") {
+    const canvas = document.getElementById("canvas-container");
+    const keys = this.getFreeformSelectedKeys();
+    if (!overlay || !canvas || !keys.length || state.editorMode === "preview") {
       overlay?.classList.remove("is-visible");
       return;
     }
-    const rect = target.getBoundingClientRect();
-    if (!rect.width || !rect.height) {
+    const elements = keys.map(key => canvas.querySelector(`[data-layout-key="${key}"]`)).filter(el => el?.isConnected);
+    if (!elements.length) {
       overlay.classList.remove("is-visible");
       return;
     }
-    overlay.style.left = `${rect.left}px`;
-    overlay.style.top = `${rect.top}px`;
-    overlay.style.width = `${rect.width}px`;
-    overlay.style.height = `${rect.height}px`;
+    this._freeformSelectedElements = elements;
+    this._freeformSelectedElement = canvas.querySelector(`[data-layout-key="${this._freeformSelectedKey}"]`) || elements[0];
+    const rects = elements.map(el => el.getBoundingClientRect()).filter(rect => rect.width > 0 && rect.height > 0);
+    if (!rects.length) {
+      overlay.classList.remove("is-visible");
+      return;
+    }
+    const left = Math.min(...rects.map(rect => rect.left));
+    const top = Math.min(...rects.map(rect => rect.top));
+    const right = Math.max(...rects.map(rect => rect.right));
+    const bottom = Math.max(...rects.map(rect => rect.bottom));
+    overlay.style.left = `${left}px`;
+    overlay.style.top = `${top}px`;
+    overlay.style.width = `${right - left}px`;
+    overlay.style.height = `${bottom - top}px`;
     overlay.classList.add("is-visible");
+    overlay.classList.toggle("is-multi", keys.length > 1);
+    const exactGroup = this.getExactFreeformGroup(keys);
+    overlay.classList.toggle("is-group", Boolean(exactGroup));
     const label = overlay.querySelector("[data-freeform-label]");
-    if (label) label.textContent = `#${this._freeformSelectedKey} · ${Math.round(rect.width)}×${Math.round(rect.height)}`;
+    const labelBar = overlay.querySelector(".freeform-selection-label");
+    const moveHandle = overlay.querySelector(".freeform-move-handle");
+    const controlsInside = top < 36;
+    const controlsTop = controlsInside ? Math.max(8 - top, 4) : -31;
+    if (labelBar) labelBar.style.top = `${controlsTop}px`;
+    if (moveHandle) moveHandle.style.top = controlsInside ? `${controlsTop + 42}px` : "-15px";
+    if (label) label.textContent = keys.length > 1
+      ? `${keys.length} éléments · ${Math.round(right - left)}×${Math.round(bottom - top)}`
+      : `#${keys[0]} · ${Math.round(right - left)}×${Math.round(bottom - top)}`;
+    const groupButton = overlay.querySelector("[data-freeform-group]");
+    const ungroupButton = overlay.querySelector("[data-freeform-ungroup]");
+    if (groupButton) groupButton.hidden = keys.length < 2 || Boolean(exactGroup);
+    if (ungroupButton) ungroupButton.hidden = !exactGroup;
   }
 
   getFreeformLayout(layoutKey = this._freeformSelectedKey, viewport = state.viewport) {
     return state.currentProject?.freeformLayout?.[viewport]?.[layoutKey] || { x: 0, y: 0 };
   }
 
-  applyFreeformLiveStyle(target, layout) {
+  applyFreeformLiveStyle(target, layout, updateOverlay = true) {
     if (!target || !layout) return;
     target.style.setProperty("position", "relative", "important");
     target.style.setProperty("translate", `${Number(layout.x) || 0}px ${Number(layout.y) || 0}px`, "important");
@@ -4149,42 +4226,60 @@ export class App {
     if (Number.isFinite(Number(layout.height)) && Number(layout.height) > 0) {
       target.style.setProperty("height", `${layout.height}px`, "important");
     }
-    this.updateFreeformOverlay();
+    if (updateOverlay) this.updateFreeformOverlay();
+  }
+
+  getFreeformSelectionBoundary(elements = []) {
+    const canvasRect = document.getElementById("canvas-container")?.getBoundingClientRect();
+    const sections = [...new Set(elements.map(el => el.closest(".editor-section-wrapper")).filter(Boolean))];
+    return sections.length === 1 ? sections[0].getBoundingClientRect() : canvasRect;
   }
 
   startFreeformInteraction(event, action = "move", handle = "") {
-    const target = this._freeformSelectedElement;
-    const key = this._freeformSelectedKey;
-    if (!target?.isConnected || !key) return;
+    const keys = this.getFreeformSelectedKeys();
+    const canvas = document.getElementById("canvas-container");
+    const elements = keys.map(key => canvas?.querySelector(`[data-layout-key="${key}"]`)).filter(el => el?.isConnected);
+    if (!elements.length || !keys.length) return;
+    if (action === "resize" && keys.length > 1) return;
     event.preventDefault();
     event.stopPropagation();
-    const base = { ...this.getFreeformLayout(key, state.viewport) };
-    const rect = target.getBoundingClientRect();
-    const sectionRect = target.closest(".editor-section-wrapper")?.getBoundingClientRect() || document.getElementById("canvas-container")?.getBoundingClientRect() || rect;
+    const entries = keys.map((key, index) => {
+      const target = elements[index];
+      return { key, target, base: { ...this.getFreeformLayout(key, state.viewport) }, rect: target.getBoundingClientRect() };
+    }).filter(entry => entry.target);
     const start = { x: event.clientX, y: event.clientY };
-    const baseWidth = Number(base.width) > 0 ? Number(base.width) : rect.width;
-    const baseHeight = Number(base.height) > 0 ? Number(base.height) : rect.height;
-    let live = { ...base, x: Number(base.x) || 0, y: Number(base.y) || 0 };
+    const selectionRect = {
+      left: Math.min(...entries.map(entry => entry.rect.left)),
+      top: Math.min(...entries.map(entry => entry.rect.top)),
+      right: Math.max(...entries.map(entry => entry.rect.right)),
+      bottom: Math.max(...entries.map(entry => entry.rect.bottom))
+    };
+    const boundary = this.getFreeformSelectionBoundary(entries.map(entry => entry.target)) || selectionRect;
+    let liveUpdates = Object.fromEntries(entries.map(entry => [entry.key, { ...entry.base, x: Number(entry.base.x) || 0, y: Number(entry.base.y) || 0 }]));
     this._freeformOverlay?.classList.add("is-transforming");
 
     const onMove = moveEvent => {
       const rawDx = moveEvent.clientX - start.x;
       const rawDy = moveEvent.clientY - start.y;
       if (action === "move") {
-        const minDx = sectionRect.left - rect.left;
-        const maxDx = sectionRect.right - rect.right;
-        const minDy = sectionRect.top - rect.top;
-        const maxDy = sectionRect.bottom - rect.bottom;
-        const dx = Math.max(minDx, Math.min(maxDx, rawDx));
-        const dy = Math.max(minDy, Math.min(maxDy, rawDy));
-        live = { ...base, x: (Number(base.x) || 0) + dx, y: (Number(base.y) || 0) + dy };
+        const dx = Math.max(boundary.left - selectionRect.left, Math.min(boundary.right - selectionRect.right, rawDx));
+        const dy = Math.max(boundary.top - selectionRect.top, Math.min(boundary.bottom - selectionRect.bottom, rawDy));
+        liveUpdates = {};
+        entries.forEach(entry => {
+          const layout = { ...entry.base, x: (Number(entry.base.x) || 0) + dx, y: (Number(entry.base.y) || 0) + dy };
+          liveUpdates[entry.key] = layout;
+          this.applyFreeformLiveStyle(entry.target, layout, false);
+        });
       } else {
+        const entry = entries[0];
+        const baseWidth = Number(entry.base.width) > 0 ? Number(entry.base.width) : entry.rect.width;
+        const baseHeight = Number(entry.base.height) > 0 ? Number(entry.base.height) : entry.rect.height;
         const minW = 24;
         const minH = 16;
         let width = baseWidth;
         let height = baseHeight;
-        let x = Number(base.x) || 0;
-        let y = Number(base.y) || 0;
+        let x = Number(entry.base.x) || 0;
+        let y = Number(entry.base.y) || 0;
         if (handle.includes("e")) width = Math.max(minW, baseWidth + rawDx);
         if (handle.includes("s")) height = Math.max(minH, baseHeight + rawDy);
         if (handle.includes("w")) {
@@ -4197,28 +4292,58 @@ export class App {
           y += baseHeight - next;
           height = next;
         }
-        live = { ...base, x, y, width, height };
+        liveUpdates = { [entry.key]: { ...entry.base, x, y, width, height } };
+        this.applyFreeformLiveStyle(entry.target, liveUpdates[entry.key], false);
       }
-      this.applyFreeformLiveStyle(target, live);
+      this.updateFreeformOverlay();
     };
     const onUp = () => {
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
       this._freeformOverlay?.classList.remove("is-transforming");
-      state.setFreeformLayout(key, state.viewport, live, action === "move" ? "Déplacement élément libre" : "Redimensionnement élément libre");
+      state.setFreeformLayouts(liveUpdates, state.viewport, action === "move"
+        ? (keys.length > 1 ? "Déplacement sélection libre" : "Déplacement élément libre")
+        : "Redimensionnement élément libre");
     };
     window.addEventListener("pointermove", onMove);
     window.addEventListener("pointerup", onUp, { once: true });
   }
 
   nudgeFreeformSelection(dx, dy) {
-    if (!this._freeformSelectedKey) return;
-    const current = this.getFreeformLayout();
-    state.setFreeformLayout(this._freeformSelectedKey, state.viewport, {
-      ...current,
-      x: (Number(current.x) || 0) + dx,
-      y: (Number(current.y) || 0) + dy
-    }, "Déplacement clavier élément libre");
+    const keys = this.getFreeformSelectedKeys();
+    if (!keys.length) return;
+    const updates = {};
+    keys.forEach(key => {
+      const current = this.getFreeformLayout(key, state.viewport);
+      updates[key] = { ...current, x: (Number(current.x) || 0) + dx, y: (Number(current.y) || 0) + dy };
+    });
+    state.setFreeformLayouts(updates, state.viewport, keys.length > 1 ? "Déplacement clavier sélection libre" : "Déplacement clavier élément libre");
+  }
+
+  resetFreeformSelection() {
+    const keys = this.getFreeformSelectedKeys();
+    if (!keys.length) return;
+    state.clearFreeformLayouts(keys, state.viewport, keys.length > 1 ? "Réinitialisation sélection libre" : "Réinitialisation élément libre");
+  }
+
+  groupFreeformSelection() {
+    const keys = this.getFreeformSelectedKeys();
+    if (keys.length < 2) return;
+    const groupId = state.createFreeformGroup(keys, "Grouper les éléments libres");
+    if (!groupId) return;
+    this._freeformSelectedKeys = keys;
+    this._freeformSelectedKey = keys[0];
+    requestAnimationFrame(() => this.selectFreeformKeys(keys, keys[0]));
+  }
+
+  ungroupFreeformSelection() {
+    const keys = this.getFreeformSelectedKeys();
+    const group = this.getExactFreeformGroup(keys);
+    if (!group) return;
+    state.deleteFreeformGroup(group.id, "Dégrouper les éléments libres");
+    this._freeformSelectedKeys = keys;
+    this._freeformSelectedKey = keys[0];
+    requestAnimationFrame(() => this.selectFreeformKeys(keys, keys[0]));
   }
 
   initFreeformEditing() {
@@ -4235,7 +4360,7 @@ export class App {
         if (event.target.closest(".editor-section-toolbar, .cta-direct-badge, .cta-context-popover, .sec-bg-popover, .sec-motion-popover, .floating-text-toolbar")) return;
         const target = event.target.closest("[data-layout-key]");
         if (target && canvas.contains(target)) {
-          this.selectFreeformTarget(target);
+          this.selectFreeformTarget(target, { additive: event.shiftKey, ignoreGroup: event.shiftKey });
         } else if (!event.target.closest("#freeform-selection-box")) {
           this.clearFreeformSelection();
         }
@@ -4246,9 +4371,16 @@ export class App {
     if (!this._freeformWindowBound) {
       window.addEventListener("resize", () => this.updateFreeformOverlay(), { passive: true });
       document.addEventListener("keydown", event => {
-        if (!this._freeformSelectedKey) return;
+        const keys = this.getFreeformSelectedKeys();
+        if (!keys.length) return;
         const editable = event.target?.matches?.("input, textarea, select, [contenteditable='true']");
         if (editable) return;
+        if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "g") {
+          event.preventDefault();
+          if (event.shiftKey) this.ungroupFreeformSelection();
+          else this.groupFreeformSelection();
+          return;
+        }
         if (event.key === "Escape") {
           this.clearFreeformSelection();
           return;
@@ -4261,10 +4393,8 @@ export class App {
       });
       this._freeformWindowBound = true;
     }
-    if (this._freeformSelectedKey) {
-      const restored = canvas.querySelector(`[data-layout-key="${this._freeformSelectedKey}"]`);
-      if (restored) this.selectFreeformTarget(restored);
-    }
+    const restoredKeys = this.getFreeformSelectedKeys();
+    if (restoredKeys.length) this.selectFreeformKeys(restoredKeys, this._freeformSelectedKey);
   }
 
   // Inline editing in canvas

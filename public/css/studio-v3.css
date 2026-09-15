@@ -623,6 +623,9 @@
 }
 .freeform-selection-label span{overflow:hidden;text-overflow:ellipsis}
 .freeform-selection-label button{border:0;border-radius:4px;background:rgba(255,255,255,.17);color:#fff;padding:3px 5px;font:700 9px/1 sans-serif;cursor:pointer}
+.freeform-selection-label button[hidden]{display:none!important}
+.freeform-selection-box.is-multi .freeform-resize-handle{display:none}
+.freeform-selection-box.is-group{border-style:solid;box-shadow:0 0 0 1px rgba(255,255,255,.9),0 0 0 4px rgba(37,99,235,.14)}
 .freeform-move-handle{
   position:absolute;left:50%;top:-15px;translate:-50% -50%;width:30px;height:24px;border:1px solid #1d4ed8;border-radius:7px;
   background:#fff;color:#1d4ed8;display:grid;place-items:center;pointer-events:auto;touch-action:none;cursor:grab;box-shadow:0 3px 10px rgba(15,23,42,.14)

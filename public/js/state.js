@@ -416,6 +416,80 @@ class AppStateManager {
     this.updateProject(project, false);
   }
 
+  setFreeformLayouts(updates = {}, viewport = "desktop", historyDesc = "Transformation libre multiple") {
+    if (!this.currentProject || !updates || typeof updates !== "object") return;
+    const safeViewport = ["desktop", "tablet", "mobile"].includes(viewport) ? viewport : "desktop";
+    const entries = Object.entries(updates).filter(([key, value]) => key && value && typeof value === "object");
+    if (!entries.length) return;
+    const normalize = nextLayout => {
+      const numberOr = (value, fallback = 0) => {
+        const parsed = Number(value);
+        return Number.isFinite(parsed) ? parsed : fallback;
+      };
+      const normalized = {
+        x: Math.round(numberOr(nextLayout.x) * 100) / 100,
+        y: Math.round(numberOr(nextLayout.y) * 100) / 100
+      };
+      const width = Number(nextLayout.width);
+      const height = Number(nextLayout.height);
+      const z = Number(nextLayout.z);
+      if (Number.isFinite(width) && width > 0) normalized.width = Math.round(width * 100) / 100;
+      if (Number.isFinite(height) && height > 0) normalized.height = Math.round(height * 100) / 100;
+      if (Number.isFinite(z)) normalized.z = Math.max(-10, Math.min(999, Math.round(z)));
+      return normalized;
+    };
+    const normalizedEntries = entries.map(([key, value]) => [key, normalize(value)]);
+    const changed = normalizedEntries.some(([key, value]) => JSON.stringify(this.currentProject.freeformLayout?.[safeViewport]?.[key] || null) !== JSON.stringify(value));
+    if (!changed) return;
+    this.pushHistory(historyDesc);
+    const project = JSON.parse(JSON.stringify(this.currentProject));
+    project.freeformLayout = project.freeformLayout || { desktop: {}, tablet: {}, mobile: {} };
+    project.freeformLayout.desktop = project.freeformLayout.desktop || {};
+    project.freeformLayout.tablet = project.freeformLayout.tablet || {};
+    project.freeformLayout.mobile = project.freeformLayout.mobile || {};
+    normalizedEntries.forEach(([key, value]) => { project.freeformLayout[safeViewport][key] = value; });
+    this.updateProject(project, false);
+  }
+
+  clearFreeformLayouts(layoutKeys = [], viewport = "desktop", historyDesc = "Réinitialisation éléments libres") {
+    if (!this.currentProject) return;
+    const safeViewport = ["desktop", "tablet", "mobile"].includes(viewport) ? viewport : "desktop";
+    const keys = [...new Set((Array.isArray(layoutKeys) ? layoutKeys : [layoutKeys]).filter(Boolean))];
+    const existing = keys.filter(key => this.currentProject.freeformLayout?.[safeViewport]?.[key]);
+    if (!existing.length) return;
+    this.pushHistory(historyDesc);
+    const project = JSON.parse(JSON.stringify(this.currentProject));
+    existing.forEach(key => { delete project.freeformLayout?.[safeViewport]?.[key]; });
+    this.updateProject(project, false);
+  }
+
+  createFreeformGroup(layoutKeys = [], historyDesc = "Grouper les éléments") {
+    if (!this.currentProject) return null;
+    const keys = [...new Set((Array.isArray(layoutKeys) ? layoutKeys : [layoutKeys]).filter(Boolean))];
+    if (keys.length < 2) return null;
+    this.pushHistory(historyDesc);
+    const project = JSON.parse(JSON.stringify(this.currentProject));
+    project.freeformGroups = project.freeformGroups || {};
+    for (const [groupId, group] of Object.entries(project.freeformGroups)) {
+      if (!Array.isArray(group?.members)) continue;
+      const remaining = group.members.filter(key => !keys.includes(key));
+      if (remaining.length >= 2) group.members = remaining;
+      else delete project.freeformGroups[groupId];
+    }
+    const id = `group-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+    project.freeformGroups[id] = { id, members: keys };
+    this.updateProject(project, false);
+    return id;
+  }
+
+  deleteFreeformGroup(groupId, historyDesc = "Dégrouper les éléments") {
+    if (!this.currentProject?.freeformGroups?.[groupId]) return;
+    this.pushHistory(historyDesc);
+    const project = JSON.parse(JSON.stringify(this.currentProject));
+    delete project.freeformGroups[groupId];
+    this.updateProject(project, false);
+  }
+
   // Button Management within currentProject (Undo/Redo supported)
   deleteButton(sectionId, buttonType) {
     if (!this.currentProject) return;

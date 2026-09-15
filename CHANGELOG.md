@@ -7,6 +7,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 15 septembre 2026 (4.8.0-alpha.18)
+
+- Canva/Figma : Shift-clic multi-sélection avec cadre englobant et actions adaptées à plusieurs éléments.
+- Groupes : Grouper/Dégrouper persistant dans le projet ; sélectionner un membre rappelle le groupe complet.
+- Transformations collectives : déplacement souris/clavier et Reset appliqués en batch avec un seul point Undo.
+- UX : la barre d’actions et la poignée de déplacement restent atteignables lorsque la sélection déborde au-dessus du viewport. Validation : 23/23 ciblés, 198/198 complets et `git diff --check`.
+
 ### Consolidation — 15 septembre 2026 (4.8.0-alpha.17)
 
 - Éditeur libre : première fondation Canva/Figma avec clé de layout stable sur textes, images et CTA, cadre de sélection, Move, Reset et huit poignées de redimensionnement.

@@ -189,5 +189,54 @@ test('Freeform editor uses Pointer Events with move, eight resize handles, keybo
   assert.ok(appSource.includes('["nw","n","ne","e","se","s","sw","w"]'));
   assert.ok(appSource.includes('window.addEventListener("pointermove", onMove)'));
   assert.ok(appSource.includes('nudgeFreeformSelection(-step, 0)'));
-  assert.ok(appSource.includes('state.clearFreeformLayout(this._freeformSelectedKey'));
+  assert.ok(appSource.includes('state.clearFreeformLayouts(keys'));
+});
+
+test('Freeform multi-selection batches transforms into one Undo snapshot and persists groups', () => {
+  const previous = {
+    projects: state.projects,
+    currentProject: state.currentProject,
+    undoStack: state.undoStack,
+    redoStack: state.redoStack
+  };
+  try {
+    const project = generateDemoSite({ name: 'Group Test', tradeId: 'paysagiste', city: 'Nantes' });
+    state.projects = [project];
+    state.currentProject = project;
+    state.undoStack = [];
+    state.redoStack = [];
+    state.setFreeformLayouts({
+      E_A: { x: 12, y: 8 },
+      E_B: { x: 22, y: 18 }
+    }, 'desktop', 'Batch move');
+    assert.equal(state.undoStack.length, 1, 'collective transform must create exactly one Undo snapshot');
+    assert.equal(state.currentProject.freeformLayout.desktop.E_A.x, 12);
+    assert.equal(state.currentProject.freeformLayout.desktop.E_B.x, 22);
+    state.undo();
+    assert.equal(state.currentProject.freeformLayout, undefined);
+
+    state.undoStack = [];
+    const groupId = state.createFreeformGroup(['E_A', 'E_B'], 'Create group');
+    assert.ok(groupId);
+    assert.deepEqual(state.currentProject.freeformGroups[groupId].members, ['E_A', 'E_B']);
+    assert.equal(state.undoStack.length, 1);
+    state.deleteFreeformGroup(groupId, 'Delete group');
+    assert.equal(state.currentProject.freeformGroups[groupId], undefined);
+    assert.equal(state.undoStack.length, 2);
+  } finally {
+    state.projects = previous.projects;
+    state.currentProject = previous.currentProject;
+    state.undoStack = previous.undoStack;
+    state.redoStack = previous.redoStack;
+  }
+});
+
+test('Freeform multi-select exposes Shift selection, group controls and collective movement', () => {
+  const appSource = fs.readFileSync(path.resolve(process.cwd(), 'public/js/app.js'), 'utf8');
+  assert.ok(appSource.includes('additive: event.shiftKey'));
+  assert.ok(appSource.includes('state.createFreeformGroup(keys'));
+  assert.ok(appSource.includes('state.deleteFreeformGroup(group.id'));
+  assert.ok(appSource.includes('state.setFreeformLayouts(liveUpdates'));
+  assert.ok(appSource.includes('keys.length > 1 ? "Déplacement sélection libre"'));
+  assert.ok(css.includes('.freeform-selection-box.is-multi .freeform-resize-handle{display:none}'));
 });

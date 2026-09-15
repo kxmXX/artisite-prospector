@@ -1,5 +1,14 @@
 # État de reprise Codex — 15 septembre 2026
 
+## LOT DE LIVRAISON — multi-sélection et groupes 4.8.0-alpha.18
+
+- Sélection : Shift-clic ajoute/retire une cible et le cadre libre devient l’union visuelle de la sélection ; les poignées de resize individuel sont masquées tant que plusieurs éléments sont sélectionnés.
+- Groupes : `project.freeformGroups` conserve les membres ; Grouper/Dégrouper passe par l’historique et un clic normal sur un membre rappelle le groupe entier.
+- Transformations : déplacement souris et clavier utilise `setFreeformLayouts` pour appliquer toutes les géométries dans une seule mutation et donc un seul Undo. Reset est lui aussi batché.
+- UX viewport : si une sélection remonte hors écran, la barre Grouper/Dégrouper/Reset et la poignée Move sont rabattues dans la zone visible.
+- Validation navigateur : deux éléments Hero groupés, déplacés ensemble de `(+18,+24)`, Undo restaure les deux sans supprimer le groupe, puis Dégrouper ; zéro erreur console. Tests : 23/23 ciblés, 198/198 complets et `git diff --check`.
+- Prochaine action : resize collectif proportionnel/non proportionnel du groupe, puis alignement/distribution.
+
 ## LOT DE LIVRAISON — fondation Canva/Figma 4.8.0-alpha.17
 
 - Modèle : `project.freeformLayout` stocke x/y/width/height/z par clé stable et par breakpoint `desktop/tablet/mobile`; chaque mutation passe par l’historique projet.
