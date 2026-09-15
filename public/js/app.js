@@ -11,7 +11,7 @@ import { renderInspector } from "./components/inspector.js";
 import { renderWebsiteHTML, generateLocalBusinessSchema } from "./components/renderer.js";
 import { generateSite, createSectionData } from "./engine/generator.js";
 import { processCopilotPrompt, applyCopilotOperations, resolveProjectUiTarget } from "./engine/copilot.js";
-import { FREEFORM_SNAP_THRESHOLD, rectAxisLines, resolveFreeformSnap } from "./engine/freeform.js";
+import { FREEFORM_SNAP_THRESHOLD, marqueeContainsRectCenter, marqueeRectFromPoints, rectAxisLines, resolveFreeformSnap } from "./engine/freeform.js";
 import { downloadHTML, downloadJSON, generateProductionPackage, downloadProductionPackage } from "./engine/exporter.js";
 import { getStylePresetById } from "./data/styles.js";
 import { getTradeById } from "./data/trades.js";
@@ -4591,6 +4591,116 @@ export class App {
     requestAnimationFrame(() => this.selectFreeformKeys(keys, keys[0]));
   }
 
+  ensureFreeformMarquee() {
+    let box = document.getElementById("freeform-marquee-box");
+    if (!box) {
+      box = document.createElement("div");
+      box.id = "freeform-marquee-box";
+      box.className = "freeform-marquee-box";
+      box.setAttribute("aria-hidden", "true");
+      document.body.appendChild(box);
+    }
+    this._freeformMarqueeBox = box;
+    return box;
+  }
+
+  clearFreeformMarqueePreview() {
+    document.querySelectorAll("#canvas-container [data-layout-key].is-freeform-marquee-hit").forEach(el => el.classList.remove("is-freeform-marquee-hit"));
+    this._freeformMarqueeHitKeys = [];
+    if (this._freeformMarqueeBox) {
+      this._freeformMarqueeBox.classList.remove("is-visible");
+      this._freeformMarqueeBox.setAttribute("aria-hidden", "true");
+    }
+    document.body.classList.remove("freeform-marqueeing");
+  }
+
+  getFreeformMarqueeCandidates(canvas = document.getElementById("canvas-container")) {
+    if (!canvas) return [];
+    return [...canvas.querySelectorAll(".artisite-root.editor-mode [data-layout-key]")].filter(element => {
+      if (!element.isConnected) return false;
+      const ancestor = element.parentElement?.closest?.("[data-layout-key]");
+      if (ancestor && canvas.contains(ancestor)) return false;
+      const style = getComputedStyle(element);
+      if (style.display === "none" || style.visibility === "hidden" || Number(style.opacity) === 0) return false;
+      const rect = element.getBoundingClientRect();
+      return rect.width >= 2 && rect.height >= 2;
+    });
+  }
+
+  expandFreeformGroupKeys(layoutKeys = []) {
+    const expanded = new Set(layoutKeys.filter(Boolean));
+    [...expanded].forEach(key => {
+      const group = this.getFreeformGroupForKey(key);
+      group?.members?.forEach(member => expanded.add(member));
+    });
+    return [...expanded];
+  }
+
+  armFreeformMarquee(event, canvas, { baseKeys = [] } = {}) {
+    if (!canvas || event.pointerType === "touch") return;
+    const startPoint = { x: event.clientX, y: event.clientY };
+    const pointerId = event.pointerId;
+    const additiveKeys = [...new Set(baseKeys.filter(Boolean))];
+    const box = this.ensureFreeformMarquee();
+    const candidates = this.getFreeformMarqueeCandidates(canvas);
+    let started = false;
+    let hitKeys = [];
+
+    const cleanupListeners = () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onCancel);
+    };
+    const updateHits = moveEvent => {
+      const marquee = marqueeRectFromPoints(startPoint, { x: moveEvent.clientX, y: moveEvent.clientY });
+      if (!marquee) return;
+      box.style.left = `${marquee.left}px`;
+      box.style.top = `${marquee.top}px`;
+      box.style.width = `${marquee.width}px`;
+      box.style.height = `${marquee.height}px`;
+      box.classList.add("is-visible");
+      box.setAttribute("aria-hidden", "false");
+      const rawHits = candidates
+        .filter(element => marqueeContainsRectCenter(marquee, element.getBoundingClientRect()))
+        .map(element => element.dataset.layoutKey)
+        .filter(Boolean);
+      hitKeys = this.expandFreeformGroupKeys(rawHits);
+      document.querySelectorAll("#canvas-container [data-layout-key].is-freeform-marquee-hit").forEach(el => el.classList.remove("is-freeform-marquee-hit"));
+      hitKeys.forEach(key => canvas.querySelector(`[data-layout-key="${key}"]`)?.classList.add("is-freeform-marquee-hit"));
+      this._freeformMarqueeHitKeys = hitKeys;
+    };
+    const onMove = moveEvent => {
+      if (pointerId != null && moveEvent.pointerId != null && moveEvent.pointerId !== pointerId) return;
+      if (!started && Math.hypot(moveEvent.clientX - startPoint.x, moveEvent.clientY - startPoint.y) < 5) return;
+      if (!started) {
+        started = true;
+        document.body.classList.add("freeform-marqueeing");
+      }
+      moveEvent.preventDefault();
+      updateHits(moveEvent);
+    };
+    const finish = commit => {
+      cleanupListeners();
+      const finalKeys = commit ? this.expandFreeformGroupKeys([...additiveKeys, ...hitKeys]) : additiveKeys;
+      this.clearFreeformMarqueePreview();
+      if (commit) {
+        if (finalKeys.length) this.selectFreeformKeys(finalKeys, finalKeys.at(-1));
+        else this.clearFreeformSelection();
+      }
+    };
+    const onUp = upEvent => {
+      if (pointerId != null && upEvent?.pointerId != null && upEvent.pointerId !== pointerId) return;
+      finish(started);
+    };
+    const onCancel = cancelEvent => {
+      if (pointerId != null && cancelEvent?.pointerId != null && cancelEvent.pointerId !== pointerId) return;
+      finish(false);
+    };
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+    window.addEventListener("pointercancel", onCancel);
+  }
+
   armFreeformDirectDrag(event, target, { wasSelected = false } = {}) {
     if (!target?.dataset?.layoutKey || event.shiftKey) return;
     if (event.target.closest("input, textarea, select, option")) return;
@@ -4632,6 +4742,7 @@ export class App {
     if (!canvas || state.editorMode === "preview") {
       this._freeformOverlay?.classList.remove("is-visible");
       this.hideFreeformGuides();
+      this.clearFreeformMarqueePreview();
       return;
     }
     this.ensureFreeformOverlay();
@@ -4651,7 +4762,9 @@ export class App {
           }
           this.armFreeformDirectDrag(event, target, { wasSelected });
         } else if (!event.target.closest("#freeform-selection-box")) {
-          this.clearFreeformSelection();
+          const baseKeys = event.shiftKey ? this.getFreeformSelectedKeys() : [];
+          this.armFreeformMarquee(event, canvas, { baseKeys });
+          if (!event.shiftKey) this.clearFreeformSelection();
         }
       }, true);
       const scrollHost = document.getElementById("editor-main-canvas");

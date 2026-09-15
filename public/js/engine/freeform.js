@@ -41,3 +41,24 @@ export function rectAxisLines(rect, axis = "x", meta = {}) {
     { ...meta, edge: "end", position: end }
   ];
 }
+
+export function marqueeRectFromPoints(start, end) {
+  const x1 = Number(start?.x);
+  const y1 = Number(start?.y);
+  const x2 = Number(end?.x);
+  const y2 = Number(end?.y);
+  if (![x1, y1, x2, y2].every(Number.isFinite)) return null;
+  const left = Math.min(x1, x2);
+  const top = Math.min(y1, y2);
+  const right = Math.max(x1, x2);
+  const bottom = Math.max(y1, y2);
+  return { left, top, right, bottom, width: right - left, height: bottom - top };
+}
+
+export function marqueeContainsRectCenter(marquee, rect) {
+  if (!marquee || !rect) return false;
+  const cx = (Number(rect.left) + Number(rect.right)) / 2;
+  const cy = (Number(rect.top) + Number(rect.bottom)) / 2;
+  if (!Number.isFinite(cx) || !Number.isFinite(cy)) return false;
+  return cx >= marquee.left && cx <= marquee.right && cy >= marquee.top && cy <= marquee.bottom;
+}

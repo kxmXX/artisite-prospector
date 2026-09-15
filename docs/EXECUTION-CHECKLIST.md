@@ -83,7 +83,8 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - [x] Redimensionnement phase 1 — 8 poignées côtés/coins, dimensions min et aperçu direct, persistées à la fin du geste.
 - [ ] Redimensionnement phase 2 — ratio verrouillable, rotation et contraintes de taille avancées.
 - [x] Multi-sélection phase 1 — Shift-clic ajoute/retire des cibles, cadre englobant unique, déplacement souris/clavier et Reset collectifs en une mutation Undo.
-- [ ] Multi-sélection phase 2 — cadre de sélection par glisser dans le vide (marquee) et ajout/retrait tactile accessible.
+- [x] Multi-sélection phase 2a — marquee par glisser dans le vide, aperçu des cibles touchées, Shift additif et respect des groupes.
+- [ ] Multi-sélection phase 2b — ajout/retrait tactile accessible et auto-scroll de bord pendant le marquee.
 - [x] Groupes phase 1 — Grouper/Dégrouper persistant, clic sur un membre resélectionne le groupe, déplacement collectif sans perdre les géométries individuelles.
 - [x] Groupes phase 2a — redimensionnement collectif persistant par scale autour du cadre, ratio uniforme avec Shift et Undo batch unique.
 - [ ] Groupes phase 2b — groupes imbriqués et ordre/z-index contrôlable.
@@ -132,5 +133,6 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - Lot `4.8.0-alpha.18` : Shift multi-sélection, cadre englobant, groupes persistants Grouper/Dégrouper, déplacement/Reset collectifs et batch Undo unique ; barre d’actions maintenue dans le viewport ; 23/23 ciblés, 198/198 complets et `git diff --check`.
 - Lot `4.8.0-alpha.19` : resize collectif de groupe par scale persistant, Shift ratio, alignements 6 axes et distributions H/V ; QA navigateur avec reload/persistance ; 24/24 ciblés, 199/199 complets et `git diff --check`.
 - Lot `4.8.0-alpha.20` : drag direct du corps sélectionné, snapping 6 px bords/centres, guides visuels, Alt pour désactiver le snap et restauration instantanée du scroll canvas ; 30/30 ciblés, 205/205 complets et `git diff --check`.
+- Lot `4.8.0-alpha.21` : marquee de multi-sélection, Shift additif, preview des hits et drag direct de la sélection résultante ; 32/32 ciblés, 207/207 complets et `git diff --check`.
 - Prochaine action unique : redimensionnement collectif des groupes puis alignement/distribution dans un commit séparé.
 - Prochaine action unique : démarrer la fondation Canva/Figma — modèle de layout libre persistant + sélection universelle + premier déplacement/redimensionnement sur cibles stables, avant multi-sélection/groupes.

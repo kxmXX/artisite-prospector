@@ -32,3 +32,11 @@ test("rectAxisLines exposes start, center and end for both axes", () => {
   assert.deepEqual(rectAxisLines(rect, "x", { source: "section" }).map(line => line.position), [10, 30, 50]);
   assert.deepEqual(rectAxisLines(rect, "y").map(line => line.position), [20, 50, 80]);
 });
+
+test("marquee geometry normalizes reverse drags and selects by element center", async () => {
+  const { marqueeContainsRectCenter, marqueeRectFromPoints } = await import("../public/js/engine/freeform.js");
+  const marquee = marqueeRectFromPoints({ x: 100, y: 80 }, { x: 20, y: 10 });
+  assert.deepEqual(marquee, { left: 20, top: 10, right: 100, bottom: 80, width: 80, height: 70 });
+  assert.equal(marqueeContainsRectCenter(marquee, { left: 40, right: 60, top: 30, bottom: 50 }), true);
+  assert.equal(marqueeContainsRectCenter(marquee, { left: 95, right: 125, top: 30, bottom: 50 }), false);
+});

@@ -1,5 +1,15 @@
 # État de reprise Codex — 15 septembre 2026
 
+## LOT DE LIVRAISON — marquee multi-sélection 4.8.0-alpha.21
+
+- Marquee : `armFreeformMarquee` démarre uniquement depuis une zone vide et après 5 px ; le rectangle utilise des coordonnées viewport et sélectionne par centre de cible pour éviter les contacts accidentels.
+- Shift : la sélection de départ est conservée et fusionnée avec les hits ; toucher un membre d’un groupe étend la sélection à tous ses membres.
+- Hiérarchie : le catalogue marquee retient les cibles de layout de premier niveau et ignore les descendants lorsqu’un parent possède déjà une clé, réduisant les doubles sélections CTA/texte.
+- Preview : `.is-freeform-marquee-hit` ne modifie pas l’état projet ; pointerup commit la sélection, pointercancel nettoie simplement l’aperçu. Le touch reste volontairement hors scope de ce sous-lot.
+- QA navigateur : marquee titre → 1 cible, Shift+marquee rôle → 2 cibles, drag direct du rôle +20 px → titre et rôle +20 px ensemble, rectangle masqué ensuite, zéro erreur console.
+- Tests : 32/32 ciblés (`state` + `freeform_snap` + `v3_ui_regressions`), 207/207 complets et `git diff --check`.
+- Prochaine action : étendre les clés de layout aux cartes, conteneurs, icônes et blocs structurels sélectionnables.
+
 ## LOT DE LIVRAISON — drag direct et snapping 4.8.0-alpha.20
 
 - Drag direct : le corps d’une cible sélectionnée devient draggable après 5 px de mouvement ; le premier clic texte reste dédié à l’édition, puis les gestes suivants peuvent déplacer sans revenir à la poignée.

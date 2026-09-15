@@ -7,6 +7,14 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 15 septembre 2026 (4.8.0-alpha.21)
+
+- Marquee : glisser dans une zone vide dessine un rectangle de sélection après un seuil de 5 px ; un clic vide simple conserve la désélection classique.
+- Sélection additive : Shift + marquee ajoute les nouvelles cibles à la sélection existante et étend automatiquement les groupes persistants touchés.
+- Hiérarchie : les cibles imbriquées sont filtrées pendant le marquee afin d’éviter de sélectionner simultanément un CTA parent et son libellé enfant.
+- Preview : les éléments touchés sont surlignés pendant le geste sans mutation d’état ; la sélection n’est commise qu’au pointerup et annulée proprement au pointercancel.
+- QA navigateur : titre seul sélectionné par rectangle, Shift + rôle → 2 éléments, puis drag direct +20 px appliqué aux deux ; zéro erreur console. Validation : 32/32 ciblés, 207/207 complets et `git diff --check`.
+
 ### Consolidation — 15 septembre 2026 (4.8.0-alpha.20)
 
 - Drag direct : un élément déjà sélectionné peut être tiré directement par son corps après un seuil de 5 px ; les textes conservent le clic simple pour l’édition et passent en déplacement dès qu’un vrai geste est détecté.

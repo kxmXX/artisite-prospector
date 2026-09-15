@@ -269,3 +269,15 @@ test('Freeform direct drag uses a movement threshold, smart snapping and visible
   assert.ok(css.includes('body.freeform-direct-dragging'));
   assert.ok(css.includes('body.freeform-transforming #canvas-container [data-layout-key].is-freeform-selected{transition:none!important}'));
 });
+
+test('Freeform marquee previews center hits, supports additive selection and respects groups', () => {
+  const appSource = fs.readFileSync(path.resolve(process.cwd(), 'public/js/app.js'), 'utf8');
+  assert.ok(appSource.includes('armFreeformMarquee(event, canvas, { baseKeys })'));
+  assert.ok(appSource.includes('marqueeRectFromPoints(startPoint'));
+  assert.ok(appSource.includes('marqueeContainsRectCenter(marquee'));
+  assert.ok(appSource.includes('this.expandFreeformGroupKeys(rawHits)'));
+  assert.ok(appSource.includes('event.shiftKey ? this.getFreeformSelectedKeys() : []'));
+  assert.ok(appSource.includes('event.pointerType === "touch"'));
+  assert.ok(css.includes('.freeform-marquee-box.is-visible{display:block}'));
+  assert.ok(css.includes('.is-freeform-marquee-hit'));
+});
