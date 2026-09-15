@@ -51,7 +51,7 @@ export function renderCommandPalette(project, allProjects = []) {
               <div class="cmd-item flex items-center justify-between px-3 py-2 rounded-lg text-xs text-zinc-800 hover:bg-zinc-100 cursor-pointer transition-colors"
                    onclick="window.app.executeCommand('open-project', '${p.id}')" data-title="${escapeHtml(p.name + ' ' + (p.business?.city || ''))}">
                 <div class="flex items-center gap-2.5">
-                  <span class="text-xs">📂</span>
+                  <span class="text-zinc-500">${getIcon("folder", "w-3.5 h-3.5")}</span>
                   <span class="font-medium text-zinc-900">${escapeHtml(p.name)}</span>
                   <span class="text-ui-xs text-zinc-400">${escapeHtml(p.business?.city || '')}</span>
                 </div>
@@ -68,7 +68,7 @@ export function renderCommandPalette(project, allProjects = []) {
             <div class="cmd-item flex items-center justify-between px-3 py-2 rounded-lg text-xs text-zinc-800 hover:bg-zinc-100 cursor-pointer transition-colors"
                  onclick="window.app.executeCommand('reset-sendpage-demo')" data-title="reinitialiser recharger modele esprit nature sendpage benchmark demo 100%">
               <div class="flex items-center gap-2.5">
-                <span class="text-sm">🌿</span>
+                <span class="text-emerald-700">${getIcon("leaf", "w-3.5 h-3.5")}</span>
                 <span class="font-bold text-emerald-800">Recharger Démo Esprit Nature (Sendpage 100%)</span>
               </div>
               <span class="text-ui-xs text-zinc-400">Recharger ↵</span>

@@ -251,19 +251,19 @@ export function renderEditor(state) {
                 <span>Ajouter un bloc :</span>
               </span>
               <button type="button" onclick="window.app.addCanvaElement('urgentBanner')" class="canva-dock-btn" title="Ajouter un bandeau promo ou urgence">
-                <span>📢 Bandeau promo</span>
+                ${getIcon("megaphone", "w-3.5 h-3.5")}<span>Bandeau promo</span>
               </button>
               <button type="button" onclick="window.app.addCanvaElement('floatingBadge')" class="canva-dock-btn" title="Ajouter un badge de réassurance agréé">
-                <span>🛡️ Badge réassurance</span>
+                ${getIcon("shield", "w-3.5 h-3.5")}<span>Badge réassurance</span>
               </button>
               <button type="button" onclick="window.app.addCanvaElement('customCard')" class="canva-dock-btn" title="Ajouter un encadré d'information">
-                <span>📦 Encadré sur-mesure</span>
+                ${getIcon("package", "w-3.5 h-3.5")}<span>Encadré sur-mesure</span>
               </button>
               <button type="button" onclick="window.app.openAddSectionModal('components')" class="canva-dock-btn" title="Ouvrir la bibliothèque des composants Add-on">
-                <span>🧩 Composants Add-on...</span>
+                ${getIcon("puzzle", "w-3.5 h-3.5")}<span>Composants Add-on...</span>
               </button>
               <button type="button" onclick="window.app.openAddSectionModal('sections')" class="canva-dock-btn" title="Ouvrir le catalogue des sections complètes">
-                <span>⊞ Sections...</span>
+                ${getIcon("layers", "w-3.5 h-3.5")}<span>Sections...</span>
               </button>
             </div>
           `}
@@ -313,7 +313,7 @@ export function renderEditor(state) {
             <div class="h-3.5 w-[1px] bg-zinc-700 mx-1"></div>
             <div class="relative inline-block">
               <button type="button" id="ftb-anim-btn" onclick="window.app.toggleTextMotionMenu()" class="ftb-btn text-amber-400 font-semibold flex items-center gap-1 px-1.5" title="Appliquer une animation à ce texte (60fps)">
-                <span>✨ Anim</span>
+                ${getIcon("sparkles", "w-3.5 h-3.5")}<span>Anim</span>
               </button>
               <div id="ftb-anim-menu" class="hidden absolute left-0 top-full mt-2 w-56 bg-zinc-900/95 backdrop-blur-md border border-white/20 rounded-xl p-2.5 shadow-2xl z-50 text-white text-ui-sm">
                 <div class="text-ui-2xs font-bold uppercase tracking-wider text-zinc-400 mb-1.5">Animation de l’élément · texte</div>
@@ -322,7 +322,7 @@ export function renderEditor(state) {
                   <button type="button" data-motion-preview="slide-up" onclick="window.app.setActiveTextMotion('slide-up')" class="motion-chip">Slide ↑</button>
                   <button type="button" data-motion-preview="spring" onclick="window.app.setActiveTextMotion('spring')" class="motion-chip">Spring ⤒</button>
                   <button type="button" data-motion-preview="pulse" onclick="window.app.setActiveTextMotion('pulse')" class="motion-chip">Pulse ◉</button>
-                  <button type="button" data-motion-preview="shimmer" onclick="window.app.setActiveTextMotion('shimmer')" class="motion-chip">Shimmer ✨</button>
+                  <button type="button" data-motion-preview="shimmer" onclick="window.app.setActiveTextMotion('shimmer')" class="motion-chip"><span class="inline-flex items-center justify-center gap-1">Shimmer ${getIcon("sparkles", "w-3 h-3")}</span></button>
                   <button type="button" data-motion-preview="zoom-in" onclick="window.app.setActiveTextMotion('zoom-in')" class="motion-chip">Zoom ⤢</button>
                   <button type="button" onclick="window.app.setActiveTextMotion('none')" class="motion-chip col-span-2 text-zinc-400">Aucune</button>
                 </div>
@@ -337,7 +337,7 @@ export function renderEditor(state) {
               </div>
             </div>
             <div class="h-3.5 w-[1px] bg-zinc-700 mx-1"></div>
-            <button type="button" id="ftb-close" class="ftb-btn text-zinc-400 hover:text-white px-1.5" title="Terminer l’édition (Échap)" aria-label="Terminer l’édition">✓</button>
+            <button type="button" id="ftb-close" class="ftb-btn text-zinc-400 hover:text-white px-1.5" title="Terminer l’édition (Échap)" aria-label="Terminer l’édition">${getIcon("check", "w-3.5 h-3.5")}</button>
           </div>
 
           <div class="transition-all duration-300 ${viewportWidthClass} ${isLivePreview ? 'client-preview-mode' : ''} min-h-full mt-3 rounded-t-xl overflow-visible shadow-sm" id="canvas-container" data-viewport="${state.viewport}" style="background-color: ${project.branding?.bgColor || '#ffffff'}; color: ${project.branding?.textColor || '#18181b'};">
@@ -628,7 +628,7 @@ function renderSectionAccordionContent(sec, project, variants) {
             <div class="p-2.5 rounded-lg bg-zinc-50 border border-zinc-200 space-y-1.5">
               <div class="flex items-center justify-between">
                 <span class="text-ui-xs font-bold text-zinc-700 uppercase">Avis #${reviewIdx + 1}</span>
-                <button type="button" onclick="window.app.removeReviewItem('${sectionId}', ${reviewIdx})" class="text-red-600 text-ui-xs">🗑️</button>
+                <button type="button" onclick="window.app.removeReviewItem('${sectionId}', ${reviewIdx})" class="text-red-600 hover:text-red-700 p-0.5" title="Supprimer">${getIcon("trash", "w-3.5 h-3.5")}</button>
               </div>
               <div class="grid grid-cols-[1fr_72px] gap-1.5">
                 <input type="text" value="${escapeHtml(review.author || '')}" placeholder="Nom"
@@ -792,7 +792,7 @@ function renderSectionAccordionContent(sec, project, variants) {
             <div class="p-2.5 rounded-lg bg-zinc-50 border border-zinc-200 space-y-1.5">
               <div class="flex items-center justify-between">
                 <span class="text-ui-xs font-bold text-zinc-800 truncate">#${sIdx + 1} ${escapeHtml(srv.title)}</span>
-                <button type="button" onclick="window.app.deleteServiceItem('${sectionId}', ${sIdx})" class="text-red-500 hover:text-red-700 text-ui-xs p-0.5" title="Supprimer ce service">🗑️</button>
+                <button type="button" onclick="window.app.deleteServiceItem('${sectionId}', ${sIdx})" class="text-red-500 hover:text-red-700 p-0.5" title="Supprimer ce service">${getIcon("trash", "w-3.5 h-3.5")}</button>
               </div>
               <input type="text" value="${escapeHtml(srv.title)}"
                      placeholder="Titre de la prestation"
@@ -950,7 +950,7 @@ function renderSectionAccordionContent(sec, project, variants) {
                       <button type="button" onclick="window.app.toggleGalleryItemType('${sectionId}', ${pIdx})" class="text-ui-2xs text-zinc-600 hover:text-zinc-900 bg-white hover:bg-zinc-100 px-1.5 py-0.5 rounded border border-zinc-200" title="Changer le type d'élément">
                         ${isBA ? 'Convertir en photo' : 'Convertir en Avant/Après'}
                       </button>
-                      <button type="button" onclick="window.app.deleteGalleryItem('${sectionId}', ${pIdx})" class="text-red-600 hover:text-red-700 text-ui-xs p-0.5" title="Supprimer">🗑️</button>
+                      <button type="button" onclick="window.app.deleteGalleryItem('${sectionId}', ${pIdx})" class="text-red-600 hover:text-red-700 p-0.5" title="Supprimer">${getIcon("trash", "w-3.5 h-3.5")}</button>
                     </div>
                   </div>
 
@@ -1023,7 +1023,7 @@ function renderSectionAccordionContent(sec, project, variants) {
               <div class="p-2.5 rounded-lg bg-zinc-50 border border-zinc-200 space-y-1.5">
                 <div class="flex items-center justify-between">
                   <span class="text-ui-xs font-bold text-zinc-700 uppercase">#${fIdx + 1} Question</span>
-                  <button type="button" onclick="window.app.removeFaqItem('${sectionId}', ${fIdx})" class="text-red-600 hover:text-red-700 text-ui-xs p-0.5" title="Supprimer">🗑️</button>
+                  <button type="button" onclick="window.app.removeFaqItem('${sectionId}', ${fIdx})" class="text-red-600 hover:text-red-700 p-0.5" title="Supprimer">${getIcon("trash", "w-3.5 h-3.5")}</button>
                 </div>
                 <input type="text" value="${escapeHtml(faq.q || '')}"
                        placeholder="Votre question ?"
@@ -1050,7 +1050,7 @@ function renderSectionAccordionContent(sec, project, variants) {
             <label class="block text-ui-xs font-medium text-zinc-500">Photo Principale :</label>
             <div class="flex items-center gap-1">
               <button type="button" onclick="window.app.openImagePicker('${sectionId}', 'heroImage')" class="text-zinc-700 hover:text-zinc-900 font-medium text-ui-xs bg-zinc-100 hover:bg-zinc-200 px-2 py-0.5 rounded border border-zinc-200">Remplacer</button>
-              <button type="button" onclick="window.app.deletePhoto('${sectionId}', 'heroImage')" class="text-red-600 hover:text-red-700 font-medium text-ui-xs bg-red-50 hover:bg-red-100 px-1.5 py-0.5 rounded border border-red-200" title="Supprimer">🗑️</button>
+              <button type="button" onclick="window.app.deletePhoto('${sectionId}', 'heroImage')" class="text-red-600 hover:text-red-700 font-medium bg-red-50 hover:bg-red-100 px-1.5 py-0.5 rounded border border-red-200 inline-flex items-center" title="Supprimer">${getIcon("trash", "w-3.5 h-3.5")}</button>
             </div>
           </div>
           <div class="aspect-[16/9] rounded-lg overflow-hidden border border-zinc-200 bg-zinc-100">
@@ -1098,14 +1098,14 @@ function renderSectionAccordionContent(sec, project, variants) {
                   <span class="text-ui-xs font-bold text-zinc-700 uppercase">Bouton Principal</span>
                   ${isPrimaryHidden ? `
                     <button type="button" onclick="window.app.restoreButton('${sectionId}', 'primary')" class="text-emerald-700 hover:text-emerald-800 font-semibold text-ui-xs bg-emerald-50 hover:bg-emerald-100 px-2 py-0.5 rounded border border-emerald-300 flex items-center gap-1 transition-colors">
-                      <span>🔄 Restaurer</span>
+                      ${getIcon("undo", "w-3 h-3")}<span>Restaurer</span>
                     </button>
                   ` : `
                     <div class="flex items-center gap-1">
                       <button type="button" onclick="window.app.adjustButtonFontSize(-1)" class="text-zinc-600 hover:text-zinc-900 font-bold text-ui-xs bg-white px-1.5 py-0.5 rounded border border-zinc-200" title="Réduire taille texte bouton">A-</button>
                       <button type="button" onclick="window.app.adjustButtonFontSize(1)" class="text-zinc-600 hover:text-zinc-900 font-bold text-ui-xs bg-white px-1.5 py-0.5 rounded border border-zinc-200" title="Agrandir taille texte bouton">A+</button>
                       <button type="button" onclick="window.app.deleteButton('${sectionId}', 'primary')" class="text-red-600 hover:text-red-700 font-semibold text-ui-xs bg-red-50 hover:bg-red-100 px-2 py-0.5 rounded border border-red-200 flex items-center gap-0.5 transition-colors" title="Supprimer ce bouton">
-                        <span>🗑️ Supprimer</span>
+                        ${getIcon("trash", "w-3 h-3")}<span>Supprimer</span>
                       </button>
                     </div>
                   `}
@@ -1139,14 +1139,14 @@ function renderSectionAccordionContent(sec, project, variants) {
                   <span class="text-ui-xs font-bold text-zinc-700 uppercase">Bouton Secondaire</span>
                   ${isSecondaryHidden ? `
                     <button type="button" onclick="window.app.restoreButton('${sectionId}', 'phone')" class="text-emerald-700 hover:text-emerald-800 font-semibold text-ui-xs bg-emerald-50 hover:bg-emerald-100 px-2 py-0.5 rounded border border-emerald-300 flex items-center gap-1 transition-colors">
-                      <span>🔄 Restaurer</span>
+                      ${getIcon("undo", "w-3 h-3")}<span>Restaurer</span>
                     </button>
                   ` : `
                     <div class="flex items-center gap-1">
                       <button type="button" onclick="window.app.adjustButtonFontSize(-1)" class="text-zinc-600 hover:text-zinc-900 font-bold text-ui-xs bg-white px-1.5 py-0.5 rounded border border-zinc-200" title="Réduire taille texte bouton">A-</button>
                       <button type="button" onclick="window.app.adjustButtonFontSize(1)" class="text-zinc-600 hover:text-zinc-900 font-bold text-ui-xs bg-white px-1.5 py-0.5 rounded border border-zinc-200" title="Agrandir taille texte bouton">A+</button>
                       <button type="button" onclick="window.app.deleteButton('${sectionId}', 'phone')" class="text-red-600 hover:text-red-700 font-semibold text-ui-xs bg-red-50 hover:bg-red-100 px-2 py-0.5 rounded border border-red-200 flex items-center gap-0.5 transition-colors" title="Supprimer ce bouton">
-                        <span>🗑️ Supprimer</span>
+                        ${getIcon("trash", "w-3 h-3")}<span>Supprimer</span>
                       </button>
                     </div>
                   `}
@@ -1346,13 +1346,13 @@ function renderSettingsAccordions(project, state = {}) {
                 const curTheme = project.branding?.globalTheme || (project.branding?.bgColor === '#09090b' ? 'dark' : (project.branding?.bgColor === '#f4f4f5' ? 'mineral' : 'white'));
                 return `
                   <button type="button" onclick="window.app.switchGlobalTheme('white')" class="py-2 border rounded-lg text-center text-ui-sm font-medium transition-all ${curTheme === 'white' ? 'border-zinc-950 bg-white ring-2 ring-zinc-950 font-bold text-zinc-950 shadow-sm' : 'border-zinc-200 bg-white hover:border-zinc-300 text-zinc-700 shadow-2xs'}">
-                    ☀️ Blanche ${curTheme === 'white' ? '<span class="text-ui-xs text-emerald-600 font-extrabold ml-0.5">✓</span>' : ''}
+                    <span class="inline-flex items-center justify-center gap-1">${getIcon("sun", "w-3.5 h-3.5")}Blanche ${curTheme === 'white' ? '<span class="text-ui-xs text-emerald-600 font-extrabold ml-0.5">✓</span>' : ''}</span>
                   </button>
                   <button type="button" onclick="window.app.switchGlobalTheme('mineral')" class="py-2 border rounded-lg text-center text-ui-sm font-medium transition-all ${curTheme === 'mineral' ? 'border-zinc-950 bg-zinc-100 ring-2 ring-zinc-950 font-bold text-zinc-950 shadow-sm' : 'border-zinc-200 bg-zinc-100 hover:border-zinc-300 text-zinc-700 shadow-2xs'}">
-                    🪨 Minérale ${curTheme === 'mineral' ? '<span class="text-ui-xs text-emerald-600 font-extrabold ml-0.5">✓</span>' : ''}
+                    <span class="inline-flex items-center justify-center gap-1">${getIcon("mountain", "w-3.5 h-3.5")}Minérale ${curTheme === 'mineral' ? '<span class="text-ui-xs text-emerald-600 font-extrabold ml-0.5">✓</span>' : ''}</span>
                   </button>
                   <button type="button" onclick="window.app.switchGlobalTheme('dark')" class="py-2 border rounded-lg text-center text-ui-sm font-medium transition-all ${curTheme === 'dark' ? 'border-amber-400 bg-zinc-900 ring-2 ring-amber-400 font-bold text-amber-300 shadow-sm' : 'border-zinc-800 bg-zinc-900 text-zinc-300 hover:text-white shadow-2xs'}">
-                    🌙 Sombre ${curTheme === 'dark' ? '<span class="text-ui-xs text-amber-400 font-extrabold ml-0.5">✓</span>' : ''}
+                    <span class="inline-flex items-center justify-center gap-1">${getIcon("moon", "w-3.5 h-3.5")}Sombre ${curTheme === 'dark' ? '<span class="text-ui-xs text-amber-400 font-extrabold ml-0.5">✓</span>' : ''}</span>
                   </button>
                 `;
               })()}
@@ -1504,13 +1504,13 @@ function renderSettingsAccordions(project, state = {}) {
             <div>
               <label class="block text-ui-xs font-medium text-zinc-400 uppercase tracking-wider mb-1.5">Typographie</label>
               <button type="button" onclick="window.app.toggleButtonCase()" class="w-full py-1.5 border rounded text-center text-ui-sm font-medium ${project.branding.ctaTransform === 'uppercase' ? 'border-zinc-900 bg-white font-semibold shadow-xs text-zinc-950' : 'border-zinc-200 bg-white text-zinc-600'}">
-                ${project.branding.ctaTransform === 'uppercase' ? '🔠 MAJUSCULES' : '🔡 Casse Normale'}
+                <span class="inline-flex items-center justify-center gap-1">${getIcon("type", "w-3.5 h-3.5")}${project.branding.ctaTransform === 'uppercase' ? 'MAJUSCULES' : 'Casse Normale'}</span>
               </button>
             </div>
             <div>
               <label class="block text-ui-xs font-medium text-zinc-400 uppercase tracking-wider mb-1.5">Boutons Masqués</label>
               <button type="button" onclick="window.app.restoreAllButtons()" class="w-full py-1.5 border border-zinc-200 bg-zinc-50 hover:bg-white rounded text-center text-ui-sm font-medium text-zinc-700 transition-colors" title="Restaurer tous les boutons supprimés">
-                🔄 Restaurer tout
+                <span class="inline-flex items-center justify-center gap-1">${getIcon("undo", "w-3.5 h-3.5")}Restaurer tout</span>
               </button>
             </div>
           </div>
@@ -1534,7 +1534,7 @@ function renderSettingsAccordions(project, state = {}) {
           <div class="pt-3 border-t border-zinc-200/80 space-y-2.5">
             <div class="flex items-center justify-between">
               <div>
-                <label class="block text-ui-sm font-semibold text-zinc-900">⚡ Animations au Scroll (Style Apple)</label>
+                <label class="flex items-center gap-1.5 text-ui-sm font-semibold text-zinc-900">${getIcon("zap", "w-3.5 h-3.5")}Animations au Scroll (Style Apple)</label>
                 <p class="text-ui-xs text-zinc-500">Apparitions progressives et zooms dynamiques lors du défilement</p>
               </div>
               <label class="relative inline-flex items-center cursor-pointer">
@@ -1550,7 +1550,7 @@ function renderSettingsAccordions(project, state = {}) {
                 ['fade-in', 'Fondu'],
                 ['slide-up', 'Slide ↑'],
                 ['slide-in', 'Entrée →'],
-                ['spring', 'Spring 🍏'],
+                ['spring', '<span class="inline-flex items-center justify-center gap-1">Spring ' + getIcon("sprout", "w-3 h-3") + '</span>'],
                 ['progress-fill', 'Jauge']
               ].map(([preset, label]) => `
                 <button type="button" data-motion-preview="${preset}" onclick="window.app.setMotionPreset('${preset}')" class="motion-preset-tile py-1.5 border rounded-md text-center text-ui-sm font-medium ${((project.branding.motionPreset || 'none') === preset) ? 'border-zinc-900 bg-white font-semibold text-zinc-950 ring-1 ring-zinc-900 shadow-xs' : 'border-zinc-200 bg-white text-zinc-600'}">${label}${((project.branding.motionPreset || 'none') === preset) ? ' ✓' : ''}</button>
@@ -1559,9 +1559,9 @@ function renderSettingsAccordions(project, state = {}) {
             <label class="block text-ui-xs font-medium text-zinc-400 uppercase tracking-wider pt-1">Rythme & Vitesse des animations</label>
             <div class="grid grid-cols-3 gap-1.5 text-xs">
               ${[
-                ['fast', '⚡ Rapide (0.5s)'],
-                ['normal', '🍎 Naturel (0.9s)'],
-                ['slow', '🎬 Posé (1.4s)']
+                ['fast', '<span class="inline-flex items-center justify-center gap-1">' + getIcon("zap", "w-3 h-3") + ' Rapide (0.5s)</span>'],
+                ['normal', '<span class="inline-flex items-center justify-center gap-1">' + getIcon("leaf", "w-3 h-3") + ' Naturel (0.9s)</span>'],
+                ['slow', '<span class="inline-flex items-center justify-center gap-1">' + getIcon("film", "w-3 h-3") + ' Posé (1.4s)</span>']
               ].map(([speed, label]) => `
                 <button type="button" onclick="window.app.setAnimationSpeed('${speed}')" class="py-1.5 border rounded-md text-center text-ui-xs font-medium ${((project.branding.animationSpeed || 'normal') === speed) ? 'border-zinc-900 bg-white font-semibold text-zinc-950 ring-1 ring-zinc-900 shadow-xs' : 'border-zinc-200 bg-white text-zinc-600'}">
                   ${label}${((project.branding.animationSpeed || 'normal') === speed) ? ' ✓' : ''}
@@ -1616,7 +1616,7 @@ function renderSettingsAccordions(project, state = {}) {
         </div>
         <div class="section-accordion-body ${isOpen('export') ? '' : 'hidden'} space-y-2" id="settings-body-export">
           <button type="button" onclick="window.app.exportProductionPackage()" class="w-full py-2 px-2.5 rounded-lg bg-zinc-950 hover:bg-black text-white flex items-center justify-between text-xs font-semibold transition-colors shadow-xs">
-            <span>📦 Télécharger Pack Production (HTML, Sitemap, Robots, Manifest)</span>
+            <span class="flex items-center gap-1.5">${getIcon("package", "w-3.5 h-3.5")}Télécharger Pack Production (HTML, Sitemap, Robots, Manifest)</span>
             ${getIcon("download", "w-3.5 h-3.5 text-white")}
           </button>
           <button type="button" onclick="window.app.exportHTML()" class="w-full py-2 px-2.5 rounded-lg bg-white hover:bg-zinc-50 border border-zinc-200 flex items-center justify-between text-xs font-medium text-zinc-900 transition-colors">
@@ -1670,7 +1670,7 @@ function renderSettingsAccordions(project, state = {}) {
 
           <div class="pt-1">
             <button type="button" onclick="window.app.copyJsonLdSchema()" class="w-full py-1.5 px-2.5 rounded-lg border border-zinc-200 hover:bg-zinc-50 flex items-center justify-between text-ui-sm font-medium text-zinc-800 transition-colors">
-              <span>📋 Copier Schema.org (LocalBusiness JSON-LD)</span>
+              <span class="flex items-center gap-1.5">${getIcon("clipboard", "w-3.5 h-3.5")}Copier Schema.org (LocalBusiness JSON-LD)</span>
               ${getIcon("copy", "w-3 h-3 text-zinc-400")}
             </button>
           </div>
@@ -1705,14 +1705,14 @@ function renderSettingsAccordions(project, state = {}) {
           <div class="grid grid-cols-2 gap-2">
             <button type="button" onclick="window.app.setNavigationMode('one-page')" class="p-2.5 border rounded-xl text-left transition-all ${project.branding?.navigationMode !== 'multi-tab' ? 'border-zinc-900 bg-white font-semibold shadow-xs text-zinc-950 ring-1 ring-zinc-900' : 'border-zinc-200 bg-zinc-50 hover:bg-white text-zinc-600'}">
               <div class="text-xs font-bold flex items-center justify-between">
-                <span>📜 One-Page</span>
+                <span class="flex items-center gap-1.5">${getIcon("scrollText", "w-3.5 h-3.5")}One-Page</span>
                 ${project.branding?.navigationMode !== 'multi-tab' ? '<span class="text-ui-2xs font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">Actif</span>' : ''}
               </div>
               <div class="text-ui-xs text-zinc-400 mt-0.5">Défilement continu fluide classique.</div>
             </button>
             <button type="button" onclick="window.app.setNavigationMode('multi-tab')" class="p-2.5 border rounded-xl text-left transition-all ${project.branding?.navigationMode === 'multi-tab' ? 'border-zinc-900 bg-white font-semibold shadow-xs text-zinc-950 ring-1 ring-zinc-900' : 'border-zinc-200 bg-zinc-50 hover:bg-white text-zinc-600'}">
               <div class="text-xs font-bold flex items-center justify-between">
-                <span>📑 Multi-Pages</span>
+                <span class="flex items-center gap-1.5">${getIcon("files", "w-3.5 h-3.5")}Multi-Pages</span>
                 ${project.branding?.navigationMode === 'multi-tab' ? '<span class="text-ui-2xs font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">Actif</span>' : ''}
               </div>
               <div class="text-ui-xs text-zinc-400 mt-0.5">Onglets thématiques (Services, Réalisations, Devis, Contact).</div>

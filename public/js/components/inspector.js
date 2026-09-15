@@ -77,7 +77,7 @@ export function renderInspector(section, project, state) {
       <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-xl space-y-2.5">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-1.5">
-            <span class="text-amber-500 font-bold">✨</span>
+            <span class="text-amber-500">${getIcon("sparkles", "w-3.5 h-3.5")}</span>
             <label class="text-ui-xs font-bold uppercase tracking-wider text-zinc-700">Animation du Bloc (60fps)</label>
           </div>
           <span class="text-ui-2xs font-mono font-semibold px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">
@@ -122,16 +122,16 @@ export function renderInspector(section, project, state) {
         </div>
         <div class="grid grid-cols-2 gap-1 text-ui-sm">
           <button type="button" onclick="window.app.insertQuickComponent('${sectionId}', 'button')" class="py-1.5 px-2 bg-white hover:bg-zinc-100 border border-zinc-200 rounded-lg text-zinc-700 font-medium flex items-center gap-1.5 transition-colors">
-            <span>🔘 Bouton CTA</span>
+            ${getIcon("circleDot", "w-3.5 h-3.5")}<span>Bouton CTA</span>
           </button>
           <button type="button" onclick="window.app.insertQuickComponent('${sectionId}', 'badge')" class="py-1.5 px-2 bg-white hover:bg-zinc-100 border border-zinc-200 rounded-lg text-zinc-700 font-medium flex items-center gap-1.5 transition-colors">
-            <span>🏷️ Badge Confiance</span>
+            ${getIcon("tag", "w-3.5 h-3.5")}<span>Badge Confiance</span>
           </button>
           <button type="button" onclick="window.app.insertQuickComponent('${sectionId}', 'quote')" class="py-1.5 px-2 bg-white hover:bg-zinc-100 border border-zinc-200 rounded-lg text-zinc-700 font-medium flex items-center gap-1.5 transition-colors">
-            <span>💬 Citation Avis</span>
+            ${getIcon("message", "w-3.5 h-3.5")}<span>Citation Avis</span>
           </button>
           <button type="button" onclick="window.app.insertQuickComponent('${sectionId}', 'separator')" class="py-1.5 px-2 bg-white hover:bg-zinc-100 border border-zinc-200 rounded-lg text-zinc-700 font-medium flex items-center gap-1.5 transition-colors">
-            <span>➖ Séparateur</span>
+            ${getIcon("minus", "w-3.5 h-3.5")}<span>Séparateur</span>
           </button>
         </div>
       </div>
@@ -182,7 +182,7 @@ export function renderInspector(section, project, state) {
                   <span>Remplacer</span>
                 </button>
                 <button type="button" onclick="window.app.deletePhoto('${sectionId}', 'heroImage')" class="text-red-600 hover:text-red-700 font-medium text-ui-xs bg-red-50 hover:bg-red-100 px-1.5 py-0.5 rounded border border-red-200 transition-colors" title="Supprimer (Poubelle)">
-                  <span>🗑️</span>
+                  ${getIcon("trash", "w-3.5 h-3.5")}
                 </button>
               </div>
             </div>
@@ -256,7 +256,7 @@ export function renderInspector(section, project, state) {
                 <label class="block text-ui-xs text-zinc-500">Photo Avant :</label>
                 <div class="flex items-center gap-1">
                   <button type="button" onclick="window.app.openImagePicker('${sectionId}', 'beforeImage')" class="text-zinc-700 hover:underline text-ui-xs font-medium">Changer</button>
-                  <button type="button" onclick="window.app.deletePhoto('${sectionId}', 'beforeImage')" class="text-red-600 text-ui-xs" title="Supprimer">🗑️</button>
+                  <button type="button" onclick="window.app.deletePhoto('${sectionId}', 'beforeImage')" class="text-red-600 text-ui-xs" title="Supprimer">${getIcon("trash", "w-3.5 h-3.5")}</button>
                 </div>
               </div>
               <div class="h-20 rounded-md overflow-hidden border border-zinc-200">
@@ -269,7 +269,7 @@ export function renderInspector(section, project, state) {
                 <label class="block text-ui-xs text-zinc-500">Photo Après :</label>
                 <div class="flex items-center gap-1">
                   <button type="button" onclick="window.app.openImagePicker('${sectionId}', 'afterImage')" class="text-zinc-700 hover:underline text-ui-xs font-medium">Changer</button>
-                  <button type="button" onclick="window.app.deletePhoto('${sectionId}', 'afterImage')" class="text-red-600 text-ui-xs" title="Supprimer">🗑️</button>
+                  <button type="button" onclick="window.app.deletePhoto('${sectionId}', 'afterImage')" class="text-red-600 text-ui-xs" title="Supprimer">${getIcon("trash", "w-3.5 h-3.5")}</button>
                 </div>
               </div>
               <div class="h-20 rounded-md overflow-hidden border border-zinc-200">
@@ -350,7 +350,7 @@ export function renderInspector(section, project, state) {
                 <label class="block text-ui-xs text-zinc-500">Photo Portrait :</label>
                 <div class="flex items-center gap-1">
                   <button type="button" onclick="window.app.openImagePicker('${sectionId}', 'image')" class="text-zinc-700 hover:underline text-ui-xs font-medium">Changer</button>
-                  <button type="button" onclick="window.app.deletePhoto('${sectionId}', 'image')" class="text-red-600 text-ui-xs" title="Supprimer">🗑️</button>
+                  <button type="button" onclick="window.app.deletePhoto('${sectionId}', 'image')" class="text-red-600 text-ui-xs" title="Supprimer">${getIcon("trash", "w-3.5 h-3.5")}</button>
                 </div>
               </div>
               <div class="h-20 rounded-md overflow-hidden border border-zinc-200">
@@ -387,8 +387,8 @@ export function renderInspector(section, project, state) {
                       <img src="${srv.image || ''}" alt="${srv.title}" class="w-full h-full object-cover">
                     </div>
                     <div class="flex gap-1 text-ui-xs">
-                      <button type="button" onclick="window.app.openImagePicker('${sectionId}', 'services.${idx}.image', ${idx})" class="text-zinc-700 bg-white border border-zinc-200 px-2 py-0.5 rounded font-medium hover:bg-zinc-50">Photo 🔄</button>
-                      <button type="button" onclick="window.app.deletePhoto('${sectionId}', 'services.${idx}.image', ${idx})" class="text-red-600 bg-red-50 px-1.5 py-0.5 rounded font-medium hover:bg-red-100" title="Poubelle">🗑️</button>
+                      <button type="button" onclick="window.app.openImagePicker('${sectionId}', 'services.${idx}.image', ${idx})" class="text-zinc-700 bg-white border border-zinc-200 px-2 py-0.5 rounded font-medium hover:bg-zinc-50">Photo ${getIcon("refreshCw", "w-3 h-3")}</button>
+                      <button type="button" onclick="window.app.deletePhoto('${sectionId}', 'services.${idx}.image', ${idx})" class="text-red-600 bg-red-50 px-1.5 py-0.5 rounded font-medium hover:bg-red-100" title="Poubelle">${getIcon("trash", "w-3.5 h-3.5")}</button>
                     </div>
                   </div>
 
@@ -418,8 +418,8 @@ export function renderInspector(section, project, state) {
                 <div class="relative group rounded-md overflow-hidden border border-zinc-200 bg-zinc-900 h-14">
                   <img src="${photo.url || ''}" alt="${photo.title || 'Photo'}" class="w-full h-full object-cover">
                   <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
-                    <button type="button" onclick="window.app.openImagePicker('${sectionId}', 'photos.${idx}.url', ${idx})" class="p-1 bg-white text-zinc-900 rounded text-ui-xs" title="Remplacer">🔄</button>
-                    <button type="button" onclick="window.app.deletePhoto('${sectionId}', 'photos.${idx}.url', ${idx})" class="p-1 bg-red-600 text-white rounded text-ui-xs" title="Poubelle">🗑️</button>
+                    <button type="button" onclick="window.app.openImagePicker('${sectionId}', 'photos.${idx}.url', ${idx})" class="p-1 bg-white text-zinc-900 rounded text-ui-xs" title="Remplacer">${getIcon("refreshCw", "w-3.5 h-3.5")}</button>
+                    <button type="button" onclick="window.app.deletePhoto('${sectionId}', 'photos.${idx}.url', ${idx})" class="p-1 bg-red-600 text-white rounded text-ui-xs" title="Poubelle">${getIcon("trash", "w-3.5 h-3.5")}</button>
                   </div>
                 </div>
               `).join('')}
@@ -627,7 +627,7 @@ export function renderInspector(section, project, state) {
               </div>
               <div class="bg-white p-1.5 rounded border border-zinc-200">
                 <span class="text-zinc-400 block text-ui-2xs">Accessibilité</span>
-                <span class="text-emerald-600 font-medium">${a11y.compliant ? '✓ WCAG Conforme' : '⚠️ Vérifier labels'}</span>
+                <span class="text-emerald-600 font-medium">${a11y.compliant ? '✓ WCAG Conforme' : `${getIcon("alertTriangle", "w-3 h-3")} Vérifier labels`}</span>
               </div>
             </div>
 
@@ -638,7 +638,7 @@ export function renderInspector(section, project, state) {
 
             ${antiPatterns.length > 0 ? `
               <div class="p-1.5 bg-amber-50 border border-amber-200 rounded text-ui-xs text-amber-800 space-y-0.5">
-                <span class="font-semibold block">⚠️ Alerte Anti-Pattern :</span>
+                <span class="font-semibold flex items-center gap-1">${getIcon("alertTriangle", "w-3.5 h-3.5")} Alerte Anti-Pattern :</span>
                 ${antiPatterns.map(ap => `<div>• ${escapeHtml(ap.message)}</div>`).join('')}
               </div>
             ` : ''}

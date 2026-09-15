@@ -7,6 +7,28 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.3) — Lot 2b : icônes, densité et téléphone
+
+- **Icônes cohérentes** : les 122 emojis et glyphes décoratifs du chrome sont remplacés par de vraies
+  icônes du système maison (`icons.js`) — 63 → 89 clés. Trois appels existants (`tag`, `laptop`,
+  `upload`) affichaient un cercle générique parce que la clé manquait : c'est corrigé. Les raccourcis
+  clavier (`⌘K`, `Échap`), les glyphes typographiques (`✓`, `★`, `→`) et le contenu du site restent
+  intacts.
+- **CSS mort retiré** : 92 lignes de règles dont aucun composant ne portait la classe
+  (`studio-v3-modal-frame`, `studio-v3-wizard-*`, `floating-section-toolbar`, …). Vérifié au
+  navigateur : la modale de composition et le wizard sont inchangés.
+- **Dashboard sur téléphone** : le rail ne disparaît plus à ≤ 760 px — il devient une barre basse qui
+  conserve l'accès aux projets, à la création, à la vitrine et au thème (auparavant le basculement de
+  thème était inaccessible sur mobile). Les titres passent en `clamp()` au lieu de 44 px et 38 px
+  fixes, et les métadonnées de projet restent visibles.
+- **Défaut majeur découvert et documenté** (antérieur à ces lots, reproduit sur `fe06c75`) : le
+  **site autonome exporté est cassé** — le hero superpose son contenu et la mise en page des sections
+  ne s'applique pas, parce que l'export embarque une copie partielle et divergente des styles du site
+  au lieu de la source qui sert l'éditeur et l'aperçu. Correctif planifié en lot dédié (extraction des
+  styles de site en module partagé) ; la vitrine publique et l'aperçu éditeur sont corrects.
+- **QA** : 285/285 tests, `npm run check:css` à jour, modale de composants et wizard vérifiés au
+  navigateur.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.2) — Lot 2a : finition du chrome
 
 - **Feuille de style morte supprimée** : `product-precision.css` (179 de ses 273 règles n'étaient

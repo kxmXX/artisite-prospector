@@ -20,6 +20,26 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - Mouvement : navigation d’ancre douce native, un seul langage de révélation discret, jamais de
   scroll-jacking ; respecter `prefers-reduced-motion`.
 
+## DÉFAUT MAJEUR CONSTATÉ — le site autonome exporté est cassé (à traiter en priorité)
+
+**Constat, 17 septembre 2026.** L'option « Exporter → Site autonome » produit une page visuellement
+cassée : la section hero superpose son contenu (titre dupliqué, badge et citation qui se chevauchent,
+texte `#&0239;` visible), l'image de fond n'apparaît pas et la mise en page des sections ne
+s'applique pas. **Reproduit à l'identique sur la base `fe06c75`**, donc **antérieur aux lots 1 et 2** :
+ce n'est pas une régression introduite par la maturation.
+
+Cause identifiée : le HTML autonome embarque sa **propre copie** des styles du site (bloc `<style>`
+écrit à la main dans `public/js/engine/exporter.js`, lignes ~44-372) au lieu de la source qui sert
+l'éditeur et l'aperçu (`public/css/app.css` + `public/js/components/heroStyles.js`). Cette copie est
+incomplète : les règles de mise en page des sections, du hero et de la vitrine manquent. Le test
+`le HTML autonome exporté se suffit à lui-même` ne vérifie que la *présence* d'une règle pour chaque
+classe, pas la fidélité de la mise en page.
+
+Correctif à prévoir (lot dédié) : extraire les styles **du site** (et non du chrome) de `app.css` dans
+un module partagé unique, consommé par l'éditeur, l'aperçu et l'export — primitive commune plutôt que
+deux copies divergentes — puis vérifier l'export au navigateur. La vitrine publique et l'aperçu
+éditeur, eux, sont corrects.
+
 ## Mission de maturation produit — plan approuvé, 9 lots (à partir de 4.9.0-alpha.1)
 
 Objectif : rendre le produit compréhensible et utilisable par un débutant (personnaliser site,
@@ -46,6 +66,14 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
       204 glyphes emoji du chrome → `icons.js`, convergence rayons/ombres/espacements, cascade de
       cartes dans l'inspecteur, liste gelée des 34 classes sans règle, navigation du dashboard
       ≤ 760 px, et le point ouvert ci-dessous.
+- [x] **Lot 2b — Icônes, densité, téléphone** (`4.9.0-alpha.3`) : 122 emojis/glyphes du chrome
+      remplacés par `icons.js` (63 → 89 clés, dont `tag`/`laptop`/`upload` qui retombaient sur un
+      cercle générique) ; 92 lignes de CSS mort retirées de `studio-v3.css` (vérifiées au navigateur) ;
+      dashboard ≤ 760 px — le rail devient une barre basse (le thème redevient accessible), titres en
+      `clamp()`, métadonnées conservées. **285/285**.
+      *Reste du lot 2 (2c, non fait)* : convergence rayons/ombres/espacements (32 rayons et
+      47 ombres distincts dans le chrome), réduction de la cascade de cartes de l'inspecteur,
+      résorption de la liste gelée des 34 classes sans règle.
       *Point ouvert 2a mesuré* : dans le canvas de l'éditeur (~640 px à 1280 de fenêtre), la vitrine
       rend sa navigation bureau et déborde (logo replié, FAQ sous le CTA). Cause identifiée : les
       media queries du site répondent à la fenêtre, pas au canvas. Correction prévue au lot

@@ -56,17 +56,21 @@ export function renderImageModal(state) {
 
         <!-- Navigation Tabs -->
         <div class="px-6 pt-3 pb-2.5 bg-zinc-50/80 border-b border-zinc-200 flex flex-wrap gap-2 text-xs flex-shrink-0">
-          <button type="button" onclick="window.app.switchImageTab('library')" id="tab-img-library" class="px-3 py-1.5 rounded-lg font-semibold text-zinc-900 bg-white shadow-xs border border-zinc-200">
-            📚 Bibliothèque Métier
+          <button type="button" onclick="window.app.switchImageTab('library')" id="tab-img-library" class="px-3 py-1.5 rounded-lg font-semibold text-zinc-900 bg-white shadow-xs border border-zinc-200 flex items-center gap-1.5">
+            ${getIcon("bookOpen", "w-3.5 h-3.5")}
+            <span>Bibliothèque Métier</span>
           </button>
-          <button type="button" onclick="window.app.switchImageTab('ai')" id="tab-img-ai" class="px-3 py-1.5 rounded-lg font-medium text-zinc-600 hover:text-zinc-900 border border-transparent flex items-center gap-1">
-            <span>⚡ Générer avec l'IA</span>
+          <button type="button" onclick="window.app.switchImageTab('ai')" id="tab-img-ai" class="px-3 py-1.5 rounded-lg font-medium text-zinc-600 hover:text-zinc-900 border border-transparent flex items-center gap-1.5">
+            ${getIcon("zap", "w-3.5 h-3.5")}
+            <span>Générer avec l'IA</span>
           </button>
-          <button type="button" onclick="window.app.switchImageTab('url')" id="tab-img-url" class="px-3 py-1.5 rounded-lg font-medium text-zinc-600 hover:text-zinc-900 border border-transparent">
-            🔗 Coller une URL
+          <button type="button" onclick="window.app.switchImageTab('url')" id="tab-img-url" class="px-3 py-1.5 rounded-lg font-medium text-zinc-600 hover:text-zinc-900 border border-transparent flex items-center gap-1.5">
+            ${getIcon("link", "w-3.5 h-3.5")}
+            <span>Coller une URL</span>
           </button>
-          <button type="button" onclick="window.app.switchImageTab('upload')" id="tab-img-upload" class="px-3 py-1.5 rounded-lg font-medium text-zinc-600 hover:text-zinc-900 border border-transparent">
-            📁 Fichier Local
+          <button type="button" onclick="window.app.switchImageTab('upload')" id="tab-img-upload" class="px-3 py-1.5 rounded-lg font-medium text-zinc-600 hover:text-zinc-900 border border-transparent flex items-center gap-1.5">
+            ${getIcon("folder", "w-3.5 h-3.5")}
+            <span>Fichier Local</span>
           </button>
         </div>
 
@@ -112,7 +116,7 @@ export function renderImageModal(state) {
           <!-- TAB 2: AI GENERATION -->
           <div id="image-panel-ai" class="space-y-3" style="display:none;">
             <div class="bg-amber-50 border border-amber-200/80 rounded-xl p-3 flex items-start gap-2.5">
-              <span class="text-amber-600 font-bold text-sm mt-0.5">⚡</span>
+              <span class="text-amber-600 mt-0.5">${getIcon("zap", "w-4 h-4")}</span>
               <div>
                 <div class="font-semibold text-xs text-amber-900">Générateur de visuels par Intelligence Artificielle</div>
                 <div class="text-ui-sm text-amber-700 leading-snug mt-0.5">Décrivez la scène souhaitée ou utilisez le prompt recommandé pour votre corps de métier.</div>

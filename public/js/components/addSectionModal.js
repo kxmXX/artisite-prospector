@@ -1,5 +1,17 @@
 import { getIcon } from "./icons.js";
 
+// Icone associee a chaque famille du catalogue de composants (chrome du modal).
+const COMPONENT_FAMILY_ICONS = {
+  action: "zap",
+  status: "shield",
+  content: "fileText",
+  media: "image",
+  disclosure: "helpCircle",
+  feedback: "bell",
+  navigation: "compass",
+  input: "clipboard"
+};
+
 /**
  * Section Catalog and Variant presets according to Cahier des Charges (Point 29 & 42).
  */
@@ -260,7 +272,7 @@ export const COMPONENT_CATALOG_ITEMS = [
   {
     id: "cta-call-direct",
     family: "action",
-    familyName: "⚡ Actions & Boutons",
+    familyName: "Actions & Boutons",
     name: "Bouton d'Appel Direct",
     description: "Bouton d'appel téléphonique 1-clic avec icône et micro-animation de pulsation.",
     badge: "P0 • Conversion",
@@ -271,7 +283,7 @@ export const COMPONENT_CATALOG_ITEMS = [
   {
     id: "action-button-group",
     family: "action",
-    familyName: "⚡ Actions & Boutons",
+    familyName: "Actions & Boutons",
     name: "Duo d'Actions (Appel + Devis)",
     description: "Paire de boutons coordonnés (primaire fort + secondaire neutre).",
     badge: "P0 • Navigation",
@@ -283,7 +295,7 @@ export const COMPONENT_CATALOG_ITEMS = [
   {
     id: "badge-reassurance",
     family: "status",
-    familyName: "🏷️ Statuts & Réassurance",
+    familyName: "Statuts & Réassurance",
     name: "Pastilles de Réassurance (RGE, Décennale)",
     description: "Macarons de confiance légale et certifications artisanales vérifiées.",
     badge: "P0 • Confiance",
@@ -294,7 +306,7 @@ export const COMPONENT_CATALOG_ITEMS = [
   {
     id: "badge-emergency-radar",
     family: "status",
-    familyName: "🏷️ Statuts & Réassurance",
+    familyName: "Statuts & Réassurance",
     name: "Badge Radar Astreinte 24/7",
     description: "Pastille radar lumineuse clignotante indiquant l'intervention d'urgence.",
     badge: "P1 • Urgence",
@@ -306,7 +318,7 @@ export const COMPONENT_CATALOG_ITEMS = [
   {
     id: "content-service-card",
     family: "content",
-    familyName: "📄 Contenus & Preuves",
+    familyName: "Contenus & Preuves",
     name: "Carte de Prestation / Service",
     description: "Encadré de service avec photo 16:10, tag de catégorie et bouton de chiffrage.",
     badge: "P0 • Métier",
@@ -317,7 +329,7 @@ export const COMPONENT_CATALOG_ITEMS = [
   {
     id: "content-quote",
     family: "content",
-    familyName: "📄 Contenus & Preuves",
+    familyName: "Contenus & Preuves",
     name: "Citation / Parole d'Artisan",
     description: "Mise en avant éditoriale d'un mot du fondateur ou d'un avis client phare.",
     badge: "P1 • Éditorial",
@@ -328,7 +340,7 @@ export const COMPONENT_CATALOG_ITEMS = [
   {
     id: "content-process-steps",
     family: "content",
-    familyName: "📄 Contenus & Preuves",
+    familyName: "Contenus & Preuves",
     name: "Parcours en 3 Étapes Numérotées",
     description: "Explication pas à pas du déroulement du chantier pour rassurer le prospect.",
     badge: "P1 • Pédagogique",
@@ -339,7 +351,7 @@ export const COMPONENT_CATALOG_ITEMS = [
   {
     id: "content-pricing-card",
     family: "content",
-    familyName: "📄 Contenus & Preuves",
+    familyName: "Contenus & Preuves",
     name: "Forfaits & Grille Tarifaire",
     description: "Cartes transparentes de formules packagées avec badge « Recommandé ».",
     badge: "P1 • Vente",
@@ -351,7 +363,7 @@ export const COMPONENT_CATALOG_ITEMS = [
   {
     id: "media-before-after",
     family: "media",
-    familyName: "🖼️ Médias & Interactif",
+    familyName: "Médias & Interactif",
     name: "Comparateur Glissant Avant / Après",
     description: "Curseur tactile glissant montrant la transformation spectaculaire avant/après travaux.",
     badge: "P0 • Preuve 60fps",
@@ -362,7 +374,7 @@ export const COMPONENT_CATALOG_ITEMS = [
   {
     id: "media-gallery-lightbox",
     family: "media",
-    familyName: "🖼️ Médias & Interactif",
+    familyName: "Médias & Interactif",
     name: "Mosaïque Galerie avec Lightbox",
     description: "Grille de photographies 4K plein écran avec agrandissement instantané.",
     badge: "P0 • Visuel",
@@ -374,7 +386,7 @@ export const COMPONENT_CATALOG_ITEMS = [
   {
     id: "disclosure-faq",
     family: "disclosure",
-    familyName: "📂 Divulgation & FAQ",
+    familyName: "Divulgation & FAQ",
     name: "Accordéon Fluide (FAQ)",
     description: "Questions cliquables avec déploiement animé sans allonger la page.",
     badge: "P0 • Rassurance",
@@ -386,7 +398,7 @@ export const COMPONENT_CATALOG_ITEMS = [
   {
     id: "feedback-urgent-banner",
     family: "feedback",
-    familyName: "🔔 Feedback & Alertes",
+    familyName: "Feedback & Alertes",
     name: "Bandeau Notification d'Astreinte",
     description: "Bandeau contrasté en haut de page pour annoncer une permanence ou promo.",
     badge: "P0 • Notification",
@@ -398,7 +410,7 @@ export const COMPONENT_CATALOG_ITEMS = [
   {
     id: "nav-sticky-bar",
     family: "navigation",
-    familyName: "🗺️ Navigation & Flottant",
+    familyName: "Navigation & Flottant",
     name: "Barre d'Appel Flottante",
     description: "Bouton d'appel persistant en bas d'écran avec numéro de téléphone direct.",
     badge: "P0 • Mobile",
@@ -410,7 +422,7 @@ export const COMPONENT_CATALOG_ITEMS = [
   {
     id: "input-quote-simulator",
     family: "input",
-    familyName: "📝 Devis & Formulaires",
+    familyName: "Devis & Formulaires",
     name: "Simulateur Interactif de Devis",
     description: "Calculateur de devis en 3 clics avec sélection de surface et rappel 24h.",
     badge: "P0 • Conversion",
@@ -422,7 +434,7 @@ export const COMPONENT_CATALOG_ITEMS = [
   {
     id: "gallery-quote-pull",
     family: "content",
-    familyName: "📄 Contenus & Preuves",
+    familyName: "Contenus & Preuves",
     name: "Citation / Pull Quote Éditoriale",
     description: "Citation grand format avec guillemets géants, photo du dirigeant et signature.",
     badge: "Gallery • Confiance",
@@ -433,7 +445,7 @@ export const COMPONENT_CATALOG_ITEMS = [
   {
     id: "gallery-video-player",
     family: "media",
-    familyName: "🖼️ Médias & Vidéos",
+    familyName: "Médias & Vidéos",
     name: "Lecteur Vidéo Immersion 4K",
     description: "Composant vidéo immersif avec affiche de chantier et bouton de lecture centré.",
     badge: "Gallery • Visuel",
@@ -444,7 +456,7 @@ export const COMPONENT_CATALOG_ITEMS = [
   {
     id: "gallery-stepper-progress",
     family: "content",
-    familyName: "📄 Contenus & Preuves",
+    familyName: "Contenus & Preuves",
     name: "Indicateur d'Étapes de Chantier (Stepper)",
     description: "Composant de processus 1-2-3-4 séquencé guidant le client pas à pas.",
     badge: "Gallery • Pédagogique",
@@ -455,7 +467,7 @@ export const COMPONENT_CATALOG_ITEMS = [
   {
     id: "gallery-comparison-table",
     family: "content",
-    familyName: "📄 Contenus & Preuves",
+    familyName: "Contenus & Preuves",
     name: "Tableau Comparatif des Prestations",
     description: "Tableau structuré confrontant la prestation standard et la formule sérénité pro.",
     badge: "Gallery • Transparence",
@@ -466,7 +478,7 @@ export const COMPONENT_CATALOG_ITEMS = [
   {
     id: "gallery-surface-slider",
     family: "input",
-    familyName: "📝 Devis & Formulaires",
+    familyName: "Devis & Formulaires",
     name: "Curseur Interactif de Surface (Slider)",
     description: "Curseur glissant de 10 à 250 m² pour chiffrer l'envergure du projet.",
     badge: "Gallery • Interactif",
@@ -477,7 +489,7 @@ export const COMPONENT_CATALOG_ITEMS = [
   {
     id: "gallery-category-tabs",
     family: "navigation",
-    familyName: "🗺️ Navigation & Flottant",
+    familyName: "Navigation & Flottant",
     name: "Sélecteur d'Onglets de Prestations (Tabs)",
     description: "Navigation par onglets filtrant instantanément les spécialités de l'artisan.",
     badge: "Gallery • Ergonomie",
@@ -488,7 +500,7 @@ export const COMPONENT_CATALOG_ITEMS = [
   {
     id: "gallery-custom-card-block",
     family: "content",
-    familyName: "📄 Contenus & Preuves",
+    familyName: "Contenus & Preuves",
     name: "Boîte Carte Personnalisée Sur-Mesure",
     description: "Encadré avec argument fort, badge vérifié et bouton d'appel direct.",
     badge: "Canva • Sur-mesure",
@@ -509,7 +521,7 @@ export function renderAddSectionModal(project, activeTab = "sections") {
         <div class="px-6 py-4 border-b border-zinc-200 flex items-center justify-between flex-shrink-0 bg-white">
           <div class="flex items-center gap-3">
             <div class="w-9 h-9 rounded-xl bg-zinc-900 flex items-center justify-center text-white font-bold text-sm">
-              ⊞
+              ${getIcon("layers", "w-4 h-4")}
             </div>
             <div>
               <div class="text-ui-xs font-bold uppercase tracking-wider text-zinc-400">Bibliothèque & Intelligence Composants</div>
@@ -525,10 +537,10 @@ export function renderAddSectionModal(project, activeTab = "sections") {
         <div class="px-6 pt-3 pb-2 bg-zinc-50 border-b border-zinc-200 flex items-center justify-between flex-shrink-0">
           <div class="pill-tabs-container max-w-md">
             <button type="button" id="tab-add-sections" onclick="window.app.switchAddModalTab('sections')" class="pill-tab-btn ${activeTab === 'sections' ? 'is-active' : ''}">
-              <span>📐 Sections Complètes (${SECTION_DEFINITIONS.length})</span>
+              ${getIcon("layout", "w-3.5 h-3.5")}<span>Sections Complètes (${SECTION_DEFINITIONS.length})</span>
             </button>
             <button type="button" id="tab-add-components" onclick="window.app.switchAddModalTab('components')" class="pill-tab-btn ${activeTab === 'components' ? 'is-active' : ''}">
-              <span>🧩 Composants Individuels (${COMPONENT_CATALOG_ITEMS.length})</span>
+              ${getIcon("puzzle", "w-3.5 h-3.5")}<span>Composants Individuels (${COMPONENT_CATALOG_ITEMS.length})</span>
             </button>
           </div>
           <div class="text-ui-sm text-zinc-500 font-medium hidden sm:block">
@@ -623,7 +635,7 @@ export function renderAddSectionModal(project, activeTab = "sections") {
               <div class="catalog-card bg-zinc-50/80 hover:bg-white border border-zinc-200 hover:border-zinc-400 rounded-2xl p-4 transition-all space-y-3 flex flex-col justify-between group" data-category="${comp.family}">
                 <div>
                   <div class="flex flex-wrap items-center justify-between gap-1.5 mb-2">
-                    <span class="text-ui-xs font-semibold text-zinc-500 uppercase tracking-wider">${comp.familyName}</span>
+                    <span class="text-ui-xs font-semibold text-zinc-500 uppercase tracking-wider flex items-center gap-1">${getIcon(COMPONENT_FAMILY_ICONS[comp.family] || "layers", "w-3 h-3")}${comp.familyName}</span>
                     <span class="text-ui-2xs font-mono px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold whitespace-nowrap">${comp.badge}</span>
                   </div>
                   <div class="flex items-start gap-3">

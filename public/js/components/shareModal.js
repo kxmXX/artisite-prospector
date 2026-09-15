@@ -50,20 +50,25 @@ export function renderShareModal(project, activeTab = "demo") {
 
         <!-- 5 Tabs Navigation Bar -->
         <div class="px-4 sm:px-5 pt-2 pb-0 border-b border-zinc-200/80 bg-zinc-50/40 flex gap-1 overflow-x-auto no-scrollbar">
-          <button type="button" onclick="window.app.setShareModalTab('demo')" class="px-3 py-2 text-xs font-semibold border-b-2 transition-all shrink-0 ${tab === 'demo' ? 'border-zinc-900 text-zinc-950 font-bold' : 'border-transparent text-zinc-500 hover:text-zinc-800'}">
-            📱 Démo Client
+          <button type="button" onclick="window.app.setShareModalTab('demo')" class="px-3 py-2 text-xs font-semibold border-b-2 transition-all shrink-0 flex items-center gap-1.5 ${tab === 'demo' ? 'border-zinc-900 text-zinc-950 font-bold' : 'border-transparent text-zinc-500 hover:text-zinc-800'}">
+            ${getIcon("smartphone", "w-3.5 h-3.5")}
+            <span>Démo Client</span>
           </button>
-          <button type="button" onclick="window.app.setShareModalTab('editor')" class="px-3 py-2 text-xs font-semibold border-b-2 transition-all shrink-0 ${tab === 'editor' ? 'border-zinc-900 text-zinc-950 font-bold' : 'border-transparent text-zinc-500 hover:text-zinc-800'}">
-            ✏️ Éditeur
+          <button type="button" onclick="window.app.setShareModalTab('editor')" class="px-3 py-2 text-xs font-semibold border-b-2 transition-all shrink-0 flex items-center gap-1.5 ${tab === 'editor' ? 'border-zinc-900 text-zinc-950 font-bold' : 'border-transparent text-zinc-500 hover:text-zinc-800'}">
+            ${getIcon("edit", "w-3.5 h-3.5")}
+            <span>Éditeur</span>
           </button>
-          <button type="button" onclick="window.app.setShareModalTab('preview')" class="px-3 py-2 text-xs font-semibold border-b-2 transition-all shrink-0 ${tab === 'preview' ? 'border-zinc-900 text-zinc-950 font-bold' : 'border-transparent text-zinc-500 hover:text-zinc-800'}">
-            🖥️ Plein Écran
+          <button type="button" onclick="window.app.setShareModalTab('preview')" class="px-3 py-2 text-xs font-semibold border-b-2 transition-all shrink-0 flex items-center gap-1.5 ${tab === 'preview' ? 'border-zinc-900 text-zinc-950 font-bold' : 'border-transparent text-zinc-500 hover:text-zinc-800'}">
+            ${getIcon("monitor", "w-3.5 h-3.5")}
+            <span>Plein Écran</span>
           </button>
-          <button type="button" onclick="window.app.setShareModalTab('domain')" class="px-3 py-2 text-xs font-semibold border-b-2 transition-all shrink-0 ${tab === 'domain' ? 'border-zinc-900 text-zinc-950 font-bold' : 'border-transparent text-zinc-500 hover:text-zinc-800'}">
-            🌐 Domaine
+          <button type="button" onclick="window.app.setShareModalTab('domain')" class="px-3 py-2 text-xs font-semibold border-b-2 transition-all shrink-0 flex items-center gap-1.5 ${tab === 'domain' ? 'border-zinc-900 text-zinc-950 font-bold' : 'border-transparent text-zinc-500 hover:text-zinc-800'}">
+            ${getIcon("globe", "w-3.5 h-3.5")}
+            <span>Domaine</span>
           </button>
-          <button type="button" onclick="window.app.setShareModalTab('export')" class="px-3 py-2 text-xs font-semibold border-b-2 transition-all shrink-0 ${tab === 'export' ? 'border-zinc-900 text-zinc-950 font-bold' : 'border-transparent text-zinc-500 hover:text-zinc-800'}">
-            📦 Export ZIP
+          <button type="button" onclick="window.app.setShareModalTab('export')" class="px-3 py-2 text-xs font-semibold border-b-2 transition-all shrink-0 flex items-center gap-1.5 ${tab === 'export' ? 'border-zinc-900 text-zinc-950 font-bold' : 'border-transparent text-zinc-500 hover:text-zinc-800'}">
+            ${getIcon("package", "w-3.5 h-3.5")}
+            <span>Export ZIP</span>
           </button>
         </div>
 
@@ -111,7 +116,7 @@ export function renderShareModal(project, activeTab = "demo") {
             <div class="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200/80 space-y-2">
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                  <span class="text-sm">🔒</span>
+                  <span class="text-zinc-500">${getIcon("lock", "w-4 h-4")}</span>
                   <div>
                     <span class="text-xs font-bold text-zinc-900 block">Verrouillage par Code PIN Client</span>
                     <span class="text-ui-xs text-zinc-500">Exiger un code de 4 à 6 chiffres avant la démo interne</span>
@@ -135,11 +140,11 @@ export function renderShareModal(project, activeTab = "demo") {
             <!-- Direct Dispatch Actions (SMS & WhatsApp) -->
             <div class="grid grid-cols-2 gap-2.5 pt-1">
               <a href="sms:${cleanPhone}?&body=${encodeURIComponent(smsText)}" class="p-2.5 rounded-xl border border-zinc-200 hover:border-zinc-300 bg-white hover:bg-zinc-50 flex items-center justify-center gap-2 text-xs font-medium text-zinc-800 transition-colors shadow-2xs no-underline">
-                <span>💬</span>
+                ${getIcon("smartphone", "w-4 h-4")}
                 <span>Envoyer par SMS</span>
               </a>
               <a href="${whatsappUrl}" target="_blank" class="p-2.5 rounded-xl border border-emerald-200 hover:border-emerald-300 bg-emerald-50/50 hover:bg-emerald-50 flex items-center justify-center gap-2 text-xs font-medium text-emerald-900 transition-colors shadow-2xs no-underline">
-                <span>🟢</span>
+                ${getIcon("message", "w-4 h-4")}
                 <span>Ouvrir WhatsApp</span>
               </a>
             </div>
@@ -149,7 +154,7 @@ export function renderShareModal(project, activeTab = "demo") {
           ${tab === "editor" ? `
             <div class="space-y-4">
               <div class="p-4 rounded-xl bg-blue-50/60 border border-blue-200/60 flex items-start gap-3">
-                <span class="text-xl">✏️</span>
+                <span class="text-blue-700">${getIcon("edit", "w-5 h-5")}</span>
                 <div class="space-y-1">
                   <h4 class="text-xs font-bold text-blue-950">Accès Collaborateur / Agence</h4>
                   <p class="text-ui-sm text-blue-800 leading-relaxed">
@@ -182,7 +187,7 @@ export function renderShareModal(project, activeTab = "demo") {
           ${tab === "preview" ? `
             <div class="space-y-4">
               <div class="p-4 rounded-xl bg-purple-50/60 border border-purple-200/60 flex items-start gap-3">
-                <span class="text-xl">🖥️</span>
+                <span class="text-purple-700">${getIcon("monitor", "w-5 h-5")}</span>
                 <div class="space-y-1">
                   <h4 class="text-xs font-bold text-purple-950">Idéal pour partage d'écran (Google Meet, Zoom)</h4>
                   <p class="text-ui-sm text-purple-800 leading-relaxed">
@@ -193,7 +198,7 @@ export function renderShareModal(project, activeTab = "demo") {
 
               <div class="flex flex-col gap-2.5 pt-2">
                 <button type="button" onclick="window.app.enterCommercialDemoMode()" class="w-full py-3.5 px-4 rounded-xl bg-zinc-900 hover:bg-black text-white text-xs font-bold flex items-center justify-center gap-2 shadow-lg transition-all">
-                  <span>🚀</span>
+                  ${getIcon("zap", "w-4 h-4")}
                   <span>Lancer la Démonstration Plein Écran Immédiate</span>
                 </button>
                 <a href="${previewUrl}" target="_blank" class="w-full py-3 px-4 rounded-xl border border-zinc-200 hover:bg-zinc-50 text-zinc-800 text-xs font-semibold flex items-center justify-center gap-2 transition-colors no-underline">
@@ -208,7 +213,7 @@ export function renderShareModal(project, activeTab = "demo") {
           ${tab === "domain" ? `
             <div class="space-y-4">
               <div class="p-4 rounded-xl bg-amber-50/60 border border-amber-200/60 flex items-start gap-3">
-                <span class="text-xl">🌐</span>
+                <span class="text-amber-700">${getIcon("globe", "w-5 h-5")}</span>
                 <div class="space-y-1">
                   <h4 class="text-xs font-bold text-amber-950">Liez le propre domaine de l'artisan</h4>
                   <p class="text-ui-sm text-amber-900 leading-relaxed">
@@ -239,7 +244,7 @@ export function renderShareModal(project, activeTab = "demo") {
               </div>
 
               <div class="flex items-center gap-2 text-xs text-emerald-700 bg-emerald-50 p-2.5 rounded-lg border border-emerald-200">
-                <span>🔒</span>
+                ${getIcon("lock", "w-4 h-4")}
                 <span class="font-medium">Certificat SSL Let's Encrypt & HTTPS automatique après propagation.</span>
               </div>
             </div>
@@ -249,7 +254,7 @@ export function renderShareModal(project, activeTab = "demo") {
           ${tab === "export" ? `
             <div class="space-y-4">
               <div class="p-4 rounded-xl bg-emerald-50/60 border border-emerald-200/60 flex items-start gap-3">
-                <span class="text-xl">📦</span>
+                <span class="text-emerald-700">${getIcon("package", "w-5 h-5")}</span>
                 <div class="space-y-1">
                   <h4 class="text-xs font-bold text-emerald-950">Pack de Déploiement Autonome Pure Vanilla</h4>
                   <p class="text-ui-sm text-emerald-900 leading-relaxed">
@@ -261,16 +266,16 @@ export function renderShareModal(project, activeTab = "demo") {
               <div class="border border-zinc-200 rounded-xl p-3 bg-zinc-50 space-y-2 text-xs">
                 <div class="font-bold text-zinc-800 uppercase tracking-wider text-ui-xs">Contenu de l'archive :</div>
                 <ul class="space-y-1 text-zinc-600 font-mono text-ui-sm">
-                  <li class="flex items-center gap-1.5">📄 <strong>index.html</strong> — Site vitrine complet et interactif</li>
-                  <li class="flex items-center gap-1.5">🗺️ <strong>sitemap.xml</strong> — Indexation Google & SEO local</li>
-                  <li class="flex items-center gap-1.5">🤖 <strong>robots.txt</strong> — Autorisation d'exploration des moteurs</li>
-                  <li class="flex items-center gap-1.5">📱 <strong>site.webmanifest</strong> — Prêt pour installation PWA mobile</li>
+                  <li class="flex items-center gap-1.5">${getIcon("fileText", "w-3.5 h-3.5")} <strong>index.html</strong> — Site vitrine complet et interactif</li>
+                  <li class="flex items-center gap-1.5">${getIcon("map", "w-3.5 h-3.5")} <strong>sitemap.xml</strong> — Indexation Google & SEO local</li>
+                  <li class="flex items-center gap-1.5">${getIcon("bot", "w-3.5 h-3.5")} <strong>robots.txt</strong> — Autorisation d'exploration des moteurs</li>
+                  <li class="flex items-center gap-1.5">${getIcon("smartphone", "w-3.5 h-3.5")} <strong>site.webmanifest</strong> — Prêt pour installation PWA mobile</li>
                 </ul>
               </div>
 
               <div class="space-y-2 pt-1">
                 <button type="button" onclick="window.app.exportProductionPackage()" class="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-md transition-colors">
-                  <span>⬇️</span>
+                  ${getIcon("download", "w-4 h-4")}
                   <span>Télécharger le Pack Production (.ZIP)</span>
                 </button>
                 <button type="button" onclick="window.app.downloadStandaloneHTML()" class="w-full py-2.5 px-4 rounded-xl border border-zinc-200 hover:bg-zinc-50 text-zinc-700 text-xs font-semibold flex items-center justify-center gap-2 transition-colors">

@@ -37,8 +37,8 @@ export function renderCloserModal(project) {
         <!-- Header with Live Call Teleprompter Status -->
         <div class="px-6 py-3.5 bg-zinc-950 text-white flex items-center justify-between flex-shrink-0">
           <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-sm">
-              🎯
+            <div class="w-8 h-8 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-100">
+              ${getIcon("target", "w-4 h-4")}
             </div>
             <div>
               <div class="flex items-center gap-2">
@@ -54,8 +54,8 @@ export function renderCloserModal(project) {
             <div class="flex items-center gap-1.5 bg-zinc-900 border border-zinc-800 px-2.5 py-1 rounded-lg text-xs font-mono text-zinc-200" id="call-timer-box">
               <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
               <span id="call-timer-display">00:00</span>
-              <button type="button" onclick="window.app?.toggleCallTimer?.()" class="ml-1 text-ui-xs text-zinc-400 hover:text-white" title="Démarrer / Mettre en pause le chronomètre d'appel">
-                ⏯️
+              <button type="button" onclick="window.app?.toggleCallTimer?.()" class="ml-1 text-zinc-400 hover:text-white flex items-center" title="Démarrer / Mettre en pause le chronomètre d'appel">
+                ${getIcon("playPause", "w-3.5 h-3.5")}
               </button>
             </div>
 
@@ -67,26 +67,33 @@ export function renderCloserModal(project) {
 
         <!-- Cockpit Navigation Tabs (7 Power Tabs) -->
         <div class="px-6 py-2 bg-zinc-100/80 border-b border-zinc-200 flex gap-1.5 text-xs overflow-x-auto flex-shrink-0">
-          <button type="button" onclick="window.app.switchCloserTab('script')" id="tab-closer-script" class="px-3 py-1.5 rounded-lg font-bold text-zinc-900 bg-white shadow-xs border border-zinc-200 whitespace-nowrap">
-            📞 Script Appel
+          <button type="button" onclick="window.app.switchCloserTab('script')" id="tab-closer-script" class="px-3 py-1.5 rounded-lg font-bold text-zinc-900 bg-white shadow-xs border border-zinc-200 whitespace-nowrap flex items-center gap-1.5">
+            ${getIcon("phone", "w-3.5 h-3.5")}
+            <span>Script Appel</span>
           </button>
-          <button type="button" onclick="window.app.switchCloserTab('objections')" id="tab-closer-objections" class="px-3 py-1.5 rounded-lg font-medium text-zinc-600 hover:text-zinc-900 border border-transparent whitespace-nowrap">
-            🛡️ Objections
+          <button type="button" onclick="window.app.switchCloserTab('objections')" id="tab-closer-objections" class="px-3 py-1.5 rounded-lg font-medium text-zinc-600 hover:text-zinc-900 border border-transparent whitespace-nowrap flex items-center gap-1.5">
+            ${getIcon("shield", "w-3.5 h-3.5")}
+            <span>Objections</span>
           </button>
-          <button type="button" onclick="window.app.switchCloserTab('audit')" id="tab-closer-audit" class="px-3 py-1.5 rounded-lg font-medium text-zinc-600 hover:text-zinc-900 border border-transparent whitespace-nowrap">
-            📊 Audit 360°
+          <button type="button" onclick="window.app.switchCloserTab('audit')" id="tab-closer-audit" class="px-3 py-1.5 rounded-lg font-medium text-zinc-600 hover:text-zinc-900 border border-transparent whitespace-nowrap flex items-center gap-1.5">
+            ${getIcon("chartBar", "w-3.5 h-3.5")}
+            <span>Audit 360°</span>
           </button>
-          <button type="button" onclick="window.app.switchCloserTab('contract')" id="tab-closer-contract" class="px-3 py-1.5 rounded-lg font-medium text-zinc-600 hover:text-zinc-900 border border-transparent whitespace-nowrap">
-            ✍️ Bon de Commande
+          <button type="button" onclick="window.app.switchCloserTab('contract')" id="tab-closer-contract" class="px-3 py-1.5 rounded-lg font-medium text-zinc-600 hover:text-zinc-900 border border-transparent whitespace-nowrap flex items-center gap-1.5">
+            ${getIcon("edit", "w-3.5 h-3.5")}
+            <span>Bon de Commande</span>
           </button>
-          <button type="button" onclick="window.app.switchCloserTab('whatsapp')" id="tab-closer-whatsapp" class="px-3 py-1.5 rounded-lg font-medium text-zinc-600 hover:text-zinc-900 border border-transparent whitespace-nowrap">
-            💬 WhatsApp
+          <button type="button" onclick="window.app.switchCloserTab('whatsapp')" id="tab-closer-whatsapp" class="px-3 py-1.5 rounded-lg font-medium text-zinc-600 hover:text-zinc-900 border border-transparent whitespace-nowrap flex items-center gap-1.5">
+            ${getIcon("message", "w-3.5 h-3.5")}
+            <span>WhatsApp</span>
           </button>
-          <button type="button" onclick="window.app.switchCloserTab('email')" id="tab-closer-email" class="px-3 py-1.5 rounded-lg font-medium text-zinc-600 hover:text-zinc-900 border border-transparent whitespace-nowrap">
-            ✉️ Email B2B
+          <button type="button" onclick="window.app.switchCloserTab('email')" id="tab-closer-email" class="px-3 py-1.5 rounded-lg font-medium text-zinc-600 hover:text-zinc-900 border border-transparent whitespace-nowrap flex items-center gap-1.5">
+            ${getIcon("mail", "w-3.5 h-3.5")}
+            <span>Email B2B</span>
           </button>
-          <button type="button" onclick="window.app.switchCloserTab('roi')" id="tab-closer-roi" class="px-3 py-1.5 rounded-lg font-medium text-zinc-600 hover:text-zinc-900 border border-transparent whitespace-nowrap">
-            💰 Rentabilité ROI
+          <button type="button" onclick="window.app.switchCloserTab('roi')" id="tab-closer-roi" class="px-3 py-1.5 rounded-lg font-medium text-zinc-600 hover:text-zinc-900 border border-transparent whitespace-nowrap flex items-center gap-1.5">
+            ${getIcon("dollarSign", "w-3.5 h-3.5")}
+            <span>Rentabilité ROI</span>
           </button>
         </div>
 
@@ -170,7 +177,8 @@ export function renderCloserModal(project) {
                   <h3 class="text-sm sm:text-base font-extrabold text-white">${audit.title}</h3>
                 </div>
                 <button type="button" id="btn-fetch-live-audit" onclick="window.app?.fetchLiveAudit?.('${project.id}')" class="btn-keycap btn-keycap-light text-ui-sm font-bold px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-sm text-zinc-900 bg-white hover:bg-zinc-100 transition-all">
-                  <span>⚡ Actualiser IA Locale</span>
+                  ${getIcon("zap", "w-3.5 h-3.5")}
+            <span>Actualiser IA Locale</span>
                 </button>
               </div>
               <p class="text-ui-sm text-zinc-400">Montrez ces écarts techniques en direct à l'artisan pour démolir ses réticences.</p>
@@ -190,7 +198,7 @@ export function renderCloserModal(project) {
                     <span class="font-bold text-xs text-zinc-900">${p.name}</span>
                     <div class="flex items-center gap-2">
                       <span class="text-ui-xs font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded border border-red-200">Actuel : ${p.currentScore}/100</span>
-                      <span class="text-ui-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Nouveau : ${p.prospectorScore}/100 ⚡</span>
+                      <span class="text-ui-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 inline-flex items-center gap-1">Nouveau : ${p.prospectorScore}/100 ${getIcon("zap", "w-3 h-3")}</span>
                     </div>
                   </div>
                   <p class="text-ui-sm text-zinc-600 leading-relaxed">${p.impact}</p>

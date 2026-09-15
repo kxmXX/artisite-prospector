@@ -526,7 +526,7 @@ export class App {
         state.currentProject = state.projects[0];
       }
       state.saveToStorage();
-      this.showNotification("✨ Modèle Esprit Nature (Sendpage 100%) rechargé avec succès !");
+      this.showNotification("Modèle Esprit Nature (Sendpage 100%) rechargé avec succès !");
       this.render();
     });
   }
@@ -1010,7 +1010,7 @@ export class App {
     } finally {
       if (btn) {
         btn.disabled = false;
-        btn.innerHTML = `<span>⚡ Actualiser IA Locale</span>`;
+        btn.innerHTML = `${getIcon("zap", "w-3.5 h-3.5")}<span>Actualiser IA Locale</span>`;
       }
     }
   }
@@ -1401,7 +1401,7 @@ export class App {
     });
 
     state.addProject(newProject, true);
-    this.showToast(`✨ Site prêt pour ${name} !`, "success");
+    this.showToast(`Site prêt pour ${name} !`, "success");
 
     if (submitBtn) {
       submitBtn.innerHTML = originalText;
@@ -1972,7 +1972,7 @@ export class App {
 
   deleteButton(sectionId, buttonType) {
     state.deleteButton(sectionId, buttonType);
-    this.showToast(`🗑️ Bouton masqué`, "info", {
+    this.showToast(`Bouton masqué`, "info", {
       label: "Annuler (⌘Z)",
       onClick: () => this.undo()
     });
@@ -2357,7 +2357,7 @@ export class App {
       root.classList.toggle("apple-scrollfx-enabled", Boolean(enabled));
     }
     this.render();
-    this.showToast(enabled ? "⚡ Animations au Scroll Apple activées" : "Animations au scroll désactivées", "info");
+    this.showToast(enabled ? "Animations au Scroll Apple activées" : "Animations au scroll désactivées", "info");
   }
 
   addStepperStep(secId) {
@@ -2761,7 +2761,7 @@ export class App {
 
     if (btn) {
       btn.disabled = true;
-      btn.innerHTML = `<span class="animate-spin mr-1.5">⚡</span><span>Génération du visuel par l'IA en cours...</span>`;
+      btn.innerHTML = `${getIcon("zap", "w-3.5 h-3.5 animate-spin mr-1.5")}<span>Génération du visuel par l'IA en cours...</span>`;
     }
 
     try {
@@ -2801,7 +2801,7 @@ export class App {
     } finally {
       if (this._aiRequests?.get("image-photo") === request && btn) {
         btn.disabled = false;
-        btn.innerHTML = `<span>⚡ Regénérer une autre variante</span>`;
+        btn.innerHTML = `${getIcon("zap", "w-3.5 h-3.5")}<span>Regénérer une autre variante</span>`;
       }
       request.dispose();
     }
@@ -3712,7 +3712,7 @@ export class App {
         <div class="ai-approval-card border border-zinc-200 bg-white p-3.5 rounded-xl shadow-md space-y-2.5">
           <div class="flex items-center justify-between">
             <span class="text-xs font-bold text-zinc-900 flex items-center gap-1.5">
-              <span>✨</span> Proposition Studio IA
+              ${getIcon("sparkles", "w-3.5 h-3.5")} Proposition Studio IA
             </span>
             <span class="text-ui-xs font-extrabold uppercase px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
               Confiance 96%
@@ -3723,11 +3723,11 @@ export class App {
           </div>
           <p class="text-xs text-zinc-600 font-medium">${summary}</p>
           <div class="ai-approval-actions flex gap-2 pt-1">
-            <button type="button" id="btn-approve-ai" class="btn-keycap btn-keycap-dark flex-1 py-1.5 text-xs font-bold text-white bg-zinc-900 rounded-lg shadow-xs">
-              ✓ Appliquer
+            <button type="button" id="btn-approve-ai" class="btn-keycap btn-keycap-dark flex-1 py-1.5 text-xs font-bold text-white bg-zinc-900 rounded-lg shadow-xs inline-flex items-center justify-center gap-1.5">
+              ${getIcon("check", "w-3.5 h-3.5")} Appliquer
             </button>
-            <button type="button" id="btn-reject-ai" class="btn-keycap btn-keycap-light px-3 py-1.5 text-xs text-zinc-600 rounded-lg">
-              ✕ Ignorer
+            <button type="button" id="btn-reject-ai" class="btn-keycap btn-keycap-light px-3 py-1.5 text-xs text-zinc-600 rounded-lg inline-flex items-center justify-center gap-1.5">
+              ${getIcon("x", "w-3.5 h-3.5")} Ignorer
             </button>
           </div>
         </div>
@@ -3739,7 +3739,7 @@ export class App {
           if (!canApply()) return;
           request.dispose();
           onApply();
-          feedback.innerHTML = `<div class="text-xs font-semibold text-emerald-700 p-2 bg-emerald-50 rounded-lg border border-emerald-200">✅ Modification appliquée avec succès (Annulation ⌘Z possible)</div>`;
+          feedback.innerHTML = `<div class="text-xs font-semibold text-emerald-700 p-2 bg-emerald-50 rounded-lg border border-emerald-200 flex items-center gap-1.5">${getIcon("checkCircle", "w-3.5 h-3.5")} Modification appliquée avec succès (Annulation ⌘Z possible)</div>`;
           if (input) input.value = "";
         };
       }
@@ -4042,7 +4042,7 @@ export class App {
         <div class="min-h-screen bg-zinc-950 flex items-center justify-center p-4 font-sans text-zinc-100">
           <div class="max-w-md w-full bg-zinc-900 border border-zinc-800 rounded-3xl p-8 shadow-2xl space-y-6 text-center animate-fade-in">
             <div class="w-16 h-16 rounded-2xl bg-zinc-800/80 border border-zinc-700 flex items-center justify-center mx-auto text-2xl text-emerald-400">
-              🔒
+              ${getIcon("lock", "w-6 h-6")}
             </div>
             <div class="space-y-2">
               <span class="px-3 py-1 rounded-full text-ui-xs font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Présentation Privée</span>

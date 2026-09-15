@@ -962,3 +962,37 @@ est correcte. Correction prévue au lot responsive (requêtes de conteneur), pas
 
 Suite : finir le lot 2 (emojis du chrome, rayons/ombres, densité, dashboard ≤ 760 px) puis ouvrir le
 lot 3 (modèle de sélection unique et hiérarchie visible).
+
+---
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.3 (lot 2b/9)
+
+Livré :
+- **Icônes** : 122 remplacements d'emojis/glyphes décoratifs par \`getIcon\` dans le chrome
+  (editor 31, addSectionModal 24, shareModal 19, inspector 15, closerModal 11, app.js 10,
+  imageModal 5, wizard 5, commandPalette 2). 26 clés ajoutées à \`icons.js\` (63 → 89), toutes au
+  format 24×24 / trait 2 / currentColor. Trois clés déjà appelées mais absentes (\`tag\`, \`laptop\`,
+  \`upload\`) affichaient un cercle de repli : fournies. Conservés : raccourcis clavier, \`✓\`, \`★\`,
+  \`→\`, \`➔\`, \`•\`, \`%\`, contrôles freeform, statuts de terminal du wizard, et tout le contenu du site
+  (\`renderer.js\`, \`heroStyles.js\`).
+- **CSS mort** : 92 lignes retirées de \`studio-v3.css\` (règles dont toutes les classes étaient
+  inutilisées : \`studio-v3-modal-frame\`, \`studio-v3-wizard-*\`, \`studio-v3-share/image/command/
+  catalog/closer-frame\`, \`studio-v3-modal-backdrop\`, \`floating-section-toolbar\`). Suppression
+  par bloc équilibré, jamais par ligne isolée ; modale de composition et wizard contrôlés au
+  navigateur après coup — inchangés.
+- **Dashboard ≤ 760 px** : le rail n'est plus \`display:none\` mais devient une barre basse fixe
+  (les quatre accès sont conservés, dont le basculement de thème qui était perdu) ; \`padding-bottom\`
+  compensatoire ; titres 44 px et 38 px remplacés par \`clamp()\` ; métadonnées de projet réaffichées.
+- **Défaut majeur documenté** : le site autonome exporté est cassé (hero superposé, mise en page des
+  sections absente). **Reproduit à l'identique sur \`fe06c75\`** : antérieur aux lots 1 et 2. Cause :
+  \`public/js/engine/exporter.js\` embarque sa propre copie partielle des styles du site au lieu de la
+  source partagée. Consigné en tête de \`docs/EXECUTION-CHECKLIST.md\` avec le plan de correction.
+  Le test d'autosuffisance de l'export ne vérifie que la présence d'une règle par classe, pas la
+  fidélité de la mise en page — limite reconnue.
+
+Vérifications : \`npm test\` 285/285 ; \`npm run check:css\` à jour (387 règles app, 369 export) ;
+modale de composants (icônes) et wizard contrôlés au navigateur en 1280 ; comparaison de l'export
+autonome courant et de la base \`fe06c75\` servis localement (les deux cassés de la même façon).
+
+Suite : lot 3 — modèle de sélection unique, fil d'Ariane, liste des éléments, suppression des
+880 lignes inertes de \`renderSectionAccordionContent\`.

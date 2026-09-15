@@ -40,10 +40,10 @@ export function renderWizardModal() {
         <div class="px-6 pt-3 pb-2 border-b border-zinc-100 bg-zinc-50/50">
           <div class="pill-tabs-container">
             <button type="button" id="tab-mode-fast" onclick="window.app.switchWizardMode('fast')" class="pill-tab-btn is-active">
-              <span>⚡ Mode Express</span>
+              ${getIcon("zap", "w-3.5 h-3.5")}<span>Mode Express</span>
             </button>
             <button type="button" id="tab-mode-adv" onclick="window.app.switchWizardMode('advanced')" class="pill-tab-btn">
-              <span>🛠 Paramètres Avancés</span>
+              ${getIcon("wrench", "w-3.5 h-3.5")}<span>Paramètres Avancés</span>
             </button>
           </div>
         </div>
@@ -118,9 +118,9 @@ export function renderWizardModal() {
                   Ambiance Globale 1-Clic
                 </label>
                 <select id="wiz-ambiance" class="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-2 text-xs text-zinc-900 font-medium focus:bg-white focus:border-zinc-900 focus:outline-none">
-                  <option value="mineral" selected>🪨 Minérale (Épurée & Moderne)</option>
-                  <option value="white">☀️ Blanche (Lumineuse & Minimale)</option>
-                  <option value="dark">🌙 Sombre (Obsidienne & Contraste Fort)</option>
+                  <option value="mineral" selected>Minérale (Épurée & Moderne)</option>
+                  <option value="white">Blanche (Lumineuse & Minimale)</option>
+                  <option value="dark">Sombre (Obsidienne & Contraste Fort)</option>
                 </select>
               </div>
             </div>
