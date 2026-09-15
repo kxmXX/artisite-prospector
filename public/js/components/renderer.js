@@ -2,20 +2,36 @@ import { getIcon } from "./icons.js";
 import { HERO_STYLES } from "./heroStyles.js";
 import { getTradeFallbackDataUrl } from "../data/imageFallbacks.js";
 import { getUiId, getSectionUiId, getUiCode } from "../data/uiIds.js";
+import { escapeHtml, sanitizeUrl, safeCssColor, safeCssLength, safeFontFamily } from "../utils/html.js";
 
 function usesReferenceVitrineTemplate(project) {
   if (project?.templateId) return project.templateId === "esprit-reference";
   return project?.business?.tradeId === "paysagiste";
 }
 
-function escapeHtml(str) {
-  if (!str) return "";
-  return String(str)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+const RENDER_URL_FIELD = /(?:url|image|logo|avatar|poster|link|target)$/i;
+
+function secureRenderValue(value, key = "") {
+  if (Array.isArray(value)) return value.map(item => secureRenderValue(item, key));
+  if (value && typeof value === "object") {
+    return Object.fromEntries(Object.entries(value).map(([childKey, childValue]) => [childKey, secureRenderValue(childValue, childKey)]));
+  }
+  if (typeof value !== "string") return value;
+  if (RENDER_URL_FIELD.test(key)) {
+    return escapeHtml(sanitizeUrl(value, { allowDataImage: true, fallback: "#" }));
+  }
+  return escapeHtml(value);
+}
+
+export function createSafeRenderProject(project) {
+  if (!project || typeof project !== "object") return project;
+  return {
+    ...project,
+    business: secureRenderValue(project.business || {}),
+    sections: Array.isArray(project.sections)
+      ? project.sections.map(section => ({ ...section, content: secureRenderValue(section.content || {}) }))
+      : []
+  };
 }
 
 function getInitialSiteTheme(project) {
@@ -312,6 +328,7 @@ export function renderWebsiteHTML(project, options = { isEditor: false, isStanda
   if (!project || !project.sections) {
     return `<div class="p-12 text-center text-gray-500">Aucun projet chargé</div>`;
   }
+  project = createSafeRenderProject(project);
   options = { ...options, project };
 
   const activePage = options.activeVirtualPage || project._activeVirtualPage || null;
@@ -364,7 +381,7 @@ export function renderWebsiteHTML(project, options = { isEditor: false, isStanda
     xl: '1.25rem'
   };
 
-  const initialSiteTheme = project.siteTheme || getInitialSiteTheme(project);
+  const initialSiteTheme = project.siteTheme === "dark" ? "dark" : getInitialSiteTheme(project);
   const isPaperGrain = !!(project.branding?.paperGrain || project.branding?.stylePreset === 'editorial-terroir' || project.branding?.stylePreset === 'papercraft-mineral');
   const socialProofHTML = renderSocialProofToast(project, options);
 
@@ -384,23 +401,23 @@ export function renderWebsiteHTML(project, options = { isEditor: false, isStanda
 
   return `
     <div class="artisite-root ${options.isEditor ? 'editor-mode' : 'public-mode'} ${isVitrineTemplate ? 'vitrine-template' : ''} font-body text-main bg-site min-h-screen ${isPaperGrain ? 'texture-paper-grain' : ''} ${isAppleScrollFx ? 'apple-scrollfx-enabled' : ''}" data-site-theme="${initialSiteTheme}" data-paper-grain="${isPaperGrain ? 'true' : 'false'}" style="
-      --primary: ${project.branding?.primaryColor || '#059669'};
-      --secondary: ${project.branding?.secondaryColor || '#065f46'};
-      --accent: ${project.branding?.accentColor || '#f59e0b'};
-      --bg: ${project.branding?.bgColor || '#ffffff'};
-      --bg-sec: ${project.branding?.bgSecondary || '#f8fafc'};
-      --text: ${project.branding?.textColor || '#0f172a'};
-      --text-muted: ${project.branding?.textMuted || '#64748b'};
-      --font-heading: '${project.branding?.headingFont || 'Plus Jakarta Sans'}', -apple-system, BlinkMacSystemFont, sans-serif;
-      --font-body: '${project.branding?.bodyFont || 'Inter'}', -apple-system, BlinkMacSystemFont, sans-serif;
-      --radius: ${project.branding?.borderRadius || '0.75rem'};
-      --card-radius: ${project.branding?.borderRadius || '0.75rem'};
-      --btn-radius: ${project.branding?.buttonRadius || '9999px'};
-      --cta-radius: ${project.branding?.buttonRadius || '9999px'};
+      --primary: ${safeCssColor(project.branding?.primaryColor, '#059669')};
+      --secondary: ${safeCssColor(project.branding?.secondaryColor, '#065f46')};
+      --accent: ${safeCssColor(project.branding?.accentColor, '#f59e0b')};
+      --bg: ${safeCssColor(project.branding?.bgColor, '#ffffff')};
+      --bg-sec: ${safeCssColor(project.branding?.bgSecondary, '#f8fafc')};
+      --text: ${safeCssColor(project.branding?.textColor, '#0f172a')};
+      --text-muted: ${safeCssColor(project.branding?.textMuted, '#64748b')};
+      --font-heading: '${safeFontFamily(project.branding?.headingFont, 'Plus Jakarta Sans')}', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-body: '${safeFontFamily(project.branding?.bodyFont, 'Inter')}', -apple-system, BlinkMacSystemFont, sans-serif;
+      --radius: ${safeCssLength(project.branding?.borderRadius, '0.75rem')};
+      --card-radius: ${safeCssLength(project.branding?.borderRadius, '0.75rem')};
+      --btn-radius: ${safeCssLength(project.branding?.buttonRadius, '9999px')};
+      --cta-radius: ${safeCssLength(project.branding?.buttonRadius, '9999px')};
       --cta-padding: ${ctaPaddingMap[ctaSize] || '0.75rem 1.5rem'};
-      --cta-font-size: ${project.branding?.ctaFontSize || ctaFontMap[ctaSize] || '0.95rem'};
-      --cta-scale: ${project.branding?.ctaScale ? (project.branding.ctaScale / 100) : 1};
-      --cta-transform: ${project.branding?.ctaTransform || 'none'};
+      --cta-font-size: ${safeCssLength(project.branding?.ctaFontSize, ctaFontMap[ctaSize] || '0.95rem')};
+      --cta-scale: ${Number.isFinite(Number(project.branding?.ctaScale)) ? Math.max(.5, Math.min(2, Number(project.branding.ctaScale) / 100)) : 1};
+      --cta-transform: ${['none', 'uppercase', 'lowercase', 'capitalize'].includes(project.branding?.ctaTransform) ? project.branding.ctaTransform : 'none'};
       --anim-duration-multiplier: ${animationMultiplier};
     ">
       <div class="site-scroll-progress" aria-hidden="true"></div>
@@ -1734,7 +1751,7 @@ function renderGalleryCard(p, idx, sec, project, options, aspectClass) {
                data-sec-id="${sec.id}"
                tabindex="0"
                role="slider"
-               aria-label="Comparateur Avant Après ${escapeHtml(p.title || '')}"
+               aria-label="Comparateur Avant Après ${p.title || ''}"
                aria-valuenow="50"
                aria-valuemin="0"
                aria-valuemax="100">
@@ -3410,7 +3427,7 @@ function renderSocialProofToast(project, options = {}) {
   const trade = project.business?.tradeLabel || "artisan";
 
   return `
-    <div id="social-proof-toast" class="social-proof-toast fixed bottom-4 left-4 z-40 bg-white/95 backdrop-blur-md border border-zinc-200/90 rounded-2xl p-3 shadow-lg flex items-center gap-3 transition-all duration-500 max-w-sm" role="status" aria-live="polite" data-city="${escapeHtml(city)}" data-trade="${escapeHtml(trade)}">
+    <div id="social-proof-toast" class="social-proof-toast fixed bottom-4 left-4 z-40 bg-white/95 backdrop-blur-md border border-zinc-200/90 rounded-2xl p-3 shadow-lg flex items-center gap-3 transition-all duration-500 max-w-sm" role="status" aria-live="polite" data-city="${city}" data-trade="${trade}">
       <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-base flex-shrink-0 border border-emerald-200">
         ⚡
       </div>
@@ -3520,5 +3537,8 @@ export function generateLocalBusinessSchema(project) {
       "reviewCount": "48"
     }
   };
-  return JSON.stringify(schema, null, 2);
+  return JSON.stringify(schema, null, 2)
+    .replace(/</g, "\\u003c")
+    .replace(/>/g, "\\u003e")
+    .replace(/&/g, "\\u0026");
 }

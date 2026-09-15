@@ -7,6 +7,12 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 15 septembre 2026 (4.8.0-alpha.37)
+
+- Sécurité : le contenu métier modifiable est neutralisé avant tout rendu public, éditeur ou export autonome ; les URL exécutables, injections CSS et fermetures de script JSON-LD sont rejetées.
+- Architecture : les six copies de `escapeHtml` sont remplacées par un module partagé qui centralise aussi les règles URL, CSS et sérialisation JavaScript.
+- QA : charges XSS testées dans l’identité, le Hero, les liens et les styles ; rendu/export restent inertes. Validation : 10/10 tests ciblés, 237/237 complets, syntaxe et `git diff --check`.
+
 ### Consolidation — 15 septembre 2026 (4.8.0-alpha.36)
 
 - Éditeur : les outils contextuels Texte, Section, Freeform et CTA sont désormais mutuellement exclusifs ; ouvrir l’un masque les autres sans effacer la sélection ni les réglages persistés.

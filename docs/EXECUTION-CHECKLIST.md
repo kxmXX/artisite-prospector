@@ -33,7 +33,7 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 ## Audit reçu après `4.8.0-alpha.35`
 
 - [x] Collisions des barres flottantes — livré et vérifié dans `4.8.0-alpha.36`.
-- [ ] XSS du renderer/export et duplication de `escapeHtml` — confirmé encore réel ; prochain lot prioritaire.
+- [x] XSS du renderer/export et duplication de `escapeHtml` — rendu métier neutralisé, URL/CSS/scripts filtrés et utilitaire partagé livré dans `4.8.0-alpha.37`.
 - [ ] PIN client — le fallback `1234`, l’affichage en clair et la portée limitée à la démo interne sont encore présents.
 - [ ] Protection des routes IA — CORS `*` et absence de limitation de débit encore présents.
 - [ ] Labels du wizard — associations `for`/`id` encore incomplètes.
@@ -43,7 +43,7 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - [~] Persistance serveur et audit SEO réel — exclus explicitement par l’utilisateur pour cette mission.
 - [~] Avis Google fictifs / badges associés — conservation explicitement demandée par l’utilisateur.
 
-Prochaine action exacte : centraliser l’échappement HTML et sécuriser les frontières de rendu public/export avec tests d’injection sur Hero, À propos, Services, Avis, FAQ et Footer, sans modifier le contenu des avis demandé.
+Prochaine action exacte : corriger le PIN client sans fallback `1234` ni affichage du secret, et clarifier dans l’interface qu’il protège uniquement la démo interne — jamais un export HTML statique.
 
 ## État exact à `4.8.0-alpha.8`
 

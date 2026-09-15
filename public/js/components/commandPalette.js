@@ -1,4 +1,5 @@
 import { getIcon } from "./icons.js";
+import { escapeHtml } from "../utils/html.js";
 
 /**
  * Command Palette (Linear & Raycast Inspired)
@@ -188,14 +189,4 @@ export function renderCommandPalette(project, allProjects = []) {
       </div>
     </div>
   `;
-}
-
-function escapeHtml(str) {
-  if (typeof str !== 'string') return str || '';
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
 }

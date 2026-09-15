@@ -7,6 +7,7 @@ import {
   verifyAccessibility,
   detectAntiPatterns
 } from "../engine/componentIntelligence.js";
+import { escapeHtml } from "../utils/html.js";
 
 /**
  * Sendpage / Linear Minimalist Inspector Panel.
@@ -660,14 +661,3 @@ export function renderInspector(section, project, state) {
     </div>
   `;
 }
-
-function escapeHtml(str) {
-  if (typeof str !== 'string') return str || '';
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
-

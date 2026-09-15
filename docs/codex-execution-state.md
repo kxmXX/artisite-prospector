@@ -1,3 +1,12 @@
+## LOT DE LIVRAISON — rendu et export sécurisés 4.8.0-alpha.37 — 15 septembre 2026
+
+- Frontière de confiance : `createSafeRenderProject()` crée une copie non mutante des données métier avant le renderer commun ; texte visible, attributs et URL deviennent inertes dans l’éditeur, la vitrine et l’export.
+- Styles/scripts : couleurs, longueurs, familles typographiques et transformations sont filtrées ; les valeurs insérées dans le JavaScript standalone et le JSON-LD ne peuvent plus fermer leur balise.
+- Mutualisation : `public/js/utils/html.js` remplace les six implémentations locales de `escapeHtml` et porte les règles URL/CSS/script testées.
+- Validation : 10/10 tests ciblés, 237/237 tests complets, une seule définition de `escapeHtml`, serveur local HTTP 200. Le navigateur Playwright existant s’est bloqué sans résultat et n’a pas été relancé en boucle ; la couverture renderer/editor/export est verte.
+- Arbitrages conservés : persistance serveur, audit SEO réel et suppression des faux avis Google restent hors périmètre sur instruction utilisateur.
+- Prochaine action exacte : PIN client — retirer le fallback `1234`, ne jamais réafficher le code et annoncer explicitement la portée démo interne avant de traiter CORS/rate limit.
+
 ## LOT DE LIVRAISON — coordination des outils flottants 4.8.0-alpha.36 — 15 septembre 2026
 
 - État de départ vérifié : branche `refactor/artist-consolidation`, `main` et branche sur `083534b`, dépôt propre, version `4.8.0-alpha.35`.

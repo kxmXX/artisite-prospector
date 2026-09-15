@@ -59,6 +59,13 @@ Cette section prévaut sur le tableau historique des lots 5–13 ci-dessous sans
 - Contrôle ciblé et navigateur réussi, puis 234/234 tests complets. Le nouvel audit est intégré à la checklist : prochain lot XSS/échappement, puis PIN, routes IA, wizard, fontes et progression réseau.
 - Hors périmètre explicite : persistance serveur, audit SEO réel et retrait des faux avis Google.
 
+### Lot sécurité du rendu — 4.8.0-alpha.37
+
+- Les données métier sont copiées et neutralisées à l’entrée du renderer partagé, ce qui couvre d’un même contrat l’éditeur, la vitrine et l’export autonome sans muter le projet source.
+- Un module HTML unique remplace les six échappements divergents et filtre aussi URL, variables CSS, scripts embarqués et JSON-LD.
+- Les assertions historiques comparent désormais le HTML sûr tout en conservant le texte décodé identique dans le navigateur. Validation complète : 237/237.
+- Prochain lot borné : PIN de démo, puis protection CORS/rate limit. Persistance serveur, audit SEO réel et faux avis Google restent exclus.
+
 ## État initial vérifié
 
 - Vanilla JS, serveur Node natif, aucune dépendance npm déclarée ; `npm test` : **136/136**.

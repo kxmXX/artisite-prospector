@@ -1,5 +1,6 @@
 import { getIcon } from "./icons.js";
 import { generateQRCodeSVG } from "./qrcode.js";
+import { escapeHtml } from "../utils/html.js";
 
 /**
  * Share Modal (Sendpage & Duda Inspired)
@@ -302,14 +303,4 @@ function slugify(text) {
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)+/g, "");
-}
-
-function escapeHtml(str) {
-  if (typeof str !== 'string') return str || '';
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
 }

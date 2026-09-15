@@ -9,6 +9,7 @@ import { state } from "../public/js/state.js";
 import { renderWebsiteHTML } from "../public/js/components/renderer.js";
 import { renderEditor } from "../public/js/components/editor.js";
 import { renderShareModal } from "../public/js/components/shareModal.js";
+import { escapeHtml } from "../public/js/utils/html.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -185,7 +186,7 @@ test("v4.7.0 Consolidation: 100% Sendpage Benchmark Fidelity for Esprit Nature P
   const html = renderWebsiteHTML(project, { isEditor: false });
 
   // Screenshot 1: Horaires & Lieu
-  assert.ok(html.includes("Horaires & Lieu"), "Must render Horaires & Lieu title");
+  assert.ok(html.includes("Horaires &amp; Lieu"), "Must render Horaires & Lieu title safely");
   assert.ok(html.includes("HORAIRES"), "Must render HORAIRES badge");
   assert.ok(html.includes("Montauban"), "Must render Montauban location subtitle");
   assert.ok(html.includes("9h - 12h / 14h - 18h"), "Must render 9h - 12h / 14h - 18h hours");
@@ -196,8 +197,8 @@ test("v4.7.0 Consolidation: 100% Sendpage Benchmark Fidelity for Esprit Nature P
 
   // Screenshot 2: Hero
   assert.ok(html.includes("Donnez à vos extérieurs"), "Hero must render Sendpage title");
-  assert.ok(html.includes("l'entretien et le soin qu'ils méritent à Montauban et ses environs"), "Hero title with city");
-  assert.ok(html.includes("Votre jardinier professionnel se déplace gratuitement dans toute l'Occitanie"), "Hero subtitle");
+  assert.ok(html.includes(escapeHtml("l'entretien et le soin qu'ils méritent à Montauban et ses environs")), "Hero title with city");
+  assert.ok(html.includes(escapeHtml("Votre jardinier professionnel se déplace gratuitement dans toute l'Occitanie")), "Hero subtitle");
   assert.ok(html.includes("Demander un devis personnalisé"), "CTA primary button");
   assert.ok(html.includes("07 70 10 29 71"), "CTA secondary button with phone number");
   assert.ok(html.includes("DÉCOUVRIR"), "Hero scroll indicator");
@@ -205,7 +206,7 @@ test("v4.7.0 Consolidation: 100% Sendpage Benchmark Fidelity for Esprit Nature P
   // Screenshot 3: À Propos
   assert.ok(html.includes("À PROPOS"), "About badge");
   assert.match(html, /Artisan certifié/, "Reference demo must render the certification chip shown in the benchmark");
-  assert.ok(html.includes("Jardinier & Paysagiste"), "Role subtitle");
+  assert.ok(html.includes(escapeHtml("Jardinier & Paysagiste")), "Role subtitle");
   assert.ok(html.includes("Benjamin met son savoir-faire"), "Benjamin story text");
   assert.ok(html.includes("Découvrir nos services"), "About secondary link");
 
@@ -213,11 +214,11 @@ test("v4.7.0 Consolidation: 100% Sendpage Benchmark Fidelity for Esprit Nature P
   assert.ok(html.includes("CE QUE NOUS PROPOSONS"), "Services badge");
   assert.ok(html.includes("Nos services"), "Services title");
   assert.ok(html.includes("Conception de jardins"), "Service 1 Conception de jardins");
-  assert.ok(html.includes("Aménagement & Plantation"), "Service 2 Aménagement & Plantation");
-  assert.ok(html.includes("Défrichage & Débroussaillage"), "Service 3 Défrichage & Débroussaillage");
+  assert.ok(html.includes(escapeHtml("Aménagement & Plantation")), "Service 2 Aménagement & Plantation");
+  assert.ok(html.includes(escapeHtml("Défrichage & Débroussaillage")), "Service 3 Défrichage & Débroussaillage");
   assert.ok(html.includes("Taille de haies"), "Service 4 Taille de haies");
   assert.ok(html.includes("Tonte"), "Service 5 Tonte");
-  assert.ok(html.includes("Élagage & Abattage"), "Service 6 Élagage & Abattage");
+  assert.ok(html.includes(escapeHtml("Élagage & Abattage")), "Service 6 Élagage & Abattage");
 
   // Screenshot 5: Galerie
   assert.ok(html.includes("NOS RÉALISATIONS"), "Gallery badge");

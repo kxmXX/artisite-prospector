@@ -5,6 +5,7 @@ import { STYLE_PRESETS } from "../data/styles.js";
 import { FONT_CATALOG, ensureFontCatalog } from "../data/fonts.js";
 import { SECTION_DEFINITIONS } from "./addSectionModal.js";
 import { INSPIRATION_PATTERNS } from "../data/inspiration.js";
+import { escapeHtml } from "../utils/html.js";
 
 function hexToRgbText(hex) {
   const raw = String(hex || "").replace("#", "");
@@ -1756,16 +1757,6 @@ function renderSettingsAccordions(project, state = {}) {
 
     </div>
   `;
-}
-
-function escapeHtml(str) {
-  if (typeof str !== 'string') return str || '';
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
 }
 
 function getHarmonyColors(hex) {

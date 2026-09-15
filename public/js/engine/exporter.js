@@ -5,9 +5,10 @@
  * 3. Commercial Proposal Print Document
  */
 
-import { renderWebsiteHTML, generateLocalBusinessSchema } from "../components/renderer.js";
+import { renderWebsiteHTML, generateLocalBusinessSchema, createSafeRenderProject } from "../components/renderer.js";
 import { UTILITY_CSS } from "./exportStyles.js";
 import { FONT_CATALOG } from "../data/fonts.js";
+import { safeCssColor, safeCssLength, safeFontFamily, serializeForInlineScript } from "../utils/html.js";
 
 const EXPORT_FONT_QUERY = FONT_CATALOG
   .map(font => `family=${encodeURIComponent(font.name).replace(/%20/g, '+')}:wght@400;500;600;700;800`)
@@ -15,8 +16,9 @@ const EXPORT_FONT_QUERY = FONT_CATALOG
 
 export function exportStandaloneHTML(project) {
   const htmlBody = renderWebsiteHTML(project, { isEditor: false, isStandalone: true });
+  const safeProject = createSafeRenderProject(project);
   const b = project.branding;
-  const bus = project.business;
+  const bus = safeProject.business;
   const animationMultiplier = b.animationSpeed === "fast" ? 0.6 : (b.animationSpeed === "slow" ? 1.5 : 1);
 
   return `<!DOCTYPE html>
@@ -25,7 +27,7 @@ export function exportStandaloneHTML(project) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${bus.name} — ${bus.tradeLabel} à ${bus.city}</title>
-  <meta name="description" content="${bus.name}, votre artisan ${bus.tradeLabel.toLowerCase()} professionnel à ${bus.city} et alentours. Devis gratuit sous 24h.">
+  <meta name="description" content="${bus.name}, votre artisan ${String(bus.tradeLabel || '').toLowerCase()} professionnel à ${bus.city} et alentours. Devis gratuit sous 24h.">
   
   <!-- LocalBusiness Structured Data (Schema.org JSON-LD) for Local Google SEO -->
   <script type="application/ld+json">
@@ -42,18 +44,18 @@ ${generateLocalBusinessSchema(project)}
 ${UTILITY_CSS}
 
     :root {
-      --primary: ${b.primaryColor};
-      --secondary: ${b.secondaryColor};
-      --accent: ${b.accentColor};
-      --bg: ${b.bgColor};
-      --bg-sec: ${b.bgSecondary};
-      --text: ${b.textColor};
-      --text-muted: ${b.textMuted};
-      --font-heading: '${b.headingFont}', -apple-system, BlinkMacSystemFont, sans-serif;
-      --font-body: '${b.bodyFont}', -apple-system, BlinkMacSystemFont, sans-serif;
-      --radius: ${b.borderRadius};
-      --btn-radius: ${b.buttonRadius};
-      --cta-radius: ${b.buttonRadius};
+      --primary: ${safeCssColor(b.primaryColor, '#059669')};
+      --secondary: ${safeCssColor(b.secondaryColor, '#065f46')};
+      --accent: ${safeCssColor(b.accentColor, '#f59e0b')};
+      --bg: ${safeCssColor(b.bgColor, '#ffffff')};
+      --bg-sec: ${safeCssColor(b.bgSecondary, '#f8fafc')};
+      --text: ${safeCssColor(b.textColor, '#0f172a')};
+      --text-muted: ${safeCssColor(b.textMuted, '#64748b')};
+      --font-heading: '${safeFontFamily(b.headingFont, 'Plus Jakarta Sans')}', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-body: '${safeFontFamily(b.bodyFont, 'Inter')}', -apple-system, BlinkMacSystemFont, sans-serif;
+      --radius: ${safeCssLength(b.borderRadius, '0.75rem')};
+      --btn-radius: ${safeCssLength(b.buttonRadius, '9999px')};
+      --cta-radius: ${safeCssLength(b.buttonRadius, '9999px')};
       --anim-duration-multiplier: ${animationMultiplier};
     }
 
@@ -686,8 +688,8 @@ ${UTILITY_CSS}
       const textEl = toast.querySelector('#sp-toast-text');
       const timeEl = toast.querySelector('#sp-toast-time');
       if (!textEl || !timeEl) return;
-      const city = toast.getAttribute('data-city') || ${JSON.stringify(project.business?.city || "votre commune")};
-      const trade = toast.getAttribute('data-trade') || ${JSON.stringify(project.business?.tradeLabel || "artisan")};
+      const city = toast.getAttribute('data-city') || ${serializeForInlineScript(project.business?.city || "votre commune")};
+      const trade = toast.getAttribute('data-trade') || ${serializeForInlineScript(project.business?.tradeLabel || "artisan")};
       const messages = [
         { text: 'Demande de devis reçue à ' + city, time: 'Il y a 6 min' },
         { text: 'Nouveau créneau réservé (' + trade + ')', time: 'Il y a 14 min' },

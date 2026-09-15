@@ -515,7 +515,7 @@ test("E2E Subsystem 8: Standalone Self-Contained HTML Export & JSON Export", () 
   assert.ok(standaloneHTML.includes("</html>"), "Must close html tag");
 
   // 2. Metadata & Titles
-  assert.ok(standaloneHTML.includes("<title>Toitures & Charpentes d'Occitanie"), "Must have descriptive title");
+  assert.ok(standaloneHTML.includes("<title>Toitures &amp; Charpentes d&#039;Occitanie"), "Must have a descriptive, HTML-safe title");
   assert.ok(standaloneHTML.includes('name="description"'), "Must have meta description");
   assert.ok(standaloneHTML.includes('name="viewport"'), "Must have mobile viewport meta");
 

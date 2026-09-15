@@ -4,6 +4,7 @@ import { SAMPLE_PROJECTS } from '../public/js/data/sampleProjects.js';
 import { renderWebsiteHTML } from '../public/js/components/renderer.js';
 import { exportStandaloneHTML } from '../public/js/engine/exporter.js';
 import { HERO_STYLES } from '../public/js/components/heroStyles.js';
+import { escapeHtml } from '../public/js/utils/html.js';
 
 test('fullscreen hero shares explicit layers and responsive styles across delivery modes', () => {
   const project = structuredClone(SAMPLE_PROJECTS[0]);
@@ -15,7 +16,7 @@ test('fullscreen hero shares explicit layers and responsive styles across delive
     assert.match(html, /class="hero-background"/);
     assert.match(html, /class="hero-content text-center/);
     assert.match(html, /rgba\(0, 0, 0, 0\.7\)/);
-    assert.ok(html.includes(hero.content.title));
+    assert.ok(html.includes(escapeHtml(hero.content.title)));
     assert.match(html, /href="#about"/);
     assert.match(html, /href="#simulateur"/);
   }

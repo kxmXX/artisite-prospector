@@ -20,16 +20,7 @@ import { ensureFontCatalog } from "./data/fonts.js";
 import { getIcon } from "./components/icons.js";
 import { createEspritNatureDemoProject } from "./data/sampleProjects.js";
 import { getDefaultTemplateIdForTrade, getSiteTemplate, instantiateSiteTemplate } from "./data/templates.js";
-
-function escapeHtml(str) {
-  if (!str) return "";
-  return String(str)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
+import { escapeHtml } from "./utils/html.js";
 
 export class App {
   // Scope async work to its original project, contents and request. Subscription
