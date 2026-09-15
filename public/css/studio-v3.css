@@ -638,7 +638,8 @@
 .freeform-layerbar button{height:26px;min-width:28px;border:0;border-radius:5px;background:transparent;color:#334155;padding:0 7px;font:700 10px/1 ui-monospace,SFMono-Regular,Menlo,monospace;cursor:pointer}
 .freeform-layerbar button:hover,.freeform-layerbar button:focus-visible{background:#e8eefc;color:#1d4ed8;outline:none}
 .freeform-layerbar span{width:1px;height:16px;background:#d8dee9;margin:0 1px}
-.freeform-responsivebar{position:absolute;left:50%;top:calc(100% + 50px);translate:-50% 0;display:flex;align-items:center;gap:3px;padding:4px;border:1px solid rgba(24,32,31,.14);border-radius:8px;background:#fff;color:#334155;box-shadow:0 8px 24px rgba(15,23,42,.16);pointer-events:auto;white-space:nowrap}
+.freeform-responsivebar{position:absolute;left:50%;top:calc(100% + 50px);translate:-50% 0;display:none;align-items:center;gap:3px;padding:4px;border:1px solid rgba(24,32,31,.14);border-radius:8px;background:#fff;color:#334155;box-shadow:0 8px 24px rgba(15,23,42,.16);pointer-events:auto;white-space:nowrap}
+.freeform-responsivebar.is-open{display:flex}
 .freeform-responsivebar>span{padding:0 5px;color:#64748b;font:700 9px/1 ui-monospace,SFMono-Regular,Menlo,monospace}
 .freeform-responsivebar button{height:26px;border:0;border-radius:5px;background:transparent;color:#334155;padding:0 7px;font:700 9px/1 ui-monospace,SFMono-Regular,Menlo,monospace;cursor:pointer}
 .freeform-responsivebar button:hover,.freeform-responsivebar button:focus-visible{background:#e8eefc;color:#1d4ed8;outline:none}

@@ -504,17 +504,26 @@ class AppStateManager {
     if (!this.currentProject) return null;
     const keys = [...new Set((Array.isArray(layoutKeys) ? layoutKeys : [layoutKeys]).filter(Boolean))];
     if (keys.length < 2) return null;
+    const groups = this.currentProject.freeformGroups || {};
+    const topGroups = Object.values(groups).filter(group =>
+      Array.isArray(group?.members) && group.members.length >= 2 && (!group.parentId || !groups[group.parentId])
+    );
+    const intersecting = topGroups.filter(group => group.members.some(key => keys.includes(key)));
+    if (intersecting.some(group => !group.members.every(key => keys.includes(key)))) return null;
+    const childGroups = intersecting.filter(group => group.members.every(key => keys.includes(key)));
+    const covered = new Set(childGroups.flatMap(group => group.members));
+    const directMembers = keys.filter(key => !covered.has(key));
+    if (childGroups.length + directMembers.length < 2) return null;
+
     this.pushHistory(historyDesc);
     const project = JSON.parse(JSON.stringify(this.currentProject));
     project.freeformGroups = project.freeformGroups || {};
-    for (const [groupId, group] of Object.entries(project.freeformGroups)) {
-      if (!Array.isArray(group?.members)) continue;
-      const remaining = group.members.filter(key => !keys.includes(key));
-      if (remaining.length >= 2) group.members = remaining;
-      else delete project.freeformGroups[groupId];
-    }
     const id = `group-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
-    project.freeformGroups[id] = { id, members: keys };
+    const childGroupIds = childGroups.map(group => group.id);
+    childGroupIds.forEach(childId => {
+      if (project.freeformGroups[childId]) project.freeformGroups[childId].parentId = id;
+    });
+    project.freeformGroups[id] = { id, members: keys, directMembers, childGroups: childGroupIds };
     this.updateProject(project, false);
     return id;
   }
@@ -523,6 +532,23 @@ class AppStateManager {
     if (!this.currentProject?.freeformGroups?.[groupId]) return;
     this.pushHistory(historyDesc);
     const project = JSON.parse(JSON.stringify(this.currentProject));
+    const group = project.freeformGroups?.[groupId];
+    if (!group) return;
+    const childIds = Array.isArray(group.childGroups) ? group.childGroups.filter(Boolean) : [];
+    const parent = group.parentId ? project.freeformGroups?.[group.parentId] : null;
+    if (parent) {
+      const parentChildren = new Set((parent.childGroups || []).filter(id => id !== groupId));
+      childIds.forEach(id => parentChildren.add(id));
+      parent.childGroups = [...parentChildren];
+      parent.directMembers = [...new Set([...(parent.directMembers || []), ...(group.directMembers || [])])];
+      childIds.forEach(childId => {
+        if (project.freeformGroups[childId]) project.freeformGroups[childId].parentId = parent.id;
+      });
+    } else {
+      childIds.forEach(childId => {
+        if (project.freeformGroups[childId]) delete project.freeformGroups[childId].parentId;
+      });
+    }
     delete project.freeformGroups[groupId];
     this.updateProject(project, false);
   }

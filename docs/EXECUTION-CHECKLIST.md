@@ -89,7 +89,7 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - [x] Groupes phase 1 — Grouper/Dégrouper persistant, clic sur un membre resélectionne le groupe, déplacement collectif sans perdre les géométries individuelles.
 - [x] Groupes phase 2a — redimensionnement collectif persistant par scale autour du cadre, ratio uniforme avec Shift et Undo batch unique.
 - [x] Groupes phase 2b-1 — ordre/z-index contrôlable : avancer/reculer, premier plan/arrière-plan, persistance par breakpoint et Undo.
-- [ ] Groupes phase 2b-2 — groupes imbriqués.
+- [x] Groupes phase 2b-2 — groupes imbriqués persistants avec sous-groupes préservés, sélection par unité, ungroup un niveau et Undo.
 - [x] Alignement phase 1 — gauche/centre/droite/haut/milieu/bas et distribution horizontale/verticale en mutation batch.
 - [x] Alignement phase 2a — guides intelligents visibles et snapping à 6 px pendant le déplacement, y compris bords/centres de section et éléments voisins.
 - [x] Alignement phase 2b — snapping pendant le resize, équidistance entre voisins et guides de spacing avec mesure en px ; Alt désactive toujours les accroches.
@@ -117,6 +117,8 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 7. Noter ici : commit, tests réellement exécutés, anomalies connues et prochaine action unique.
 
 ## Dernière livraison validée
+
+- Lot `4.8.0-alpha.28` : groupes imbriqués, ungroup un niveau et Shift-clic par unité ; barre Responsive repliée par défaut pour supprimer un chevauchement. QA Chrome : groupe parent 3 calques, Move +10 collectif, sous-groupe 2 calques intact après ungroup. 37/37 ciblés, 221/221 complets et `git diff --check`.
 
 - Lot `4.8.0-alpha.27` : adaptation responsive explicite Desktop/Tablette/Mobile, héritage Desktop et Reset local. QA Chrome : 12/8 → 3,9/2,6, édition Mobile indépendante à 10,9, héritage/restauration et toolbar bornée, zéro erreur console. 44/44 ciblés, 219/219 complets et `git diff --check`.
 

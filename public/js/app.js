@@ -4088,6 +4088,7 @@ export class App {
           <button type="button" data-freeform-layer="forward" title="Avancer d’un plan" aria-label="Avancer d’un plan">+</button>
           <button type="button" data-freeform-layer="front" title="Mettre au premier plan" aria-label="Mettre au premier plan">⇥</button>
           <span></span>
+          <button type="button" data-freeform-responsive-toggle title="Ouvrir les outils responsive" aria-label="Ouvrir les outils responsive" aria-expanded="false">Resp.</button>
           <button type="button" data-freeform-ratio title="Verrouiller le ratio largeur/hauteur" aria-label="Verrouiller le ratio largeur/hauteur">Ratio libre</button>
           <button type="button" data-freeform-lock title="Verrouiller la sélection" aria-label="Verrouiller la sélection">Verrouiller</button>
         </div>
@@ -4131,6 +4132,15 @@ export class App {
         event.preventDefault();
         event.stopPropagation();
         this.ungroupFreeformSelection();
+      });
+      overlay.querySelector("[data-freeform-responsive-toggle]")?.addEventListener("click", event => {
+        event.preventDefault();
+        event.stopPropagation();
+        const bar = overlay.querySelector(".freeform-responsivebar");
+        const open = !bar?.classList.contains("is-open");
+        bar?.classList.toggle("is-open", open);
+        event.currentTarget.setAttribute("aria-expanded", open ? "true" : "false");
+        this.updateFreeformOverlay();
       });
       overlay.querySelectorAll("[data-freeform-copy]").forEach(button => {
         button.addEventListener("click", event => {
@@ -4201,16 +4211,21 @@ export class App {
 
   getFreeformGroupForKey(layoutKey) {
     if (!layoutKey) return null;
-    return Object.values(state.currentProject?.freeformGroups || {}).find(group => Array.isArray(group?.members) && group.members.includes(layoutKey)) || null;
+    const groups = state.currentProject?.freeformGroups || {};
+    const matches = Object.values(groups).filter(group => Array.isArray(group?.members) && group.members.includes(layoutKey));
+    if (!matches.length) return null;
+    return matches.find(group => !group.parentId || !groups[group.parentId]) || matches[0];
   }
 
   getExactFreeformGroup(layoutKeys = this.getFreeformSelectedKeys()) {
     const keys = [...new Set(layoutKeys.filter(Boolean))].sort();
     if (keys.length < 2) return null;
-    return Object.values(state.currentProject?.freeformGroups || {}).find(group => {
+    const groups = state.currentProject?.freeformGroups || {};
+    const matches = Object.values(groups).filter(group => {
       const members = Array.isArray(group?.members) ? [...new Set(group.members)].sort() : [];
       return members.length === keys.length && members.every((key, index) => key === keys[index]);
-    }) || null;
+    });
+    return matches.find(group => !group.parentId || !groups[group.parentId]) || matches[0] || null;
   }
 
   selectFreeformKeys(layoutKeys = [], primaryKey = null) {
@@ -4224,6 +4239,9 @@ export class App {
     this._freeformSelectedKeys = keys;
     this._freeformSelectedKey = primaryKey && keys.includes(primaryKey) ? primaryKey : keys[0];
     this._freeformSelectedElement = canvas.querySelector(`[data-layout-key="${this._freeformSelectedKey}"]`);
+    const responsiveBar = this._freeformOverlay?.querySelector?.(".freeform-responsivebar");
+    responsiveBar?.classList.remove("is-open");
+    this._freeformOverlay?.querySelector?.("[data-freeform-responsive-toggle]")?.setAttribute("aria-expanded", "false");
     document.querySelectorAll("#canvas-container [data-layout-key].is-freeform-selected").forEach(el => el.classList.remove("is-freeform-selected"));
     keys.forEach(key => canvas.querySelector(`[data-layout-key="${key}"]`)?.classList.add("is-freeform-selected"));
     const overlay = this.ensureFreeformOverlay();
@@ -4246,7 +4264,12 @@ export class App {
     const key = target.dataset.layoutKey;
     if (options.additive) {
       const current = this.getFreeformSelectedKeys();
-      const next = current.includes(key) ? current.filter(item => item !== key) : [...current, key];
+      const group = options.ignoreGroup ? null : this.getFreeformGroupForKey(key);
+      const unitKeys = group?.members?.length ? group.members : [key];
+      const unitSelected = unitKeys.every(item => current.includes(item));
+      const next = unitSelected
+        ? current.filter(item => !unitKeys.includes(item))
+        : [...new Set([...current, ...unitKeys])];
       this.selectFreeformKeys(next, key);
       return;
     }
@@ -5087,7 +5110,7 @@ export class App {
     window.addEventListener("pointercancel", onCancel);
   }
 
-  armFreeformDirectDrag(event, target, { wasSelected = false } = {}) {
+  armFreeformDirectDrag(event, target, { wasSelected = false, onClick = null } = {}) {
     if (!target?.dataset?.layoutKey || event.shiftKey || this.isFreeformSelectionLocked()) return;
     if (event.target.closest("input, textarea, select, option")) return;
     const textLike = target.hasAttribute("data-editable") || target.matches("[contenteditable='true']");
@@ -5116,7 +5139,10 @@ export class App {
       }, "move", "", { direct: true, startPoint, pointerId, initialMoveEvent: moveEvent });
     };
     const onArmUp = () => {
-      if (!started) cleanup();
+      if (!started) {
+        cleanup();
+        if (typeof onClick === "function") onClick();
+      }
     };
     window.addEventListener("pointermove", onArmMove);
     window.addEventListener("pointerup", onArmUp);
@@ -5141,12 +5167,15 @@ export class App {
         if (target) {
           const previousKeys = this.getFreeformSelectedKeys();
           const wasSelected = previousKeys.includes(target.dataset.layoutKey);
+          let collapseOnClick = null;
           if (!event.shiftKey && wasSelected && previousKeys.length > 1) {
+            const activeGroup = this.getExactFreeformGroup(previousKeys);
             this.selectFreeformKeys(previousKeys, target.dataset.layoutKey);
+            if (!activeGroup) collapseOnClick = () => this.selectFreeformTarget(target);
           } else {
             this.selectFreeformTarget(target, { additive: event.shiftKey, ignoreGroup: event.shiftKey });
           }
-          this.armFreeformDirectDrag(event, target, { wasSelected });
+          this.armFreeformDirectDrag(event, target, { wasSelected, onClick: collapseOnClick });
         } else if (!event.target.closest("#freeform-selection-box")) {
           const baseKeys = event.shiftKey ? this.getFreeformSelectedKeys() : [];
           this.armFreeformMarquee(event, canvas, { baseKeys });

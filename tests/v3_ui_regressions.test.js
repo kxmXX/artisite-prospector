@@ -399,4 +399,20 @@ test('Freeform responsive tools adapt selected layouts across breakpoints withou
   assert.ok(appSource.includes('responsiveBar.style.left = `${desiredLeft - left}px`'));
   assert.ok(!appSource.match(/copyShareUrl[\s\S]{0,900}responsiveBar\.style\.left/));
   assert.ok(css.includes('.freeform-responsivebar'));
+  assert.ok(appSource.includes('data-freeform-responsive-toggle'));
+  assert.ok(appSource.includes('bar?.classList.toggle("is-open", open)'));
+  assert.ok(css.includes('.freeform-responsivebar.is-open{display:flex}'));
+});
+
+test('Freeform nested groups keep top-level selection semantics and additive group units', () => {
+  const appSource = fs.readFileSync(path.resolve(process.cwd(), 'public/js/app.js'), 'utf8');
+  const stateSource = fs.readFileSync(path.resolve(process.cwd(), 'public/js/state.js'), 'utf8');
+  assert.ok(appSource.includes('matches.find(group => !group.parentId || !groups[group.parentId])'));
+  assert.ok(appSource.includes('const unitKeys = group?.members?.length ? group.members : [key]'));
+  assert.ok(appSource.includes('const unitSelected = unitKeys.every(item => current.includes(item))'));
+  assert.ok(appSource.includes('if (!activeGroup) collapseOnClick = () => this.selectFreeformTarget(target)'));
+  assert.ok(appSource.includes('if (typeof onClick === "function") onClick()'));
+  assert.ok(stateSource.includes('const childGroups = intersecting.filter(group => group.members.every(key => keys.includes(key)))'));
+  assert.ok(stateSource.includes('project.freeformGroups[id] = { id, members: keys, directMembers, childGroups: childGroupIds }'));
+  assert.ok(stateSource.includes('if (project.freeformGroups[childId]) delete project.freeformGroups[childId].parentId'));
 });

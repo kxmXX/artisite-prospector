@@ -7,6 +7,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 15 septembre 2026 (4.8.0-alpha.28)
+
+- Groupes imbriqués : un groupe parent conserve ses sous-groupes via `childGroups/parentId` tout en gardant `members` aplati pour les transformations existantes.
+- Sélection : Shift-clic traite désormais un groupe comme une unité ; clic simple sur une multi-sélection non groupée réévalue la hiérarchie sans casser le drag collectif.
+- Dégrouper un niveau : supprimer un groupe parent libère ses sous-groupes sans les détruire ; Undo restaure la hiérarchie complète.
+- UX : la barre Responsive est repliée par défaut derrière `Resp.` afin de ne plus recouvrir les champs voisins. QA Chrome : parent 3 calques, Move +10 sur les 3, ungroup externe puis sous-groupe 2 calques intact, zéro erreur console. Validation : 37/37 ciblés, 221/221 complets et `git diff --check`.
+
 ### Consolidation — 15 septembre 2026 (4.8.0-alpha.27)
 
 - Responsive assisté : adaptation explicite d’une sélection entre Desktop / Tablette / Mobile avec échelle de référence 1200 / 768 / 390 ; x/y/width/height sont proportionnels, rotation/z/scale/ratio restent cohérents.

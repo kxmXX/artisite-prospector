@@ -1,3 +1,12 @@
+## LOT DE LIVRAISON — groupes imbriqués 4.8.0-alpha.28
+
+- Modèle : les groupes peuvent référencer des `childGroups` avec `parentId` ; leurs `members` restent aplatis pour préserver déplacement, resize, rotation, z-index et export sans nouveau moteur de transform.
+- Création : une sélection contenant un groupe complet le conserve comme sous-groupe ; les sélections partielles d’un groupe sont refusées afin d’éviter de corrompre la hiérarchie.
+- Dégrouper : un niveau externe est supprimé sans supprimer ses enfants ; les sous-groupes redeviennent racines et Undo restaure le parent.
+- UX : Shift-clic ajoute/retire un groupe entier ; un clic sans mouvement sur une multi-sélection non groupée recalcule la hiérarchie, tandis qu’un drag conserve la sélection collective. La barre Responsive est désormais repliée par défaut via `Resp.`.
+- QA Chrome : sous-groupe titre+rôle, parent + texte, sélection externe 3 calques, Move +10 sur les 3, ungroup parent puis sous-groupe 2 calques intact et texte seul sélectionnable ; zéro erreur console. Validation : 37/37 ciblés, 221/221 complets et `git diff --check`.
+- Prochaine action : ajout/retrait tactile et auto-scroll de bord pendant marquee/drag.
+
 ## LOT DE LIVRAISON — responsive assisté 4.8.0-alpha.27
 
 - Adaptation : `adaptFreeformLayoutToViewport` applique un ratio de largeur de référence (desktop 1200, tablette 768, mobile 390) aux coordonnées/dimensions d’un layout sélectionné sans coupler les breakpoints.

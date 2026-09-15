@@ -177,3 +177,41 @@ test("freeform layer locks persist and Undo restores them", () => {
   state.setFreeformLocked(["E_A", "E_B"], false, "Unlock layers");
   assert.deepEqual(state.currentProject.freeformLocked, {});
 });
+
+test("nested freeform groups preserve child groups and ungroup one level", () => {
+  const previous = { projects: state.projects, currentProject: state.currentProject, undoStack: state.undoStack, redoStack: state.redoStack };
+  try {
+    const project = generateSite({ name: "Nested Groups", tradeId: "menuisier" });
+    state.projects = [project];
+    state.currentProject = project;
+    state.undoStack = [];
+    state.redoStack = [];
+
+    const childA = state.createFreeformGroup(["A", "B"], "Group A");
+    const childB = state.createFreeformGroup(["C", "D"], "Group B");
+    const parent = state.createFreeformGroup(["A", "B", "C", "D", "E"], "Nested parent");
+    assert.ok(parent && childA && childB);
+    assert.deepEqual(new Set(state.currentProject.freeformGroups[parent].childGroups), new Set([childA, childB]));
+    assert.deepEqual(state.currentProject.freeformGroups[parent].directMembers, ["E"]);
+    assert.equal(state.currentProject.freeformGroups[childA].parentId, parent);
+    assert.equal(state.currentProject.freeformGroups[childB].parentId, parent);
+    assert.deepEqual(new Set(state.currentProject.freeformGroups[parent].members), new Set(["A", "B", "C", "D", "E"]));
+
+    state.deleteFreeformGroup(parent, "Ungroup outer");
+    assert.equal(state.currentProject.freeformGroups[parent], undefined);
+    assert.ok(state.currentProject.freeformGroups[childA]);
+    assert.ok(state.currentProject.freeformGroups[childB]);
+    assert.equal(state.currentProject.freeformGroups[childA].parentId, undefined);
+    assert.equal(state.currentProject.freeformGroups[childB].parentId, undefined);
+
+    state.undo();
+    assert.equal(state.currentProject.freeformGroups[childA].parentId, parent);
+    assert.equal(state.currentProject.freeformGroups[childB].parentId, parent);
+    assert.ok(state.currentProject.freeformGroups[parent]);
+  } finally {
+    state.projects = previous.projects;
+    state.currentProject = previous.currentProject;
+    state.undoStack = previous.undoStack;
+    state.redoStack = previous.redoStack;
+  }
+});
