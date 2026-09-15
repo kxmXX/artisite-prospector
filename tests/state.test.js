@@ -161,6 +161,31 @@ for (const storageKey of ["artisite_projects_v11", "artisite_projects_v5", "arti
   });
 }
 
+
+test("batch project deletion persists an intentionally empty library without reseeding the demo", async () => {
+  const previousStore = global.localStorage.store;
+  const projects = [
+    generateSite({ name: "Projet A", tradeId: "menuisier", city: "Nantes" }),
+    generateSite({ name: "Projet B", tradeId: "plombier", city: "Lyon" })
+  ];
+  global.localStorage.store = { artisite_projects_v11: JSON.stringify(projects) };
+  try {
+    const fresh = await import(`../public/js/state.js?batch-delete=${Date.now()}`);
+    assert.equal(fresh.state.hasStoredLibrary, true);
+    assert.equal(fresh.state.deleteProjects(projects.map(project => project.id)), 2);
+    assert.deepEqual(fresh.state.projects, []);
+    assert.equal(fresh.state.currentProject, null);
+    assert.deepEqual(JSON.parse(global.localStorage.getItem("artisite_projects_v11")), []);
+
+    const reloaded = await import(`../public/js/state.js?empty-library=${Date.now()}-${Math.random()}`);
+    assert.equal(reloaded.state.hasStoredLibrary, true);
+    assert.deepEqual(reloaded.state.projects, []);
+    assert.equal(reloaded.state.currentProject, null);
+  } finally {
+    global.localStorage.store = previousStore;
+  }
+});
+
 test("freeform layer locks persist and Undo restores them", () => {
   const p = generateSite({ name: "Layer Lock Test", tradeId: "menuisier" });
   state.addProject(p, true);

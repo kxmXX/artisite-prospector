@@ -7,6 +7,12 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 15 septembre 2026 (4.8.0-alpha.35)
+
+- Bibliothèque : sélection multi-projets, sélection de toutes les cartes visibles, compteur, annulation et suppression groupée avec cibles 34×34.
+- Persistance : une suppression groupée est sauvegardée en une opération ; vider volontairement la bibliothèque persiste `[]` et ne recrée plus automatiquement le projet Esprit Nature au prochain chargement.
+- QA Chrome : suppression 4→2 puis reload=2, suppression 2→0 puis reload=0 ; sélection conservée après rerender et aucun overflow à 390 px. Validation : 19/19 ciblés, 233/233 complets et `git diff --check`.
+
 ### Consolidation — 15 septembre 2026 (4.8.0-alpha.34)
 
 - Vitrine : le simulateur de devis est désormais placé avant le footer ; le footer redevient le dernier bloc public, sans section interactive après lui.

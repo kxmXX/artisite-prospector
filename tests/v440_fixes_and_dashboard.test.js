@@ -88,6 +88,9 @@ test("v4.4.0: 2026 SaaS Dashboard Cockpit with 1-click prompt chips and KPI metr
   assert.ok(dashboardHTML.includes("quick-gen-form"), "Dashboard must render quick generation form");
   assert.ok(dashboardHTML.includes("fillQuickGen"), "Dashboard must render 1-click suggestion chips");
   assert.ok(dashboardHTML.includes("Esprit Nature"), "Dashboard must render project card");
+  assert.ok(dashboardHTML.includes('data-project-select="'), "Dashboard projects expose an explicit multi-select control");
+  assert.ok(dashboardHTML.includes('id="project-select-all"'), "Dashboard exposes select-all for the visible library");
+  assert.ok(dashboardHTML.includes('data-project-bulk-delete'), "Dashboard exposes a grouped delete action");
   assert.ok(dashboardHTML.includes("Pipeline de vente"), "Dashboard must render pipeline KPI card");
 });
 

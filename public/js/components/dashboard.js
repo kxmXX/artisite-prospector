@@ -36,6 +36,10 @@ export function renderDashboard(state) {
 
     return `
       <article class="dashboard-v3-project ${index === 0 ? 'is-featured' : ''}" data-project-id="${p.id}" data-pipeline-status="${p.pipelineStatus || 'generated'}">
+        <label class="dashboard-v3-project-select" title="Sélectionner ${p.name}" onclick="event.stopPropagation()">
+          <input type="checkbox" data-project-select="${p.id}" aria-label="Sélectionner ${p.name}" onchange="window.app.toggleProjectSelection('${p.id}', this.checked)">
+          <span aria-hidden="true"></span>
+        </label>
         <button type="button" class="dashboard-v3-project-media" onclick="window.app.openEditor('${p.id}')" aria-label="Ouvrir ${p.name} dans l'éditeur">
           <img src="${heroImage}" data-fallback-src="${fallbackImage}" alt="Aperçu ${p.name}" onerror="if(!this.dataset.fallbackApplied){this.dataset.fallbackApplied='true';this.src=this.dataset.fallbackSrc;}">
           <span class="dashboard-v3-project-index">${String(index + 1).padStart(2, '0')}</span>
@@ -157,6 +161,18 @@ export function renderDashboard(state) {
               <div class="dashboard-v3-library-tools">
                 <span>${total} direction${total > 1 ? 's' : ''}</span>
                 <button type="button" onclick="window.app.openWizard()">${getIcon("plus", "w-4 h-4")} Ajouter</button>
+              </div>
+            </div>
+
+            <div class="dashboard-v3-bulkbar" aria-label="Actions groupées sur les projets">
+              <label class="dashboard-v3-select-all">
+                <input type="checkbox" id="project-select-all" onchange="window.app.toggleSelectAllProjects(this.checked)">
+                <span>Tout sélectionner</span>
+              </label>
+              <span class="dashboard-v3-selection-count" data-project-selection-count>0 sélectionné</span>
+              <div class="dashboard-v3-bulk-actions">
+                <button type="button" data-project-clear-selection onclick="window.app.clearProjectSelection()" disabled>Annuler</button>
+                <button type="button" data-project-bulk-delete onclick="window.app.deleteSelectedProjects()" disabled>${getIcon("trash", "w-3.5 h-3.5")} Supprimer</button>
               </div>
             </div>
 

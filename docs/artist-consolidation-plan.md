@@ -38,7 +38,7 @@ V4.3 PRO sur l'accueil et v4.7 dans les tests : cette divergence sera supprimée
 - Ensuite seulement : reprendre les contrôles d’édition encore prioritaires (typo, fonds,
   rayon, animations) sans modifier les données personnalisées des vitrines.
 
-## État de consolidation courant — après 4.8.0-alpha.34
+## État de consolidation courant — après 4.8.0-alpha.35
 
 Cette section prévaut sur le tableau historique des lots 5–13 ci-dessous sans le supprimer.
 
@@ -47,7 +47,8 @@ Cette section prévaut sur le tableau historique des lots 5–13 ci-dessous sans
 - Vitrine/hero/FAQ/personnalisation/export/responsive : les sous-lots historiques restent livrés, mais ils doivent maintenant être protégés par une validation visuelle de template avant tout nouveau chantier Figma lourd.
 - Templates : registre livré dans le wizard avec Esprit Nature 1:1, Artisan Moderne et Local Chaleureux. Une instance de référence reprend la composition sans copier les données de démo ; Avis/Horaires sans faits sont explicitement à renseigner.
 - QA visuel anti-régression de la template validé en alpha.34 : canonique et instance contrôlées à 1440/390, footer dernier et devis juste avant.
-- Prochaine priorité produit : nettoyage de bibliothèque (sélection/suppression groupée), puis audit des overlays éditeur.
+- Bibliothèque : sélection/suppression groupée livrée en alpha.35 ; une bibliothèque vidée volontairement ne recrée plus la démo.
+- Prochaine priorité produit : audit renforcé de consolidation, puis correction mesurée des collisions d’overlays dans l’éditeur.
 - Restent ouverts après stabilisation template : robustesse texte/image/CTA/groupe, audit factuel des prompts/fallbacks, limites partage/multi-utilisateur et contre-audit sécurité/performance.
 - Dette suivie : concentration de logique dans `app.js` et duplication du runtime de reparenting editor/export. Aucun refactor lourd sans besoin mesuré.
 

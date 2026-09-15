@@ -1,3 +1,11 @@
+## LOT DE LIVRAISON — bibliothèque multi-sélection 4.8.0-alpha.35 — 15 septembre 2026
+
+- Dashboard : case explicite 34×34 par projet, Tout sélectionner sur les cartes visibles, compteur, annulation et suppression groupée. Une sélection active est resynchronisée après rerender et les IDs supprimés sont purgés.
+- State : `deleteProjects(ids)` supprime en batch, met à jour `currentProject`, persiste une liste vide et ne réinjecte plus automatiquement `proj-esprit-nature` lorsqu'une bibliothèque stockée existe. Le seed initial reste uniquement un comportement de première ouverture sans stockage.
+- QA Chrome : 4 projets initiaux, 2 sélectionnés/supprimés puis 2 persistés après reload ; suppression des 2 restants => `artisite_projects_v11=[]`, reload => 0 projet et aucune démo recréée. Mobile 390 : barre 362 px, overflow horizontal 0, zéro erreur console.
+- Validation : 19/19 ciblés, 233/233 complets et `git diff --check`.
+- Prochaine action unique : audit renforcé post-stabilisation vitrine/templates/bibliothèque, puis audit/correction des overlays éditeur.
+
 ## LOT DE LIVRAISON — validation visuelle template 4.8.0-alpha.34 — 15 septembre 2026
 
 - Composition : `quoteSimulator` est replacé avant `footer`; le footer redevient le dernier bloc visible de la vitrine de référence.

@@ -15,6 +15,7 @@ class AppStateManager {
     this.activeSidebarTab = "sections"; // "sections", "settings"
     this.activeDrawer = null; // null, "closer", "new_project", "add_section"
     this.copilotOpen = false;
+    this.hasStoredLibrary = false;
 
     // History for Undo/Redo
     this.undoStack = [];
@@ -29,15 +30,11 @@ class AppStateManager {
 
   init() {
     this.loadFromStorage();
-    if (this.projects.length === 0) {
+    if (!this.hasStoredLibrary && this.projects.length === 0) {
       this.projects = JSON.parse(JSON.stringify(SAMPLE_PROJECTS));
       this.saveToStorage();
-    } else if (!this.projects.some(p => p.id === "proj-esprit-nature")) {
-      // Keep user projects untouched; only add the explicit demo when it is absent.
-      this.projects.unshift(JSON.parse(JSON.stringify(SAMPLE_PROJECTS[0])));
-      this.saveToStorage();
     }
-    this.currentProject = this.projects[0];
+    this.currentProject = this.projects[0] || null;
   }
 
   resetDemoProject() {
@@ -85,20 +82,16 @@ class AppStateManager {
     try {
       if (typeof localStorage !== "undefined") {
         let data = localStorage.getItem(STORAGE_KEY);
-        if (!data) {
-          const oldData = localStorage.getItem("artisite_projects_v5") || localStorage.getItem("artisite_projects_v4");
-          if (oldData) {
-            const parsed = JSON.parse(oldData);
-            this.projects = parsed;
-            if (!this.projects.some(p => p.id === "proj-esprit-nature")) {
-              this.projects.unshift(JSON.parse(JSON.stringify(SAMPLE_PROJECTS[0])));
-            }
-            this.saveToStorage();
-            return;
-          }
-        }
-        if (data) {
+        if (data !== null) {
+          this.hasStoredLibrary = true;
           this.projects = JSON.parse(data);
+          return;
+        }
+        const oldData = localStorage.getItem("artisite_projects_v5") || localStorage.getItem("artisite_projects_v4");
+        if (oldData) {
+          this.hasStoredLibrary = true;
+          this.projects = JSON.parse(oldData);
+          this.saveToStorage();
         }
       }
     } catch (e) {
@@ -220,12 +213,22 @@ class AppStateManager {
   }
 
   deleteProject(projectId) {
-    this.projects = this.projects.filter(p => p.id !== projectId);
-    if (this.currentProject?.id === projectId) {
+    return this.deleteProjects([projectId]);
+  }
+
+  deleteProjects(projectIds = []) {
+    const ids = new Set((projectIds || []).filter(Boolean));
+    if (!ids.size) return 0;
+    const before = this.projects.length;
+    this.projects = this.projects.filter(project => !ids.has(project.id));
+    const deleted = before - this.projects.length;
+    if (!deleted) return 0;
+    if (this.currentProject && ids.has(this.currentProject.id)) {
       this.currentProject = this.projects[0] || null;
     }
     this.saveToStorage();
     this.notify("project_deleted");
+    return deleted;
   }
 
   // Section Management within currentProject

@@ -27,7 +27,7 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - [x] `Voir le site` depuis l'éditeur affiche le projet réellement ouvert, pas Esprit Nature par défaut.
 - [x] Mettre en place un registre de templates explicite dans le wizard : Esprit Nature 1:1 + Artisan Moderne + Local Chaleureux, avec instanciation propre, `templateId/templateName` et personnalisation ensuite libre.
 - [x] Validation visuelle dédiée vitrine/template : Chrome 1440 et 390 sur démo canonique + nouvelle instance ; largeur viewport exacte, header 1280 desktop, hero pleine largeur, ordre stable, simulateur avant footer et footer dernier.
-- [ ] Rendre la bibliothèque plus facile à nettoyer : sélection multi-projets + suppression groupée claire, sans recréer automatiquement une démo supprimée.
+- [x] Bibliothèque nettoyable : sélection multi-projets 34×34, Tout sélectionner sur les cartes visibles, compteur, annulation et suppression groupée persistée ; une bibliothèque volontairement vide reste vide après reload.
 - [ ] Refaire l'audit UI/UX des overlays de l'éditeur après stabilisation template : aucune toolbar/popover ne doit masquer une action ou du contenu utile.
 
 ## État exact à `4.8.0-alpha.8`
@@ -127,6 +127,8 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 7. Noter ici : commit, tests réellement exécutés, anomalies connues et prochaine action unique.
 
 ## Dernière livraison validée
+
+- Lot `4.8.0-alpha.35` : nettoyage de bibliothèque par sélection multi-projets et suppression groupée. Sélection individuelle 34×34, Tout sélectionner sur les cartes visibles, compteur et état conservés à travers un rerender dashboard. `deleteProjects()` persiste les suppressions en batch ; une bibliothèque vidée reste `[]` après reload et ne réinjecte plus Esprit Nature. QA Chrome : 4→2→0 projets, persistance après reload, mobile 390 sans overflow, zéro erreur console. 19/19 ciblés, 233/233 complets et `git diff --check`.
 
 - Lot `4.8.0-alpha.34` : garde-fou visuel template et composition publique. Le simulateur de devis passe avant le footer afin que le footer reste réellement le dernier bloc. QA Chrome canonique + instance à 1440/390 : 1440/1440 puis 390/390, header 1280 desktop, hero pleine largeur, même ordre de sections, 0 overflow, 3 placeholders avis + 7 horaires à renseigner sur instance non documentée, zéro erreur console. 34/34 ciblés, 232/232 complets et `git diff --check`.
 

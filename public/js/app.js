@@ -200,6 +200,7 @@ export class App {
 
     if (state.currentView === "dashboard") {
       this.rootEl.innerHTML = renderDashboard(state);
+      this.syncProjectSelectionUI();
     } else if (state.currentView === "editor") {
       this.rootEl.innerHTML = renderEditor(state);
       this.initInlineEditing();
@@ -3602,8 +3603,65 @@ export class App {
 
   deleteProject(id) {
     if (confirm("Supprimer ce projet ?")) {
+      this._selectedProjectIds?.delete(id);
       state.deleteProject(id);
     }
+  }
+
+  toggleProjectSelection(projectId, selected) {
+    this._selectedProjectIds ||= new Set();
+    if (selected) this._selectedProjectIds.add(projectId);
+    else this._selectedProjectIds.delete(projectId);
+    this.syncProjectSelectionUI();
+  }
+
+  toggleSelectAllProjects(selected) {
+    this._selectedProjectIds ||= new Set();
+    const cards = [...document.querySelectorAll("#projects-grid .dashboard-v3-project")].filter(card => card.style.display !== "none");
+    cards.forEach(card => {
+      const id = card.dataset.projectId;
+      if (!id) return;
+      if (selected) this._selectedProjectIds.add(id);
+      else this._selectedProjectIds.delete(id);
+    });
+    this.syncProjectSelectionUI();
+  }
+
+  clearProjectSelection() {
+    this._selectedProjectIds = new Set();
+    this.syncProjectSelectionUI();
+  }
+
+  syncProjectSelectionUI() {
+    this._selectedProjectIds ||= new Set();
+    const existingIds = new Set(state.projects.map(project => project.id));
+    this._selectedProjectIds = new Set([...this._selectedProjectIds].filter(id => existingIds.has(id)));
+    const cards = [...document.querySelectorAll("#projects-grid .dashboard-v3-project")];
+    cards.forEach(card => {
+      const selected = this._selectedProjectIds.has(card.dataset.projectId);
+      card.classList.toggle("is-selected", selected);
+      const input = card.querySelector("[data-project-select]");
+      if (input) input.checked = selected;
+    });
+    const visibleCards = cards.filter(card => card.style.display !== "none");
+    const visibleSelected = visibleCards.filter(card => this._selectedProjectIds.has(card.dataset.projectId)).length;
+    const allInput = document.getElementById("project-select-all");
+    if (allInput) {
+      allInput.checked = visibleCards.length > 0 && visibleSelected === visibleCards.length;
+      allInput.indeterminate = visibleSelected > 0 && visibleSelected < visibleCards.length;
+    }
+    const count = this._selectedProjectIds.size;
+    const countLabel = document.querySelector("[data-project-selection-count]");
+    if (countLabel) countLabel.textContent = `${count} sélectionné${count > 1 ? "s" : ""}`;
+    document.querySelectorAll("[data-project-clear-selection], [data-project-bulk-delete]").forEach(button => { button.disabled = count === 0; });
+  }
+
+  deleteSelectedProjects() {
+    const ids = [...(this._selectedProjectIds || [])].filter(id => state.projects.some(project => project.id === id));
+    if (!ids.length) return;
+    if (!confirm(`Supprimer ${ids.length} projet${ids.length > 1 ? "s" : ""} ?`)) return;
+    this._selectedProjectIds = new Set();
+    state.deleteProjects(ids);
   }
 
   updateStatus(projectId, newStatus) {
@@ -3643,6 +3701,7 @@ export class App {
       const text = card.textContent.toLowerCase();
       card.style.display = text.includes(q) ? "" : "none";
     }
+    this.syncProjectSelectionUI();
   }
 
   // Standalone Exports
