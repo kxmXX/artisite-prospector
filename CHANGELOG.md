@@ -7,6 +7,17 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.13) — Revenir au style principal
+
+- **Action explicite « Effacer cet état »** dans le menu couleur : elle supprime toutes les
+  déclarations de l'état choisi sur l'élément et ramène au style principal, au lieu de laisser
+  l'auteur chercher comment défaire un survol. L'effacement passe par `clearElementState`, donc par
+  le modèle partagé, et par `state.updateProject`, donc il est **annulable**.
+- **Le produit explique au lieu d'échouer en silence** : sans état choisi, l'action indique
+  « Choisissez d'abord un état à effacer » ; sans texte sélectionné, elle invite à en sélectionner un.
+- **QA** : test ajouté (présence de l'action, passage par la primitive et par l'historique, message
+  d'aide). **324/324 tests**.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.12) — Sécurité d'usage des états
 
 - **Trou de sécurité d'usage corrigé, introduit par le lot précédent** : une fois un état choisi

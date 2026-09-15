@@ -1231,3 +1231,20 @@ Vérifications : 323/323 tests.
 
 Reste (5b, second temps) : aperçu immédiat de l'état sans survol réel, bouton « Revenir au style
 principal » hors du menu, extension des états aux autres propriétés que la couleur.
+
+---
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.13 (retour au style principal)
+
+Complète l'exigence « l'utilisateur doit pouvoir revenir au style principal » du chantier des états :
+une action explicite « Effacer cet état » supprime les déclarations de l'état choisi, via
+clearElementState et state.updateProject (donc annulable), avec deux messages d'aide quand l'action
+n'a pas de sens (aucun état choisi, aucun texte sélectionné).
+
+Une erreur de test a été corrigée au passage : un fragment d'assertion contenant une apostrophe
+échappée cassait la syntaxe du fichier de test ; remplacé par un fragment sans apostrophe.
+
+Vérifications : 324/324 tests.
+
+Reste (5b, second temps) : aperçu immédiat d'un état sans survol réel, et extension des états aux
+propriétés autres que la couleur (fond, bordure, ombre, opacité), que le modèle autorise déjà.

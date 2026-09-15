@@ -99,3 +99,16 @@ test('l etat actif reste visible quand le menu est ferme', () => {
     'le rappel doit apparaître et disparaître avec l état choisi');
 });
 
+
+test('revenir au style principal est une action explicite', () => {
+  assert.ok(editorSource.includes('clearActiveTextState()'),
+    'un bouton doit permettre d effacer l état choisi');
+  const method = appSource.slice(appSource.indexOf('clearActiveTextState() {'));
+  assert.ok(method.slice(0, 900).includes('clearElementState(state.currentProject, layoutKey, stateName)'),
+    'effacer un état doit passer par la primitive du modèle');
+  assert.ok(method.slice(0, 900).includes('state.updateProject('),
+    'l effacement doit passer par l historique, donc être annulable');
+  assert.ok(appSource.includes('état à effacer'),
+    'sans état choisi, l action doit expliquer au lieu d échouer en silence');
+});
+

@@ -301,6 +301,7 @@ export function renderEditor(state) {
                   <button type="button" data-ftb-state="active" class="motion-loop-btn" onclick="window.app.setActiveTextState('active')">Actif</button>
                   <button type="button" data-ftb-state="disabled" class="motion-loop-btn" onclick="window.app.setActiveTextState('disabled')">Désactivé</button>
                 </div>
+                <button type="button" onclick="window.app.clearActiveTextState()" class="w-full mb-2.5 py-1.5 rounded-md border border-white/20 text-ui-2xs font-semibold text-zinc-300 hover:text-white" title="Supprimer les réglages de l'état choisi et revenir au style principal">Effacer cet état</button>
                 <div class="text-ui-2xs font-bold uppercase tracking-wider text-zinc-400 mb-1.5">Nuancier Texte</div>
                 <div class="grid grid-cols-6 gap-1.5 mb-2">
                   <button type="button" onclick="window.app.setActiveTextColor('#09090b')" class="w-6 h-6 rounded-md border border-white/30 bg-[#09090b]" title="Noir Profond"></button>

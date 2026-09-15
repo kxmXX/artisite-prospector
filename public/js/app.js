@@ -2488,6 +2488,25 @@ export class App {
       : "Réglages appliqués à l'état : " + ELEMENT_STATE_LABELS[this._activeTextState], "info");
   }
 
+  /** Efface toutes les déclarations de l'état en cours : retour au style principal. */
+  clearActiveTextState() {
+    const stateName = this._activeTextState || "default";
+    if (stateName === "default") {
+      this.showToast("Choisissez d'abord un état à effacer", "info");
+      return;
+    }
+    const el = this._activeEditableEl;
+    const secId = el?.closest(".editor-section-wrapper")?.getAttribute("data-section-id");
+    const field = el?.getAttribute("data-editable");
+    if (!el || !secId || !field || !state.currentProject) {
+      this.showToast("Sélectionnez un texte pour effacer son état", "info");
+      return;
+    }
+    const layoutKey = getUiCode(state.currentProject.id, secId, field);
+    state.updateProject(clearElementState(state.currentProject, layoutKey, stateName), true);
+    this.showToast(ELEMENT_STATE_LABELS[stateName] + " : retour au style principal", "success");
+  }
+
   syncActiveTextStateButtons() {
     const active = this._activeTextState || "default";
     if (typeof document === "undefined" || typeof document.querySelectorAll !== "function") return;
