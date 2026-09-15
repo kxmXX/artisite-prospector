@@ -83,20 +83,29 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
       media queries du site répondent à la fenêtre, pas au canvas. Correction prévue au lot
       responsive via des requêtes de conteneur sur le canvas — **non appliquée à ce stade**;
       la vitrine publique, elle, est correcte (vérifiée pleine largeur).
-- [ ] **Lot 3 — Sélection et hiérarchie** : un seul état de sélection (site/section/élément/multi),
-      Échap remonte d'un niveau, fil d'Ariane Site ▸ Section ▸ Élément, liste des éléments du canvas,
-      suppression des 830 lignes inertes de `renderSectionAccordionContent` après réimplantation de
-      ses capacités uniques.
+- [~] **Lot 3 — Sélection et hiérarchie** (3a livré en `4.9.0-alpha.7`) : Échap suit un escalier
+      unique (édition en ligne, modale, élément, barres), une sélection dont la boîte est masquée ne
+      répond plus aux flèches, et la barre d'étape affiche `Section ▸ Élément`. 4 tests dédiés.
+      **Reste (3b)** : l'état de sélection reste porté par deux variables historiques
+      (`_freeformSelectedKey`/`selectedSectionId`) au lieu d'une source unique ; pas d'arbre des
+      éléments dans le panneau Structure ; les 830 lignes inertes de `renderSectionAccordionContent`
+      sont toujours présentes et **plusieurs de leurs capacités ne sont atteignables nulle part
+      ailleurs** (boucle d'animation de section, motifs d'inspiration, assombrissement du hero) :
+      les réimplanter avant de supprimer le template, pas l'inverse.
 - [ ] **Lot 4 — Inspecteur contextuel** : onglets par portée, divulgation progressive, modèles
       `section.style` et `elementStyles[layoutKey]`, wording humain (fin du « 60fps », « preset »,
       « responsive », « HEX/RGB », « WCAG AA »).
-- [~] **Lot 5 — États des éléments** (5a livré en `4.9.0-alpha.9`) : modèle `elementStates[layoutKey]`
-      (survol, focus, actif, désactivé), primitive unique `elementStateCSS` injectée par le renderer
-      et donc partagée par l'éditeur, l'aperçu et l'export, liste blanche de propriétés et valeurs
-      filtrées, plafond de 400 règles. 5 tests dédiés, **319/319**.
-      **Reste (5b)** : toute l'interface — sélecteur d'état, application des réglages à l'état choisi,
-      « Revenir au style principal », et inclusion dans l'historique d'annulation. Tant que ce n'est
-      pas fait, aucun état n'est définissable depuis le produit.
+- [~] **Lot 5 — États des éléments** (5a en `4.9.0-alpha.9`, 5b en `4.9.0-alpha.11` et
+      `alpha.12`) : modèle `elementStates[layoutKey]` (survol, focus, actif, désactivé), primitive
+      unique `elementStateCSS` injectée par le renderer et donc partagée par l'éditeur, l'aperçu et
+      l'export, liste blanche de propriétés et valeurs filtrées, plafond de 400 règles. Interface :
+      sélecteur « Principal · Survol · Focus · Actif · Désactivé » dans le menu couleur du texte,
+      réglages routés vers l'état choisi, retour au style principal en sortant de l'édition, et
+      pastille rappelant l'état actif hors du menu. 8 tests dédiés, **323/323**.
+      **Reste (5b, second temps)** : aucun aperçu immédiat d'un état sans survol réel ; le bouton
+      « Revenir au style principal » n'existe que par l'entrée « Principal » du menu ; seuls la
+      **couleur** est éditable par état — fond, bordure, ombre et opacité sont prévus par le modèle
+      (`ALLOWED_PROPERTIES`) mais aucun contrôle ne les expose.
 - [ ] **Lot 6 — Positionnement** : flux par défaut, position libre en option, champs numériques
       X/Y/L/H/rotation, boîte de sélection réduite à un menu `⋯`, bornes clavier = bornes souris.
 - [ ] **Lot 7 — Mouvement unifié** : catalogue unique, déclencheur, durée, délai, courbe, direction,
