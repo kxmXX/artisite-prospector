@@ -846,6 +846,7 @@ function renderButtonPopover(sec, buttonType, options = {}, project = {}) {
           <button type="button" onclick="event.preventDefault(); window.app.setButtonRadius('0px')" class="cta-context-btn ${currentRadius === '0px' ? 'is-selected' : ''}" title="Bords droits">▮</button>
           <button type="button" onclick="event.preventDefault(); window.app.setButtonRadius('8px')" class="cta-context-btn ${currentRadius === '8px' || currentRadius === '0.5rem' ? 'is-selected' : ''}" title="Bords adoucis">▢</button>
           <button type="button" onclick="event.preventDefault(); window.app.setButtonRadius('9999px')" class="cta-context-btn ${currentRadius === '9999px' ? 'is-selected' : ''}" title="Format pilule">⬭</button>
+          <button type="button" onclick="event.preventDefault(); event.stopPropagation(); window.app.editButtonLayout('${sec.id}', '${buttonType}')" class="cta-context-btn cta-context-position" title="Déplacer ou redimensionner ce bouton">${getIcon("move", "w-3 h-3")} Position</button>
         </div>
       </div>
 

@@ -620,12 +620,12 @@ body[data-active-editor-toolbar="section"] .freeform-selection-box,
 body[data-active-editor-toolbar="cta"] .freeform-selection-box{display:none!important}
 .freeform-selection-box.is-transforming{box-shadow:0 0 0 1px rgba(255,255,255,.9),0 0 0 4px rgba(37,99,235,.16)}
 .freeform-selection-label{
-  position:absolute;left:-1px;top:-31px;min-height:24px;max-width:min(360px,70vw);display:flex;align-items:center;gap:6px;
-  padding:3px 5px 3px 8px;border-radius:6px;background:#1d4ed8;color:#fff;font:650 10px/1.1 ui-monospace,SFMono-Regular,Menlo,monospace;
-  box-shadow:0 6px 18px rgba(29,78,216,.22);pointer-events:none;white-space:nowrap;
+  position:absolute;left:-1px;top:-34px;min-height:30px;max-width:min(440px,82vw);display:flex;align-items:center;gap:7px;
+  padding:4px 6px 4px 9px;border-radius:7px;background:#172554;color:#fff;font:700 11px/1.1 ui-monospace,SFMono-Regular,Menlo,monospace;
+  box-shadow:0 6px 18px rgba(15,23,42,.24);pointer-events:none;white-space:nowrap;
 }
 .freeform-selection-label span{overflow:hidden;text-overflow:ellipsis}
-.freeform-selection-label button{pointer-events:auto;border:0;border-radius:4px;background:rgba(255,255,255,.17);color:#fff;padding:3px 5px;font:700 9px/1 sans-serif;cursor:pointer}
+.freeform-selection-label button{pointer-events:auto;min-height:24px;border:0;border-radius:5px;background:rgba(255,255,255,.17);color:#fff;padding:4px 6px;font:700 10px/1 sans-serif;cursor:pointer}
 .freeform-selection-label button[hidden]{display:none!important}
 .freeform-selection-label [data-freeform-additive].is-active{background:#fff;color:#1d4ed8}
 .freeform-selection-box.is-multi:not(.is-group) .freeform-resize-handle{display:none}
@@ -639,7 +639,7 @@ body[data-active-editor-toolbar="cta"] .freeform-selection-box{display:none!impo
 .freeform-alignbar button:hover,.freeform-alignbar button:focus-visible{background:#e8eefc;color:#1d4ed8;outline:none}
 .freeform-alignbar span{width:1px;height:16px;background:#d8dee9;margin:0 1px}
 .freeform-layerbar{position:absolute;left:50%;top:calc(100% + 10px);translate:-50% 0;display:flex;align-items:center;gap:3px;padding:4px;border:1px solid rgba(24,32,31,.14);border-radius:8px;background:#fff;color:#334155;box-shadow:0 8px 24px rgba(15,23,42,.16);pointer-events:auto;white-space:nowrap}
-.freeform-layerbar button{height:26px;min-width:28px;border:0;border-radius:5px;background:transparent;color:#334155;padding:0 7px;font:700 10px/1 ui-monospace,SFMono-Regular,Menlo,monospace;cursor:pointer}
+.freeform-layerbar button{height:30px;min-width:30px;border:0;border-radius:6px;background:transparent;color:#334155;padding:0 8px;font:700 10.5px/1 ui-monospace,SFMono-Regular,Menlo,monospace;cursor:pointer}
 .freeform-layerbar button:hover,.freeform-layerbar button:focus-visible{background:#e8eefc;color:#1d4ed8;outline:none}
 .freeform-layerbar button.is-active{background:#1d4ed8;color:#fff}
 .editor-section-wrapper.is-freeform-reparent-target{outline:2px solid #ec4899!important;outline-offset:-2px;box-shadow:inset 0 0 0 3px rgba(236,72,153,.12)}
@@ -654,15 +654,17 @@ body[data-active-editor-toolbar="cta"] .freeform-selection-box{display:none!impo
 .freeform-selection-box.is-locked .freeform-layerbar [data-freeform-layer]{opacity:.35;pointer-events:none}
 .freeform-selection-box.is-locked .freeform-layerbar [data-freeform-lock]{background:#fff7ed;color:#b45309}
 .freeform-move-handle{
-  position:absolute;left:50%;top:-15px;translate:-50% -50%;width:30px;height:24px;border:1px solid #1d4ed8;border-radius:7px;
+  position:absolute;left:18px;top:18px;translate:-50% -50%;width:30px;height:24px;border:1px solid #1d4ed8;border-radius:7px;
   background:#fff;color:#1d4ed8;display:grid;place-items:center;pointer-events:auto;touch-action:none;cursor:grab;box-shadow:0 3px 10px rgba(15,23,42,.14)
 }
 .freeform-move-handle:active{cursor:grabbing}
+.freeform-selection-box.is-cta .freeform-move-handle,
+.freeform-selection-box.is-cta .freeform-rotate-handle{display:none!important}
 .freeform-resize-handle{
   position:absolute;width:14px;height:14px;border:2px solid #2563eb;border-radius:50%;background:#fff;pointer-events:auto;touch-action:none;padding:0;
   box-shadow:0 1px 5px rgba(15,23,42,.15)
 }
-.freeform-rotate-handle{position:absolute;right:-38px;top:-15px;width:28px;height:28px;border:1px solid #1d4ed8;border-radius:50%;background:#fff;color:#1d4ed8;display:grid;place-items:center;padding:0;pointer-events:auto;touch-action:none;cursor:grab;font:800 15px/1 sans-serif;box-shadow:0 3px 10px rgba(15,23,42,.14)}
+.freeform-rotate-handle{position:absolute;right:2px;top:2px;width:28px;height:28px;border:1px solid #1d4ed8;border-radius:50%;background:#fff;color:#1d4ed8;display:grid;place-items:center;padding:0;pointer-events:auto;touch-action:none;cursor:grab;font:800 15px/1 sans-serif;box-shadow:0 3px 10px rgba(15,23,42,.14)}
 .freeform-rotate-handle:active{cursor:grabbing}
 .freeform-resize-nw{left:0;top:0;translate:-50% -50%;cursor:nwse-resize}.freeform-resize-n{left:50%;top:0;translate:-50% -50%;cursor:ns-resize}.freeform-resize-ne{right:0;top:0;translate:50% -50%;cursor:nesw-resize}
 .freeform-resize-e{right:0;top:50%;translate:50% -50%;cursor:ew-resize}.freeform-resize-se{right:0;bottom:0;translate:50% 50%;cursor:nwse-resize}.freeform-resize-s{left:50%;bottom:0;translate:-50% 50%;cursor:ns-resize}

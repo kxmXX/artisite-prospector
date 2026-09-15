@@ -21,6 +21,8 @@ const { exportStandaloneHTML } = await import('../public/js/engine/exporter.js')
 
 const css = fs.readFileSync(path.resolve(process.cwd(), 'public/css/studio-v3.css'), 'utf8');
 const appCss = fs.readFileSync(path.resolve(process.cwd(), 'public/css/app.css'), 'utf8');
+const appSource = fs.readFileSync(path.resolve(process.cwd(), 'public/js/app.js'), 'utf8');
+const rendererSource = fs.readFileSync(path.resolve(process.cwd(), 'public/js/components/renderer.js'), 'utf8');
 
 test('floating editor tools are mutually exclusive without clearing selection state', () => {
   const app = Object.create(App.prototype);
@@ -59,6 +61,32 @@ test('floating editor tools are mutually exclusive without clearing selection st
   assert.match(css, /z-index:var\(--z-toolbar-freeform\)/);
   assert.match(appCss, /data-active-editor-toolbar="freeform"[^}]*editor-section-toolbar/s);
   assert.match(css, /data-active-editor-toolbar="text"[^}]*freeform-selection-box/s);
+});
+
+test('CTA editing and freeform layout use one explicit interaction path', () => {
+  assert.match(appSource, /event\.target\.closest\("\[data-cta-popover-wrapper\]"\)\) return/);
+  assert.match(appSource, /editButtonLayout\(sectionId, buttonType\)/);
+  assert.match(rendererSource, /editButtonLayout\('\$\{sec\.id\}', '\$\{buttonType\}'\)/);
+  assert.match(rendererSource, />[^<]*Position<\/button>/);
+  assert.match(appCss, /data-active-editor-toolbar="freeform"[^}]*cta-context-popover/s);
+  assert.match(appCss, /data-active-editor-toolbar="freeform"[^}]*cta-direct-badge/s);
+  assert.match(appSource, /classList\.toggle\("is-cta"/);
+  assert.match(css, /\.freeform-selection-box\.is-cta \.freeform-move-handle/);
+});
+
+test('single freeform elements are constrained by their nearest editable parent', () => {
+  const app = Object.create(App.prototype);
+  const parentRect = { left: 40, top: 50, right: 440, bottom: 350 };
+  const parent = { getBoundingClientRect: () => parentRect };
+  const element = {
+    parentElement: { closest: selector => selector === '[data-layout-key]' ? parent : null },
+    closest: () => null
+  };
+  document.getElementById = () => ({ getBoundingClientRect: () => ({ left: 0, top: 0, right: 1200, bottom: 800 }) });
+
+  assert.equal(app.getFreeformSelectionBoundary([element]), parentRect);
+  assert.match(css, /\.freeform-move-handle\{[^}]*left:18px;top:18px/s);
+  assert.match(css, /\.freeform-rotate-handle\{[^}]*right:2px;top:2px/s);
 });
 
 test('V3 settings rail re-renders the V3 sidebar immediately', () => {
@@ -479,8 +507,8 @@ test('Freeform touch multi-select and marquee edge auto-scroll stay explicit', (
   assert.ok(appSource.includes('scrollHost.scrollTop = Math.max(0, Math.min(scrollHost.scrollHeight - scrollHost.clientHeight, before + speed))'));
   assert.ok(appSource.includes('autoScrollFrame = requestAnimationFrame(tickAutoScroll)'));
   assert.ok(css.includes('@media(pointer:coarse)'));
-  assert.ok(appSource.includes('const coarsePointer = Boolean(window.matchMedia?.("(pointer: coarse)")?.matches)'));
-  assert.ok(appSource.includes('moveHandle.style.left = coarsePointer ? "18px" : "50%"'));
+  assert.ok(appSource.includes('moveHandle.style.left = "18px"'));
+  assert.ok(appSource.includes('rotateHandle.style.right = "2px"'));
   assert.ok(css.includes('[data-freeform-additive].is-active'));
 });
 

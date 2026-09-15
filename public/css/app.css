@@ -1418,15 +1418,16 @@ input, textarea, select, [contenteditable] {
   color: #ffffff;
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 10px;
-  padding: 5px 10px;
+  padding: 8px 10px;
   display: none;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   box-shadow: 0 10px 30px -4px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3);
   z-index: 60;
   white-space: normal;
   flex-wrap: wrap;
-  max-width: min(26rem, 92vw);
+  width: max-content;
+  max-width: min(25rem, calc(100vw - 24px));
   font-size: 11px;
 }
 
@@ -1462,6 +1463,11 @@ input, textarea, select, [contenteditable] {
   background: #ffffff;
   color: #09090b;
   border-color: #ffffff;
+}
+.cta-context-position {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 .cta-context-btn.cta-btn-delete {
   background: #27272a;
@@ -1572,6 +1578,14 @@ body[data-active-editor-toolbar="cta"] .editor-section-toolbar {
 body[data-active-editor-toolbar="section"] .floating-text-toolbar,
 body[data-active-editor-toolbar="freeform"] .floating-text-toolbar,
 body[data-active-editor-toolbar="cta"] .floating-text-toolbar {
+  display: none !important;
+}
+body[data-active-editor-toolbar="text"] .cta-context-popover,
+body[data-active-editor-toolbar="section"] .cta-context-popover,
+body[data-active-editor-toolbar="freeform"] .cta-context-popover,
+body[data-active-editor-toolbar="text"] .cta-direct-badge,
+body[data-active-editor-toolbar="section"] .cta-direct-badge,
+body[data-active-editor-toolbar="freeform"] .cta-direct-badge {
   display: none !important;
 }
 

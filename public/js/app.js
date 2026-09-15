@@ -4460,6 +4460,20 @@ export class App {
     return basis.parentElement?.closest?.("[data-layout-key]") || target;
   }
 
+  editButtonLayout(sectionId, buttonType) {
+    const canvas = document.getElementById("canvas-container");
+    const target = [...(canvas?.querySelectorAll?.("[data-cta-popover-wrapper]") || [])]
+      .find(element => element.dataset.sectionId === String(sectionId)
+        && element.dataset.buttonType === String(buttonType));
+    if (!target) {
+      this.showToast?.("Bouton introuvable dans le canevas", "error");
+      return false;
+    }
+    this.closeAllFloatingToolbars("freeform");
+    this.selectFreeformTarget(target, { ignoreGroup: true });
+    return true;
+  }
+
   selectFreeformTarget(target, options = {}) {
     if (!target || !target.dataset?.layoutKey) return;
     const key = target.dataset.layoutKey;
@@ -4528,6 +4542,7 @@ export class App {
     overlay.style.height = `${bottom - top}px`;
     overlay.classList.add("is-visible");
     overlay.classList.toggle("is-multi", keys.length > 1);
+    overlay.classList.toggle("is-cta", elements.length === 1 && elements[0].matches?.("[data-cta-popover-wrapper]"));
     const exactGroup = this.getExactFreeformGroup(keys);
     const selectionLocked = this.isFreeformSelectionLocked(keys);
     overlay.classList.toggle("is-group", Boolean(exactGroup));
@@ -4539,22 +4554,21 @@ export class App {
     const alignBar = overlay.querySelector(".freeform-alignbar");
     const layerBar = overlay.querySelector(".freeform-layerbar");
     const responsiveBar = overlay.querySelector(".freeform-responsivebar");
-    const controlsInside = top < 36;
-    const controlsTop = controlsInside ? Math.max(8 - top, 4) : -31;
-    const coarsePointer = Boolean(window.matchMedia?.("(pointer: coarse)")?.matches);
+    const controlsInside = top < 40;
+    const controlsTop = controlsInside ? Math.max(bottom - top + 8, 8) : -34;
     if (labelBar) labelBar.style.top = `${controlsTop}px`;
     if (moveHandle) {
-      moveHandle.style.left = coarsePointer ? "18px" : "50%";
-      moveHandle.style.top = coarsePointer ? "18px" : (controlsInside ? `${controlsTop + 42}px` : "-15px");
+      moveHandle.style.left = "18px";
+      moveHandle.style.top = "18px";
     }
     if (rotateHandle) {
-      rotateHandle.style.top = coarsePointer ? "2px" : (controlsInside ? `${controlsTop + 42}px` : "-15px");
-      rotateHandle.style.right = coarsePointer ? "2px" : (right > window.innerWidth - 48 ? "4px" : "-38px");
+      rotateHandle.style.top = "2px";
+      rotateHandle.style.right = "2px";
     }
     if (alignBar && keys.length > 1 && !selectionLocked) {
       const toolbarWidth = alignBar.offsetWidth || 276;
       const desiredLeft = Math.max(8, Math.min(window.innerWidth - toolbarWidth - 8, (left + right - toolbarWidth) / 2));
-      const desiredTop = Math.max(8, Math.min(window.innerHeight - 38, bottom + 10));
+      const desiredTop = Math.max(8, Math.min(window.innerHeight - 38, bottom + 10 + (controlsInside ? 44 : 0)));
       alignBar.style.left = `${desiredLeft - left}px`;
       alignBar.style.top = `${desiredTop - top}px`;
       alignBar.style.translate = "0 0";
@@ -4562,7 +4576,7 @@ export class App {
     if (layerBar) {
       const toolbarWidth = layerBar.offsetWidth || 250;
       const desiredLeft = Math.max(8, Math.min(window.innerWidth - toolbarWidth - 8, (left + right - toolbarWidth) / 2));
-      const baseTop = keys.length > 1 && !selectionLocked ? bottom + 50 : bottom + 10;
+      const baseTop = (keys.length > 1 && !selectionLocked ? bottom + 50 : bottom + 10) + (controlsInside ? 44 : 0);
       const desiredTop = Math.max(8, Math.min(window.innerHeight - 38, baseTop));
       layerBar.style.left = `${desiredLeft - left}px`;
       layerBar.style.top = `${desiredTop - top}px`;
@@ -4571,7 +4585,7 @@ export class App {
     if (responsiveBar) {
       const toolbarWidth = responsiveBar.offsetWidth || 320;
       const desiredLeft = Math.max(8, Math.min(window.innerWidth - toolbarWidth - 8, (left + right - toolbarWidth) / 2));
-      const extra = keys.length > 1 && !selectionLocked ? 90 : 50;
+      const extra = (keys.length > 1 && !selectionLocked ? 90 : 50) + (controlsInside ? 44 : 0);
       const desiredTop = Math.max(8, Math.min(window.innerHeight - 38, bottom + extra));
       responsiveBar.style.left = `${desiredLeft - left}px`;
       responsiveBar.style.top = `${desiredTop - top}px`;
@@ -4790,6 +4804,12 @@ export class App {
 
   getFreeformSelectionBoundary(elements = []) {
     const canvasRect = document.getElementById("canvas-container")?.getBoundingClientRect();
+    if (elements.length === 1) {
+      const parentBoundary = elements[0].parentElement?.closest?.("[data-layout-key]");
+      if (parentBoundary && parentBoundary !== elements[0]) {
+        return parentBoundary.getBoundingClientRect();
+      }
+    }
     const sections = [...new Set(elements.map(el => el.closest(".editor-section-wrapper")).filter(Boolean))];
     return sections.length === 1 ? sections[0].getBoundingClientRect() : canvasRect;
   }
@@ -5561,6 +5581,9 @@ export class App {
       canvas.addEventListener("pointerdown", event => {
         if (event.button !== undefined && event.button !== 0) return;
         if (event.target.closest(".editor-section-toolbar, .cta-direct-badge, .cta-context-popover, .sec-bg-popover, .sec-motion-popover, .floating-text-toolbar")) return;
+        // CTAs own their click interaction. Layout editing is entered explicitly
+        // from the button popover so the two editing modes never stack.
+        if (event.target.closest("[data-cta-popover-wrapper]")) return;
         const target = this.resolveFreeformPointerTarget(event.target, canvas, { parentStep: event.metaKey || event.ctrlKey });
         if (target) {
           const previousKeys = this.getFreeformSelectedKeys();

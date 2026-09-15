@@ -84,6 +84,13 @@ Cette section prévaut sur le tableau historique des lots 5–13 ci-dessous sans
 - Les Google Fonts ne sont plus chargées une seconde fois par un `@import` bloquant dans `app.css`.
 - Prochaine étape : terminal de génération fidèle à l’état réseau, puis mesure objective avant d’accepter ou refuser un bundler.
 
+### Lot ergonomie CTA et cellules — 4.8.0-alpha.41
+
+- Les modes CTA et Freeform ne s’ouvrent plus au même clic : les réglages du bouton restent le chemin par défaut et l’action « Position » entre explicitement dans la manipulation spatiale.
+- Le redimensionnement d’un contenu de carte est maintenant borné par son parent éditable immédiat ; les cellules ne peuvent plus recouvrir une colonne sœur.
+- Les couches concurrentes sont masquées par l’état d’outil actif et les poignées sont séparées du libellé de sélection. Validation : 33/33 ciblés et 244/244 complets.
+- Prochaine étape : QA navigateur des gestes avancés, puis progression terminal IA et mesure bundling. Aucun changement demandé sur les faux avis Google.
+
 ## État initial vérifié
 
 - Vanilla JS, serveur Node natif, aucune dépendance npm déclarée ; `npm test` : **136/136**.

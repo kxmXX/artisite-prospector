@@ -7,6 +7,12 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 15 septembre 2026 (4.8.0-alpha.41)
+
+- Éditeur CTA : un clic ouvre uniquement les réglages du bouton ; le déplacement/redimensionnement passe désormais par l’action explicite « Position », sans superposer les outils CTA et Freeform.
+- Canevas libre : une cellule isolée est bornée par son parent éditable immédiat, empêchant son redimensionnement de recouvrir la colonne voisine. Les poignées et le libellé ne se chevauchent plus.
+- QA : 33/33 tests ciblés sur les régressions V3 puis 244/244 tests complets.
+
 ### Consolidation — 15 septembre 2026 (4.8.0-alpha.40)
 
 - Accessibilité : chaque champ nommé du wizard possède désormais une association native `label[for]` / `id`, y compris les paramètres avancés.

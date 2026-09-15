@@ -1,3 +1,13 @@
+## LOT DE LIVRAISON — édition CTA/cellules sans collision 4.8.0-alpha.41 — 15 septembre 2026
+
+- Interaction : un CTA ne déclenche plus le pointeur Freeform par propagation. Son panneau conserve taille, casse, rayon, animations et suppression ; « Position » bascule volontairement vers le cadre de manipulation.
+- Géométrie : une cible unique utilise son parent éditable immédiat comme limite de redimensionnement ; une cellule de carte ne peut plus envahir la colonne suivante.
+- Chrome : popover et badge CTA sont masqués pendant l’édition Texte/Section/Freeform ; poignées Move/Rotation placées dans les coins internes et libellé agrandi.
+- Fichiers produit : `public/js/app.js`, `public/js/components/renderer.js`, `public/css/app.css`, `public/css/studio-v3.css`.
+- Tests : 33/33 ciblés V3 puis 244/244 complets ; `git diff --check` propre.
+- Restant : QA navigateur des gestes Freeform avancés, terminal IA fidèle au réseau, mesure bundling. Les faux avis Google restent volontairement inchangés.
+- Prochaine action exacte : exécuter un contrôle navigateur CTA → Position → resize dans une carte, puis traiter la progression du terminal IA sans rouvrir le design vitrine validé.
+
 ## LOT DE LIVRAISON — wizard accessible et fontes dédupliquées 4.8.0-alpha.40 — 15 septembre 2026
 
 - Wizard : nom, métier, ville, téléphone, région, preset, ambiance, tonalité, couleur et email possèdent tous une association `label[for]` / `id` testée.
