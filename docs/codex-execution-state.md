@@ -1,3 +1,11 @@
+## LOT DE LIVRAISON — validation visuelle template 4.8.0-alpha.34 — 15 septembre 2026
+
+- Composition : `quoteSimulator` est replacé avant `footer`; le footer redevient le dernier bloc visible de la vitrine de référence.
+- QA Chrome 1440/390, sur `?vitrine=1` et sur une nouvelle instance `esprit-reference` : root = viewport (1440 puis 390), aucun overflow horizontal, header 1280 px desktop / 390 mobile, hero pleine largeur, ordre identique `header → hero → about → services → gallery → hours → reviews → faq → quoteSimulator → footer`.
+- Instance sans faits : 3 placeholders Avis, 7 lignes horaires `À renseigner`, aucune chaîne `5.0/5 — 5 avis`; la structure reste visuellement complète sans inventer de données client.
+- Validation : 34/34 ciblés, 232/232 complets et `git diff --check`.
+- Prochaine action unique : bibliothèque — sélection multi-projets et suppression groupée explicite.
+
 ## LOT DE LIVRAISON — registre de templates 4.8.0-alpha.33 — 15 septembre 2026
 
 - Wizard : trois bases explicites avant génération — Esprit Nature Référence 1:1, Artisan Moderne, Local Chaleureux. Carte active visible, 3 colonnes desktop et pile mobile scrollable.

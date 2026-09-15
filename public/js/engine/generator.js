@@ -456,13 +456,13 @@ function generateSiteFromInput(input = {}, useDemoContent = false) {
     hoursSection,
     reviewsSection,
     faqSection,
+    quoteSection,
     footerSection,
     // Secondary modules (stored in model with visibility: false for seamless editor toggle)
     trustSection,
     statsSection,
     beforeAfterSection,
     realisationsSection,
-    quoteSection,
     locationSection,
     ctaSection
   ] : [

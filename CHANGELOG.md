@@ -7,6 +7,12 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 15 septembre 2026 (4.8.0-alpha.34)
+
+- Vitrine : le simulateur de devis est désormais placé avant le footer ; le footer redevient le dernier bloc public, sans section interactive après lui.
+- Garde-fou visuel : démo canonique et nouvelle instance Esprit contrôlées en Chrome à 1440 et 390 px ; largeur racine = viewport, header centré à 1280 px desktop, hero pleine largeur et aucun overflow horizontal.
+- Template sûre : une instance sans avis/horaires conserve 3 emplacements d’avis et 7 horaires `À renseigner`, sans note ni horaires inventés. Validation : 34/34 ciblés, 232/232 complets et `git diff --check`.
+
 ### Consolidation — 15 septembre 2026 (4.8.0-alpha.33)
 
 - Templates : registre explicite avec `Esprit Nature — Référence 1:1`, `Artisan Moderne` et `Local Chaleureux`; le wizard choisit la base avant génération et persiste `templateId/templateName`.

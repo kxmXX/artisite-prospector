@@ -178,7 +178,7 @@ test("v4.7.0 Consolidation: 100% Sendpage Benchmark Fidelity for Esprit Nature P
   // because every published primary CTA must have a real in-page destination.
   const visibleTypes = project.sections.filter(s => s.visibility !== false).map(s => s.type);
   assert.deepEqual(visibleTypes, [
-    "header", "hero", "about", "services", "gallery", "hours", "reviews", "faq", "footer", "quoteSimulator"
+    "header", "hero", "about", "services", "gallery", "hours", "reviews", "faq", "quoteSimulator", "footer"
   ], "Visible sections must strictly follow Sendpage showcase order");
 
   // 3. Render HTML verification

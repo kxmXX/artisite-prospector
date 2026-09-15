@@ -26,7 +26,7 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - [x] Donner aux vues dashboard/éditeur/aperçu/vitrine une vraie navigation navigateur : URL interne, Retour et Avancer via `history.pushState/popstate`.
 - [x] `Voir le site` depuis l'éditeur affiche le projet réellement ouvert, pas Esprit Nature par défaut.
 - [x] Mettre en place un registre de templates explicite dans le wizard : Esprit Nature 1:1 + Artisan Moderne + Local Chaleureux, avec instanciation propre, `templateId/templateName` et personnalisation ensuite libre.
-- [ ] Ajouter une validation visuelle navigateur dédiée à la vitrine canonique et à une nouvelle instance issue de la template pour empêcher toute nouvelle dérive de largeur/centrage/ordre.
+- [x] Validation visuelle dédiée vitrine/template : Chrome 1440 et 390 sur démo canonique + nouvelle instance ; largeur viewport exacte, header 1280 desktop, hero pleine largeur, ordre stable, simulateur avant footer et footer dernier.
 - [ ] Rendre la bibliothèque plus facile à nettoyer : sélection multi-projets + suppression groupée claire, sans recréer automatiquement une démo supprimée.
 - [ ] Refaire l'audit UI/UX des overlays de l'éditeur après stabilisation template : aucune toolbar/popover ne doit masquer une action ou du contenu utile.
 
@@ -127,6 +127,8 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 7. Noter ici : commit, tests réellement exécutés, anomalies connues et prochaine action unique.
 
 ## Dernière livraison validée
+
+- Lot `4.8.0-alpha.34` : garde-fou visuel template et composition publique. Le simulateur de devis passe avant le footer afin que le footer reste réellement le dernier bloc. QA Chrome canonique + instance à 1440/390 : 1440/1440 puis 390/390, header 1280 desktop, hero pleine largeur, même ordre de sections, 0 overflow, 3 placeholders avis + 7 horaires à renseigner sur instance non documentée, zéro erreur console. 34/34 ciblés, 232/232 complets et `git diff --check`.
 
 - Lot `4.8.0-alpha.33` : registre de templates réel dans le wizard. Esprit Nature conserve composition/variants/sections visibles de la référence sans copier état/données démo ; Artisan Moderne et Local Chaleureux restent distincts. Avis/Horaires sans faits restent visibles avec états `à renseigner`, sans fausse note ni faux horaires. QA wizard 1440/390 + création réelle de deux templates, 28/28 ciblés, 232/232 complets et `git diff --check`.
 

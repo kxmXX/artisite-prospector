@@ -57,6 +57,11 @@ test('Esprit reference template preserves canonical composition without copying 
     canonical.sections.filter(section => section.visibility !== false).map(section => section.type)
   );
   assert.equal(project.sections.find(section => section.type === 'about').content.certified, '');
+  assert.deepEqual(project.sections.find(section => section.type === 'reviews').content.reviews, []);
+  assert.deepEqual(project.sections.find(section => section.type === 'hours').content.hours, {});
+  const visibleTypes = project.sections.filter(section => section.visibility !== false).map(section => section.type);
+  assert.equal(visibleTypes.at(-1), 'footer');
+  assert.ok(visibleTypes.indexOf('quoteSimulator') < visibleTypes.indexOf('footer'));
   const html = renderWebsiteHTML(project);
   assert.match(html, /vitrine-template/);
   assert.match(html, /Avis clients à renseigner/);
