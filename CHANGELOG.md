@@ -7,6 +7,20 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.18) — Réglages d'élément complétés
+
+- **Fond, bordure et ombre** rejoignent la respiration, l'arrondi et l'opacité : six réglages par
+  élément, tous **annulables** et tous conditionnés (rien n'est émis si l'auteur n'a rien changé).
+- **Un fond accentué impose un texte lisible** : la paire « fond accentué + texte blanc » est
+  indissociable dans le modèle, pour ne pas livrer un contraste illisible par construction.
+- **Contrainte de parité respectée** : les valeurs n'utilisent que des jetons du **site**
+  (`--primary`, `--bg-sec`) ou des valeurs littérales sûres. Les jetons `--ui-*` du chrome ne sont
+  **pas** utilisés, car le site autonome exporté ne les définit pas — c'est précisément le genre
+  d'écart qui a cassé l'export.
+- **QA** : `tests/element_style.test.js` passe de 5 à 6 tests. **337/337 tests**.
+- *Toujours non vérifié* : l'apparence à l'écran des blocs de l'inspecteur (hors champ des captures à
+  1280 px). Le rendu, la parité aperçu/export et l'annulation sont, eux, prouvés par test.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.17) — Lot 4c : réglages d'élément
 
 - **Répond à la demande « LES BLOCS / ÉLÉMENTS »** de la mission, qui n'avait rien : un élément

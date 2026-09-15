@@ -9,7 +9,7 @@ import {
 } from "../engine/componentIntelligence.js";
 import { escapeHtml } from "../utils/html.js";
 import { SECTION_WIDTHS, SECTION_SPACING, SECTION_ALIGN, getSectionLayout } from "../engine/sectionStyle.js";
-import { ELEMENT_PADDING, ELEMENT_RADIUS, ELEMENT_OPACITY, getElementStyle } from "../engine/elementStyle.js";
+import { ELEMENT_PADDING, ELEMENT_RADIUS, ELEMENT_OPACITY, ELEMENT_BACKGROUND, ELEMENT_BORDER, ELEMENT_SHADOW, getElementStyle } from "../engine/elementStyle.js";
 
 /**
  * Réglages de l'élément sélectionné (clé de mise en page stable).
@@ -29,6 +29,9 @@ function elementStyleControlsHTML(project, layoutKey) {
     row('padding', ELEMENT_PADDING) +
     row('radius', ELEMENT_RADIUS) +
     row('opacity', ELEMENT_OPACITY) +
+    row('background', ELEMENT_BACKGROUND) +
+    row('border', ELEMENT_BORDER) +
+    row('shadow', ELEMENT_SHADOW) +
     '<button type="button" onclick="window.app.clearSelectedElementStyle()" class="w-full py-1.5 rounded-md border border-zinc-200 bg-white text-ui-2xs font-semibold text-zinc-600">Revenir au style du thème</button>' +
   '</div>';
 }

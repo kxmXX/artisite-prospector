@@ -1358,3 +1358,22 @@ Vérifications : tests/element_style.test.js (5 tests) ; 336/336 tests complets.
 
 Non vérifié : l'apparence à l'écran du nouveau bloc, l'inspecteur restant hors du champ des captures
 à 1280 px. À lever comme pour le lot 4b.
+
+---
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.18 (réglages d'élément complétés)
+
+Ajouté aux réglages d'élément : fond (aucun, surface, accent), bordure (aucune, fine, marquée) et
+ombre (aucune, douce, portée). Six réglages au total avec la respiration, l'arrondi et l'opacité.
+
+Deux décisions à retenir :
+- Un fond accentué force la couleur de texte blanche : sans cela, le produit aurait laissé créer des
+  blocs illisibles par construction.
+- Les valeurs n'utilisent QUE des jetons du site (--primary, --bg-sec) ou des littéraux sûrs. Les
+  jetons --ui-* du chrome sont volontairement exclus : le site autonome exporté ne les définit pas, et
+  c'est exactement le type d'écart qui a cassé l'export. Les réglages précédents (arrondis) passent par
+  des var() avec repli littéral, donc le problème ne s'y pose pas non plus.
+
+Vérifications : tests/element_style.test.js (6 tests) ; 337/337 tests complets.
+
+Non vérifié : l'apparence à l'écran des blocs de l'inspecteur, comme pour les lots 4b et 4c.

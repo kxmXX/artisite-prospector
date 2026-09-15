@@ -30,7 +30,32 @@ export const ELEMENT_OPACITY = {
   faded: { label: "60 %", value: "0.6" }
 };
 
-export const ELEMENT_STYLE_DEFAULTS = Object.freeze({ padding: "normal", radius: "soft", opacity: "full" });
+export const ELEMENT_BACKGROUND = {
+  none: { label: "Aucun", value: "" },
+  surface: { label: "Surface", value: "var(--bg-sec, #f0f2eb)" },
+  accent: { label: "Accent", value: "var(--primary, #527c22)", contrast: "color: #ffffff;" }
+};
+
+export const ELEMENT_BORDER = {
+  none: { label: "Aucune", value: "" },
+  hairline: { label: "Fine", value: "1px solid rgba(0, 0, 0, 0.12)" },
+  strong: { label: "Marquée", value: "2px solid var(--primary, #527c22)" }
+};
+
+export const ELEMENT_SHADOW = {
+  none: { label: "Aucune", value: "" },
+  soft: { label: "Douce", value: "0 1px 2px rgba(0, 0, 0, 0.06)" },
+  lifted: { label: "Portée", value: "0 8px 24px rgba(0, 0, 0, 0.10)" }
+};
+
+export const ELEMENT_STYLE_DEFAULTS = Object.freeze({
+  padding: "normal",
+  radius: "soft",
+  opacity: "full",
+  background: "none",
+  border: "none",
+  shadow: "none"
+});
 
 const SAFE_KEY = /^[A-Za-z0-9_-]{1,64}$/;
 
@@ -44,7 +69,10 @@ export function getElementStyle(project, layoutKey) {
   return {
     padding: pick(ELEMENT_PADDING, raw.padding, ELEMENT_STYLE_DEFAULTS.padding),
     radius: pick(ELEMENT_RADIUS, raw.radius, ELEMENT_STYLE_DEFAULTS.radius),
-    opacity: pick(ELEMENT_OPACITY, raw.opacity, ELEMENT_STYLE_DEFAULTS.opacity)
+    opacity: pick(ELEMENT_OPACITY, raw.opacity, ELEMENT_STYLE_DEFAULTS.opacity),
+    background: pick(ELEMENT_BACKGROUND, raw.background, ELEMENT_STYLE_DEFAULTS.background),
+    border: pick(ELEMENT_BORDER, raw.border, ELEMENT_STYLE_DEFAULTS.border),
+    shadow: pick(ELEMENT_SHADOW, raw.shadow, ELEMENT_STYLE_DEFAULTS.shadow)
   };
 }
 
@@ -56,7 +84,14 @@ export function hasCustomElementStyle(project, layoutKey) {
 /** Applique un réglage. Renvoie un nouveau projet, sans muter la source. */
 export function setElementStyle(project, layoutKey, property, value) {
   if (!project || !SAFE_KEY.test(String(layoutKey || ""))) return project;
-  const scales = { padding: ELEMENT_PADDING, radius: ELEMENT_RADIUS, opacity: ELEMENT_OPACITY };
+  const scales = {
+    padding: ELEMENT_PADDING,
+    radius: ELEMENT_RADIUS,
+    opacity: ELEMENT_OPACITY,
+    background: ELEMENT_BACKGROUND,
+    border: ELEMENT_BORDER,
+    shadow: ELEMENT_SHADOW
+  };
   const scale = scales[property];
   if (!scale || !Object.prototype.hasOwnProperty.call(scale, value)) return project;
   const elementStyles = { ...(project.elementStyles || {}) };
@@ -94,6 +129,14 @@ export function elementStyleCSS(project) {
     if (style.padding !== ELEMENT_STYLE_DEFAULTS.padding) declarations.push("padding: " + ELEMENT_PADDING[style.padding].value + ";");
     if (style.radius !== ELEMENT_STYLE_DEFAULTS.radius) declarations.push("border-radius: " + ELEMENT_RADIUS[style.radius].value + ";");
     if (style.opacity !== ELEMENT_STYLE_DEFAULTS.opacity) declarations.push("opacity: " + ELEMENT_OPACITY[style.opacity].value + ";");
+    if (style.background !== ELEMENT_STYLE_DEFAULTS.background) {
+      const background = ELEMENT_BACKGROUND[style.background];
+      declarations.push("background-color: " + background.value + ";");
+      // Un fond accentué impose un texte lisible : la paire est indissociable.
+      if (background.contrast) declarations.push(background.contrast);
+    }
+    if (style.border !== ELEMENT_STYLE_DEFAULTS.border) declarations.push("border: " + ELEMENT_BORDER[style.border].value + ";");
+    if (style.shadow !== ELEMENT_STYLE_DEFAULTS.shadow) declarations.push("box-shadow: " + ELEMENT_SHADOW[style.shadow].value + ";");
     if (!declarations.length) continue;
     rules.push('[data-layout-key="' + layoutKey + '"] { ' + declarations.join(" ") + " }");
     if (rules.length >= 400) break;

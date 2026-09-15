@@ -13,7 +13,8 @@ const markupOnly = (html) => html.replace(/<style[\s\S]*?<\/style>/g, '');
 test('un element sans reglage ne produit aucune regle', () => {
   assert.equal(style.elementStyleCSS(project()), '', 'aucun réglage, aucune feuille');
   assert.deepEqual(style.getElementStyle(project(), 'E1'),
-    { padding: 'normal', radius: 'soft', opacity: 'full' }, 'les valeurs par défaut sont complètes');
+    { padding: 'normal', radius: 'soft', opacity: 'full', background: 'none', border: 'none', shadow: 'none' },
+    'les valeurs par défaut sont complètes');
   assert.equal(style.hasCustomElementStyle(project(), 'E1'), false);
 });
 
@@ -25,6 +26,20 @@ test('un reglage produit une declaration ciblee', () => {
   const css = style.elementStyleCSS(current);
   assert.match(css, /border-radius: var\(--ui-radius-full, 999px\);/);
   assert.match(css, /opacity: 0\.6;/);
+});
+
+test('fond, bordure et ombre suivent le meme contrat', () => {
+  let current = style.setElementStyle(project(), 'E1', 'background', 'accent');
+  const css = style.elementStyleCSS(current);
+  assert.match(css, /background-color: var\(--primary, #527c22\);/);
+  assert.match(css, /color: #ffffff;/, 'un fond accentué impose un texte lisible');
+  current = style.setElementStyle(current, 'E1', 'border', 'hairline');
+  current = style.setElementStyle(current, 'E1', 'shadow', 'lifted');
+  const full = style.elementStyleCSS(current);
+  assert.match(full, /border: 1px solid rgba\(0, 0, 0, 0\.12\);/);
+  assert.match(full, /box-shadow: 0 8px 24px rgba\(0, 0, 0, 0\.10\);/);
+  assert.equal(style.setElementStyle(current, 'E1', 'background', 'arc-en-ciel'), current,
+    'une valeur inconnue ne change rien');
 });
 
 test('les reglages inconnus sont ignores, la source n est pas mutee', () => {
