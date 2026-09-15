@@ -496,6 +496,14 @@ export function renderInspector(section, project, state) {
                 class="w-full py-1.5 bg-white hover:bg-zinc-100 text-zinc-800 rounded-lg text-xs font-semibold border border-zinc-200 flex items-center justify-center gap-1.5 shadow-2xs transition-colors">
           ${getIcon("play", "w-3.5 h-3.5")}<span>Tester l'animation en direct</span>
         </button>
+        <div class="grid grid-cols-2 gap-1.5">
+          <button type="button"
+                  class="py-1 bg-white hover:bg-zinc-100 text-zinc-700 rounded-lg text-ui-xs font-semibold border border-zinc-200 transition-colors"
+                  onclick="window.app.stopSectionMotion('${sectionId}')">Arrêter</button>
+          <button type="button"
+                  class="py-1 bg-white hover:bg-zinc-100 text-zinc-700 rounded-lg text-ui-xs font-semibold border border-zinc-200 transition-colors"
+                  onclick="window.app.resetSectionMotion('${sectionId}')">Réinitialiser</button>
+        </div>
       </div>
 
       <!-- Quick Component Inserter -->

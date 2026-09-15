@@ -1781,3 +1781,9 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Un test restait (libelle 'Interactive Google Maps'/'Choisir l'image de carte') : repoins vers l'inspecteur, ou le controle vit sous 'Carte interactive'.
 - Tests : 403/403. Le contenu retire etait dans un template, non rendu par les navigateurs : l'interface visible ne pouvait pas changer.
 - Dette : updateListField sans interface vivante. Reste : lot 7 (courbe, direction, tester/rejouer), export 2d, PRODUCT.md/DESIGN.md, et la validation utilisateur du geste de deplacement et du mobile.
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.58 (lot 7 : arreter et reinitialiser)
+
+- Ajoute sous le bouton de test : Arreter (retire is-revealed, motion-preview, l'etat de pulsation et annule le minuteur) et Reinitialiser (efface preset, repetition, vitesse, delai ; instantane d'historique, donc annulable).
+- Tests : 403/403, un test nouveau verifie les trois boutons sur la sortie reelle de l'inspecteur.
+- Reste sur le lot 7 : courbe (easing) et direction par animation. Puis export 2d, PRODUCT.md/DESIGN.md, updateListField, et la validation utilisateur du geste de deplacement et du mobile.

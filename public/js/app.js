@@ -3349,7 +3349,31 @@ export class App {
     }
   }
 
-  previewSectionMotion(secId, preset) {
+  /** Arrete l'animation d'une section : elle revient a son etat de repos. */
+  stopSectionMotion(sectionId) {
+    const secEl = document.getElementById("section-" + sectionId) || document.querySelector('.editor-section-wrapper[data-section-id="' + sectionId + '"]');
+    if (!secEl) return;
+    if (this._sectionMotionPreviewTimer) { clearTimeout(this._sectionMotionPreviewTimer); this._sectionMotionPreviewTimer = null; }
+    secEl.classList.remove("is-revealed", "motion-preview", "btn-pulse-active");
+  }
+
+  /** Remet les reglages d'animation de la section a leur etat par defaut. */
+  resetSectionMotion(sectionId) {
+    if (!state.currentProject || !sectionId) return;
+    state.pushHistory("Reinitialisation de l'animation");
+    const updated = JSON.parse(JSON.stringify(state.currentProject));
+    const sec = updated.sections.find(s => s.id === sectionId);
+    if (!sec) return;
+    sec.settings = sec.settings || {};
+    delete sec.settings.motionPreset;
+    delete sec.settings.motionLoop;
+    delete sec.settings.motionSpeed;
+    delete sec.settings.motionDelay;
+    state.updateProject(updated, true);
+    this.stopSectionMotion(sectionId);
+    this.refreshInspectorPanel();
+    this.showToast("Animation de la section reinitialisee", "info");
+  }  previewSectionMotion(secId, preset) {
     const secEl = document.getElementById(`section-${secId}`) || document.querySelector(`.editor-section-wrapper[data-section-id="${secId}"]`);
     if (!secEl) return;
     const motion = preset === "none" ? "" : preset;

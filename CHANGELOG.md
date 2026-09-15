@@ -7,6 +7,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.58) — Lot 7 : arrêter et réinitialiser une animation
+
+- Le panneau proposait « Tester l'animation en direct » mais rien pour **l'arrêter**, ni pour **revenir aux réglages d'origine** : une fois une animation posée, il fallait décocher à la main chaque réglage (preset, répétition, vitesse, délai).
+- Ajouté sous le bouton de test : **Arrêter** (retire `is-revealed`, `motion-preview` et l'état de pulsation, et annule le minuteur d'aperçu) et **Réinitialiser** (efface preset, répétition, vitesse et délai, avec instantané d'historique — donc annulable).
+- Tests : 1 nouveau ; **403/403**. Vérifié sur la sortie réelle de l'inspecteur : les trois boutons sont présents.
+- Reste sur le lot 7 : la **courbe** (easing) et la **direction** par animation.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.57) — Lot 3b soldé : les 843 lignes inertes sont supprimées
 
 - **Suppression effectuée** : `renderSectionAccordionContent` (843 lignes) et le `<template id="studio-v3-section-capabilities">` qui le portait. `editor.js` passe de **1856 à 1013 lignes**. Aucune référence ne subsiste, aucun appel.

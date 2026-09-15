@@ -260,3 +260,21 @@ test('galerie et boutons masques sont reglables depuis l inspecteur', async () =
   assert.ok(!renderInspector(untouched, base, state).includes('restoreButton'), 'aucune restauration quand rien n est masque');
   state.selectedElementKey = null;
 });
+
+test('l animation de section peut etre testee, arretee et reinitialisee', async () => {
+  const { renderInspector } = await import('../public/js/components/inspector.js');
+  const { generateSite } = await import('../public/js/engine/generator.js');
+  const { state } = await import('../public/js/state.js');
+  const app = read('public/js/app.js');
+  const project = generateSite({ name: 'Controle Rythme', tradeId: 'plombier' });
+  state.currentProject = project;
+  const hero = project.sections.find((s) => s.type === 'hero');
+  const html = renderInspector(hero, project, state);
+  assert.ok(html.includes('window.app.previewSectionMotion('), 'tester l animation');
+  assert.ok(html.includes("window.app.stopSectionMotion('" + hero.id + "')"), 'arreter l animation');
+  assert.ok(html.includes("window.app.resetSectionMotion('" + hero.id + "')"), 'reinitialiser l animation');
+  assert.ok(app.includes('stopSectionMotion(sectionId) {'), 'la methode arreter doit exister');
+  assert.ok(app.includes('resetSectionMotion(sectionId) {'), 'la methode reinitialiser doit exister');
+  assert.ok(app.includes("state.pushHistory(\"Reinitialisation de l'animation\")"), 'la reinitialisation doit etre annulable');
+  state.selectedElementKey = null;
+});
