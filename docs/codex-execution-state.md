@@ -1802,3 +1802,12 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Regle a retenir : "push" ne vaut pas "live". Apres chaque lot pousse, relancer `vercel --prod --yes` depuis la racine du depot, puis verifier /js/version.js.
 - Comptage honnete : la suite reelle est 405/405 (mesuree), pas 404 — les entrees alpha.58 et alpha.59 comptaient un test de moins.
 - Reste (inchange) : lot 7 direction par animation, export autonome 2d, PRODUCT.md/DESIGN.md, updateListField, et la validation utilisateur (geste de deplacement, mobile).
+
+## Journal — 17 septembre 2026 · sessions : verification demandee
+
+- Question utilisateur : "il n'y a pas de session". Reponse verifiee : les sessions existent (lots 9a/9b, alpha.5/alpha.6) mais ne fonctionnaient dans aucun des deux environnements testes.
+- Cause locale : le serveur de developpement tournait depuis 18h39, AVANT l'ajout des routes de compte (20h34). Il repondait 404 sur /api/auth/session. Redemarre : inscription -> cookie HttpOnly -> session -> deconnexion verifies de bout en bout, et la modale "Retrouver mes sites" s'ouvre au navigateur.
+- Cause publique : sur Vercel, isPersistentHost() est faux (pas de disque persistant, DATA_DIR absent) ; toutes les routes /api/auth/* et /api/projects/* repondent 503 par conception. Le site public affiche donc "Connexion indisponible". Ce n'est pas une absence de code, c'est un refus explicite : les donnees ne seraient pas conservees.
+- Decision a prendre : (a) heberger le serveur Node sur un hote a disque persistant (Railway/Render/Fly/VPS) — aucun changement de code ; (b) ajouter un stockage externe pour Vercel (Upstash Redis / Vercel KV ou Postgres) — ecrire un adaptateur REST sans dependance npm, apres provisionnement et fourniture des variables ; (c) rester local.
+- Perimetre corrige par l'utilisateur : l'editeur ne sera jamais utilise sur mobile. Les gestes mobile sortent du perimetre ; reste desktop/tablette.
+- Reste (inchange) : lot 7 direction, export 2d, PRODUCT.md/DESIGN.md, updateListField, geste de deplacement desktop.
