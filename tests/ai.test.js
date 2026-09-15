@@ -27,7 +27,11 @@ test("getFallbackModels respects custom GEMINI_MODELS environment variable", () 
   try {
     process.env.GEMINI_MODELS = "gemini-3.8-flash, gemini-3.7-flash, gemini-2.5-flash";
     const models = getFallbackModels();
-    assert.deepEqual(models, ["gemini-3.8-flash", "gemini-3.7-flash", "gemini-2.5-flash"]);
+    assert.deepEqual(models.slice(0, 3), ["gemini-3.8-flash", "gemini-3.7-flash", "gemini-2.5-flash"]);
+    // Les valeurs par defaut restent en secours : une variable qui ne liste que des
+    // modeles recents ne doit PAS supprimer le filet de securite.
+    assert.ok(models.includes("gemini-2.5-flash-lite"));
+    assert.equal(models.length, new Set(models).size, "aucun doublon");
   } finally {
     if (original !== undefined) {
       process.env.GEMINI_MODELS = original;

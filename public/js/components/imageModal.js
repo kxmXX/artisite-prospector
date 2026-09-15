@@ -142,6 +142,8 @@ export function renderImageModal(state) {
               <span>Générer le visuel avec l'IA</span>
             </button>
 
+            <div id="ai-image-status" class="hidden text-ui-sm rounded-lg px-3 py-2 leading-snug" role="status" aria-live="polite"></div>
+
             <div id="ai-image-output-container" class="hidden pt-2 space-y-2 border-t border-zinc-200">
               <div class="text-ui-sm font-semibold text-zinc-700">Aperçu du visuel généré :</div>
               <div class="aspect-[16/9] max-h-56 rounded-xl overflow-hidden border border-zinc-200 bg-zinc-950">

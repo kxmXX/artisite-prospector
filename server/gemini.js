@@ -43,24 +43,32 @@ async function fetchWithRetry(url, options) {
   return lastResponse;
 }
 
-export function getFallbackModels() {
-  if (process.env.GEMINI_MODELS) {
-    const list = process.env.GEMINI_MODELS.split(",")
-      .map(m => m.trim())
-      .filter(Boolean);
-    if (list.length > 0) return list;
+/**
+ * Les modeles configures par variables d'environnement passent en premier, mais on
+ * leur AJOUTE toujours les valeurs par defaut. Sinon une variable ne contenant que
+ * des modeles recents supprime tout le filet de securite — l'incident du 15/09.
+ */
+function configuredModels(value, defaults) {
+  const configured = String(value || "")
+    .split(",")
+    .map((model) => model.trim())
+    .filter(Boolean);
+  const merged = [];
+  const seen = new Set();
+  for (const model of configured.concat(defaults)) {
+    if (seen.has(model)) continue;
+    seen.add(model);
+    merged.push(model);
   }
-  return DEFAULT_FALLBACK_MODELS;
+  return merged;
+}
+
+export function getFallbackModels() {
+  return configuredModels(process.env.GEMINI_MODELS, DEFAULT_FALLBACK_MODELS);
 }
 
 export function getImageModels() {
-  if (process.env.GEMINI_IMAGE_MODELS) {
-    const list = process.env.GEMINI_IMAGE_MODELS.split(",")
-      .map(m => m.trim())
-      .filter(Boolean);
-    if (list.length > 0) return list;
-  }
-  return DEFAULT_IMAGE_MODELS;
+  return configuredModels(process.env.GEMINI_IMAGE_MODELS, DEFAULT_IMAGE_MODELS);
 }
 
 export async function callGeminiWithFallback({ prompt, systemInstruction = "", jsonOutput = true, apiKey = process.env.GEMINI_API_KEY }) {

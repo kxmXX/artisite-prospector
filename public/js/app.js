@@ -3179,6 +3179,19 @@ export class App {
     const btn = document.getElementById("btn-generate-ai-photo");
     const outputContainer = document.getElementById("ai-image-output-container");
     const previewImg = document.getElementById("ai-generated-preview-img");
+    const statusEl = document.getElementById("ai-image-status");
+    // L'auteur doit savoir ce qui se passe : en cours, reussi, ou pourquoi l'echec.
+    const setStatus = (message, tone) => {
+      if (!statusEl) return;
+      if (!message) { statusEl.classList.add("hidden"); statusEl.textContent = ""; return; }
+      statusEl.textContent = message;
+      statusEl.className = "text-ui-sm rounded-lg px-3 py-2 leading-snug " + (
+        tone === "error" ? "bg-red-50 text-red-700 border border-red-200" :
+        tone === "success" ? "bg-emerald-50 text-emerald-700 border border-emerald-200" :
+        "bg-zinc-100 text-zinc-700 border border-zinc-200"
+      );
+    };
+    setStatus("Génération en cours…", "info");
 
     if (btn) {
       btn.disabled = true;
@@ -3201,6 +3214,12 @@ export class App {
           const data = await res.json();
           if (!sameTarget()) return;
           if (data.imageUrl) imageUrl = data.imageUrl;
+          if (data.aiAvailable === false) {
+            const reason = data.error ? String(data.error).replace(/\s+/g, " ").slice(0, 160) : "raison inconnue";
+            setStatus("L'IA n'a pas pu produire d'image : " + reason + " — un visuel du catalogue est proposé à la place.", "error");
+          } else if (data.aiAvailable) {
+            setStatus("Visuel généré par l'IA.", "success");
+          }
         }
       } catch (err) {
         if (!sameTarget()) return;
