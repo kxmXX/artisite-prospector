@@ -1051,3 +1051,43 @@ Reste pour ce chantier (9b) : le client (api.js, session.js, modale de connexion
 dans le dashboard), la migration des projets locaux à la première connexion avec copie de secours,
 et le passage du localStorage en cache hors ligne. Aucun test de navigateur n'a encore été fait sur
 ce chantier : la partie serveur est testée, pas l'interface.
+
+---
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.6 (lot 9b/9)
+
+Client des comptes, qui rend enfin la Mission 3 visible dans l'interface.
+
+Ajouté :
+- public/js/api.js : apiFetch unique (same-origin, délai d'attente, ApiError porteuse du message
+  serveur). Utilisé par session.js.
+- public/js/session.js : fetchSession (connecté / anonyme / indisponible / hors ligne), signIn,
+  signUp, signOut, pullProjects, pushProject, removeProject, importProjects, readLocalProjects,
+  planMigration (absent, plus récent, plus ancien, invalide), backupLocalProjects.
+- public/js/components/authModal.js : modale de connexion / création, deux onglets, branchée sur
+  state.activeDrawer comme les autres modales.
+- app.js : initAccounts (crochet de sauvegarde + amorçage de session), pullCloudLibrary (fusion en
+  gardant la version la plus récente par projet), queueCloudSync (poussée différée de 600 ms),
+  openAuthModal, closeAuthModal, switchAuthTab, submitAuth, importLocalLibrary, dismissMigration,
+  signOutAccount.
+- state.js : sessionUser, authStatus, authTab, authBusy, authError, _migrationPlan, registerSaveHook
+  et notification session_change.
+- dashboard.js : accountControlHTML (Se connecter / identifiant · Se déconnecter / indisponible) et
+  migrationBannerHTML (compter, importer, plus tard) ; studio-v3.css reçoit les styles du bandeau,
+  avec ligne mobile et alternative reduced-motion.
+
+Vérifications :
+- tests/accounts_client.test.js (7 tests) : erreurs HTTP/réseau, quatre états de session, décision de
+  migration, copie de secours, corps de l'import, présence des points d'entrée.
+- Bout en bout au navigateur sur un serveur local (PORT=5190, DATA_DIR=/tmp/artist-data) : inscription
+  par HTTP 201, connexion par l'interface, en-tête affichant « kevin.test · Se déconnecter » et
+  notification de connexion. Le fichier db.json ne contient qu'un hachage scrypt (128 caractères de
+  hash, 32 de sel) et un jeton de session haché en SHA-256 ; le mot de passe en clair n'y apparaît pas.
+- Un défaut d'affichage a été trouvé et corrigé pendant cette vérification : la modale s'affichait en
+  bas à gauche car il manquait les classes de positionnement (fixed inset-0 …) que portent les autres
+  modales. Sans ce contrôle navigateur, le défaut serait passé inaperçu : les tests statiques ne
+  l'auraient pas attrapé.
+- **310/310 tests**, générateur d'utilitaires à jour.
+
+Reste ouvert : la synchronisation ne pousse que le projet courant et ne propage pas les suppressions ;
+aucun test multi-navigateurs simultanés n'a été fait.

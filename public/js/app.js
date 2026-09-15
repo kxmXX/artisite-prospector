@@ -5,6 +5,8 @@ import { renderWizardModal } from "./components/wizard.js";
 import { renderCloserModal } from "./components/closerModal.js";
 import { renderShareModal } from "./components/shareModal.js";
 import { renderCommandPalette } from "./components/commandPalette.js";
+import { renderAuthModal } from "./components/authModal.js";
+import { fetchSession, signIn, signUp, signOut, pullProjects, pushProject, importProjects, readLocalProjects, planMigration, backupLocalProjects } from "./session.js";
 import { renderAddSectionModal } from "./components/addSectionModal.js";
 import { renderImageModal } from "./components/imageModal.js";
 import { renderInspector } from "./components/inspector.js";
@@ -65,6 +67,7 @@ export class App {
     // Expose app on window for inline handlers
     window.app = this;
     ensureFontCatalog();
+    this.initAccounts();
     document.body.classList.toggle("dark-theme", state.themeMode === "dark");
 
     // Subscribe to state changes
@@ -234,6 +237,9 @@ export class App {
       modalContainer.innerHTML = renderCloserModal(state.currentProject);
     } else if (state.activeDrawer === "share_modal") {
       modalContainer.innerHTML = renderShareModal(state.currentProject, this._shareModalTab || 'demo');
+    } else if (state.activeDrawer === "auth") {
+      modalContainer.innerHTML = renderAuthModal(state);
+      setTimeout(() => document.getElementById("auth-username")?.focus(), 0);
     } else if (state.activeDrawer === "command_palette") {
       modalContainer.innerHTML = renderCommandPalette(state.currentProject, state.projects);
       setTimeout(() => {
@@ -582,6 +588,129 @@ export class App {
     const schema = generateLocalBusinessSchema(state.currentProject);
     navigator.clipboard?.writeText(schema);
     alert("✓ Schema.org (LocalBusiness JSON-LD) copié dans le presse-papier !");
+  }
+
+  /* ------------------------------------------------------------------ *
+   * Comptes et synchronisation
+   * ------------------------------------------------------------------ */
+
+  initAccounts() {
+    this._cloudSync = { timer: null };
+    state.registerSaveHook((projects, project) => this.queueCloudSync(project));
+    this.refreshSession();
+  }
+
+  async refreshSession() {
+    const result = await fetchSession();
+    state.setSession(result.user, result.status);
+    if (result.status === "authenticated") await this.pullCloudLibrary();
+    this.render();
+  }
+
+  async pullCloudLibrary() {
+    try {
+      const remote = await pullProjects();
+      if (!remote.length) return;
+      const byId = new Map(state.projects.map((project) => [project.id, project]));
+      for (const project of remote) {
+        const local = byId.get(project.id);
+        const localTime = local ? Date.parse(local.updatedAt || 0) || 0 : 0;
+        const remoteTime = Date.parse(project.updatedAt || 0) || 0;
+        if (!local || remoteTime > localTime) byId.set(project.id, project);
+      }
+      const previousId = state.currentProject && state.currentProject.id;
+      state.projects = [...byId.values()];
+      state.currentProject = state.projects.find((project) => project.id === previousId) || state.projects[0] || null;
+      state.hasStoredLibrary = true;
+      state.saveToStorage();
+    } catch (error) {
+      this.showToast(error.message || "Bibliothèque distante indisponible", "error");
+    }
+  }
+
+  queueCloudSync(project) {
+    if (state.authStatus !== "authenticated" || !project || !project.id) return;
+    clearTimeout(this._cloudSync.timer);
+    this._cloudSync.timer = setTimeout(() => {
+      pushProject(project).catch((error) => {
+        this.showToast("Synchronisation impossible : " + (error.message || ""), "error");
+      });
+    }, 600);
+  }
+
+  openAuthModal(tab = "login") {
+    state.authTab = tab === "register" ? "register" : "login";
+    state.authError = "";
+    state.authNotice = "";
+    state.activeDrawer = "auth";
+    this.renderModals();
+  }
+
+  closeAuthModal() {
+    state.activeDrawer = null;
+    this.renderModals();
+  }
+
+  switchAuthTab(tab) {
+    state.authTab = tab === "register" ? "register" : "login";
+    state.authError = "";
+    this.renderModals();
+  }
+
+  async submitAuth() {
+    const usernameField = document.getElementById("auth-username");
+    const passwordField = document.getElementById("auth-password");
+    const username = usernameField ? usernameField.value : "";
+    const password = passwordField ? passwordField.value : "";
+    state.authError = "";
+    state.authNotice = "";
+    state.authBusy = true;
+    this.renderModals();
+    try {
+      if (state.authTab === "register") await signUp(username, password);
+      else await signIn(username, password);
+      const session = await fetchSession();
+      state.setSession(session.user, session.status);
+      await this.pullCloudLibrary();
+      state.authBusy = false;
+      state.activeDrawer = null;
+      const plan = planMigration(readLocalProjects(), state.projects);
+      state._migrationPlan = plan.toImport.length ? plan : null;
+      this.render();
+      this.showToast("Connecté : " + (session.user ? session.user.username : ""), "success");
+    } catch (error) {
+      state.authBusy = false;
+      state.authError = error.message || "Connexion impossible";
+      this.renderModals();
+    }
+  }
+
+  async importLocalLibrary() {
+    const projects = readLocalProjects();
+    if (!projects.length) return;
+    const backedUp = backupLocalProjects();
+    try {
+      const result = await importProjects(projects);
+      await this.pullCloudLibrary();
+      state._migrationPlan = null;
+      this.showToast((result && result.imported ? result.imported : projects.length) + " site(s) importés" + (backedUp ? " (copie de secours conservée)" : ""), "success");
+      this.render();
+    } catch (error) {
+      this.showToast("Import impossible : " + (error.message || ""), "error");
+    }
+  }
+
+  dismissMigration() {
+    state._migrationPlan = null;
+    this.render();
+  }
+
+  async signOutAccount() {
+    try { await signOut(); } catch { /* la session locale est fermée quand même */ }
+    state.setSession(null, "anonymous");
+    state._migrationPlan = null;
+    this.showToast("Déconnecté", "info");
+    this.render();
   }
 
   openAddSectionModal(tab = "sections") {

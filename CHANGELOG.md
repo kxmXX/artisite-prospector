@@ -7,6 +7,32 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.6) — Lot 9b : comptes dans l'interface
+
+- **Appel HTTP unique** (`public/js/api.js`) : `apiFetch` avec `credentials: "same-origin"`, délai
+  d'attente, et `ApiError` qui porte le message du serveur — l'interface n'interprète plus jamais un
+  code HTTP elle-même.
+- **Session** (`public/js/session.js`) : amorçage au démarrage, connexion, inscription, déconnexion,
+  récupération et envoi des projets, et distinction explicite des trois états : connecté, anonyme,
+  **indisponible** (hébergement sans disque persistant) ou hors ligne — dans ce dernier cas
+  l'application reste utilisable en local au lieu de bloquer.
+- **Interface** : bouton « Se connecter » dans l'en-tête du dashboard, modale de compte (deux onglets,
+  français, sans jargon), et pastille « identifiant · Se déconnecter » une fois connecté. La modale
+  utilise le coordinateur d'overlays existant et les mêmes classes que les autres modales.
+- **Synchronisation** : quand une session est ouverte, chaque enregistrement local est aussi poussé au
+  serveur (groupé sur 600 ms) ; au démarrage, la bibliothèque du compte est fusionnée avec la copie
+  locale en gardant la version la plus récente par projet. Le `localStorage` reste la copie hors ligne.
+- **Migration des créations locales** : à la première connexion, les sites présents sur l'appareil mais
+  absents du compte (ou plus récents) sont proposés dans un bandeau, avec **copie de secours
+  `artisite_migration_backup_v11` avant tout import**. Rien n'est jamais supprimé silencieusement.
+- **QA** : `tests/accounts_client.test.js` (7 tests) — erreurs HTTP et réseau de `apiFetch`, les quatre
+  états de session, la décision de migration (absent, plus récent, plus ancien, invalide), la copie de
+  secours, le corps envoyé à l'import, et la présence des points d'entrée dans l'interface.
+  **310/310 tests**.
+- **Vérifié au navigateur** : connexion réelle de bout en bout sur un serveur local — la modale
+  s'ouvre centrée, le compte est créé, l'en-tête affiche l'identifiant et la déconnexion, et le fichier
+  de données ne contient que des empreintes `scrypt` et un jeton de session haché.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.5) — Lot 9a : comptes côté serveur
 
 - **Persistance serveur sans aucune dépendance** : `server/store.js` tient un fichier JSON unique

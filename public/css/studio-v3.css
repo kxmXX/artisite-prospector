@@ -649,3 +649,14 @@ body.freeform-transforming #canvas-container [data-layout-key].is-freeform-selec
     transition:none!important;animation:none!important;
   }
 }
+
+/* ---------- compte et migration des créations locales ---------- */
+.dashboard-v3-migration{display:flex;align-items:center;gap:12px;margin:0 0 14px;padding:12px 14px;border:1px solid var(--ui-line);border-radius:var(--ui-radius-lg,12px);background:var(--ui-accent-soft);color:var(--ui-ink);font-size:11px;line-height:1.5}
+.dashboard-v3-migration p{margin:0;flex:1;min-width:0}
+.dashboard-v3-migration-actions{display:flex;gap:8px;flex:0 0 auto}
+.dashboard-v3-migration-actions button{min-height:34px;padding:0 12px;border-radius:var(--ui-radius-md,8px);border:1px solid var(--ui-line-strong);background:var(--ui-panel);color:var(--ui-ink);font-size:11px;font-weight:600;cursor:pointer;transition:background var(--ui-dur-fast,120ms) var(--ui-ease,ease)}
+.dashboard-v3-migration-actions button:first-child{background:var(--ui-ink);border-color:var(--ui-ink);color:#fff}
+.dashboard-v3-migration-actions button:hover{background:var(--ui-panel)}
+.dashboard-v3-migration-actions button:first-child:hover{background:var(--ui-ink-2)}
+@media (max-width:760px){.dashboard-v3-migration{flex-direction:column;align-items:stretch}.dashboard-v3-migration-actions button{flex:1;min-height:44px}}
+@media (prefers-reduced-motion:reduce){.dashboard-v3-migration-actions button{transition:none}}

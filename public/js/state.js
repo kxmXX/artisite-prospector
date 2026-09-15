@@ -17,6 +17,17 @@ class AppStateManager {
     this.copilotOpen = false;
     this.hasStoredLibrary = false;
 
+    // Comptes : null tant que la session serveur n'a pas répondu.
+    this.sessionUser = null;
+    this.authStatus = "anonymous"; // "anonymous" | "authenticated" | "unavailable"
+    this.authModalOpen = false;
+    this.authTab = "login";
+    this._migrationPlan = null;
+
+    // Crochets appelés après chaque écriture locale : le mode connecté s'en sert
+    // pour pousser la modification au serveur sans que le reste du code le sache.
+    this.saveHooks = new Set();
+
     // History for Undo/Redo
     this.undoStack = [];
     this.redoStack = [];
@@ -108,6 +119,21 @@ class AppStateManager {
     } catch (e) {
       console.warn("Could not save to localStorage:", e);
     }
+    for (const hook of this.saveHooks) {
+      try { hook(this.projects, this.currentProject); }
+      catch (e) { console.warn("Save hook error:", e); }
+    }
+  }
+
+  registerSaveHook(hook) {
+    this.saveHooks.add(hook);
+    return () => this.saveHooks.delete(hook);
+  }
+
+  setSession(user, status = "anonymous") {
+    this.sessionUser = user || null;
+    this.authStatus = status;
+    this.notify("session_change");
   }
 
   save() {

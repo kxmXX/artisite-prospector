@@ -105,9 +105,16 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
       jetons de session stockés hachés, cookie `HttpOnly`/`SameSite=Lax`/`Secure`, `ownerId` par
       projet, 404 uniforme hors propriétaire, freinage 20 tentatives/5 min, refus 503 explicite sans
       disque persistant). Routes branchées dans `server/apiHandler.js`, 8 tests dédiés, **303/303**.
-      **Reste (9b)** : le client — `api.js`, `session.js`, modale de connexion, pastille de compte,
-      migration des projets locaux à la première connexion, et le passage du `localStorage` en cache
-      hors ligne.
+      **9b livré en `4.9.0-alpha.6`** : `api.js` (appel unique, `ApiError`), `session.js` (trois états
+      connecté / anonyme / indisponible + hors ligne), modale de compte branchée sur le coordinateur
+      d'overlays, bouton « Se connecter » et pastille « identifiant · Se déconnecter » dans l'en-tête
+      du dashboard, poussée différée des écritures (600 ms), fusion de la bibliothèque en gardant la
+      version la plus récente par projet, et bandeau de migration des créations locales avec copie de
+      secours avant import. 7 tests client supplémentaires, **310/310**, et connexion réelle vérifiée
+      au navigateur sur un serveur local.
+      *Reste à faire sur ce chantier* : la synchronisation ne pousse que le projet courant (pas une
+      suppression côté serveur quand un projet est effacé localement), et aucun test n'a été fait sur
+      deux navigateurs simultanés.
 
 ## Reprise P0 qualité produit — signalement du 15 septembre
 

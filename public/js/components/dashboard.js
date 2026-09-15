@@ -1,12 +1,45 @@
 import { getIcon } from "./icons.js";
 import { getTradeFallbackDataUrl } from "../data/imageFallbacks.js";
 import { APP_VERSION } from "../version.js";
+import { escapeHtml } from "../utils/html.js";
 
 /**
  * Studio V3 dashboard.
  * The dashboard is a prospecting desk first: one dominant generation action,
  * a compact pipeline readout, then a project library instead of a generic card grid.
  */
+/**
+ * Entrée de compte : sans session, proposer de se connecter ; avec session, montrer
+ * l'utilisateur et permettre de fermer la session. Aucun jargon, aucun menu caché.
+ */
+function accountControlHTML(state) {
+  const user = state.sessionUser;
+  if (state.authStatus === "unavailable") {
+    return '<span class="dashboard-v3-secondary" title="Le stockage de cette version hébergée n\'est pas persistant">' +
+      getIcon("laptop", "w-4 h-4") + '<span>Connexion indisponible</span></span>';
+  }
+  if (user) {
+    return '<button type="button" class="dashboard-v3-secondary" onclick="window.app.signOutAccount()" title="Se déconnecter de ' + escapeHtml(user.username) + '">' +
+      getIcon("user", "w-4 h-4") + '<span>' + escapeHtml(user.username) + ' · Se déconnecter</span></button>';
+  }
+  return '<button type="button" class="dashboard-v3-secondary" onclick="window.app.openAuthModal(\'login\')" title="Retrouver mes sites sur un autre appareil">' +
+    getIcon("user", "w-4 h-4") + '<span>Se connecter</span></button>';
+}
+
+function migrationBannerHTML(state) {
+  const plan = state._migrationPlan;
+  if (!plan || !plan.toImport || !plan.toImport.length) return "";
+  const count = plan.toImport.length;
+  return '<div class="dashboard-v3-migration" role="status">' +
+    getIcon("upload", "w-4 h-4") +
+    '<p><b>' + count + ' site' + (count > 1 ? "s" : "") + '</b> enregistré' + (count > 1 ? "s" : "") + ' sur cet appareil et absent' + (count > 1 ? "s" : "") + ' de votre compte.</p>' +
+    '<div class="dashboard-v3-migration-actions">' +
+      '<button type="button" onclick="window.app.importLocalLibrary()">Importer dans mon compte</button>' +
+      '<button type="button" onclick="window.app.dismissMigration()">Plus tard</button>' +
+    '</div>' +
+  '</div>';
+}
+
 export function renderDashboard(state) {
   const projects = state.projects || [];
   const total = projects.length;
@@ -90,6 +123,7 @@ export function renderDashboard(state) {
               <input type="text" id="project-search" oninput="window.app.filterProjects(this.value)" placeholder="Rechercher un projet" aria-label="Rechercher un projet">
             </label>
             <button type="button" onclick="window.app.openVitrineDemo()" class="dashboard-v3-secondary">${getIcon("eye", "w-4 h-4")}<span>Voir la vitrine</span></button>
+            ${accountControlHTML(state)}
             <button type="button" onclick="window.app.openWizard()" class="dashboard-v3-new">${getIcon("plus", "w-4 h-4")}<span>Nouveau prospect</span></button>
           </div>
         </header>
@@ -176,6 +210,7 @@ export function renderDashboard(state) {
               </div>
             </div>
 
+            ${migrationBannerHTML(state)}
             <div id="projects-grid" class="dashboard-v3-project-list">
               ${projectCardsHTML || `
                 <div class="dashboard-v3-empty">
