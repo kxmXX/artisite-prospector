@@ -117,7 +117,7 @@ export function renderInspector(section, project, state) {
       <!-- Section Header Info -->
       <div class="flex items-center justify-between pb-3 border-b border-zinc-200">
         <div>
-          <div class="text-ui-xs font-medium uppercase tracking-wider text-zinc-400">Inspecteur de Section</div>
+          <div class="text-ui-xs font-medium uppercase tracking-wider text-zinc-400">Réglages de la section</div>
           <h3 class="font-semibold text-sm text-zinc-900 capitalize">${friendlyTitle}</h3>
         </div>
 
@@ -153,12 +153,12 @@ export function renderInspector(section, project, state) {
         </div>
       ` : ''}
 
-      <!-- Animation Suite 60fps -->
+      <!-- Réglages d’animation -->
       <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-xl space-y-2.5">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-1.5">
             <span class="text-amber-500">${getIcon("sparkles", "w-3.5 h-3.5")}</span>
-            <label class="text-ui-xs font-bold uppercase tracking-wider text-zinc-700">Animation du Bloc (60fps)</label>
+            <label class="text-ui-xs font-bold uppercase tracking-wider text-zinc-700">Animation de la section</label>
           </div>
           <span class="text-ui-2xs font-mono font-semibold px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">
             ${section.settings?.motionPreset || section.motionPreset || 'aucune'}
@@ -688,7 +688,7 @@ export function renderInspector(section, project, state) {
           <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-lg space-y-2.5 text-xs">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-1.5">
-                <span class="text-ui-xs font-semibold uppercase tracking-wider text-zinc-500">Intelligence Composant</span>
+                <span class="text-ui-xs font-semibold uppercase tracking-wider text-zinc-500">Analyse du bloc</span>
                 <span class="px-1.5 py-0.5 rounded text-ui-2xs font-medium bg-zinc-200 text-zinc-700">${compDef.family}</span>
               </div>
               <span class="px-2 py-0.5 rounded-full text-ui-xs font-semibold ${confidence.score >= 80 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
@@ -702,7 +702,7 @@ export function renderInspector(section, project, state) {
 
             <div class="grid grid-cols-2 gap-1.5 pt-1 text-ui-xs">
               <div class="bg-white p-1.5 rounded border border-zinc-200">
-                <span class="text-zinc-400 block text-ui-2xs">Rôle sémantique</span>
+                <span class="text-zinc-400 block text-ui-2xs">Rôle dans la page</span>
                 <span class="font-mono text-zinc-700">&lt;${compDef.accessibilityPolicy?.semanticRole || 'section'}&gt;</span>
               </div>
               <div class="bg-white p-1.5 rounded border border-zinc-200">

@@ -322,7 +322,7 @@ export function renderEditor(state) {
             </div>
             <div class="h-3.5 w-[1px] bg-zinc-700 mx-1"></div>
             <div class="relative inline-block">
-              <button type="button" id="ftb-anim-btn" onclick="window.app.toggleTextMotionMenu()" class="ftb-btn text-amber-400 font-semibold flex items-center gap-1 px-1.5" title="Appliquer une animation à ce texte (60fps)">
+              <button type="button" id="ftb-anim-btn" onclick="window.app.toggleTextMotionMenu()" class="ftb-btn text-amber-400 font-semibold flex items-center gap-1 px-1.5" title="Appliquer une animation à ce texte">
                 ${getIcon("sparkles", "w-3.5 h-3.5")}<span>Anim</span>
               </button>
               <div id="ftb-anim-menu" class="hidden absolute left-0 top-full mt-2 w-56 bg-zinc-900/95 backdrop-blur-md border border-white/20 rounded-xl p-2.5 shadow-2xl z-50 text-white text-ui-sm">
@@ -342,8 +342,8 @@ export function renderEditor(state) {
                   <button type="button" data-text-loop="twice" class="motion-loop-btn" onclick="window.app.setActiveTextMotionLoop('twice')">×2</button>
                   <button type="button" data-text-loop="infinite" class="motion-loop-btn" onclick="window.app.setActiveTextMotionLoop('infinite')">Boucle</button>
                 </div>
-                <div class="motion-preview-hint">Survolez un preset pour le prévisualiser.</div>
-                <div class="motion-preview-hint">Survolez un preset pour le prévisualiser.</div>
+                <div class="motion-preview-hint">Survolez un style pour le voir jouer.</div>
+                <div class="motion-preview-hint">Survolez un style pour le voir jouer.</div>
               </div>
             </div>
             <div class="h-3.5 w-[1px] bg-zinc-700 mx-1"></div>
@@ -1214,7 +1214,7 @@ function renderSectionAccordionContent(sec, project, variants) {
           <button type="button" data-section-loop="twice" class="motion-loop-btn ${(sec.settings?.motionLoop || 'once') === 'twice' ? 'is-active' : ''}" onclick="window.app.setSectionMotionLoop('${sectionId}', 'twice')">×2</button>
           <button type="button" data-section-loop="infinite" class="motion-loop-btn ${(sec.settings?.motionLoop || 'once') === 'infinite' ? 'is-active' : ''}" onclick="window.app.setSectionMotionLoop('${sectionId}', 'infinite')">Boucle</button>
         </div>
-        <p class="motion-loop-hint">Ce mouvement s’applique à toute la section. Pour animer un seul texte ou une image, ouvrez l’outil Anim de l’élément. Survolez un preset pour le prévisualiser.</p>
+        <p class="motion-loop-hint">Ce mouvement s’applique à toute la section. Pour animer un seul texte ou une image, ouvrez l’outil Anim de l’élément. Survolez un style pour le voir jouer.</p>
         <div class="pattern-catalog mt-2" aria-label="Patterns d'inspiration">
           ${INSPIRATION_PATTERNS.slice(0, 4).map(pattern => {
             const motionKey = pattern.id === 'progress' ? 'progress-fill' : pattern.id;
@@ -1578,7 +1578,7 @@ function renderSettingsAccordions(project, state = {}) {
                 </button>
               `).join('')}
             </div>
-            <p class="text-ui-xs text-zinc-500">Effets fluides 60fps respectant le réglage système « réduire les mouvements ».</p>
+            <p class="text-ui-xs text-zinc-500">Animations fluides, désactivées si votre système demande de réduire les mouvements.</p>
           </div>
 
           <!-- Bandeau Flottant Fixe (Unbounce & Duda Inspired) -->

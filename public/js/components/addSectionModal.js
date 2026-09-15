@@ -366,7 +366,7 @@ export const COMPONENT_CATALOG_ITEMS = [
     familyName: "Médias & Interactif",
     name: "Comparateur Glissant Avant / Après",
     description: "Curseur tactile glissant montrant la transformation spectaculaire avant/après travaux.",
-    badge: "P0 • Preuve 60fps",
+    badge: "P0 • Preuve visuelle",
     icon: "sliders",
     targetSectionType: "beforeAfter",
     variant: "interactive-slider"

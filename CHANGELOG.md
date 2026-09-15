@@ -7,6 +7,21 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.21) — Wording humain dans le chrome
+
+- **23 formulations techniques remplacées par du français lisible**, comme le demandait la mission
+  (« wording humain plutôt que jargon CSS ») : « Animation du Bloc (60fps) » → « Animation de la
+  section », « Inspecteur de Section » → « Réglages de la section », « Intelligence Composant » →
+  « Analyse du bloc », « Ratio libre / verrouillé » → « Proportions libres / bloquées », « Vers
+  desktop / tablette / mobile » → « Adapter au bureau / à la tablette / au mobile », « Hériter du
+  desktop » → « Reprendre la version bureau ».
+- **La fréquence d'images disparaît de l'interface** : six dernières mentions de « 60fps » retirées
+  (infobulles et texte d'aide). C'est une information d'implémentation, pas une information utile à
+  l'auteur — et un marqueur d'interface générée.
+- **Deux tests de non-retour** ajoutés : le jargon retiré ne peut pas revenir dans le chrome, et
+  « 60fps » n'y a plus sa place.
+- **QA** : 3 attentes de test mises à jour (le vocabulaire a changé volontairement), **340/340 tests**.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.20) — États éditables depuis l'inspecteur
 
 - **Les six réglages d'élément s'appliquent maintenant au style de base ou à un état**, au choix, dans

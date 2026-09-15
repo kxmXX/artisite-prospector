@@ -299,7 +299,7 @@ export function renderEditableImage(url, { sectionId = "", fieldPath = "", targe
           <button type="button"
                   onclick="event.stopPropagation(); window.app.toggleImageMotionMenu('${sectionId}', '${fieldPath}', ${indexParam})"
                   class="btn-keycap btn-keycap-light px-2 py-1.5 text-zinc-900 rounded-lg text-xs font-medium shadow-xs flex items-center gap-1 transition-all"
-                  title="Animer cette image (60fps)">
+                  title="Animer cette image">
             ${getIcon("sparkles", "w-3.5 h-3.5 text-amber-500")}
             <span>Anim</span>
           </button>
@@ -329,7 +329,7 @@ export function renderEditableImage(url, { sectionId = "", fieldPath = "", targe
               <button type="button" data-image-loop="twice" class="motion-loop-btn" onclick="event.stopPropagation(); window.app.setImageMotionLoop('${sectionId}', '${fieldPath}', ${indexParam}, 'twice')">×2</button>
               <button type="button" data-image-loop="infinite" class="motion-loop-btn" onclick="event.stopPropagation(); window.app.setImageMotionLoop('${sectionId}', '${fieldPath}', ${indexParam}, 'infinite')">Boucle</button>
             </div>
-            <div class="motion-preview-hint">Survolez un preset pour le prévisualiser.</div>
+            <div class="motion-preview-hint">Survolez un style pour le voir jouer.</div>
           </div>
         </div>
         <button type="button"
@@ -675,13 +675,13 @@ function renderSection(sec, project, options) {
           </div>
         </div>
         <div class="relative inline-block">
-          <button type="button" class="btn-sec-ctrl btn-sec-anim" title="Animations 60fps" data-action="toggle-motion-menu" data-id="${sec.id}" data-motion-trigger="${sec.id}">
+          <button type="button" class="btn-sec-ctrl btn-sec-anim" title="Animation de la section" data-action="toggle-motion-menu" data-id="${sec.id}" data-motion-trigger="${sec.id}">
             ${getIcon("sparkles", "w-3.5 h-3.5 text-amber-400")}
             <span class="sec-ctrl-text">Anim</span>
           </button>
           <div id="sec-motion-popover-${sec.id}" data-section-id="${sec.id}" class="sec-motion-popover hidden absolute left-0 top-full mt-2 w-56 bg-zinc-900/95 backdrop-blur-md border border-white/20 rounded-xl p-2.5 shadow-2xl z-50 text-white text-xs">
             <div class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 mb-2 flex items-center justify-between">
-              <span>Preset 60fps</span>
+              <span>Style d’animation</span>
               <span class="text-amber-400 font-mono font-bold">${sec.settings?.motionPreset || sec.motionPreset || 'défaut'}</span>
             </div>
             <div class="grid grid-cols-2 gap-1.5">

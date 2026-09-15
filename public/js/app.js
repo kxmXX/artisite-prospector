@@ -1948,7 +1948,7 @@ export class App {
     const preset = motionKeyMap[patternId] || patternId;
     this.setSectionMotion(sectionId, preset);
 
-    // Instant visual replay on the canvas element for immediate 60fps tactile feedback
+    // Instant visual replay on the canvas element for immediate tactile feedback
     const el = document.getElementById(`section-${sectionId}`) || document.getElementById(sectionId);
     if (el) {
       el.classList.remove("is-revealed");
@@ -4758,15 +4758,15 @@ export class App {
           <span></span>
           <button type="button" data-freeform-cross-section title="Autoriser le déplacement entre sections" aria-label="Déplacement entre sections" aria-pressed="false">Entre sections</button>
           <button type="button" data-freeform-responsive-toggle title="Ouvrir les outils responsive" aria-label="Ouvrir les outils responsive" aria-expanded="false">Responsive</button>
-          <button type="button" data-freeform-ratio title="Verrouiller le ratio largeur/hauteur" aria-label="Verrouiller le ratio largeur/hauteur">Ratio libre</button>
+          <button type="button" data-freeform-ratio title="Verrouiller le ratio largeur/hauteur" aria-label="Verrouiller le ratio largeur/hauteur">Proportions libres</button>
           <button type="button" data-freeform-lock title="Verrouiller la sélection" aria-label="Verrouiller la sélection">Verrouiller</button>
         </div>
         <div class="freeform-responsivebar" role="toolbar" aria-label="Adapter la sélection aux breakpoints">
           <span data-freeform-responsive-label>Responsive</span>
-          <button type="button" data-freeform-copy="desktop" title="Adapter vers ordinateur">Vers desktop</button>
-          <button type="button" data-freeform-copy="tablet" title="Adapter vers tablette">Vers tablette</button>
-          <button type="button" data-freeform-copy="mobile" title="Adapter vers mobile">Vers mobile</button>
-          <button type="button" data-freeform-inherit-desktop title="Adapter Desktop vers le breakpoint actuel">Hériter du desktop</button>
+          <button type="button" data-freeform-copy="desktop" title="Adapter vers ordinateur">Adapter au bureau</button>
+          <button type="button" data-freeform-copy="tablet" title="Adapter vers tablette">Adapter à la tablette</button>
+          <button type="button" data-freeform-copy="mobile" title="Adapter vers mobile">Adapter au mobile</button>
+          <button type="button" data-freeform-inherit-desktop title="Adapter Desktop vers le breakpoint actuel">Reprendre la version bureau</button>
           <button type="button" data-freeform-breakpoint-reset title="Réinitialiser la sélection sur ce breakpoint">Réinitialiser ici</button>
         </div>
         <div class="freeform-alignbar" role="toolbar" aria-label="Aligner et distribuer la sélection">
@@ -5115,7 +5115,7 @@ export class App {
     if (ratioButton) {
       const aspectLocked = keys.length === 1 && this.getFreeformLayout(keys[0], state.viewport)?.aspectLocked === true;
       ratioButton.hidden = selectionLocked || keys.length !== 1;
-      ratioButton.textContent = aspectLocked ? "Ratio verrouillé" : "Ratio libre";
+      ratioButton.textContent = aspectLocked ? "Proportions bloquées" : "Proportions libres";
       ratioButton.setAttribute("aria-pressed", aspectLocked ? "true" : "false");
       ratioButton.title = aspectLocked ? "Libérer le ratio largeur/hauteur" : "Verrouiller le ratio largeur/hauteur";
     }

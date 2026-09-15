@@ -279,7 +279,7 @@ test("Component Intelligence: Inspector panel integrates Component Intelligence 
   const heroSection = site.sections.find(s => s.type === "hero");
   
   const inspectorHtml = renderInspector(heroSection, site, {});
-  assert.ok(inspectorHtml.includes("Intelligence Composant"), "Le titre Intelligence Composant doit être affiché");
+  assert.ok(inspectorHtml.includes("Analyse du bloc"), "Le titre Analyse du bloc doit être affiché");
   assert.ok(inspectorHtml.includes("Score:"), "Le score de confiance doit être affiché");
   assert.ok(inspectorHtml.includes("Accessibilité"), "Le bloc d'accessibilité doit être présent");
   assert.ok(inspectorHtml.includes("Tag Analytics:"), "Le tag analytics doit être présent");
@@ -372,7 +372,7 @@ test("Component Intelligence: Inspector Animation Suite and Quick Component Inse
   const inspectorHtml = renderInspector(heroSec, site, {});
 
   // 1. Animation suite
-  assert.ok(inspectorHtml.includes("Animation du Bloc (60fps)"));
+  assert.ok(inspectorHtml.includes("Animation de la section"));
   assert.ok(inspectorHtml.includes("Tester l'animation en direct"));
   assert.ok(inspectorHtml.includes("fade-in"));
   assert.ok(inspectorHtml.includes("slide-up"));

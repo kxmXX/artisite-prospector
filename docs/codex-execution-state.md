@@ -1418,3 +1418,22 @@ Erreur commise et corrigée pendant ce lot : un import dupliqué de setElementSt
 attrapé par node --check avant tout commit.
 
 Vérifications : 338/338 tests. Non vérifié : l'apparence à l'écran du bloc, comme pour les lots 4b à 4c.
+
+---
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.21 (wording humain)
+
+Passe de vocabulaire demandée explicitement par la mission (« wording humain plutôt que jargon CSS »).
+23 formulations remplacées dans le chrome, dont le retrait complet des mentions de « 60fps »
+(fréquence d'images = détail d'implémentation, et marqueur d'interface générée).
+
+Deux tests de non-retour ajoutés dans tests/design_system.test.js : le jargon retiré ne peut pas
+revenir, et « 60fps » ne doit plus apparaître dans le chrome.
+
+Trois attentes de test ont été mises à jour parce qu'elles assertaient les anciens libellés : c'est un
+changement de vocabulaire volontaire, pas une régression.
+
+Erreur de manipulation : mon premier script de remplacement a été rejeté par une apostrophe échappée
+dans une chaîne ; corrigé en utilisant l'apostrophe typographique, plus correcte en français.
+
+Vérifications : 340/340 tests. Non vérifié : l'apparence à l'écran, comme depuis le lot 4b.

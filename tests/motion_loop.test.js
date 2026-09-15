@@ -78,6 +78,6 @@ test('every preset previews its own motion on hover', () => {
   assert.ok(appCss.includes('.motion-option[data-motion-preview]:hover, .motion-chip[data-motion-preview]:hover { animation: none !important; }'), 'reduced motion disables previews');
   assert.ok(editorSource.includes('data-motion-preview='), 'editor menus wire the preview');
   assert.ok(rendererSource.includes('data-motion-preview='), 'image menu wires the preview');
-  assert.ok(editorSource.includes('Survolez un preset pour le prévisualiser'), 'the editor explains the hover preview');
+  assert.ok(editorSource.includes('Survolez un style pour le voir jouer'), 'the editor explains the hover preview in plain words');
   assert.ok(rendererSource.includes('motion-preview-hint'), 'the image menu explains the hover preview');
 });

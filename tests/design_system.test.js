@@ -206,3 +206,19 @@ test('le chrome n a plus qu une seule valeur de rayon pilule', () => {
   assert.ok(tokens.includes('--ui-radius-full: 999px'), 'le jeton de rayon pilule est déclaré une seule fois');
 });
 
+
+test('le jargon technique retire ne revient pas dans le chrome', () => {
+  const chrome = ['public/js/components/editor.js', 'public/js/components/inspector.js', 'public/js/components/renderer.js']
+    .map(read).join('\n');
+  for (const jargon of ['Animation du Bloc (60fps)', 'Survolez un preset pour le prévisualiser', 'Inspecteur de Section', 'Intelligence Composant']) {
+    assert.ok(!chrome.includes(jargon), 'jargon réintroduit dans le chrome : ' + jargon);
+  }
+});
+
+
+test('plus aucune mention technique de 60fps dans le chrome', () => {
+  const chrome = ['public/js/components/editor.js', 'public/js/components/inspector.js', 'public/js/components/renderer.js', 'public/js/components/addSectionModal.js', 'public/js/app.js']
+    .map(read).join('\n');
+  assert.ok(!chrome.includes('60fps'), 'la fréquence d’images n’est pas une information utile pour l’auteur');
+});
+
