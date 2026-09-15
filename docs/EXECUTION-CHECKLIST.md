@@ -90,8 +90,13 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
 - [ ] **Lot 4 — Inspecteur contextuel** : onglets par portée, divulgation progressive, modèles
       `section.style` et `elementStyles[layoutKey]`, wording humain (fin du « 60fps », « preset »,
       « responsive », « HEX/RGB », « WCAG AA »).
-- [ ] **Lot 5 — États des éléments** : `elementStates[layoutKey]` (survol, focus, actif, désactivé)
-      partagés éditeur / aperçu / export via une primitive unique.
+- [~] **Lot 5 — États des éléments** (5a livré en `4.9.0-alpha.9`) : modèle `elementStates[layoutKey]`
+      (survol, focus, actif, désactivé), primitive unique `elementStateCSS` injectée par le renderer
+      et donc partagée par l'éditeur, l'aperçu et l'export, liste blanche de propriétés et valeurs
+      filtrées, plafond de 400 règles. 5 tests dédiés, **319/319**.
+      **Reste (5b)** : toute l'interface — sélecteur d'état, application des réglages à l'état choisi,
+      « Revenir au style principal », et inclusion dans l'historique d'annulation. Tant que ce n'est
+      pas fait, aucun état n'est définissable depuis le produit.
 - [ ] **Lot 6 — Positionnement** : flux par défaut, position libre en option, champs numériques
       X/Y/L/H/rotation, boîte de sélection réduite à un menu `⋯`, bornes clavier = bornes souris.
 - [ ] **Lot 7 — Mouvement unifié** : catalogue unique, déclencheur, durée, délai, courbe, direction,

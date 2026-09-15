@@ -1144,3 +1144,34 @@ Vérifications : 314/314 tests ; générateur d'utilitaires à jour (check:css) 
 jour dans tests/design_system.test.js. Aucun contrôle navigateur n'a été jugé nécessaire ici : les
 classes retirées n'avaient aucune règle, leur suppression ne peut donc rien changer au rendu, et les
 deux classes réparées ont été vérifiées par le générateur (règle émise).
+
+---
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.9 (lot 5a/9)
+
+Chantier « états des éléments », première moitié : le modèle et le rendu, sans interface.
+
+Ajouté :
+- public/js/engine/elementStates.js : ELEMENT_STATES (hover, focus, active, disabled), libellés
+  français, getElementState / setElementState / clearElementState (retournent un nouveau projet sans
+  muter la source), elementStateCSS (une seule primitive), countStyledStates.
+- renderer.js : <style data-element-states> injecté à côté de la feuille freeform, donc présent dans
+  l'éditeur, l'aperçu ET l'export autonome, qui passent tous par renderWebsiteHTML.
+
+Décisions :
+- focus est traduit en :focus-visible, en cohérence avec la politique de focus unique du produit
+  (tokens.css). Un état « focus au clic » serait un second langage.
+- Seuls les écarts sont stockés ; un projet sans état n'émet aucune règle (test dédié).
+- Sécurité : liste blanche de propriétés, refus des valeurs contenant ; { } < > url( expression(
+  javascript: ou un commentaire CSS, validation des clés de mise en page, plafond de 400 règles.
+- Un défaut a été introduit puis corrigé immédiatement pendant ce lot : la primitive était appelée
+  dans le renderer avant d'être importée, ce qui cassait cinq suites de tests. Le contrôle « suite
+  complète » l'a attrapé avant tout commit.
+
+Vérifications : tests/element_states.test.js (5 tests) ; suite complète 319/319 ; la règle d'état est
+présente dans renderWebsiteHTML et dans exportStandaloneHTML, et absente quand aucun état n'est
+défini.
+
+Reste (5b) : le sélecteur d'état dans l'inspecteur, l'application des réglages à l'état choisi, le
+retour au style principal et l'intégration à l'historique. Aucun état n'est encore définissable
+depuis l'interface, et je ne présente donc pas ce chantier comme livré.

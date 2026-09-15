@@ -1,5 +1,6 @@
 import { getIcon } from "./icons.js";
 import { HERO_STYLES } from "./heroStyles.js";
+import { elementStateCSS } from "../engine/elementStates.js";
 import { getTradeFallbackDataUrl } from "../data/imageFallbacks.js";
 import { getUiId, getSectionUiId, getUiCode } from "../data/uiIds.js";
 import { escapeHtml, sanitizeUrl, safeCssColor, safeCssLength, safeFontFamily } from "../utils/html.js";
@@ -453,6 +454,7 @@ export function renderWebsiteHTML(project, options = { isEditor: false, isStanda
       <div class="site-scroll-progress" aria-hidden="true"></div>
       <style>${HERO_STYLES}</style>
       <style data-freeform-layout>${buildFreeformLayoutCSS(project)}</style>
+      <style data-element-states>${elementStateCSS(project)}</style>
       ${sectionsHTML}
       ${stickyBarHTML}
       ${lightboxHTML}

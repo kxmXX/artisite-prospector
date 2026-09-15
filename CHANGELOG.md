@@ -7,6 +7,28 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.9) — Lot 5a : socle des états d'élément
+
+- **Modèle de données** (`public/js/engine/elementStates.js`) : chaque élément peut porter des écarts
+  de style pour **survol, focus, actif et désactivé**, indexés par sa clé de mise en page stable
+  (`data-layout-key`). Le style par défaut reste dans le rendu habituel : seuls les écarts sont
+  stockés, et un projet sans état ne produit **aucune** feuille de style.
+- **Une seule primitive de rendu** : `elementStateCSS` est injectée par `renderWebsiteHTML`, donc
+  l'éditeur, l'aperçu et le **site autonome exporté** partagent exactement les mêmes règles — l'auteur
+  voit ce qui sera publié. Le `focus` est traduit en `:focus-visible`, cohérent avec la politique de
+  focus unique du produit.
+- **Sécurité** : liste blanche de propriétés CSS et refus des valeurs contenant `;`, `{`, `}`, `<`,
+  `>`, `url(`, `expression(` ou `javascript:`. Les clés de mise en page sont validées avant d'entrer
+  dans un sélecteur. Un plafond de 400 règles évite une feuille de style non bornée.
+- **QA** : `tests/element_states.test.js` (5 tests) — aller-retour sans muter le projet source, refus
+  des déclarations dangereuses ou hors liste, vidage d'un état et nettoyage de l'élément, forme exacte
+  du CSS produit (`:hover`, `:focus-visible`, `:disabled`), présence dans l'aperçu **et** dans
+  l'export, et absence totale de règle quand aucun état n'est défini. **319/319 tests**.
+- **Ce qui reste (5b, non fait)** : l'interface — sélecteur d'état dans l'inspecteur, application des
+  réglages à l'état choisi, bouton « Revenir au style principal », et entrée dans l'historique. En
+  l'état, le modèle et le rendu existent et sont testés, mais **rien dans l'interface ne permet encore
+  de définir un état**.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.8) — Lot 2c : dette de classes réduite
 
 - **Défaut réel corrigé** : le champ de recherche de la palette de commandes portait
