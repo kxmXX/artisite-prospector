@@ -1,3 +1,12 @@
+## LOT DE LIVRAISON — QA responsive et CTA tactile 4.8.0-alpha.31
+
+- Dashboard/éditeur : contrôle Chrome 1440/1024/390, `scrollWidth == clientWidth` sur les surfaces racines ; aucun overflow horizontal ni erreur console.
+- Inspecteur responsive : à 1024, drawer 330×720 ; à 390, 374×694, contenu scrollable et bouton `Fermer les propriétés` fonctionnel.
+- CTA : `data-cta-editor-bound` évite les listeners dupliqués après les rebinds. Sur tactile, `pointerup` ouvre le popover avant le clic synthétique ; un guard document capture neutralise ce clic retargeté pendant 400 ms.
+- QA CTA : 1024 souris et 390 tactile ouvrent réellement `is-active`, `aria-expanded=true`; popover 334,5×110,5 entièrement dans le viewport et aucun overflow.
+- Validation automatisée : 51/51 ciblés, 226/226 complets et `git diff --check`.
+- Prochaine action : vérifier la version réellement servie par Vercel et documenter tout écart entre Git et production.
+
 ## LOT DE LIVRAISON — reparenting inter-sections 4.8.0-alpha.30
 
 - Mode `Page` : activation explicite avant un geste inter-section ; la section sous le centre du calque est surlignée et le mode se désactive visuellement et réellement après un drop réussi.

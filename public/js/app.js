@@ -3992,7 +3992,36 @@ export class App {
       // The same CTA markup is used by the public site. Public links must keep
       // their native navigation; only the editor has contextual controls.
       if (wrapper.dataset.uiTarget !== "true") return;
+      if (wrapper.dataset.ctaEditorBound === "true") return;
+      wrapper.dataset.ctaEditorBound = "true";
       const setOpen = (open) => wrapper.setAttribute("aria-expanded", String(open));
+      const togglePopover = () => {
+        this.hideFloatingTextToolbar();
+        document.querySelectorAll("[data-cta-popover-wrapper].is-active").forEach(w => {
+          if (w !== wrapper) {
+            w.classList.remove("is-active");
+            w.setAttribute("aria-expanded", "false");
+          }
+        });
+        const open = wrapper.classList.toggle("is-active");
+        setOpen(open);
+      };
+      let touchStart = null;
+      wrapper.addEventListener("pointerdown", event => {
+        if (event.pointerType !== "touch") return;
+        touchStart = { x: event.clientX, y: event.clientY, editable: Boolean(event.target.closest("[data-editable]")) };
+      });
+      wrapper.addEventListener("pointerup", event => {
+        if (event.pointerType !== "touch" || !touchStart) return;
+        const distance = Math.hypot(event.clientX - touchStart.x, event.clientY - touchStart.y);
+        const editable = touchStart.editable || Boolean(event.target.closest("[data-editable]"));
+        touchStart = null;
+        if (distance >= 8 || editable || event.target.closest(".cta-context-popover, .cta-direct-badge")) return;
+        event.preventDefault();
+        event.stopPropagation();
+        this._ctaTouchHandledAt = Date.now();
+        togglePopover();
+      });
       wrapper.addEventListener("mouseenter", () => setOpen(true));
       wrapper.addEventListener("mouseleave", () => {
         if (!wrapper.matches(":focus-within") && !wrapper.classList.contains("is-active")) {
@@ -4006,6 +4035,7 @@ export class App {
         });
       });
       wrapper.addEventListener("click", event => {
+        if (Date.now() - (this._ctaTouchHandledAt || 0) < 400) return;
         if (event.target.closest(".cta-context-popover") || event.target.closest(".cta-direct-badge")) return;
         event.preventDefault();
 
@@ -4015,17 +4045,7 @@ export class App {
           editableSpan.focus();
           return;
         }
-
-        this.hideFloatingTextToolbar();
-        document.querySelectorAll("[data-cta-popover-wrapper].is-active").forEach(w => {
-          if (w !== wrapper) {
-            w.classList.remove("is-active");
-            w.setAttribute("aria-expanded", "false");
-          }
-        });
-
-        const open = wrapper.classList.toggle("is-active");
-        setOpen(open);
+        togglePopover();
       });
     });
 
@@ -4050,8 +4070,18 @@ export class App {
       this._popoverEscapeBound = true;
     }
 
+    if (!this._ctaTouchClickGuardBound) {
+      document.addEventListener("click", event => {
+        if (Date.now() - (this._ctaTouchHandledAt || 0) >= 400) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+      }, true);
+      this._ctaTouchClickGuardBound = true;
+    }
+
     if (!this._popoverOutsideClickBound) {
       document.addEventListener("click", (e) => {
+        if (Date.now() - (this._ctaTouchHandledAt || 0) < 400) return;
         if (!e.target.closest("[data-cta-popover-wrapper]")) {
           document.querySelectorAll("[data-cta-popover-wrapper].is-active").forEach(w => {
             w.classList.remove("is-active");

@@ -112,6 +112,17 @@ test('V3 inspector becomes a responsive editing drawer below desktop width', () 
   assert.ok(appSource.includes('rightInspector.classList.add("is-responsive-open")'));
 });
 
+test('V3 CTA popover bindings stay idempotent across editor rebinds', () => {
+  const appSource = fs.readFileSync(path.resolve(process.cwd(), 'public/js/app.js'), 'utf8');
+  assert.ok(appSource.includes('wrapper.dataset.ctaEditorBound === "true"'));
+  assert.ok(appSource.includes('wrapper.dataset.ctaEditorBound = "true"'));
+  assert.ok(appSource.includes('event.pointerType !== "touch"'));
+  assert.ok(appSource.includes('this._ctaTouchHandledAt = Date.now()'));
+  assert.ok(appSource.includes('Date.now() - (this._ctaTouchHandledAt || 0) < 400'));
+  assert.ok(appSource.includes('this._ctaTouchClickGuardBound'));
+  assert.ok(appSource.includes('event.stopImmediatePropagation()'));
+});
+
 test('V3 nested image actions target the real service and realisation fields', () => {
   const project = generateDemoSite({ name: 'Esprit Nature', tradeId: 'paysagiste', city: 'Montauban' });
   const html = renderWebsiteHTML(project, { isEditor: true, isStandalone: false });

@@ -69,7 +69,7 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - [x] P0/P1 — Sélection, visibilité, drag-and-drop souris, réordre clavier, édition texte, Assistant et Undo rejoués dans la V3.
 - [x] P0/P1 — Image picker : les actions imbriquées Services/Réalisations ciblent le vrai chemin (`services.N.image` / `items.N.image`) ; application URL + Undo rejoués en navigateur. CTA/popover desktop : ouverture, suppression et Undo validés.
 - [x] P1 — Modales V3 : hauteur bornée au viewport, scroll interne, focus initial explicite, Escape et retour de fermeture validés à 1440/1024/390 sur Image/Share/Ajouter/Commande/Wizard/Closer.
-- [ ] P1 — Auditer le dashboard responsive hors modales et les derniers chemins tactiles CTA/mobile.
+- [x] P1 — Dashboard responsive et derniers chemins CTA/mobile audités à 1440/1024/390 : aucun overflow horizontal ; inspecteur responsive borné/scrollable ; popover CTA tactile ouvre et reste dans le viewport.
 
 
 ## Édition libre Canva / Figma — nouveau cap produit
@@ -117,6 +117,8 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 7. Noter ici : commit, tests réellement exécutés, anomalies connues et prochaine action unique.
 
 ## Dernière livraison validée
+
+- Lot `4.8.0-alpha.31` : QA global dashboard/éditeur 1440/1024/390 et fiabilisation CTA mobile. Aucun overflow horizontal ; inspecteur responsive 390 px = 374×694 dans le viewport ; binding CTA rendu idempotent et tap tactile résolu au Pointer Event avant le clic synthétique retargeté. QA Chrome : popover ouvert à 1024 et 390, `aria-expanded=true`, entièrement visible, zéro erreur console. 51/51 ciblés, 226/226 complets et `git diff --check`.
 
 - Lot `4.8.0-alpha.30` : reparenting inter-sections explicite via `Page`, `parentSectionId` par breakpoint, couche libre commune éditeur/preview/export et retour vers toute section sans changement de dimensions. QA Chrome : Header→Hero puis Hero→Header, 87,625×72 avant/après, Undo replace dans Hero ; preview/standalone reparentent réellement le DOM. 50/50 ciblés, 225/225 complets et `git diff --check`.
 

@@ -7,6 +7,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 15 septembre 2026 (4.8.0-alpha.31)
+
+- Responsive : audit navigateur du dashboard et de l’éditeur à 1440×900, 1024×800 et 390×844 sans débordement horizontal ; sticky client masquée en conception mobile.
+- Inspecteur : drawer V3 validé à 1024 et 390 px, borné au viewport, scrollable et fermable par un contrôle accessible.
+- CTA éditeur : les listeners de popover sont désormais idempotents lors des rebinds ; sur tactile, le tap est résolu au `pointerup` et le clic synthétique retargeté vers un contrôle flottant est neutralisé en capture.
+- QA Chrome : popover CTA réellement ouvert à 1024 et 390, `aria-expanded=true`, surface intégralement dans le viewport et zéro erreur console. Validation automatisée : 51/51 ciblés, 226/226 complets et `git diff --check`.
+
 ### Consolidation — 15 septembre 2026 (4.8.0-alpha.30)
 
 - Reparenting : mode `Page` explicite pour déplacer un calque entre sections ; `parentSectionId` est persisté par breakpoint et les sections publiques exposent le même contrat que l’éditeur.
