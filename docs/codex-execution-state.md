@@ -1,3 +1,12 @@
+## LOT DE LIVRAISON — sortie d’édition explicite 4.8.0-alpha.52 — 15 septembre 2026
+
+- Cause : le bouton de fermeture de la barre d’outils texte se contentait de `style.display = "none"` sans blur, et la cellule n’écoutait pas Échap. Une fois dans une cellule, l’utilisateur restait en édition sans sortie claire.
+- Correctif : nouvelle méthode `exitInlineEditing()` qui blur l’élément actif contenteditable (donc déclenche le commit `onblur`), vide `_activeEditableEl` et masque la barre. Elle est partagée par Échap dans la cellule, le bouton de validation et le gestionnaire global Échap.
+- Affordance : le bouton devient une coche avec `title="Terminer l’édition (Échap)"` et `aria-label`, au lieu d’un « Fermer » ambigu.
+- Preuve navigateur : cliquer un titre hero fait apparaître la barre (TAILLE, B/U, Couleur, Anim) ; Échap la fait disparaître et retire le focus.
+- Tests : 12/12 tests d’intégrité éditeur, 267/267 complets, `node --check` et `git diff --check` propres.
+- Prochaine action exacte : réduire la complexité d’usage des barres d’outils et des libellés, puis passe finale de cohérence UI/UX.
+
 ## LOT DE LIVRAISON — matrice de gestes 4.8.0-alpha.51 — 15 septembre 2026
 
 - Nouveau fichier `tests/editor_gesture_matrix.test.js` : 9 tests organisés par modalité, exécutés en valeurs exactes sur le moteur pur `engine/freeform.js`.

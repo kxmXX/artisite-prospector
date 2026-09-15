@@ -7,6 +7,12 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 15 septembre 2026 (4.8.0-alpha.52)
+
+- Sortie de l’édition en ligne : Échap termine désormais l’édition d’une cellule ou d’un texte en confirmant la valeur et en retirant le focus, au lieu de laisser le curseur actif. Le bouton de la barre d’outils texte devient une validation explicite (« Terminer l’édition », coche) qui blur la cellule.
+- Un seul chemin de sortie (`exitInlineEditing`) est partagé par Échap dans la cellule, la validation et le gestionnaire global Échap — plus de mode « coincé ».
+- QA : test comportemental (blur effectif, barre masquée), 12/12 tests d’intégrité éditeur, 267/267 tests complets, sortie confirmée par capture navigateur.
+
 ### Consolidation — 15 septembre 2026 (4.8.0-alpha.51)
 
 - Matrice de non-régression des gestes : 9 tests couvrant les trois modalités. Souris — magnétisme d’ancrage (bord, centre, seuil), lignes d’alignement, égalisation des espacements, sélection au cadre. Tactile — défilement automatique en bordure. Clavier — pas de 1 px / 10 px, Échap, groupage ⌘G, magnétisme à 15°. Responsive — mise à l’échelle entre breakpoints.

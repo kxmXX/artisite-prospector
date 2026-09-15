@@ -329,7 +329,7 @@ export function renderEditor(state) {
               </div>
             </div>
             <div class="h-3.5 w-[1px] bg-zinc-700 mx-1"></div>
-            <button type="button" id="ftb-close" class="ftb-btn text-zinc-400 hover:text-white px-1.5" title="Fermer">✕</button>
+            <button type="button" id="ftb-close" class="ftb-btn text-zinc-400 hover:text-white px-1.5" title="Terminer l’édition (Échap)" aria-label="Terminer l’édition">✓</button>
           </div>
 
           <div class="transition-all duration-300 ${viewportWidthClass} ${isLivePreview ? 'client-preview-mode' : ''} min-h-full mt-3 rounded-t-xl overflow-visible shadow-sm" id="canvas-container" data-viewport="${state.viewport}" style="background-color: ${project.branding?.bgColor || '#ffffff'}; color: ${project.branding?.textColor || '#18181b'};">

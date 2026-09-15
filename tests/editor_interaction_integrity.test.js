@@ -202,3 +202,26 @@ test('editor anchors cannot navigate the canvas', async () => {
   assert.ok(publicAnchors.length > 0);
   assert.ok(publicAnchors.every(tag => !tag.includes('event.preventDefault()')), 'public anchors keep native navigation');
 });
+
+test('inline editing has an explicit exit that commits the caret', () => {
+  const editorSource = fs.readFileSync(new URL('../public/js/components/editor.js', import.meta.url), 'utf8');
+  const app = Object.create(App.prototype);
+  let blurred = false;
+  let hidden = 0;
+  app.hideFloatingTextToolbar = () => { hidden += 1; };
+  const editable = { isContentEditable: true, blur() { blurred = true; } };
+  const original = Object.getOwnPropertyDescriptor(globalThis.document, 'activeElement');
+  Object.defineProperty(globalThis.document, 'activeElement', { configurable: true, get: () => editable });
+  app._activeEditableEl = editable;
+  try {
+    app.exitInlineEditing();
+    assert.equal(blurred, true, 'the focused cell must lose focus and commit');
+    assert.equal(app._activeEditableEl, null);
+    assert.equal(hidden, 1, 'the text toolbar must be dismissed');
+  } finally {
+    if (original) Object.defineProperty(globalThis.document, 'activeElement', original);
+    else delete globalThis.document.activeElement;
+  }
+  assert.ok(appSource.includes('this.exitInlineEditing()'), 'Escape and the close button share one exit path');
+  assert.ok(editorSource.includes('Terminer l’édition'), 'the close control is labelled for the user');
+});

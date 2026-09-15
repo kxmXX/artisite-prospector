@@ -130,6 +130,7 @@ export class App {
         e.preventDefault();
         this.openCommandPalette();
       } else if (e.key === "Escape") {
+        if (document.activeElement?.isContentEditable) this.exitInlineEditing();
         this.closeModals();
         this.toggleExportMenu(false);
         this.closeAllButtonPopovers();
@@ -2243,7 +2244,7 @@ export class App {
       btnUnderline.onclick = (e) => { e.preventDefault(); e.stopPropagation(); this.toggleActiveTextUnderline(); };
     }
     if (btnClose) {
-      btnClose.onclick = (e) => { e.preventDefault(); e.stopPropagation(); toolbar.style.display = "none"; };
+      btnClose.onclick = (e) => { e.preventDefault(); e.stopPropagation(); this.exitInlineEditing(); };
     }
 
     // Dismiss open submenus
@@ -2257,6 +2258,19 @@ export class App {
     if (document.body?.dataset.activeEditorToolbar === "text") {
       delete document.body.dataset.activeEditorToolbar;
     }
+  }
+
+  // Leaving inline editing must be explicit: blur commits the cell and removes
+  // the caret, instead of leaving the user stuck with a focused editable.
+  exitInlineEditing() {
+    const active = document.activeElement;
+    if (active?.isContentEditable && typeof active.blur === "function") {
+      active.blur();
+    } else if (this._activeEditableEl && typeof this._activeEditableEl.blur === "function") {
+      this._activeEditableEl.blur();
+    }
+    this._activeEditableEl = null;
+    this.hideFloatingTextToolbar();
   }
 
   closeAllFloatingToolbars(except = "") {
@@ -5831,6 +5845,12 @@ export class App {
       };
 
       el.onkeydown = (e) => {
+        if (e.key === "Escape") {
+          e.preventDefault();
+          e.stopPropagation();
+          this.exitInlineEditing();
+          return;
+        }
         if (e.key === "Enter" && !el.tagName.toLowerCase().includes("p")) {
           e.preventDefault();
           el.blur();
