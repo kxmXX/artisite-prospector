@@ -7,6 +7,21 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.20) — États éditables depuis l'inspecteur
+
+- **Les six réglages d'élément s'appliquent maintenant au style de base ou à un état**, au choix, dans
+  le bloc « Élément sélectionné » : un sélecteur **Principal · Survol · Focus · Actif · Désactivé**, une
+  aide qui rappelle que les réglages suivants ne visent que cet état, et un bouton qui devient
+  **« Effacer cet état »** au lieu de « Revenir au style du thème ».
+- **Une seule grille pour les deux cibles** : les six rangées sont déclarées une fois et parcourues une
+  fois ; seule la commande change selon l'état choisi. Un test vérifie l'absence de duplication — c'est
+  la garantie que les deux chemins ne divergeront pas.
+- **Tout reste annulable** : chaque réglage d'état passe par l'historique avec un libellé explicite
+  (« Réglage de l'état Survol ») et non un message générique.
+- **QA** : `tests/element_states.test.js` passe de 9 à 10 tests. **338/338 tests**.
+- *Toujours non vérifié* : l'apparence à l'écran de ce bloc (inspecteur hors du champ des captures à
+  1280 px). Le modèle, la parité aperçu/export et l'annulation sont prouvés par test.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.19) — Un seul vocabulaire de réglages
 
 - **Cause racine traitée** : les styles d'élément et les états d'élément étaient deux familles de

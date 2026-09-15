@@ -2447,6 +2447,31 @@ export class App {
     state.updateProject(next, true, "Style de l'élément");
   }
 
+  /** Choisit l'état auquel s'appliquent les réglages d'élément de l'inspecteur. */
+  setElementStyleState(stateName) {
+    state.elementStyleState = ELEMENT_STATES.includes(stateName) ? stateName : "default";
+    this.updateSelectedSectionUI();
+  }
+
+  /** Applique un réglage d'élément à l'état choisi (annulable). */
+  setSelectedElementStateValue(property, value) {
+    const layoutKey = state.selectedElementKey;
+    const stateName = state.elementStyleState;
+    if (!state.currentProject || !layoutKey || !ELEMENT_STATES.includes(stateName)) return;
+    const next = setElementState(state.currentProject, layoutKey, stateName, property, value);
+    if (next === state.currentProject) return;
+    state.updateProject(next, true, "Réglage de l'état " + ELEMENT_STATE_LABELS[stateName]);
+  }
+
+  /** Efface l'état choisi sur l'élément sélectionné. */
+  clearSelectedElementState() {
+    const layoutKey = state.selectedElementKey;
+    const stateName = state.elementStyleState;
+    if (!state.currentProject || !layoutKey || !ELEMENT_STATES.includes(stateName)) return;
+    const next = clearElementState(state.currentProject, layoutKey, stateName);
+    state.updateProject(next, true, "Effacement de l'état " + ELEMENT_STATE_LABELS[stateName]);
+  }
+
   /** Retire tous les réglages de l'élément sélectionné. */
   clearSelectedElementStyle() {
     const layoutKey = state.selectedElementKey;

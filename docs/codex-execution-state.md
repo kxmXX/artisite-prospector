@@ -1400,3 +1400,21 @@ Erreurs commises pendant ce lot, à consigner :
    defined »), attrapé par la suite avant tout commit.
 
 Vérifications : 337/337 tests. Non vérifié : l'apparence à l'écran, comme pour les lots 4b à 4c.
+
+---
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.20 (états éditables depuis l'inspecteur)
+
+Le vocabulaire partagé (alpha.19) devient utilisable : le bloc « Élément sélectionné » de l'inspecteur
+porte un sélecteur d'état, les six rangées écrivent soit dans le style de base, soit dans l'état choisi,
+et le bouton de remise à zéro change de sens selon le cas.
+
+Point d'architecture : une seule liste ELEMENT_SCALE_ROWS, parcourue une fois, et seule la commande
+appelée change (setSelectedElementStyle ou setSelectedElementStateValue). Un test compte les occurrences
+de cette liste pour garantir qu'on n'a pas recopié les rangées — c'est exactement le mécanisme qui avait
+fait diverger les styles de l'export.
+
+Erreur commise et corrigée pendant ce lot : un import dupliqué de setElementState dans app.js,
+attrapé par node --check avant tout commit.
+
+Vérifications : 338/338 tests. Non vérifié : l'apparence à l'écran du bloc, comme pour les lots 4b à 4c.

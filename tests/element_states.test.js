@@ -119,3 +119,16 @@ test('les commandes d etat passent par la primitive et par l historique', () => 
     'l effacement doit passer par l historique, donc être annulable');
 });
 
+
+const inspectorSource = fs.readFileSync(new URL('../public/js/components/inspector.js', import.meta.url), 'utf8');
+
+test('l inspecteur edite le style de base ou un etat, avec la meme grille', () => {
+  assert.ok(inspectorSource.includes('setElementStyleState('), 'un sélecteur d état doit exister dans l inspecteur');
+  assert.ok(inspectorSource.includes('setSelectedElementStateValue'), 'les réglages doivent pouvoir viser un état');
+  assert.ok(inspectorSource.includes('setSelectedElementStyle'), 'les réglages doivent pouvoir viser le style de base');
+  assert.ok(inspectorSource.includes('clearSelectedElementState'), 'un état doit pouvoir être effacé');
+  assert.ok(inspectorSource.includes('ELEMENT_SCALE_ROWS'), 'une seule grille pilote les six réglages');
+  assert.equal(inspectorSource.split('ELEMENT_SCALE_ROWS').length - 1, 2,
+    'la grille est déclarée une fois et parcourue une fois : pas de duplication des rangées');
+});
+

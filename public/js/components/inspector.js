@@ -10,29 +10,58 @@ import {
 import { escapeHtml } from "../utils/html.js";
 import { SECTION_WIDTHS, SECTION_SPACING, SECTION_ALIGN, getSectionLayout } from "../engine/sectionStyle.js";
 import { ELEMENT_PADDING, ELEMENT_RADIUS, ELEMENT_OPACITY, ELEMENT_BACKGROUND, ELEMENT_BORDER, ELEMENT_SHADOW, getElementStyle } from "../engine/elementStyle.js";
+import { ELEMENT_STATES, ELEMENT_STATE_LABELS, getElementState } from "../engine/elementStates.js";
+
+const ELEMENT_SCALE_ROWS = [
+  ["padding", ELEMENT_PADDING],
+  ["radius", ELEMENT_RADIUS],
+  ["opacity", ELEMENT_OPACITY],
+  ["background", ELEMENT_BACKGROUND],
+  ["border", ELEMENT_BORDER],
+  ["shadow", ELEMENT_SHADOW]
+];
 
 /**
  * Réglages de l'élément sélectionné (clé de mise en page stable).
  * Construit par concaténation, sans valeur libre : tout vient d'énumérations.
  */
-function elementStyleControlsHTML(project, layoutKey) {
-  const style = getElementStyle(project, layoutKey);
+function elementStyleControlsHTML(project, layoutKey, activeState) {
+  const stateName = ELEMENT_STATES.includes(activeState) ? activeState : 'default';
+  // Les réglages et leurs valeurs vivent dans deux magasins selon l'état choisi :
+  // le style de base de l'élément, ou les écarts de l'état. Une seule grille pilote
+  // les deux, ce qui évite deux interfaces à maintenir.
+  const values = stateName === 'default'
+    ? getElementStyle(project, layoutKey)
+    : getElementState(project, layoutKey, stateName);
+  const command = stateName === 'default' ? 'setSelectedElementStyle' : 'setSelectedElementStateValue';
+  const isActive = (property, id) => Object.prototype.hasOwnProperty.call(values, property) && values[property] === id;
+
+  const stateRow = '<div class="flex flex-wrap gap-1">' + [['default', 'Principal']]
+    .concat(ELEMENT_STATES.map(function (name) { return [name, ELEMENT_STATE_LABELS[name]]; }))
+    .map(function (pair) {
+      const cls = 'motion-loop-btn' + (stateName === pair[0] ? ' is-active' : '');
+      return '<button type="button" class="' + cls + '" onclick="window.app.setElementStyleState(\'' + pair[0] + '\')">' + pair[1] + '</button>';
+    }).join('') + '</div>';
+
   const row = (property, scale) => '<div class="flex flex-wrap gap-1">' + Object.keys(scale).map(function (id) {
-    const cls = 'motion-loop-btn' + (style[property] === id ? ' is-active' : '');
+    const cls = 'motion-loop-btn' + (isActive(property, id) ? ' is-active' : '');
     return '<button type="button" class="' + cls +
-      '" onclick="window.app.setSelectedElementStyle(\'' + property + '\', \'' + id + '\')">' +
+      '" onclick="window.app.' + command + '(\'' + property + '\', \'' + id + '\')">' +
       scale[id].label + '</button>';
   }).join('') + '</div>';
+
+  const reset = stateName === 'default'
+    ? 'window.app.clearSelectedElementStyle()'
+    : 'window.app.clearSelectedElementState()';
+
   return '<div class="p-2.5 bg-zinc-50 border border-zinc-200 rounded-lg space-y-2">' +
     '<label class="block text-ui-xs font-medium text-zinc-500 uppercase tracking-wider">Élément sélectionné</label>' +
     '<div class="text-ui-2xs font-mono text-zinc-400">' + escapeHtml(layoutKey) + '</div>' +
-    row('padding', ELEMENT_PADDING) +
-    row('radius', ELEMENT_RADIUS) +
-    row('opacity', ELEMENT_OPACITY) +
-    row('background', ELEMENT_BACKGROUND) +
-    row('border', ELEMENT_BORDER) +
-    row('shadow', ELEMENT_SHADOW) +
-    '<button type="button" onclick="window.app.clearSelectedElementStyle()" class="w-full py-1.5 rounded-md border border-zinc-200 bg-white text-ui-2xs font-semibold text-zinc-600">Revenir au style du thème</button>' +
+    stateRow +
+    (stateName === 'default' ? '' : '<p class="text-ui-2xs text-zinc-500">Les réglages suivants ne s\'appliquent qu\'à l\'état « ' + ELEMENT_STATE_LABELS[stateName] + ' ».</p>') +
+    ELEMENT_SCALE_ROWS.map(function (entry) { return row(entry[0], entry[1]); }).join('') +
+    '<button type="button" onclick="' + reset + '" class="w-full py-1.5 rounded-md border border-zinc-200 bg-white text-ui-2xs font-semibold text-zinc-600">' +
+      (stateName === 'default' ? 'Revenir au style du thème' : 'Effacer cet état') + '</button>' +
   '</div>';
 }
 
@@ -108,7 +137,7 @@ export function renderInspector(section, project, state) {
       <!-- Section Variant Switcher -->
       ${sectionLayoutControlsHTML(section, sectionId)}
 
-      ${state.selectedElementKey ? elementStyleControlsHTML(project, state.selectedElementKey) : ''}
+      ${state.selectedElementKey ? elementStyleControlsHTML(project, state.selectedElementKey, state.elementStyleState) : ''}
 
       ${variants.length > 1 ? `
         <div class="p-2.5 bg-zinc-50 border border-zinc-200 rounded-lg space-y-1">
