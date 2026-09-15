@@ -1666,3 +1666,12 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Anomalie relevee, a instruire : apres un clic sur une ligne de section, le panneau peut rester sur la section precedente. Diagnostic : `renderInspector` rend les 16 sections sans erreur, donc le defaut est dans `handleSectionNavigation` / `selectSection`, pas dans le rendu. Piste : la ligne declenche `toggleSectionAccordion` avant la selection.
 - Tests : 390 → 391. `node --check` sur app.js, `scripts/build-utilities.mjs` relance.
 - Reste : instruire le panneau en retard, verifier l'indicateur a l'ecran, geste de deplacement (validation utilisateur), boites de selection unifiees cote multi-selection ; puis 4d, 3b, 7, export 2d.
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.44 (panneau pilote par un etat, et il suit la section)
+
+- Cause du panneau bloque : la visibilite dependait de `matchMedia('(max-width: 1280px)')`, donc d'une requete media et non d'un etat. Sur ecran large ce chemin n'ouvrait pas le panneau, et le contenu restait sur la section precedente.
+- Correctif : `state.inspectorPanelOpen` porte la visibilite ; `refreshInspectorPanel()` rend le contenu et applique la visibilite ; le bouton la bascule. Plus de requete media dans ce chemin.
+- Choix assume : le panneau ne s'ouvre plus automatiquement sous 1280 px (une surtoile qui s'ouvre a chaque selection recouvre le canevas).
+- Verifie a l'ecran : panneau ferme au chargement, ouvert par le bouton, affiche « Hero » apres selection de Hero. La liste du hero expose Badge, Titre, Sous-titre, Bouton principal, Bouton secondaire, Mention de confiance.
+- Deux tests reecrits (contrat change), 391/391. `node --check` sur app.js et state.js, `scripts/build-utilities.mjs` relance.
+- Reste : desambiguiser deux libelles « Bouton » identiques ; geste de deplacement (validation utilisateur) ; puis 4d (mise en page, reglages globaux), 3b, 7, export 2d.

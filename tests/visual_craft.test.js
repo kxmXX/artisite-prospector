@@ -82,7 +82,7 @@ test('le panneau de proprietes a un controle explicite', () => {
   assert.ok(editor.includes('window.app.toggleInspectorPanel()'), 'l editeur doit offrir un bouton');
   assert.ok(editor.includes('aria-controls="right-inspector-panel"'), 'le bouton doit cibler le panneau');
   assert.ok(app.includes('toggleInspectorPanel() {'), 'la methode doit exister');
-  assert.ok(app.includes('classList.toggle("is-responsive-open")'), 'elle doit ouvrir la surtoile');
+  assert.ok(app.includes('state.inspectorPanelOpen'), 'elle doit piloter un etat, pas une requete media');
 });
 
 test('la liste des elements est le chemin vers les reglages d element', () => {

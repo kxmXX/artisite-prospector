@@ -13,6 +13,7 @@ class AppStateManager {
     this.selectedSectionId = null;
     // Clé de mise en page de l'élément sélectionné dans le canevas, ou null.
     this.selectedElementKey = null;
+    this.inspectorPanelOpen = false;
     // État auquel s'appliquent les réglages d'élément de l'inspecteur.
     this.elementStyleState = "default";
     this.activeInspectorTab = "content"; // "content", "style", "visibility"

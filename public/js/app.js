@@ -1585,12 +1585,8 @@ export class App {
    * `is-responsive-open`. Sans geste ni bouton dedie, il etait inatteignable.
    */
   toggleInspectorPanel() {
-    const panel = document.getElementById("right-inspector-panel");
-    if (!panel) return;
-    const open = panel.classList.toggle("is-responsive-open");
-    panel.setAttribute("aria-hidden", open ? "false" : "true");
-    document.querySelectorAll('[aria-controls="right-inspector-panel"]').forEach(btn => btn.setAttribute("aria-expanded", open ? "true" : "false"));
-    if (open) this.updateSelectedSectionUI();
+    state.inspectorPanelOpen = state.inspectorPanelOpen !== true;
+    this.refreshInspectorPanel();
   }
 
   /**
@@ -1604,10 +1600,14 @@ export class App {
     const panel = document.getElementById("right-inspector-panel");
     const section = state.currentProject?.sections.find(s => s.id === state.selectedSectionId) || state.currentProject?.sections[0];
     if (!panel || !section) return;
-    panel.classList.add("is-responsive-open");
-    panel.setAttribute("aria-hidden", "false");
-    const shell = panel.querySelector(".studio-v3-inspector-shell");
-    if (shell) shell.innerHTML = renderInspector(section, state.currentProject, state);
+    const shell = panel.querySelector(".studio-v3-inspector-shell") || panel;
+    shell.innerHTML = renderInspector(section, state.currentProject, state);
+    // La visibilite vient d'un etat, pas d'une requete media : le panneau ne se
+    // referme plus tout seul et ne recouvre plus le canevas sans qu'on le demande.
+    const open = state.inspectorPanelOpen === true;
+    panel.classList.toggle("is-responsive-open", open);
+    panel.setAttribute("aria-hidden", open ? "false" : "true");
+    document.querySelectorAll('[aria-controls="right-inspector-panel"]').forEach(btn => btn.setAttribute("aria-expanded", open ? "true" : "false"));
   }
 
   /** Active la position libre d'un element sans le deplacer. Instantane avant mutation. */
@@ -1710,16 +1710,11 @@ export class App {
     // Le fil de contexte est la source unique du libellé Site > Section > Élément.
     this.updateStageContext();
 
-    // 4. Update inspector content without destroying its responsive shell/header.
-    const rightInspector = document.getElementById("right-inspector-panel");
-    if (rightInspector) {
-      const inspectorShell = rightInspector.querySelector(".studio-v3-inspector-shell") || rightInspector;
-      inspectorShell.innerHTML = renderInspector(selectedSec, state.currentProject, state);
-      if (typeof window !== "undefined" && window.matchMedia?.("(max-width: 1280px)").matches) {
-        document.querySelector(".studio-v3-structure-panel")?.classList.remove("is-mobile-open");
-        rightInspector.classList.add("is-responsive-open");
-      }
-    }
+    // 4. Le contenu du panneau suit la section, sans detruire sa coque. Sa visibilite
+    //    est pilotee par `state.inspectorPanelOpen` : auparavant elle dependait d'une
+    //    requete media, donc le panneau se refermait a chaque changement de section sur
+    //    un ecran large — et restait bloque sur la section precedente.
+    this.refreshInspectorPanel();
   }
 
   scrollSidebarCardIntoView(card) {

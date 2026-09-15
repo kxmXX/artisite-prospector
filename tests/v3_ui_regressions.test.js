@@ -176,8 +176,12 @@ test('V3 inspector becomes a responsive editing drawer below desktop width', () 
   assert.ok(editorSource.includes('studio-v3-responsive-inspector-head'));
   assert.ok(css.includes('.studio-v3-inspector-panel.is-responsive-open'));
   assert.ok(css.includes('width:calc(100vw - 16px)!important'));
-  assert.ok(appSource.includes('window.matchMedia?.("(max-width: 1280px)").matches'));
-  assert.ok(appSource.includes('rightInspector.classList.add("is-responsive-open")'));
+  const stateSource = fs.readFileSync(path.resolve(process.cwd(), 'public/js/state.js'), 'utf8');
+  // La visibilite du panneau est pilotee par un etat : elle ne depend plus d'une requete
+  // media, qui le refermait a chaque changement de section sur un ecran large.
+  assert.ok(stateSource.includes('inspectorPanelOpen'), 'l etat ouvert doit etre declare');
+  assert.ok(appSource.includes('state.inspectorPanelOpen'), 'l application doit le lire');
+  assert.ok(appSource.includes('panel.classList.toggle("is-responsive-open", open)'), 'la classe suit l etat');
 });
 
 test('V3 CTA popover bindings stay idempotent across editor rebinds', () => {

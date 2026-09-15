@@ -152,9 +152,10 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
       rythme de l'animation de section puis aux réglages d'élément — espacement et angles immédiats,
       opacité / fond / bordure / ombre repliés (`4.9.0-alpha.40`). *Reste* : le groupe « Mise en page » de
       section et les réglages globaux du projet.
-- [ ] **Panneau de propriétés en retard sur la section** (relevé en `4.9.0-alpha.43`) : après un clic sur une
-      ligne de section, le panneau peut encore afficher la section précédente. `renderInspector` passe les 16
-      sections d'un projet de référence sans erreur : la cause est dans le chemin d'événement, à instruire.
+- [x] **Panneau de propriétés en retard sur la section** (`4.9.0-alpha.44`) : la visibilité dépendait d'une
+      requête média et non d'un état, d'où un panneau bloqué sur la section précédente. Elle est désormais
+      portée par `state.inspectorPanelOpen` ; **vérifié à l'écran** — le panneau affiche bien la section
+      choisie. Conséquence assumée : il ne s'ouvre plus tout seul sous 1280 px, l'auteur l'ouvre par le bouton.
 - [ ] **Passe anti-slop (skill Impeccable)** : surfaces du navigateur thématisées en `4.9.0-alpha.30`
       (sélection, curseur de saisie, barres de défilement, chiffres tabulaires, anneau de focus unique),
       portée bornée à `.studio-editor` ; **tous** les glyphes du chrome et du rendu remplacés par des icônes

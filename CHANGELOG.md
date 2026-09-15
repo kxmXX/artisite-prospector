@@ -7,6 +7,16 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.44) — Le panneau de propriétés suit enfin la section
+
+- Cause trouvée : la visibilité du panneau dépendait d'une **requête média** (`matchMedia("(max-width: 1280px)")`) au lieu d'un état. Sur un écran large, ce chemin ne l'ouvrait donc jamais ; et après un changement de section il restait **bloqué sur la section précédente** — je cliquais « Hero », le panneau affichait « Menu ».
+- Correctif : la visibilité est portée par `state.inspectorPanelOpen`, un état unique. `refreshInspectorPanel()` rend le contenu **et** applique la visibilité depuis cet état ; le bouton « Propriétés de la section » le bascule. La requête média disparaît du chemin du panneau.
+- Effet de bord assumé : le panneau ne s'ouvre plus tout seul sous 1280 px. C'est un choix — une surtoile qui s'ouvre à chaque sélection de section recouvre le canevas. L'auteur l'ouvre explicitement, et son choix est conservé.
+- **Vérifié à l'écran** : panneau fermé au chargement, ouvert par le bouton, **et il affiche bien « Hero » après sélection de Hero** — la désynchronisation a disparu. La liste des éléments du hero expose Badge, Titre, Sous-titre, Bouton principal, Bouton secondaire et Mention de confiance.
+- Deux tests encodaient l'ancienne implémentation (requête média, classe ajoutée à la main) : ils ont été **réécrits** sur le nouveau contrat, pas supprimés.
+- Tests : **391/391**.
+- Reste, cosmétique : deux éléments de la liste peuvent porter le même libellé « Bouton » ; à désambiguïser.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.43) — Un seul indicateur de sélection d'élément
 
 - Constat : sélectionner un élément dans la liste remplissait le panneau de propriétés mais **ne montrait rien sur le canevas**. L'auteur ne savait pas quel élément il réglait. Les deux chemins de sélection — liste et sélection libre — n'avaient pas le même retour visuel.
