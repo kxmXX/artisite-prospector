@@ -1539,3 +1539,12 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Erreur rencontrée et corrigée : `MOTION_SPEEDS` utilisée dans `renderer.js` sans import → 12 tests rouges. Diagnostiquée par la trace de pile, corrigée, puis couverte par un test de rendu de l'éditeur qui aurait attrapé la faute.
 - Tests : 357 → 360. `node --check` sur les quatre fichiers modifiés, `scripts/build-utilities.mjs` relancé.
 - Reste : courbe et direction par animation ; vocabulaire de répétition du menu texte encore `once / twice / infinite` alors que le catalogue dit `once / twice / thrice / loop` (valeurs persistées, migration à préparer) ; outil tester/rejouer/arrêter/réinitialiser ; motions pendant un transform libre.
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.29 (lot 4d entamé, et la skill Impeccable enfin utilisée)
+
+- Constat honnête : les lots 7b, 7c et 7c étendu de cette session ont été menés sans la skill Impeccable, alors que MISSION 2 l'exigeait. Elle a été chargée à la fin du tour 29 et son `context` exécuté (`impeccable context --target public/js/components/inspector.js`).
+- Résultat du `context` : le projet n'a ni PRODUCT.md ni DESIGN.md ; en mode raffinement le code existant fait autorité et `init` reste à faire. Le détecteur mécanique doit être passé une fois sur l'UI modifiée, ce qui a été fait.
+- Fait : primitive de divulgation progressive (`disclosure`) dans l'inspecteur, sur `<details>/<summary>` natifs. Premier usage : les réglages de rythme (vitesse, délai) passent derrière « Réglages avancés : vitesse et délai » ; le choix de l'animation et le test restent immédiats. L'état ouvert est retenu par module, sinon le panneau se refermerait à chaque clic.
+- Détecteur Impeccable : uniquement des avertissements pré-existants (gray-on-color, bounce-easing, border-accent-on-rounded) ; rien de nouveau introduit par ce lot.
+- Tests : 360 → 364. `node --check` sur l'inspecteur, `scripts/build-utilities.mjs` relancé.
+- Reste : étendre la divulgation aux autres groupes de l'inspecteur ; écrire PRODUCT.md et DESIGN.md ; lots 6 (positionnement), 3b (sélection et arbre des éléments), 7 (courbe, direction, tester/rejouer) et 2d (export autonome cassé) toujours ouverts.

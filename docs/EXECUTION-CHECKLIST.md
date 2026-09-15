@@ -125,6 +125,10 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
       et injectés par le rendu (une seule feuille pour éditeur, aperçu et export). *Reste* : courbe et
       direction réglables, vocabulaire de répétition du menu texte encore `once / twice / infinite`,
       outil tester/rejouer/arrêter/réinitialiser, et neutralisation des motions pendant un transform libre.
+- [ ] **Lot 4d — Divulgation progressive de l'inspecteur** : entamé en `4.9.0-alpha.29` avec une
+      primitive partagée (`disclosure`, `<details>/<summary>` natifs, focus clavier, état retenu au
+      nouveau rendu) appliquée au rythme de l'animation de section. *Reste* : appliquer le patron aux
+      états, aux réglages d'élément et aux groupes de composants.
 - [x] **Lot 8 — Undo/Redo exhaustif** (`4.9.0-alpha.4`) : 11 commandes mutaient avant de prendre
       l'instantané (l'annulation ne restaurait rien) et 20 commandes n'avaient aucun historique ;
       toutes prennent désormais leur instantané **avant** la mutation, y compris les six

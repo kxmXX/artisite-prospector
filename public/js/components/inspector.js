@@ -13,6 +13,34 @@ import { ELEMENT_PADDING, ELEMENT_RADIUS, ELEMENT_OPACITY, ELEMENT_BACKGROUND, E
 import { ELEMENT_STATES, ELEMENT_STATE_LABELS, getElementState } from "../engine/elementStates.js";
 import { MOTION_PRESETS, MOTION_SPEEDS, MOTION_DELAYS } from "../data/motionPresets.js";
 
+/**
+ * Divulgation progressive : l'inspecteur montre d'abord l'essentiel — choisir une
+ * animation — et garde les réglages de rythme derrière « Réglages avancés ». L'état
+ * est retenu par module pour survivre au nouveau rendu du panneau après chaque
+ * modification : sans cela, le panneau se refermerait à chaque clic.
+ */
+const DISCLOSURE_STATE = new Map();
+
+export function isDisclosureOpen(key) {
+  return DISCLOSURE_STATE.get(key) === true;
+}
+
+export function rememberDisclosure(key, isOpen) {
+  DISCLOSURE_STATE.set(key, isOpen === true);
+}
+
+if (typeof window !== "undefined") {
+  window.artistRememberDisclosure = (key, isOpen) => rememberDisclosure(key, isOpen);
+}
+
+function disclosure(key, summary, body) {
+  const open = isDisclosureOpen(key) ? " open" : "";
+  return `<details class="ui-disclosure" data-disclosure="${key}"${open} ontoggle="window.artistRememberDisclosure('${key}', this.open)">
+            <summary class="ui-disclosure-summary">${summary}</summary>
+            <div class="ui-disclosure-body">${body}</div>
+          </details>`;
+}
+
 const ELEMENT_SCALE_ROWS = [
   ["padding", ELEMENT_PADDING],
   ["radius", ELEMENT_RADIUS],
@@ -177,6 +205,7 @@ export function renderInspector(section, project, state) {
           `).join('')}
         </div>
 
+        ${disclosure("section-motion-timing", "Réglages avancés : vitesse et délai", `
         <div class="motion-loop-row" data-section-timing>
           <span class="motion-loop-label">Vitesse</span>
           ${MOTION_SPEEDS.map((speed) => `
@@ -195,6 +224,7 @@ export function renderInspector(section, project, state) {
                     onclick="window.app.setSectionMotionDelay('${sectionId}', '${delay.id}')">${delay.label}</button>
           `).join('')}
         </div>
+        `)}
 
         <button type="button"
                 onclick="window.app.previewSectionMotion('${sectionId}', '${section.settings?.motionPreset || section.motionPreset || 'fade-in'}')"

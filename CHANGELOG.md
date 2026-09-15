@@ -7,6 +7,15 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.29) — Lot 4d entamé : l'inspecteur cache le secondaire
+
+- Problème : l'inspecteur présentait tous ses contrôles au même niveau. Sur le seul bloc Animation, l'auteur voyait 12 pastilles, la vitesse, le délai et le bouton de test sans aucune hiérarchie — « wall of controls » au sens de la skill Impeccable.
+- Correctif : primitive de divulgation progressive partagée (`disclosure`) dans l'inspecteur, appuyée sur `<details>/<summary>` natifs — donc accessible au clavier sans JavaScript, avec anneau de focus. Premier usage : « Réglages avancés : vitesse et délai » regroupe le rythme derrière un résumé lisible ; le choix de l'animation et le bouton de test restent immédiats.
+- Détail qui compte : l'état ouvert est retenu par module et réappliqué au nouveau rendu du panneau. Sans cela le panneau se refermerait à chaque modification — le remède serait devenu le défaut.
+- Skill Impeccable : chargée, et son `context` exécuté pour cette session. Le projet n'a ni PRODUCT.md ni DESIGN.md : en mode raffinement le code fait autorité, `init` reste à faire. Détecteur mécanique relancé sur les fichiers modifiés : uniquement des avertissements pré-existants (gray-on-color, bounce-easing, border-accent-on-rounded), aucun introduit par ce lot.
+- Tests : 4 nouveaux dans `tests/inspector_disclosure.test.js` (replié par défaut, essentiel visible, état retenu au nouveau rendu, style et focus clavier) ; 360 → **364/364**.
+- Reste : appliquer le même patron aux autres groupes de l'inspecteur (états, réglages d'élément, composants) et écrire PRODUCT.md / DESIGN.md.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.28) — Lot 7c étendu : texte et image, et le menu texte rejoint le catalogue
 
 - Cause : la vitesse et le délai n'existaient que pour la section ; et le menu d'animation du texte, dernier survivant des anciens catalogues locaux, affichait encore « Fade », « Slide », « Spring » — la même animation portait donc deux noms selon l'endroit — avec une ligne d'aide dupliquée.
