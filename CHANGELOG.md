@@ -7,6 +7,14 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.34) — Le dernier glyphe du produit part, remplacé par une icône
+
+- Trois derniers cas, dont deux que mes tours précédents avaient manqués : le bouton de lecture du composant vidéo (`▶`, affiché sur le site du client), les six pastilles d'étape du terminal de l'assistant (`○`, encore écrites en dur dans le balisage alors que leur mise à jour dynamique utilisait déjà le système d'icônes), et le bouton « Tester l'animation » de l'inspecteur (`▶`).
+- Correctif : icône `play` ajoutée à la bibliothèque (même vocabulaire 24×24, trait, `currentColor`) et branchée aux trois endroits ; les pastilles d'étape sont laissées vides et remplies par le code qui les pilote déjà.
+- Fausse alerte levée : je pensais voir des glyphes `⋯ ⇄ ⊕ ▼` dans les barres de section et de texte d'après une capture. Vérification faite dans le code, ce sont **déjà** des icônes SVG — j'avais mal lu une image à basse résolution. Je le note pour ne pas laisser croire à un travail qui n'a pas eu lieu.
+- Tests : 1 nouveau ; 373 → **374/374**.
+- Reste sur le volet visuel : unification du vocabulaire de boutons (valeurs arbitraires `34px`/`10px`/`.16s` au lieu des jetons — dette de nommage, pas défaut visible), puis le fond : lot 6 positionnement.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.33) — La barre de sélection freeform quitte les glyphes
 
 - Craft-floor : « les glyphes Unicode ou emoji tenant lieu d'un système d'icônes » sont refusés. La sélection freeform — le contrôle le plus « Canva » du produit — en portait sept : `↻` (pivoter), `⇤ − + ⇥` (ordre des plans), `H↔` et `V↕` (distribuer). Mon tour précédent avait conclu trop vite que le chrome était nettoyé : je n'avais cherché que dans les `textContent`, jamais dans le balisage des barres d'outils.

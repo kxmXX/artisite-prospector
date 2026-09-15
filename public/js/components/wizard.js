@@ -180,27 +180,27 @@ export function renderWizardModal() {
 
           <div id="term-steps" class="space-y-2 text-xs text-zinc-400">
             <div id="step-1" class="wizard-terminal-step flex items-center gap-2" data-status="idle">
-              <span class="step-icon" aria-hidden="true">○</span>
+              <span class="step-icon" aria-hidden="true"></span>
               <span data-terminal-step-label>Validation des informations du projet</span>
             </div>
             <div id="step-2" class="wizard-terminal-step flex items-center gap-2" data-status="idle">
-              <span class="step-icon" aria-hidden="true">○</span>
+              <span class="step-icon" aria-hidden="true"></span>
               <span data-terminal-step-label>Connexion au service de génération IA</span>
             </div>
             <div id="step-3" class="wizard-terminal-step flex items-center gap-2" data-status="idle">
-              <span class="step-icon" aria-hidden="true">○</span>
+              <span class="step-icon" aria-hidden="true"></span>
               <span data-terminal-step-label>Rédaction des contenus personnalisés</span>
             </div>
             <div id="step-4" class="wizard-terminal-step flex items-center gap-2" data-status="idle">
-              <span class="step-icon" aria-hidden="true">○</span>
+              <span class="step-icon" aria-hidden="true"></span>
               <span data-terminal-step-label>Assemblage de la structure et des sections</span>
             </div>
             <div id="step-5" class="wizard-terminal-step flex items-center gap-2" data-status="idle">
-              <span class="step-icon" aria-hidden="true">○</span>
+              <span class="step-icon" aria-hidden="true"></span>
               <span data-terminal-step-label>Application du design system et des médias</span>
             </div>
             <div id="step-6" class="wizard-terminal-step flex items-center gap-2 font-medium" data-status="idle">
-              <span class="step-icon" aria-hidden="true">○</span>
+              <span class="step-icon" aria-hidden="true"></span>
               <span data-terminal-step-label>Ouverture de l’éditeur</span>
             </div>
           </div>

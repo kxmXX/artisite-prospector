@@ -229,7 +229,7 @@ export function renderInspector(section, project, state) {
         <button type="button"
                 onclick="window.app.previewSectionMotion('${sectionId}', '${section.settings?.motionPreset || section.motionPreset || 'fade-in'}')"
                 class="w-full py-1.5 bg-white hover:bg-zinc-100 text-zinc-800 rounded-lg text-xs font-semibold border border-zinc-200 flex items-center justify-center gap-1.5 shadow-2xs transition-colors">
-          <span>▶ Tester l'animation en direct</span>
+          ${getIcon("play", "w-3.5 h-3.5")}<span>Tester l'animation en direct</span>
         </button>
       </div>
 

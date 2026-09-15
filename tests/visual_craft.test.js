@@ -57,3 +57,11 @@ test('les nouvelles icones sont des SVG bien formes, sans glyphe', async () => {
     assert.ok(!/[\u2190-\u21FF\u2600-\u27BF]/.test(svg), key + ' ne doit contenir aucun glyphe');
   }
 });
+
+test('les derniers glyphes du chrome et du rendu passent par les icones', async () => {
+  const { getIcon } = await import('../public/js/components/icons.js');
+  assert.ok(getIcon('play', 'w-4 h-4').startsWith('<svg'), 'l icone de lecture doit exister');
+  assert.ok(!read('public/js/components/wizard.js').includes('>○</span>'), 'plus de cercle en glyphe');
+  assert.ok(!read('public/js/components/renderer.js').includes('>▶</span>'), 'plus de triangle de lecture en glyphe');
+  assert.ok(!read('public/js/components/inspector.js').includes('▶ Tester'), 'plus de triangle dans le bouton de test');
+});

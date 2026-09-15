@@ -2957,7 +2957,7 @@ function renderVideoBlock(sec, project, options = {}) {
           <img src="${c.poster || 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=80'}" alt="Vidéo de présentation" class="w-full h-full object-cover opacity-80 group-hover:scale-102 transition-transform duration-500">
           <div class="absolute inset-0 bg-black/40 flex flex-col items-center justify-center p-6 text-center">
             <button type="button" onclick="alert('Lecture vidéo de présentation artisan')" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/95 text-zinc-950 flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all group-hover:bg-amber-400">
-              <span class="text-2xl ml-1">▶</span>
+              ${getIcon("play", "w-6 h-6 ml-1")}
             </button>
             <span class="mt-4 text-xs font-semibold tracking-wider uppercase text-zinc-300 bg-black/60 px-3 py-1 rounded-full border border-white/20">
               Vidéo 4K • 1 min 45
