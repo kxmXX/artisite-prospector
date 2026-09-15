@@ -534,8 +534,8 @@ export class App {
   toggleStickyBar(enabled) {
     if (!state.currentProject) return;
     if (!state.currentProject.settings) state.currentProject.settings = {};
-    state.currentProject.settings.stickyBarEnabled = enabled;
     state.pushHistory(enabled ? "Activation bandeau flottant" : "Désactivation bandeau flottant");
+    state.currentProject.settings.stickyBarEnabled = enabled;
     state.saveToStorage();
     this.render();
   }
@@ -543,13 +543,14 @@ export class App {
   updateWhatsAppNumber(number) {
     if (!state.currentProject) return;
     if (!state.currentProject.settings) state.currentProject.settings = {};
-    state.currentProject.settings.whatsappNumber = number;
     state.pushHistory("Modification WhatsApp");
+    state.currentProject.settings.whatsappNumber = number;
     state.saveToStorage();
     this.render();
   }
 
   switchGlobalTheme(theme) {
+    state.pushHistory("Ambiance : " + theme);
     if (!state.currentProject) return;
     const b = state.currentProject.branding;
     if (theme === "white") {
@@ -572,7 +573,6 @@ export class App {
       b.globalTheme = "dark";
     }
     state.currentProject.siteTheme = theme === "dark" ? "dark" : "light";
-    state.pushHistory(`Ambiance : ${theme}`);
     state.saveToStorage();
     this.render();
   }
@@ -1116,6 +1116,7 @@ export class App {
   setNavigationMode(mode) {
     if (!state.currentProject) return;
     if (!state.currentProject.branding) state.currentProject.branding = {};
+    state.pushHistory("Mode de navigation : " + mode);
     state.currentProject.branding.navigationMode = mode;
     state.currentProject._activeVirtualPage = "home";
     state._openSettingsItem = "navigation";
@@ -1128,6 +1129,7 @@ export class App {
   toggleSocialProof(enabled) {
     if (!state.currentProject) return;
     if (!state.currentProject.branding) state.currentProject.branding = {};
+    state.pushHistory("Preuve sociale " + (enabled ? "activée" : "désactivée"));
     state.currentProject.branding.socialProofEnabled = Boolean(enabled);
     state._openSettingsItem = "socialProof";
     state.save();
@@ -1144,6 +1146,7 @@ export class App {
       return false;
     }
     if (!state.currentProject.settings) state.currentProject.settings = {};
+    state.pushHistory(parsed.pin ? "Code PIN client défini" : "Code PIN client désactivé");
     state.currentProject.settings.clientDemoPin = parsed.pin;
     this._clientUnlocked = false;
     state._openSettingsItem = "pinLock";
@@ -2020,6 +2023,7 @@ export class App {
     const key = `fontSize_${field}`;
     const current = parseFloat(sec.settings[key]) || 0;
     const next = Math.max(-10, Math.min(24, current + delta));
+    state.pushHistoryCoalesced("Taille de texte " + field);
     sec.settings[key] = next;
 
     // Apply live to DOM element
@@ -2028,7 +2032,6 @@ export class App {
       el.style.fontSize = next === 0 ? "" : `calc(1em + ${next}px)`;
     }
 
-    state.pushHistory(`Taille de texte ${field} (${next >= 0 ? '+' : ''}${next}px)`);
     state.saveToStorage();
     this.updateUndoRedoUI();
     this.showToast(`Taille du texte : ${next >= 0 ? '+' : ''}${next}px`, "info");
@@ -2040,6 +2043,7 @@ export class App {
     const sec = state.currentProject.sections.find(s => s.id === sectionId);
     if (!sec) return;
     sec.settings = sec.settings || {};
+    state.pushHistoryCoalesced("Taille de texte " + field);
     sec.settings[`fontSize_${field}`] = delta;
 
     const el = document.querySelector(`#section-${sectionId} [data-editable="${field}"]`);
@@ -2055,6 +2059,7 @@ export class App {
     if (!sec) return;
     sec.settings = sec.settings || {};
     const num = Math.max(0, Math.min(90, parseInt(val, 10) || 0));
+    state.pushHistoryCoalesced("Assombrissement du hero");
     sec.settings.overlayDarkening = num;
 
     const overlay = document.querySelector(`#section-${sectionId} .hero-darkening-overlay`);
@@ -2094,6 +2099,7 @@ export class App {
       const sec = state.currentProject.sections.find(s => s.id === secId);
       if (sec) {
         sec.settings = sec.settings || {};
+        state.pushHistoryCoalesced("Taille de texte " + field);
         sec.settings[`fontSize_${field}`] = delta;
       }
       el.style.fontSize = delta === 0 ? "" : `calc(1em + ${delta}px)`;
@@ -2120,9 +2126,9 @@ export class App {
         sec.settings = sec.settings || {};
         const key = `bold_${field}`;
         const isCurrentlyBold = sec.settings[key] === true || window.getComputedStyle(el).fontWeight >= 700;
+        state.pushHistory("Style gras " + field);
         sec.settings[key] = !isCurrentlyBold;
         el.style.fontWeight = isCurrentlyBold ? "400" : "800";
-        state.pushHistory(`Style gras ${field}`);
         state.saveToStorage();
         this.updateUndoRedoUI();
         this.showToast(isCurrentlyBold ? "Texte normal" : "Texte en gras", "info");
@@ -2145,9 +2151,9 @@ export class App {
         sec.settings = sec.settings || {};
         const key = `italic_${field}`;
         const isCurrentlyItalic = sec.settings[key] === true || window.getComputedStyle(el).fontStyle === "italic";
+        state.pushHistory("Style italique " + field);
         sec.settings[key] = !isCurrentlyItalic;
         el.style.fontStyle = isCurrentlyItalic ? "normal" : "italic";
-        state.pushHistory(`Style italique ${field}`);
         state.saveToStorage();
         this.updateUndoRedoUI();
         this.showToast(isCurrentlyItalic ? "Texte normal" : "Texte en italique", "info");
@@ -2170,9 +2176,9 @@ export class App {
         sec.settings = sec.settings || {};
         const key = `underline_${field}`;
         const isCurrentlyUnderline = sec.settings[key] === true || window.getComputedStyle(el).textDecorationLine?.includes("underline");
+        state.pushHistory("Style souligné " + field);
         sec.settings[key] = !isCurrentlyUnderline;
         el.style.textDecoration = isCurrentlyUnderline ? "none" : "underline";
-        state.pushHistory(`Style souligné ${field}`);
         state.saveToStorage();
         this.updateUndoRedoUI();
         this.showToast(isCurrentlyUnderline ? "Texte normal" : "Texte souligné", "info");
@@ -2322,7 +2328,7 @@ export class App {
         } else {
           delete sec.settings[`color_${field}`];
         }
-        state.updateProject(updated, false);
+        state.updateProject(updated, true);
       }
     }
     el.style.color = color || "";
@@ -2998,7 +3004,7 @@ export class App {
     sec.settings = sec.settings || {};
     if (nextMode) sec.settings.motionLoop = nextMode;
     else delete sec.settings.motionLoop;
-    state.updateProject(updated, false);
+    state.updateProject(updated, true);
     const secEl = document.getElementById("section-" + sectionId) || document.querySelector(".editor-section-wrapper[data-section-id=\"" + sectionId + "\"]");
     if (secEl) {
       if (nextMode) secEl.setAttribute("data-motion-loop", nextMode);
@@ -3023,7 +3029,7 @@ export class App {
         sec.settings.elementMotionLoops = sec.settings.elementMotionLoops || {};
         if (nextMode) sec.settings.elementMotionLoops[field] = nextMode;
         else delete sec.settings.elementMotionLoops[field];
-        state.updateProject(updated, false);
+        state.updateProject(updated, true);
       }
     }
     const motion = state.currentProject?.sections.find(s => s.id === secId)?.settings?.elementMotions?.[field] || "";
@@ -3044,7 +3050,7 @@ export class App {
     const imgKey = fieldPath + "_" + idx;
     if (nextMode) sec.settings.imageMotionLoops[imgKey] = nextMode;
     else delete sec.settings.imageMotionLoops[imgKey];
-    state.updateProject(updated, false);
+    state.updateProject(updated, true);
     const secEl = document.getElementById("section-" + secId) || document.querySelector(".editor-section-wrapper[data-section-id=\"" + secId + "\"]");
     const imgEl = secEl?.querySelector("[data-image-field=\"" + fieldPath + "\"][data-image-index=\"" + idx + "\"]") || secEl?.querySelector("img");
     if (imgEl) {
@@ -3082,7 +3088,7 @@ export class App {
     sec.settings.imageMotions = sec.settings.imageMotions || {};
     const imgKey = `${fieldPath}_${idx}`;
     sec.settings.imageMotions[imgKey] = preset === "none" ? "" : preset;
-    state.updateProject(updated, false);
+    state.updateProject(updated, true);
 
     setTimeout(() => {
       const secEl = document.getElementById(`section-${secId}`) || document.querySelector(`.editor-section-wrapper[data-section-id="${secId}"]`);
@@ -3119,7 +3125,7 @@ export class App {
         sec.settings = sec.settings || {};
         sec.settings.elementMotions = sec.settings.elementMotions || {};
         sec.settings.elementMotions[field || "text"] = motion;
-        state.updateProject(updated, false);
+        state.updateProject(updated, true);
       }
     }
 

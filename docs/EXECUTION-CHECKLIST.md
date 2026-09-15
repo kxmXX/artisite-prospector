@@ -92,8 +92,14 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
       X/Y/L/H/rotation, boîte de sélection réduite à un menu `⋯`, bornes clavier = bornes souris.
 - [ ] **Lot 7 — Mouvement unifié** : catalogue unique, déclencheur, durée, délai, courbe, direction,
       répétition explicite, tester/rejouer/arrêter/réinitialiser, runtime partagé à l'export.
-- [ ] **Lot 8 — Undo/Redo exhaustif** : 11 chemins qui mutaient avant l'instantané et 20+ chemins sans
-      historique routés vers un point d'entrée unique, transactions pour les glissers et curseurs.
+- [x] **Lot 8 — Undo/Redo exhaustif** (`4.9.0-alpha.4`) : 11 commandes mutaient avant de prendre
+      l'instantané (l'annulation ne restaurait rien) et 20 commandes n'avaient aucun historique ;
+      toutes prennent désormais leur instantané **avant** la mutation, y compris les six
+      affectations `updateProject(..., false)` des animations. `pushHistoryCoalesced` regroupe les
+      mutations continues (25 pas de curseur = 1 entrée). 10 tests dédiés, **295/295**.
+      *Reste* : le regroupement n'est branché que sur les deux curseurs de taille de texte et
+      l'assombrissement du hero ; les glissers freeform et le glisser du bandeau collant ne sont pas
+      encore transactionnels.
 - [ ] **Lot 9 — Comptes et persistance** : `scrypt` + sel, sessions hachées, `ownerId` par projet,
       migration des projets locaux à la première connexion, échec explicite sur Vercel.
 

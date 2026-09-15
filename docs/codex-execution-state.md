@@ -996,3 +996,27 @@ autonome courant et de la base \`fe06c75\` servis localement (les deux cassés d
 
 Suite : lot 3 — modèle de sélection unique, fil d'Ariane, liste des éléments, suppression des
 880 lignes inertes de \`renderSectionAccordionContent\`.
+
+---
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.4 (lot 8/9)
+
+Motif corrigé (relevé par l'audit, vérifié en lecture du code) : **onze commandes** modifiaient
+l'état puis poussaient l'instantané — state.pushHistory enregistrait donc un état déjà modifié et
+une pression sur « Annuler » ne restaurait rien de visible. Vérifié : toggleStickyBar,
+updateWhatsAppNumber, switchGlobalTheme, adjustFieldFontSize, toggleActiveTextBold,
+toggleActiveTextItalic, toggleActiveTextUnderline, et les deux curseurs de taille de texte.
+**Vingt commandes** n'avaient aucun historique : mode de navigation, preuve sociale, code PIN client,
+assombrissement du hero, et les six state.updateProject(updated, false) des animations.
+
+Correctif : l'instantané est pris **avant** chaque mutation, et state.pushHistoryCoalesced regroupe
+les mutations continues (curseurs de taille de texte, assombrissement du hero) pour qu'un mouvement
+continu ne produise qu'une entrée. Les six updateProject(..., false) passent en true : une entrée
+par clic, correct pour des boutons, à affiner pour d'éventuels curseurs.
+
+Vérifications : node --check sur app.js et state.js ; tests/undo_coverage.test.js (10 tests) dont
+huit parcours complets valeur avant, action, annulation, rétablissement, plus un garde-fou de source
+qui échoue si updateProject(..., false) réapparaît ; **295/295 tests**.
+
+Reste ouvert pour ce chantier : les glissers freeform et le glisser du bandeau collant persistent
+directement sans transaction ; à traiter avec le lot positionnement (6).

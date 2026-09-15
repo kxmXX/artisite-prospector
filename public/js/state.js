@@ -114,6 +114,22 @@ class AppStateManager {
     this.saveToStorage();
   }
 
+  /**
+   * Regroupe une mutation continue (curseur, glisser) en une seule entrée
+   * d'historique : sans cela, un simple déplacement produirait des dizaines
+   * d'instantanés et l'annulation devrait être répétée autant de fois.
+   */
+  pushHistoryCoalesced(historyDesc, windowMs = 600) {
+    const now = Date.now();
+    const last = this._lastCoalesce;
+    if (last && last.description === historyDesc && now - last.at < windowMs) {
+      last.at = now;
+      return;
+    }
+    this._lastCoalesce = { description: historyDesc, at: now };
+    this.pushHistory(historyDesc);
+  }
+
   // View management
   setView(view) {
     this.currentView = view;

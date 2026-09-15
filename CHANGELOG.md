@@ -7,6 +7,22 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.4) — Lot 8 : annulation réellement fiable
+
+- **Motif corrigé** : onze commandes **enregistraient l'instantané après avoir modifié le projet**.
+  Le bouton « Annuler » restaurait alors un état déjà modifié : appuyer une fois ne changeait rien.
+  Bandeau flottant, numéro WhatsApp, ambiance globale, gras/italique/souligné et taille de texte par
+  flèches poussaient tous leur historique trop tard ; l'instantané est désormais pris **avant**.
+- **Vingt commandes n'avaient aucun historique** : couleur de texte, réglages de navigation, preuve
+  sociale, code PIN client, assombrissement du hero, taille de texte au curseur, et les six
+  affectations `updateProject(..., false)` des animations. Toutes sont annulables.
+- **Mutations continues regroupées** : `pushHistoryCoalesced` fusionne les pas d'un curseur dans une
+  seule entrée d'historique (25 pas = 1 entrée au lieu de 25), sans quoi l'annulation aurait demandé
+  autant de clics que de mouvements.
+- **QA** : nouvelle suite `tests/undo_coverage.test.js` — huit commandes vérifiées de bout en bout
+  (valeur avant, action, annulation, rétablissement), garde-fou de source interdisant
+  `updateProject(..., false)`, et mesure du regroupement. **295/295 tests**.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.3) — Lot 2b : icônes, densité et téléphone
 
 - **Icônes cohérentes** : les 122 emojis et glyphes décoratifs du chrome sont remplacés par de vraies
