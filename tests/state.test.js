@@ -160,3 +160,20 @@ for (const storageKey of ["artisite_projects_v11", "artisite_projects_v5", "arti
     }
   });
 }
+
+test("freeform layer locks persist and Undo restores them", () => {
+  const p = generateSite({ name: "Layer Lock Test", tradeId: "menuisier" });
+  state.addProject(p, true);
+  state.undoStack = [];
+  state.redoStack = [];
+  state.setFreeformLocked(["E_A", "E_B"], true, "Lock layers");
+  assert.equal(state.currentProject.freeformLocked.E_A, true);
+  assert.equal(state.currentProject.freeformLocked.E_B, true);
+  assert.equal(state.undoStack.length, 1);
+  state.undo();
+  assert.equal(state.currentProject.freeformLocked, undefined);
+  state.redo();
+  assert.equal(state.currentProject.freeformLocked.E_A, true);
+  state.setFreeformLocked(["E_A", "E_B"], false, "Unlock layers");
+  assert.deepEqual(state.currentProject.freeformLocked, {});
+});

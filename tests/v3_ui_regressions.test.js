@@ -328,3 +328,17 @@ test('Freeform hierarchy supports stepping from deep children to structural pare
   assert.ok(appSource.includes('basis.parentElement?.closest?.("[data-layout-key]") || target'));
   assert.ok(appSource.includes('dataset?.layoutLabel || `#${keys[0]}`'));
 });
+
+test('Freeform layer controls persist z-order and lock all destructive transforms', () => {
+  const appSource = fs.readFileSync(path.resolve(process.cwd(), 'public/js/app.js'), 'utf8');
+  const stateSource = fs.readFileSync(path.resolve(process.cwd(), 'public/js/state.js'), 'utf8');
+  assert.ok(appSource.includes('data-freeform-layer="front"'));
+  assert.ok(appSource.includes('data-freeform-layer="backward"'));
+  assert.ok(appSource.includes('changeFreeformLayerOrder(mode = "forward")'));
+  assert.ok(appSource.includes('toggleFreeformSelectionLock()'));
+  assert.ok(appSource.includes('this.isFreeformSelectionLocked(keys)'));
+  assert.ok(appSource.includes('state.setFreeformLocked(keys, !shouldUnlock'));
+  assert.ok(stateSource.includes('setFreeformLocked(layoutKeys = [], locked = true'));
+  assert.ok(css.includes('.freeform-selection-box.is-locked'));
+  assert.ok(css.includes('.freeform-layerbar'));
+});

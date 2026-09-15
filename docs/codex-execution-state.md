@@ -1,5 +1,13 @@
 # État de reprise Codex — 15 septembre 2026
 
+## LOT DE LIVRAISON — ordre et verrouillage des calques 4.8.0-alpha.23
+
+- Ordre : chaque sélection expose arrière-plan / reculer / avancer / premier plan ; les valeurs `z` sont stockées dans le layout du breakpoint actif et passent par une mutation batch Undo-compatible.
+- Verrouillage : `project.freeformLocked` conserve les calques verrouillés globalement ; le cadre reste sélectionnable et affiche Déverrouiller.
+- Garde-fous : drag direct, poignée Move, resize, flèches, Reset, alignement/distribution, Grouper/Dégrouper et changement de plan refusent toute sélection contenant un calque verrouillé.
+- QA Chrome : `z-index` calculé `0 → 1`, lock persistant après rerender, poignées masquées, drag/clavier sans mutation puis déplacement réactivé après unlock ; zéro erreur console.
+- Validation automatisée : 37/37 ciblés, 212/212 complets et `git diff --check`. Prochaine action : rotation persistante avec poignée dédiée, snapping angulaire et Undo.
+
 ## LOT DE LIVRAISON — calques structurels 4.8.0-alpha.22
 
 - Renderer : les conteneurs visuels significatifs reçoivent `data-layout-node`, transformé par `decorateLayoutKeys` en clé stable `data-layout-key` + `data-layout-type="structure"` dans tous les modes.

@@ -87,13 +87,15 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - [ ] Multi-sélection phase 2b — ajout/retrait tactile accessible et auto-scroll de bord pendant le marquee.
 - [x] Groupes phase 1 — Grouper/Dégrouper persistant, clic sur un membre resélectionne le groupe, déplacement collectif sans perdre les géométries individuelles.
 - [x] Groupes phase 2a — redimensionnement collectif persistant par scale autour du cadre, ratio uniforme avec Shift et Undo batch unique.
-- [ ] Groupes phase 2b — groupes imbriqués et ordre/z-index contrôlable.
+- [x] Groupes phase 2b-1 — ordre/z-index contrôlable : avancer/reculer, premier plan/arrière-plan, persistance par breakpoint et Undo.
+- [ ] Groupes phase 2b-2 — groupes imbriqués.
 - [x] Alignement phase 1 — gauche/centre/droite/haut/milieu/bas et distribution horizontale/verticale en mutation batch.
 - [x] Alignement phase 2a — guides intelligents visibles et snapping à 6 px pendant le déplacement, y compris bords/centres de section et éléments voisins.
 - [ ] Alignement phase 2b — snapping pendant le resize, équidistances et guides de spacing.
 - [x] Responsive phase 1 — positions/dimensions isolées par desktop/tablette/mobile ; le viewport simulé gagne sur la taille réelle du navigateur.
 - [ ] Responsive phase 2 — héritage/adaptation assistée et commandes de copie/reset entre breakpoints.
 - [x] Persistance phase 1 — transformations enregistrées dans l’état projet, sauvegarde locale, Undo/Redo, preview et export standalone.
+- [x] Calques phase 1 — verrouillage persistant avec Undo ; un calque verrouillé reste sélectionnable mais refuse drag, resize, clavier, alignement, groupage et changement de plan.
 - [ ] Robustesse — tests unitaires + navigateur pour texte/image/CTA/groupe, souris/tactile/clavier, sans collision avec inline editing, popovers ou modales.
 
 ## Stabilité async / backend — reprise après l’éditeur
@@ -114,6 +116,8 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 7. Noter ici : commit, tests réellement exécutés, anomalies connues et prochaine action unique.
 
 ## Dernière livraison validée
+
+- Lot `4.8.0-alpha.23` : ordre de calques + verrouillage persistant ; premier plan/arrière-plan/±1 par breakpoint, verrou global Undo-compatible et blocage des transformations. QA Chrome : z-index 0→1, verrouillage bloque drag/clavier, déverrouillage restaure le drag ; 37/37 ciblés, 212/212 complets et `git diff --check`.
 
 - Lot `4.8.0-alpha.8` : contrôles transversaux fonds / typographies / rayon global des boutons / animations fiabilisés de l’éditeur jusqu’à l’export.
 - Fonds : surface de section cohérente dans preview/public/export, y compris couleurs personnalisées.

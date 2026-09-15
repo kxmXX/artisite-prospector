@@ -4078,6 +4078,14 @@ export class App {
         </div>
         <button type="button" class="freeform-move-handle" data-freeform-action="move" aria-label="Déplacer la sélection">${getIcon("move", "w-3.5 h-3.5")}</button>
         ${["nw","n","ne","e","se","s","sw","w"].map(handle => `<button type="button" class="freeform-resize-handle freeform-resize-${handle}" data-freeform-action="resize" data-freeform-handle="${handle}" aria-label="Redimensionner ${handle}"></button>`).join("")}
+        <div class="freeform-layerbar" role="toolbar" aria-label="Ordre et verrouillage du calque">
+          <button type="button" data-freeform-layer="back" title="Envoyer à l’arrière-plan" aria-label="Envoyer à l’arrière-plan">⇤</button>
+          <button type="button" data-freeform-layer="backward" title="Reculer d’un plan" aria-label="Reculer d’un plan">−</button>
+          <button type="button" data-freeform-layer="forward" title="Avancer d’un plan" aria-label="Avancer d’un plan">+</button>
+          <button type="button" data-freeform-layer="front" title="Mettre au premier plan" aria-label="Mettre au premier plan">⇥</button>
+          <span></span>
+          <button type="button" data-freeform-lock title="Verrouiller la sélection" aria-label="Verrouiller la sélection">Verrouiller</button>
+        </div>
         <div class="freeform-alignbar" role="toolbar" aria-label="Aligner et distribuer la sélection">
           <button type="button" data-freeform-align="left" title="Aligner à gauche" aria-label="Aligner à gauche">L</button>
           <button type="button" data-freeform-align="center" title="Centrer horizontalement" aria-label="Centrer horizontalement">C</button>
@@ -4124,6 +4132,18 @@ export class App {
           this.distributeFreeformSelection(button.dataset.freeformDistribute);
         });
       });
+      overlay.querySelectorAll("[data-freeform-layer]").forEach(button => {
+        button.addEventListener("click", event => {
+          event.preventDefault();
+          event.stopPropagation();
+          this.changeFreeformLayerOrder(button.dataset.freeformLayer);
+        });
+      });
+      overlay.querySelector("[data-freeform-lock]")?.addEventListener("click", event => {
+        event.preventDefault();
+        event.stopPropagation();
+        this.toggleFreeformSelectionLock();
+      });
     }
     this._freeformOverlay = overlay;
     return overlay;
@@ -4133,6 +4153,14 @@ export class App {
     const keys = Array.isArray(this._freeformSelectedKeys) ? this._freeformSelectedKeys.filter(Boolean) : [];
     if (keys.length) return [...new Set(keys)];
     return this._freeformSelectedKey ? [this._freeformSelectedKey] : [];
+  }
+
+  isFreeformLocked(layoutKey) {
+    return Boolean(layoutKey && state.currentProject?.freeformLocked?.[layoutKey]);
+  }
+
+  isFreeformSelectionLocked(layoutKeys = this.getFreeformSelectedKeys()) {
+    return layoutKeys.some(key => this.isFreeformLocked(key));
   }
 
   getFreeformGroupForKey(layoutKey) {
@@ -4197,7 +4225,7 @@ export class App {
     this._freeformSelectedElement = null;
     this._freeformSelectedKey = null;
     if (this._freeformOverlay) {
-      this._freeformOverlay.classList.remove("is-visible", "is-multi", "is-group");
+      this._freeformOverlay.classList.remove("is-visible", "is-multi", "is-group", "is-locked");
       this._freeformOverlay.setAttribute("aria-hidden", "true");
     }
     this.hideFreeformGuides();
@@ -4234,22 +4262,34 @@ export class App {
     overlay.classList.add("is-visible");
     overlay.classList.toggle("is-multi", keys.length > 1);
     const exactGroup = this.getExactFreeformGroup(keys);
+    const selectionLocked = this.isFreeformSelectionLocked(keys);
     overlay.classList.toggle("is-group", Boolean(exactGroup));
+    overlay.classList.toggle("is-locked", selectionLocked);
     const label = overlay.querySelector("[data-freeform-label]");
     const labelBar = overlay.querySelector(".freeform-selection-label");
     const moveHandle = overlay.querySelector(".freeform-move-handle");
     const alignBar = overlay.querySelector(".freeform-alignbar");
+    const layerBar = overlay.querySelector(".freeform-layerbar");
     const controlsInside = top < 36;
     const controlsTop = controlsInside ? Math.max(8 - top, 4) : -31;
     if (labelBar) labelBar.style.top = `${controlsTop}px`;
     if (moveHandle) moveHandle.style.top = controlsInside ? `${controlsTop + 42}px` : "-15px";
-    if (alignBar && keys.length > 1) {
+    if (alignBar && keys.length > 1 && !selectionLocked) {
       const toolbarWidth = alignBar.offsetWidth || 276;
       const desiredLeft = Math.max(8, Math.min(window.innerWidth - toolbarWidth - 8, (left + right - toolbarWidth) / 2));
       const desiredTop = Math.max(8, Math.min(window.innerHeight - 38, bottom + 10));
       alignBar.style.left = `${desiredLeft - left}px`;
       alignBar.style.top = `${desiredTop - top}px`;
       alignBar.style.translate = "0 0";
+    }
+    if (layerBar) {
+      const toolbarWidth = layerBar.offsetWidth || 250;
+      const desiredLeft = Math.max(8, Math.min(window.innerWidth - toolbarWidth - 8, (left + right - toolbarWidth) / 2));
+      const baseTop = keys.length > 1 && !selectionLocked ? bottom + 50 : bottom + 10;
+      const desiredTop = Math.max(8, Math.min(window.innerHeight - 38, baseTop));
+      layerBar.style.left = `${desiredLeft - left}px`;
+      layerBar.style.top = `${desiredTop - top}px`;
+      layerBar.style.translate = "0 0";
     }
     if (label) {
       const primaryLabel = this._freeformSelectedElement?.dataset?.layoutLabel || `#${keys[0]}`;
@@ -4259,8 +4299,16 @@ export class App {
     }
     const groupButton = overlay.querySelector("[data-freeform-group]");
     const ungroupButton = overlay.querySelector("[data-freeform-ungroup]");
-    if (groupButton) groupButton.hidden = keys.length < 2 || Boolean(exactGroup);
-    if (ungroupButton) ungroupButton.hidden = !exactGroup;
+    const resetButton = overlay.querySelector("[data-freeform-reset]");
+    const lockButton = overlay.querySelector("[data-freeform-lock]");
+    if (groupButton) groupButton.hidden = selectionLocked || keys.length < 2 || Boolean(exactGroup);
+    if (ungroupButton) ungroupButton.hidden = selectionLocked || !exactGroup;
+    if (resetButton) resetButton.hidden = selectionLocked;
+    if (lockButton) {
+      lockButton.textContent = selectionLocked ? "Déverrouiller" : "Verrouiller";
+      lockButton.setAttribute("aria-label", selectionLocked ? "Déverrouiller la sélection" : "Verrouiller la sélection");
+      lockButton.title = selectionLocked ? "Déverrouiller la sélection" : "Verrouiller la sélection";
+    }
   }
 
   getFreeformLayout(layoutKey = this._freeformSelectedKey, viewport = state.viewport) {
@@ -4359,7 +4407,7 @@ export class App {
     const keys = this.getFreeformSelectedKeys();
     const canvas = document.getElementById("canvas-container");
     const elements = keys.map(key => canvas?.querySelector(`[data-layout-key="${key}"]`)).filter(el => el?.isConnected);
-    if (!elements.length || !keys.length) return;
+    if (!elements.length || !keys.length || this.isFreeformSelectionLocked(keys)) return;
     const exactGroup = this.getExactFreeformGroup(keys);
     if (action === "resize" && keys.length > 1 && !exactGroup) return;
     event.preventDefault();
@@ -4502,7 +4550,7 @@ export class App {
 
   nudgeFreeformSelection(dx, dy) {
     const keys = this.getFreeformSelectedKeys();
-    if (!keys.length) return;
+    if (!keys.length || this.isFreeformSelectionLocked(keys)) return;
     const updates = {};
     keys.forEach(key => {
       const current = this.getFreeformLayout(key, state.viewport);
@@ -4514,7 +4562,7 @@ export class App {
   alignFreeformSelection(mode = "left") {
     const keys = this.getFreeformSelectedKeys();
     const canvas = document.getElementById("canvas-container");
-    if (!canvas || keys.length < 2) return;
+    if (!canvas || keys.length < 2 || this.isFreeformSelectionLocked(keys)) return;
     const entries = keys.map(key => {
       const element = canvas.querySelector(`[data-layout-key="${key}"]`);
       return element ? { key, element, rect: element.getBoundingClientRect(), layout: { ...this.getFreeformLayout(key, state.viewport) } } : null;
@@ -4550,7 +4598,7 @@ export class App {
   distributeFreeformSelection(axis = "horizontal") {
     const keys = this.getFreeformSelectedKeys();
     const canvas = document.getElementById("canvas-container");
-    if (!canvas || keys.length < 3) return;
+    if (!canvas || keys.length < 3 || this.isFreeformSelectionLocked(keys)) return;
     const entries = keys.map(key => {
       const element = canvas.querySelector(`[data-layout-key="${key}"]`);
       return element ? { key, element, rect: element.getBoundingClientRect(), layout: { ...this.getFreeformLayout(key, state.viewport) } } : null;
@@ -4577,15 +4625,45 @@ export class App {
     state.setFreeformLayouts(updates, state.viewport, horizontal ? "Distribution horizontale" : "Distribution verticale");
   }
 
-  resetFreeformSelection() {
+  changeFreeformLayerOrder(mode = "forward") {
+    const keys = this.getFreeformSelectedKeys();
+    if (!keys.length || this.isFreeformSelectionLocked(keys)) return;
+    const currentLayouts = state.currentProject?.freeformLayout?.[state.viewport] || {};
+    const allZ = Object.values(currentLayouts).map(layout => Number(layout?.z)).filter(Number.isFinite);
+    const minZ = Math.min(0, ...allZ);
+    const maxZ = Math.max(0, ...allZ);
+    const selected = keys.map(key => ({ key, layout: { ...this.getFreeformLayout(key, state.viewport) }, z: Number(this.getFreeformLayout(key, state.viewport)?.z) || 0 }));
+    const updates = {};
+    if (mode === "front" || mode === "back") {
+      const ordered = [...selected].sort((a, b) => a.z - b.z);
+      const start = mode === "front" ? Math.min(998, maxZ + 1) : Math.max(-10, minZ - ordered.length);
+      ordered.forEach((entry, index) => {
+        const z = mode === "front" ? Math.min(999, start + index) : Math.max(-10, start + index);
+        updates[entry.key] = { ...entry.layout, z };
+      });
+    } else {
+      const delta = mode === "backward" ? -1 : 1;
+      selected.forEach(entry => { updates[entry.key] = { ...entry.layout, z: Math.max(-10, Math.min(999, entry.z + delta)) }; });
+    }
+    state.setFreeformLayouts(updates, state.viewport, mode === "front" ? "Premier plan" : mode === "back" ? "Arrière-plan" : mode === "backward" ? "Reculer un calque" : "Avancer un calque");
+  }
+
+  toggleFreeformSelectionLock() {
     const keys = this.getFreeformSelectedKeys();
     if (!keys.length) return;
+    const shouldUnlock = this.isFreeformSelectionLocked(keys);
+    state.setFreeformLocked(keys, !shouldUnlock, shouldUnlock ? "Déverrouiller les calques" : "Verrouiller les calques");
+  }
+
+  resetFreeformSelection() {
+    const keys = this.getFreeformSelectedKeys();
+    if (!keys.length || this.isFreeformSelectionLocked(keys)) return;
     state.clearFreeformLayouts(keys, state.viewport, keys.length > 1 ? "Réinitialisation sélection libre" : "Réinitialisation élément libre");
   }
 
   groupFreeformSelection() {
     const keys = this.getFreeformSelectedKeys();
-    if (keys.length < 2) return;
+    if (keys.length < 2 || this.isFreeformSelectionLocked(keys)) return;
     const groupId = state.createFreeformGroup(keys, "Grouper les éléments libres");
     if (!groupId) return;
     this._freeformSelectedKeys = keys;
@@ -4596,7 +4674,7 @@ export class App {
   ungroupFreeformSelection() {
     const keys = this.getFreeformSelectedKeys();
     const group = this.getExactFreeformGroup(keys);
-    if (!group) return;
+    if (!group || this.isFreeformSelectionLocked(keys)) return;
     state.deleteFreeformGroup(group.id, "Dégrouper les éléments libres");
     this._freeformSelectedKeys = keys;
     this._freeformSelectedKey = keys[0];
@@ -4724,7 +4802,7 @@ export class App {
   }
 
   armFreeformDirectDrag(event, target, { wasSelected = false } = {}) {
-    if (!target?.dataset?.layoutKey || event.shiftKey) return;
+    if (!target?.dataset?.layoutKey || event.shiftKey || this.isFreeformSelectionLocked()) return;
     if (event.target.closest("input, textarea, select, option")) return;
     const textLike = target.hasAttribute("data-editable") || target.matches("[contenteditable='true']");
     if (textLike && !wasSelected) return;

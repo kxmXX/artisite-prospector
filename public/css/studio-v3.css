@@ -626,11 +626,20 @@
 .freeform-selection-label button[hidden]{display:none!important}
 .freeform-selection-box.is-multi:not(.is-group) .freeform-resize-handle{display:none}
 .freeform-selection-box.is-group{border-style:solid;box-shadow:0 0 0 1px rgba(255,255,255,.9),0 0 0 4px rgba(37,99,235,.14)}
+.freeform-selection-box.is-locked{border-color:#d97706;box-shadow:0 0 0 1px rgba(255,255,255,.9),0 0 0 4px rgba(217,119,6,.14)}
+.freeform-selection-box.is-locked .freeform-selection-label{background:#b45309;box-shadow:0 6px 18px rgba(180,83,9,.22)}
+.freeform-selection-box.is-locked .freeform-move-handle,.freeform-selection-box.is-locked .freeform-resize-handle,.freeform-selection-box.is-locked .freeform-alignbar{display:none!important}
 .freeform-alignbar{position:absolute;left:50%;top:calc(100% + 10px);translate:-50% 0;display:none;align-items:center;gap:3px;padding:4px;border:1px solid rgba(24,32,31,.14);border-radius:8px;background:#fff;color:#334155;box-shadow:0 8px 24px rgba(15,23,42,.16);pointer-events:auto;white-space:nowrap}
 .freeform-selection-box.is-multi .freeform-alignbar{display:flex}
 .freeform-alignbar button{min-width:26px;height:26px;border:0;border-radius:5px;background:transparent;color:#334155;font:700 9px/1 ui-monospace,SFMono-Regular,Menlo,monospace;cursor:pointer}
 .freeform-alignbar button:hover,.freeform-alignbar button:focus-visible{background:#e8eefc;color:#1d4ed8;outline:none}
 .freeform-alignbar span{width:1px;height:16px;background:#d8dee9;margin:0 1px}
+.freeform-layerbar{position:absolute;left:50%;top:calc(100% + 10px);translate:-50% 0;display:flex;align-items:center;gap:3px;padding:4px;border:1px solid rgba(24,32,31,.14);border-radius:8px;background:#fff;color:#334155;box-shadow:0 8px 24px rgba(15,23,42,.16);pointer-events:auto;white-space:nowrap}
+.freeform-layerbar button{height:26px;min-width:28px;border:0;border-radius:5px;background:transparent;color:#334155;padding:0 7px;font:700 10px/1 ui-monospace,SFMono-Regular,Menlo,monospace;cursor:pointer}
+.freeform-layerbar button:hover,.freeform-layerbar button:focus-visible{background:#e8eefc;color:#1d4ed8;outline:none}
+.freeform-layerbar span{width:1px;height:16px;background:#d8dee9;margin:0 1px}
+.freeform-selection-box.is-locked .freeform-layerbar [data-freeform-layer]{opacity:.35;pointer-events:none}
+.freeform-selection-box.is-locked .freeform-layerbar [data-freeform-lock]{background:#fff7ed;color:#b45309}
 .freeform-move-handle{
   position:absolute;left:50%;top:-15px;translate:-50% -50%;width:30px;height:24px;border:1px solid #1d4ed8;border-radius:7px;
   background:#fff;color:#1d4ed8;display:grid;place-items:center;pointer-events:auto;touch-action:none;cursor:grab;box-shadow:0 3px 10px rgba(15,23,42,.14)

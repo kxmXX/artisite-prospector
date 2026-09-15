@@ -7,6 +7,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 15 septembre 2026 (4.8.0-alpha.23)
+
+- Calques : commandes Premier plan / Avancer / Reculer / Arrière-plan persistées dans le `freeformLayout` du breakpoint actif.
+- Verrouillage : un ou plusieurs calques peuvent être verrouillés avec Undo/Redo ; ils restent sélectionnables pour être déverrouillés mais ne peuvent plus être déplacés, redimensionnés, alignés, groupés ou réordonnés.
+- UX : cadre orange pour une sélection verrouillée, poignées de transformation masquées et toolbar de calques maintenue accessible.
+- Validation navigateur : z-index réel `0 → 1`, verrouillage bloque drag + clavier, déverrouillage réactive le déplacement, zéro erreur console. Validation : 37/37 ciblés, 212/212 complets et `git diff --check`.
+
 ### Consolidation — 15 septembre 2026 (4.8.0-alpha.22)
 
 - Calques structurels : Services, Galerie, Réalisations, Avis, FAQ, À propos, Stats, Process, Certifications, Tarifs, Stepper, citation, tableau comparatif et blocs custom exposent désormais des parents visuels sélectionnables en plus de leurs champs internes.

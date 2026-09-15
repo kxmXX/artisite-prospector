@@ -471,6 +471,23 @@ class AppStateManager {
     this.updateProject(project, false);
   }
 
+  setFreeformLocked(layoutKeys = [], locked = true, historyDesc = "Verrouillage éléments libres") {
+    if (!this.currentProject) return;
+    const keys = [...new Set((Array.isArray(layoutKeys) ? layoutKeys : [layoutKeys]).filter(Boolean))];
+    if (!keys.length) return;
+    const currentLocks = this.currentProject.freeformLocked || {};
+    const changed = keys.some(key => Boolean(currentLocks[key]) !== Boolean(locked));
+    if (!changed) return;
+    this.pushHistory(historyDesc);
+    const project = JSON.parse(JSON.stringify(this.currentProject));
+    project.freeformLocked = project.freeformLocked || {};
+    keys.forEach(key => {
+      if (locked) project.freeformLocked[key] = true;
+      else delete project.freeformLocked[key];
+    });
+    this.updateProject(project, false);
+  }
+
   createFreeformGroup(layoutKeys = [], historyDesc = "Grouper les éléments") {
     if (!this.currentProject) return null;
     const keys = [...new Set((Array.isArray(layoutKeys) ? layoutKeys : [layoutKeys]).filter(Boolean))];
