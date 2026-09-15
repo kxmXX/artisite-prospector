@@ -1,15 +1,25 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { getFallbackModels, callGeminiWithFallback, DEFAULT_FALLBACK_MODELS } from "../server/gemini.js";
+import { getFallbackModels, getImageModels, callGeminiWithFallback, DEFAULT_FALLBACK_MODELS } from "../server/gemini.js";
 import { handleApiRequest } from "../server/apiHandler.js";
 
 test("getFallbackModels returns default models in correct order", () => {
   const models = getFallbackModels();
   assert.ok(Array.isArray(models));
   assert.ok(models.length >= 3);
-  assert.equal(models[0], "gemini-2.5-flash");
-  assert.equal(models[1], "gemini-2.0-flash");
-  assert.equal(models[2], "gemini-1.5-flash");
+  assert.equal(models[0], "gemini-3.8-flash");
+  assert.equal(models[1], "gemini-3.7-flash");
+  assert.equal(models[2], "gemini-3.6-flash");
+  // La chaine doit aussi contenir une generation anterieure : sans elle, un 503
+  // sur les seuls modeles recents fait tout tomber (l'incident du 15/09).
+  assert.ok(models.some((model) => model.startsWith("gemini-2.")));
+});
+
+test("getImageModels ne propose que des modeles capables de generer une image", () => {
+  const models = getImageModels();
+  assert.ok(Array.isArray(models));
+  assert.ok(models.length >= 1);
+  assert.ok(models.every((model) => model.includes("image")), "un modele texte ne peut pas generer d'image");
 });
 
 test("getFallbackModels respects custom GEMINI_MODELS environment variable", () => {

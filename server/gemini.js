@@ -4,11 +4,44 @@
  */
 
 export const DEFAULT_FALLBACK_MODELS = [
+  "gemini-3.8-flash",
+  "gemini-3.7-flash",
+  "gemini-3.6-flash",
   "gemini-2.5-flash",
-  "gemini-2.0-flash",
-  "gemini-1.5-flash",
-  "gemini-1.5-flash-8b"
+  "gemini-2.5-flash-lite"
 ];
+
+// Modeles capables de produire une image (Nano Banana / Imagen). Un modele texte
+// ne peut PAS generer d'image : c'etait l'erreur d'origine de /api/ai/image.
+export const DEFAULT_IMAGE_MODELS = [
+  "gemini-3.1-flash-image",
+  "gemini-2.5-flash-image",
+  "gemini-3-pro-image"
+];
+
+// Google renvoie 503 « forte demande » sur les modeles recents : sans reessai,
+// toute la chaine echoue et l'application retombait en silence sur le moteur local.
+const RETRYABLE_STATUS = new Set([429, 500, 502, 503, 504]);
+const MAX_RETRIES = 2;
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function fetchWithRetry(url, options) {
+  let lastResponse = null;
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt += 1) {
+    try {
+      const response = await fetch(url, options);
+      if (!RETRYABLE_STATUS.has(response.status) || attempt === MAX_RETRIES) return response;
+      lastResponse = response;
+    } catch (error) {
+      if (attempt === MAX_RETRIES) throw error;
+    }
+    await sleep(400 * Math.pow(2, attempt) + Math.floor(Math.random() * 200));
+  }
+  return lastResponse;
+}
 
 export function getFallbackModels() {
   if (process.env.GEMINI_MODELS) {
@@ -18,6 +51,16 @@ export function getFallbackModels() {
     if (list.length > 0) return list;
   }
   return DEFAULT_FALLBACK_MODELS;
+}
+
+export function getImageModels() {
+  if (process.env.GEMINI_IMAGE_MODELS) {
+    const list = process.env.GEMINI_IMAGE_MODELS.split(",")
+      .map(m => m.trim())
+      .filter(Boolean);
+    if (list.length > 0) return list;
+  }
+  return DEFAULT_IMAGE_MODELS;
 }
 
 export async function callGeminiWithFallback({ prompt, systemInstruction = "", jsonOutput = true, apiKey = process.env.GEMINI_API_KEY }) {
@@ -54,7 +97,7 @@ export async function callGeminiWithFallback({ prompt, systemInstruction = "", j
         };
       }
 
-      const res = await fetch(url, {
+      const res = await fetchWithRetry(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
@@ -168,4 +211,54 @@ RÈGLES STRICTES :
     systemInstruction: "Tu es un copywriter web d'élite. Tu réponds exclusivement en JSON strict valide sans fioritures.",
     jsonOutput: true
   });
+}
+
+/**
+ * Generation d'image via un modele image de Gemini (Nano Banana / Imagen).
+ * Renvoie une data URL exploitable directement par le rendu.
+ */
+export async function generateImageWithGemini({ prompt, apiKey = process.env.GEMINI_API_KEY }) {
+  if (!apiKey) {
+    return { success: false, error: "NO_API_KEY", message: "GEMINI_API_KEY is not configured in environment variables." };
+  }
+  const models = getImageModels();
+  let lastError = null;
+
+  for (const model of models) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      const res = await fetchWithRetry(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ role: "user", parts: [{ text: prompt }] }],
+          generationConfig: { responseModalities: ["IMAGE"] }
+        })
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.warn(`⚠️ [Gemini Image] Model ${model} returned ${res.status}: ${errorText.slice(0, 150)} — Switching to next fallback model...`);
+        lastError = `Status ${res.status}: ${errorText}`;
+        continue;
+      }
+
+      const result = await res.json();
+      const parts = result.candidates?.[0]?.content?.parts || [];
+      const imagePart = parts.find((part) => part.inlineData || part.inline_data);
+      const inline = imagePart && (imagePart.inlineData || imagePart.inline_data);
+      if (!inline || !inline.data) {
+        console.warn(`⚠️ [Gemini Image] Model ${model} returned no image part — Switching to next fallback model...`);
+        lastError = "No image part in response";
+        continue;
+      }
+      const mimeType = inline.mimeType || inline.mime_type || "image/png";
+      return { success: true, modelUsed: model, dataUrl: `data:${mimeType};base64,${inline.data}` };
+    } catch (err) {
+      console.warn(`⚠️ [Gemini Image] Network/runtime error with ${model}: ${err.message} — Switching to next fallback model...`);
+      lastError = err.message;
+    }
+  }
+
+  return { success: false, error: "ALL_IMAGE_MODELS_FAILED", lastError };
 }

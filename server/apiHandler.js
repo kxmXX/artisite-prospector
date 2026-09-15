@@ -1,4 +1,4 @@
-import { getFallbackModels, enrichSiteWithAI, callGeminiWithFallback } from "./gemini.js";
+import { getFallbackModels, enrichSiteWithAI, callGeminiWithFallback, generateImageWithGemini } from "./gemini.js";
 import { handleAccountsRoute } from "./accounts.js";
 import { getTradeFallbackDataUrl } from "../public/js/data/imageFallbacks.js";
 import { createHash } from "node:crypto";
@@ -30,19 +30,6 @@ export function generationCacheKey(context) {
     models: getFallbackModels(),
     configured: Boolean(process.env.GEMINI_API_KEY)
   })).digest("hex");
-}
-
-function extractImageUrl(data) {
-  if (typeof data === "string" && /^(data:image\/|https?:\/\/)/i.test(data.trim())) {
-    return data.trim();
-  }
-
-  if (!data || typeof data !== "object") return null;
-
-  const candidate = data.imageUrl || data.image_url || data.url || data.image?.url;
-  return typeof candidate === "string" && /^(data:image\/|https?:\/\/)/i.test(candidate.trim())
-    ? candidate.trim()
-    : null;
 }
 
 // High-performance in-memory cache for repeated AI queries to eliminate network latency.
@@ -409,25 +396,35 @@ Si aucune cible # explicite n'est présente, retourne "operations": []. Si une c
       const requestedPrompt = prompt || "Photo artisanale pro";
       const fallbackUrl = getTradeFallbackDataUrl(tradeId, sectionType, requestedPrompt);
       let generatedUrl = null;
+      let aiError = null;
       if (process.env.GEMINI_API_KEY) {
+        const imagePrompt = [
+          "Photographie réaliste, professionnelle et soignée pour le site vitrine d'un artisan.",
+          `Corps de métier : ${tradeId}. Section : ${sectionType}. Style : ${style || "photo réaliste"}.`,
+          `Sujet demandé : ${requestedPrompt}.`,
+          "Aucun texte, aucun logo, aucune watermark, aucune interface. Cadrage naturel, lumière du jour."
+        ].join(" ");
         try {
-          const aiResult = await callGeminiWithFallback({
-            prompt: `Génère une description détaillée et un objet visuel pour ce prompt d'image d'artisan: "${requestedPrompt}". Corps de métier: "${tradeId}". Section: "${sectionType}". Style: "${style}". Si une URL ou une data URL d'image est disponible, renvoie-la explicitement.`,
-            jsonOutput: false
-          });
-          if (aiResult.success) {
-            generatedUrl = extractImageUrl(aiResult.data);
-          }
-        } catch (e) {
-          // Fallback gracefully
+          const aiImage = await generateImageWithGemini({ prompt: imagePrompt });
+          if (aiImage.success) generatedUrl = aiImage.dataUrl;
+          else aiError = aiImage.lastError || aiImage.error;
+        } catch (error) {
+          aiError = error && error.message;
         }
+      } else {
+        aiError = "NO_API_KEY";
+      }
+      if (!generatedUrl) {
+        console.warn("[ai/image] generation indisponible, visuel du catalogue utilise :", aiError);
       }
 
       sendJSON(res, 200, {
         success: true,
         source: generatedUrl ? "gemini" : "local_engine",
         prompt: requestedPrompt,
-        imageUrl: generatedUrl || fallbackUrl
+        imageUrl: generatedUrl || fallbackUrl,
+        aiAvailable: Boolean(generatedUrl),
+        error: generatedUrl ? undefined : aiError
       });
       return;
     }
