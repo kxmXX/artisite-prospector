@@ -71,6 +71,59 @@ const ELEMENT_SCALE_ROWS = [
  * selection d'element n'existait qu'en selection libre, c'est-a-dire derriere un
  * geste de glisser que rien dans l'interface n'annoncait.
  */
+const LIST_LABELS = {
+  reviews: "Avis", services: "Services", photos: "Photos", items: "Éléments",
+  links: "Liens", badges: "Badges", points: "Points forts", citiesCovered: "Villes",
+  stickers: "Autocollants", types: "Types", sizes: "Tailles", urgencyOptions: "Options d'urgence"
+};
+
+/** Ajout : seules les listes dont l'application sait fabriquer une entree complete. */
+const LIST_ADDERS = {
+  "reviews:reviews": { method: "addReviewItem", arg: "" },
+  "services:services": { method: "addServiceItem", arg: "" },
+  "faq:items": { method: "addFaqItem", arg: "" },
+  "gallery:photos": { method: "addGalleryItem", arg: ", 'photo'" }
+};
+
+/**
+ * Listes de la section : ajouter et retirer des entrees.
+ *
+ * Ces controles vivaient uniquement dans un gabarit jamais rendu
+ * (`renderSectionAccordionContent`, 837 lignes inertes). Sans eux, on pouvait
+ * modifier un avis existant mais ni en ajouter ni en supprimer un.
+ */
+function sectionListsHTML(section, sectionId) {
+  const content = section?.content || {};
+  const lists = Object.keys(content).filter((key) => Array.isArray(content[key]));
+  if (!lists.length) return "";
+  const itemLabel = (item, index) => {
+    if (typeof item === "string") return item;
+    const candidate = item && (item.title || item.label || item.name || item.text || item.role);
+    return candidate ? String(candidate) : "Élément " + (index + 1);
+  };
+  return `
+    <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-xl space-y-2">
+      <label class="text-ui-xs font-bold uppercase tracking-wider text-zinc-700">Listes de la section</label>
+      ${lists.map((key) => {
+        const items = content[key];
+        const adder = LIST_ADDERS[section.type + ":" + key];
+        return `
+        <div class="space-y-1">
+          <div class="flex items-center justify-between">
+            <span class="text-ui-2xs uppercase tracking-wider text-zinc-500">${LIST_LABELS[key] || key} · ${items.length}</span>
+            ${adder ? `<button type="button" class="text-ui-2xs font-semibold text-zinc-700 border border-zinc-200 rounded-md px-1.5 py-0.5 bg-white hover:border-zinc-400" onclick="window.app.${adder.method}('${sectionId}'${adder.arg})">Ajouter</button>` : ''}
+          </div>
+          ${items.map((item, index) => `
+            <div class="flex items-center justify-between gap-2 text-ui-xs text-zinc-600">
+              <span class="truncate">${escapeHtml(itemLabel(item, index))}</span>
+              <button type="button" class="text-ui-2xs text-red-600 font-semibold whitespace-nowrap" title="Retirer cette entrée" onclick="window.app.removeListEntry('${sectionId}', '${key}', ${index})">Retirer</button>
+            </div>`).join("")}
+        </div>`;
+      }).join("")}
+    </div>
+  `;
+}
+
 function sectionElementsHTML(section, project, selectedKey) {
   const elements = collectSectionElements(project, section);
   if (!elements.length) return "";
@@ -251,6 +304,7 @@ export function renderInspector(section, project, state) {
       ${state.selectedElementKey ? elementStyleControlsHTML(project, state.selectedElementKey, state.elementStyleState) : ''}
       ${state.selectedElementKey ? elementTransformControlsHTML(project, state.selectedElementKey, state.viewport) : ''}
       ${sectionElementsHTML(section, project, state.selectedElementKey)}
+      ${sectionListsHTML(section, sectionId)}
 
       ${variants.length > 1 ? `
         <div class="p-2.5 bg-zinc-50 border border-zinc-200 rounded-lg space-y-1">

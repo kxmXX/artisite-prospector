@@ -201,3 +201,21 @@ test('les deux panneaux nomment les elements de la meme facon', async () => {
   assert.equal(elementLabelFor('', 'button'), 'Bouton', 'sans champ, la nature suffit');
   assert.deepEqual(numberedLabels([{ field: 'title' }, { field: 'title' }, { field: 'text' }]), ['Titre 1', 'Titre 2', 'Texte']);
 });
+
+test('les listes de la section sont editables depuis l inspecteur', async () => {
+  const { renderInspector } = await import('../public/js/components/inspector.js');
+  const { generateSite } = await import('../public/js/engine/generator.js');
+  const { state } = await import('../public/js/state.js');
+  const app = read('public/js/app.js');
+  const project = generateSite({ name: 'Controle Listes', tradeId: 'plombier' });
+  state.currentProject = project;
+  const services = project.sections.find((s) => s.type === 'services');
+  const html = renderInspector(services, project, state);
+  assert.ok(html.includes('Listes de la section'), 'le bloc des listes doit etre rendu');
+  assert.ok(html.includes('window.app.addServiceItem('), 'on doit pouvoir ajouter un service');
+  assert.ok(html.includes('window.app.removeListEntry('), 'on doit pouvoir retirer une entree');
+  assert.ok(html.includes('Services · ' + services.content.services.length), 'le compte doit etre affiche');
+  assert.ok(app.includes('removeListEntry(sectionId, listKey, index) {'), 'l operation generique doit exister');
+  assert.ok(app.includes('state.pushHistory("Suppression dans la liste "'), 'la suppression doit etre annulable');
+  state.selectedElementKey = null;
+});

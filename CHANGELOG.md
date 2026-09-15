@@ -7,6 +7,15 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.51) — Lot 3b : les listes redeviennent éditables
+
+- Inventaire avant suppression : les 837 lignes de `renderSectionAccordionContent` sont bien **inertes** (son gabarit n'est cloné nulle part), mais elles portent **31 capacités**, dont une quinzaine sans aucun autre point d'entrée. Supprimer d'abord aurait retiré des fonctions.
+- La plus visible : **les listes de la section**. On pouvait modifier un avis existant, mais ni en ajouter ni en supprimer un. Les services, la FAQ, la galerie et les points forts étaient dans le même cas.
+- Réimplémenté dans l'inspecteur : un bloc « Listes de la section » qui affiche chaque liste avec son compte, un bouton **Ajouter** quand l'application sait fabriquer une entrée complète (avis, services, FAQ, galerie), et un bouton **Retirer** par entrée — via une opération générique unique, `removeListEntry`, annulable.
+- Mesuré sur un projet de référence : services → 6 entrées retirables et 1 ajout ; FAQ → 1 et 1 ; points forts → 4 retirables ; avis → 1 ajout.
+- Tests : 1 nouveau ; 400 → **401/401**. Vérifié sur la sortie réelle de l'inspecteur, pas seulement en source.
+- Reste sur 3b : l'assombrissement du hero, les motifs d'inspiration, et les curseurs de taille de champ — puis la suppression des 837 lignes.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.50) — Lot 3b : l'arbre des éléments dans la structure
 
 - Fait : chaque section du panneau Structure peut se **déplier** pour montrer ses éléments — « Nom de marque », « Téléphone », « Texte du bouton 1 / 2 »… Cliquer un élément le sélectionne exactement comme depuis le panneau de propriétés : même point d'écriture, même indicateur sur le canevas.

@@ -1724,3 +1724,11 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Defaut que j'ai introduit et corrige dans le meme tour : le bouton de depliage etait un 6e enfant d'une grille a 5 colonnes, ce qui cassait l'alignement des lignes suivantes. Colonne ajoutee, place reservee meme sans element. Verifie par deux captures.
 - Tests : 398 → 400. `node --check` sur les quatre fichiers, `scripts/build-utilities.mjs` relance.
 - Reste sur 3b : les 830 lignes inertes de renderSectionAccordionContent (reimplementer d'abord les capacites uniques). Puis lot 7, export 2d, PRODUCT.md/DESIGN.md, et la validation utilisateur du geste de deplacement.
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.51 (lot 3b : listes reimplementees)
+
+- Inventaire : renderSectionAccordionContent = 837 lignes, gabarit jamais clone (1 seule reference, sa definition), 31 capacites appelees, ~15 sans autre point d'entree. La suppression directe aurait retire des fonctions.
+- Reimplemente : bloc « Listes de la section » dans l'inspecteur (compte, ajout quand l'app sait construire une entree, retrait generique annulable). Nouvelle methode removeListEntry(sectionId, listKey, index).
+- Mesure : services 6 retraits + 1 ajout, FAQ 1+1, points forts 4 retraits, avis 1 ajout.
+- Tests : 400 → 401, verifie sur la sortie reelle de renderInspector.
+- Reste sur 3b : assombrissement du hero, motifs d'inspiration, curseurs de taille de champ ; puis suppression des 837 lignes. Ensuite lot 7, export 2d, PRODUCT.md/DESIGN.md. Toujours en attente : validation utilisateur du geste de deplacement et du mobile.

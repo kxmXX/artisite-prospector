@@ -1652,7 +1652,22 @@ export class App {
     this.updateStageContext();
   }
 
-  /** Deplie ou replie la liste des elements d'une section, sans re-rendu complet. */
+  /**
+   * Retire une entree d'une liste du contenu.
+   *
+   * Remplace les methodes specifiques qui dormaient dans le gabarit mort : une seule
+   * operation generique couvre les avis, les services, la FAQ, la galerie et les autres.
+   */
+  removeListEntry(sectionId, listKey, index) {
+    const section = state.currentProject?.sections.find(s => s.id === sectionId);
+    const list = section?.content?.[listKey];
+    if (!Array.isArray(list) || index < 0 || index >= list.length) return;
+    state.pushHistory("Suppression dans la liste " + listKey);
+    const updated = JSON.parse(JSON.stringify(state.currentProject));
+    updated.sections.find(s => s.id === sectionId).content[listKey].splice(index, 1);
+    state.updateProject(updated, true);
+    this.refreshInspectorPanel();
+  }  /** Deplie ou replie la liste des elements d'une section, sans re-rendu complet. */
   toggleStructureSection(sectionId) {
     const list = document.getElementById("structure-elements-" + sectionId);
     if (!list) return;
