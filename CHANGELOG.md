@@ -7,6 +7,23 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.11) — Lot 5b : les états sont éditables
+
+- **Sélecteur d'état dans le menu couleur du texte** : « Principal · Survol · Focus · Actif ·
+  Désactivé ». L'auteur voit toujours **à quel état** s'appliquent les réglages suivants ; un message
+  le confirme à chaque changement, et sortir de l'édition revient automatiquement au style principal.
+- **Les réglages respectent l'état choisi** : hors « Principal », la couleur alimente
+  `elementStates[clé].état` au lieu du style par défaut, donc la règle est produite par la primitive
+  partagée et se retrouve à l'identique dans l'éditeur, l'aperçu et le **site autonome exporté**.
+  Le chemin du style principal n'est pas exécuté en plus, et la modification passe par l'historique
+  d'annulation.
+- **QA** : 2 tests ajoutés — présence des cinq états dans l'interface, et vérification que la branche
+  « état » écrit bien dans `elementStates` via la clé de mise en page du renderer, avant de sortir.
+  **322/322 tests**.
+- *Reste (5b, second temps)* : l'aperçu immédiat de l'état sans survol réel, le bouton explicite
+  « Revenir au style principal » hors du menu, et l'extension des états aux autres réglages
+  (fond, bordure, opacité) qui utilisent encore le style par défaut uniquement.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.10) — Finitions de cohérence
 
 - **Un seul rayon « pilule » dans le chrome** : les cinq dernières valeurs littérales `999px` de

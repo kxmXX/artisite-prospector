@@ -1193,3 +1193,26 @@ non poussé.
   l'aveugle.
 
 Vérifications : 320/320 tests.
+
+---
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.11 (lot 5b/9)
+
+Le socle des états (5a) devient utilisable : sélecteur « Principal / Survol / Focus / Actif /
+Désactivé » dans le menu couleur de la barre d'outils texte, et routage des réglages vers l'état
+choisi via elementStates et la clé de mise en page du renderer (getUiCode). Sortir de l'édition
+repart toujours du style principal.
+
+Deux erreurs commises puis corrigées pendant ce lot, à consigner :
+1. syncActiveTextStateButtons() touchait document sans garde : une suite existante
+   (editor_interaction_integrity) instancie App.prototype sans DOM et échouait. Garde ajouté.
+2. Le test ajouté importait app.js, dont l'initialisation lance une requête de session asynchrone ;
+   après la fin du test, la promesse touchait document et faisait échouer le fichier entier avec
+   « A resource generated asynchronous activity after the test ended ». Le test a été réécrit en
+   vérifications de source, sans importer app.js. Leçon : ne pas importer un module à effet de bord
+   dans une suite de tests unitaires.
+
+Vérifications : 322/322 tests ; les 5 tests du modèle (5a) passent inchangés.
+
+Reste (5b, second temps) : aperçu immédiat de l'état sans survol réel, bouton « Revenir au style
+principal » hors du menu, extension des états aux autres propriétés que la couleur.

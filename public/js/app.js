@@ -19,6 +19,8 @@ import { getStylePresetById } from "./data/styles.js";
 import { getTradeById } from "./data/trades.js";
 import { getTradeFallbackDataUrl } from "./data/imageFallbacks.js";
 import { ensureFontCatalog } from "./data/fonts.js";
+import { getUiCode } from "./data/uiIds.js";
+import { ELEMENT_STATES, ELEMENT_STATE_LABELS, setElementState, clearElementState } from "./engine/elementStates.js";
 import { getIcon } from "./components/icons.js";
 import { parseClientDemoPin, verifyClientDemoPin } from "./utils/clientDemoPin.js";
 import { createEspritNatureDemoProject } from "./data/sampleProjects.js";
@@ -2400,6 +2402,9 @@ export class App {
   // Leaving inline editing must be explicit: blur commits the cell and removes
   // the caret, instead of leaving the user stuck with a focused editable.
   exitInlineEditing() {
+    // Les réglages suivants repartent toujours du style principal.
+    this._activeTextState = "default";
+    this.syncActiveTextStateButtons();
     const active = document.activeElement;
     if (active?.isContentEditable && typeof active.blur === "function") {
       active.blur();
@@ -2474,12 +2479,44 @@ export class App {
     if (menu) menu.classList.toggle("hidden");
   }
 
+  /** Choisit l'état auquel les réglages suivants s'appliquent (principal par défaut). */
+  setActiveTextState(stateName) {
+    this._activeTextState = ELEMENT_STATES.includes(stateName) ? stateName : "default";
+    this.syncActiveTextStateButtons();
+    this.showToast(this._activeTextState === "default"
+      ? "Réglages appliqués au style principal"
+      : "Réglages appliqués à l'état : " + ELEMENT_STATE_LABELS[this._activeTextState], "info");
+  }
+
+  syncActiveTextStateButtons() {
+    const active = this._activeTextState || "default";
+    if (typeof document === "undefined" || typeof document.querySelectorAll !== "function") return;
+    document.querySelectorAll("[data-ftb-state]").forEach(button => {
+      button.classList.toggle("is-active", button.dataset.ftbState === active);
+    });
+  }
+
   setActiveTextColor(color) {
     if (!this._activeEditableEl) return;
     const el = this._activeEditableEl;
     const secWrapper = el.closest(".editor-section-wrapper");
     const secId = secWrapper?.getAttribute("data-section-id");
     const field = el.getAttribute("data-editable");
+
+    // Hors style principal, la couleur alimente l'état choisi : la règle est produite
+    // par la primitive partagée du renderer, donc l'aperçu et l'export la verront aussi.
+    const textState = this._activeTextState || "default";
+    if (textState !== "default" && secId && field && state.currentProject) {
+      const layoutKey = getUiCode(state.currentProject.id, secId, field);
+      const nextProject = color
+        ? setElementState(state.currentProject, layoutKey, textState, "color", color)
+        : clearElementState(state.currentProject, layoutKey, textState);
+      state.updateProject(nextProject, true);
+      const stateMenu = document.getElementById("ftb-color-menu");
+      if (stateMenu) stateMenu.classList.add("hidden");
+      this.showToast(ELEMENT_STATE_LABELS[textState] + " : " + (color || "retour au style principal"), "info");
+      return;
+    }
 
     if (secId && field && state.currentProject) {
       const updated = JSON.parse(JSON.stringify(state.currentProject));

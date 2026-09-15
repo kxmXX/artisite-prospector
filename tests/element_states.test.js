@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 
 const states = await import('../public/js/engine/elementStates.js');
 const { renderWebsiteHTML } = await import('../public/js/components/renderer.js');
@@ -68,3 +69,25 @@ test('les etats sont presents dans le rendu partage et dans l export autonome', 
   const untouched = renderWebsiteHTML(JSON.parse(JSON.stringify(SAMPLE_PROJECTS[0])), { isEditor: false, isStandalone: false });
   assert.ok(!/\[data-layout-key="[^"]+"\]:hover/.test(untouched), 'aucun etat par defaut : rien n est invente');
 });
+
+const editorSource = fs.readFileSync(new URL('../public/js/components/editor.js', import.meta.url), 'utf8');
+const appSource = fs.readFileSync(new URL('../public/js/app.js', import.meta.url), 'utf8');
+
+test('l interface permet de choisir l etat modifie', () => {
+  for (const stateName of ['default', 'hover', 'focus', 'active', 'disabled']) {
+    assert.ok(editorSource.includes('data-ftb-state="' + stateName + '"'),
+      'le sélecteur doit proposer l état ' + stateName);
+  }
+  assert.ok(/setActiveTextState\('hover'\)/.test(editorSource), 'le sélecteur est branché sur une commande');
+});
+
+test('hors style principal, la couleur alimente bien les etats', () => {
+  const block = appSource.slice(appSource.indexOf('setActiveTextColor(color) {'));
+  const stateBranch = block.slice(0, block.indexOf('if (secId && field && state.currentProject) {', 10));
+  assert.ok(stateBranch.includes('setElementState(state.currentProject, layoutKey'),
+    'la couleur doit écrire dans les états quand un état est choisi');
+  assert.ok(stateBranch.includes('getUiCode('), 'la clé de mise en page doit être celle du renderer');
+  assert.ok(stateBranch.includes('return;'), 'le chemin du style principal ne doit pas être exécuté en plus');
+  assert.ok(appSource.includes('this._activeTextState = "default"'), 'sortir de l édition revient au style principal');
+});
+

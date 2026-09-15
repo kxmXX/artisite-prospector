@@ -292,6 +292,14 @@ export function renderEditor(state) {
                 <span>Couleur</span>
               </button>
               <div id="ftb-color-menu" class="hidden absolute left-0 top-full mt-2 w-52 bg-zinc-900/95 backdrop-blur-md border border-white/20 rounded-xl p-2.5 shadow-2xl z-50 text-white text-ui-sm">
+                <div class="text-ui-2xs font-bold uppercase tracking-wider text-zinc-400 mb-1.5">État modifié</div>
+                <div class="flex flex-wrap gap-1 mb-2.5" role="group" aria-label="État auquel s'appliquent les réglages">
+                  <button type="button" data-ftb-state="default" class="motion-loop-btn is-active" onclick="window.app.setActiveTextState('default')">Principal</button>
+                  <button type="button" data-ftb-state="hover" class="motion-loop-btn" onclick="window.app.setActiveTextState('hover')">Survol</button>
+                  <button type="button" data-ftb-state="focus" class="motion-loop-btn" onclick="window.app.setActiveTextState('focus')">Focus</button>
+                  <button type="button" data-ftb-state="active" class="motion-loop-btn" onclick="window.app.setActiveTextState('active')">Actif</button>
+                  <button type="button" data-ftb-state="disabled" class="motion-loop-btn" onclick="window.app.setActiveTextState('disabled')">Désactivé</button>
+                </div>
                 <div class="text-ui-2xs font-bold uppercase tracking-wider text-zinc-400 mb-1.5">Nuancier Texte</div>
                 <div class="grid grid-cols-6 gap-1.5 mb-2">
                   <button type="button" onclick="window.app.setActiveTextColor('#09090b')" class="w-6 h-6 rounded-md border border-white/30 bg-[#09090b]" title="Noir Profond"></button>
