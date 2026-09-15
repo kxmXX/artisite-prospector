@@ -92,9 +92,18 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
       sont toujours présentes et **plusieurs de leurs capacités ne sont atteignables nulle part
       ailleurs** (boucle d'animation de section, motifs d'inspiration, assombrissement du hero) :
       les réimplanter avant de supprimer le template, pas l'inverse.
-- [ ] **Lot 4 — Inspecteur contextuel** : onglets par portée, divulgation progressive, modèles
-      `section.style` et `elementStyles[layoutKey]`, wording humain (fin du « 60fps », « preset »,
-      « responsive », « HEX/RGB », « WCAG AA »).
+- [~] **Lot 4 — Inspecteur contextuel** (4a et 4b livrés en `4.9.0-alpha.14` à `alpha.16`) :
+      modèle de mise en page de section (largeur pleine/contenu/étroite, respiration
+      compacte/normale/aérée, alignement), **conditionné** pour ne rien changer aux vitrines existantes,
+      branché sur l'élément `<section>` et injecté par `renderWebsiteHTML` — donc éditeur, aperçu et
+      **site autonome exporté** partagent la même feuille. Trois rangées de contrôles dans l'inspecteur,
+      application annulable. 7 tests, **331/331**.
+      *Vérifié par test* : marquage et variables présents dans l'aperçu **et** dans l'export, aucune
+      émission pour une section non modifiée, feuille injectée pour les trois surfaces.
+      *Non vérifié* : l'**apparence à l'écran** des trois rangées (l'inspecteur est hors du champ des
+      captures à 1280 px, et je n'ai ni redimensionnement de fenêtre ni accès aux styles calculés).
+      **Reste (4c)** : onglets par portée, divulgation progressive, `elementStyles[layoutKey]` pour les
+      éléments, wording humain (fin du « 60fps », « preset », « responsive », « HEX/RGB », « WCAG AA »).
 - [~] **Lot 5 — États des éléments** (5a en `4.9.0-alpha.9`, 5b en `4.9.0-alpha.11` et
       `alpha.12`) : modèle `elementStates[layoutKey]` (survol, focus, actif, désactivé), primitive
       unique `elementStateCSS` injectée par le renderer et donc partagée par l'éditeur, l'aperçu et

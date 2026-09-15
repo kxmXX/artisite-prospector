@@ -1320,3 +1320,12 @@ consigné un avertissement inutile parce que je n'ai pas fait ce contrôle tout 
 Reste, honnêtement : l'inspecteur n'a pas pu être observé à l'écran (hors champ des captures à
 1280 px, pas de redimensionnement ni de styles calculés disponibles). Le modèle, le rendu, la parité
 et l'annulation sont prouvés par test ; l'apparence des trois rangées de contrôles ne l'est pas.
+
+---
+
+## Journal — 17 septembre 2026 · point de reprise réaligné (lot 4)
+
+L'entrée « Lot 4 » de la checklist annonçait « non commencé » alors que 4a et 4b sont livrés. Elle est
+corrigée, avec la distinction explicite entre ce qui est prouvé par test (marquage, variables, parité
+aperçu/export, absence d'émission par défaut, annulation) et ce qui ne l'est pas (l'apparence à
+l'écran des trois rangées de contrôles).
