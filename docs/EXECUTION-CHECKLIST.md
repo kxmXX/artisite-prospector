@@ -147,11 +147,12 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
       et injectés par le rendu (une seule feuille pour éditeur, aperçu et export). *Reste* : courbe et
       direction réglables, vocabulaire de répétition du menu texte encore `once / twice / infinite`,
       outil tester/rejouer/arrêter/réinitialiser, et neutralisation des motions pendant un transform libre.
-- [ ] **Lot 4d — Divulgation progressive de l'inspecteur** : primitive partagée depuis `4.9.0-alpha.29`
-      (`disclosure`, `<details>/<summary>` natifs, focus clavier, état retenu au nouveau rendu), appliquée au
-      rythme de l'animation de section puis aux réglages d'élément — espacement et angles immédiats,
-      opacité / fond / bordure / ombre repliés (`4.9.0-alpha.40`). *Reste* : le groupe « Mise en page » de
-      section et les réglages globaux du projet.
+- [x] **Lot 4d — Divulgation progressive de l'inspecteur** (clos en `4.9.0-alpha.48`) : primitive partagée
+      (`disclosure`, `<details>/<summary>` natifs, focus clavier, état retenu au nouveau rendu) appliquée au
+      rythme de l'animation de section (`4.9.0-alpha.29`) puis aux réglages d'élément — espacement et angles
+      immédiats, opacité / fond / bordure / ombre repliés (`4.9.0-alpha.40`) ; les dix groupes de réglages
+      globaux sont des accordéons, désormais **focusables et annoncés** (`4.9.0-alpha.48`). Le groupe « Mise
+      en page » de section n'en a pas besoin : trois rangées ne font pas un mur.
 - [x] **Panneau de propriétés en retard sur la section** (`4.9.0-alpha.44`) : la visibilité dépendait d'une
       requête média et non d'un état, d'où un panneau bloqué sur la section précédente. Elle est désormais
       portée par `state.inspectorPanelOpen` ; **vérifié à l'écran** — le panneau affiche bien la section

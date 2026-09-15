@@ -147,3 +147,13 @@ test('le chrome de l editeur n a plus de verre decoratif', () => {
   // Le voile de modale garde son flou : c'est un effet au service d'une intention.
   assert.ok(studio.includes('backdrop-filter:blur(18px) saturate(.9)'), 'le voile de modale reste floute');
 });
+
+test('les en-tetes de reglages sont des controles accessibles', () => {
+  const editor = read('public/js/components/editor.js');
+  const app = read('public/js/app.js');
+  const headers = editor.split('role="button" tabindex="0" aria-expanded=').length - 1;
+  assert.ok(headers >= 10, 'les groupes de reglages doivent etre focusables, trouves : ' + headers);
+  assert.ok(editor.includes('aria-controls="settings-body-'), 'chaque en-tete doit designer son corps');
+  assert.ok(editor.includes('window.app.toggleSettingsItem'), 'le basculement doit rester branche');
+  assert.ok(app.includes('setAttribute("aria-expanded", body.classList.contains("hidden") ? "false" : "true")'), 'l etat doit suivre le basculement');
+});

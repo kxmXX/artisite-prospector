@@ -1941,6 +1941,8 @@ export class App {
         state._openSettingsItem = null;
       }
     }
+    // Un lecteur d'ecran doit savoir si le groupe est ouvert.
+    parentCard?.querySelector(".section-card-header")?.setAttribute("aria-expanded", body.classList.contains("hidden") ? "false" : "true");
   }
 
   toggleSectionBgMenu(secId) {

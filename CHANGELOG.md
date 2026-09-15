@@ -7,6 +7,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.48) — Lot 4d clos, et les réglages deviennent accessibles
+
+- Constat en fermant le lot 4d : les **dix** groupes de réglages globaux (entreprise, favicon, couleurs, typographie, boutons, export, SEO, navigation, preuve sociale, code PIN) étaient déjà des accordéons — mais leurs en-têtes étaient des `<div onclick>` : **non focusables au clavier, invisibles pour un lecteur d'écran**, sans état annoncé.
+- Correctif : chaque en-tête porte `role="button"`, `tabindex="0"`, `aria-controls` vers son corps, `aria-expanded` calculé à l'ouverture, et répond à Entrée et à Espace. Le type d'élément et la mise en page ne changent pas — pas de régression visuelle possible. `toggleSettingsItem` met `aria-expanded` à jour à chaque basculement.
+- Le lot 4d est donc **clos** : divulgation sur le rythme d'animation de section (`4.9.0-alpha.29`), sur les réglages d'élément (`4.9.0-alpha.40`), et accordéons sur les dix groupes globaux. Le groupe « Mise en page » de section n'en a pas besoin — trois rangées de pastilles ne font pas un mur.
+- Tests : 1 nouveau ; 395/395.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.47) — Chaque élément de la section porte un nom distinct
 
 - Constat : la liste « Éléments de la section » affichait jusqu'à neuf fois le même libellé dans la section Services (« Titre », « Texte »…). Deux boutons du menu portaient tous deux « Texte du bouton ». Impossible de savoir lequel on réglait.

@@ -1267,7 +1267,7 @@ function renderSettingsAccordions(project, state = {}) {
 
       <!-- 1. Business Information -->
       <div class="section-card">
-        <div class="section-card-header" onclick="window.app.toggleSettingsItem('business')">
+        <div class="section-card-header" role="button" tabindex="0" aria-expanded="${isOpen('business') ? 'true' : 'false'}" aria-controls="settings-body-business" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.app.toggleSettingsItem('business')}" onclick="window.app.toggleSettingsItem('business')">
           <div class="flex items-center gap-2 text-xs font-medium text-zinc-900">
             ${getIcon("mapPin", "w-4 h-4 text-zinc-500")}
             <span>Informations entreprise</span>
@@ -1319,7 +1319,7 @@ function renderSettingsAccordions(project, state = {}) {
 
       <!-- 2. Favicon & Identité -->
       <div class="section-card">
-        <div class="section-card-header" onclick="window.app.toggleSettingsItem('favicon')">
+        <div class="section-card-header" role="button" tabindex="0" aria-expanded="${isOpen('favicon') ? 'true' : 'false'}" aria-controls="settings-body-favicon" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.app.toggleSettingsItem('favicon')}" onclick="window.app.toggleSettingsItem('favicon')">
           <div class="flex items-center gap-2 text-xs font-medium text-zinc-900">
             ${getIcon("tag", "w-4 h-4 text-zinc-500")}
             <span>Favicon & Identité</span>
@@ -1344,7 +1344,7 @@ function renderSettingsAccordions(project, state = {}) {
 
       <!-- 3. Couleurs & Thème -->
       <div class="section-card">
-        <div class="section-card-header" onclick="window.app.toggleSettingsItem('colors')">
+        <div class="section-card-header" role="button" tabindex="0" aria-expanded="${isOpen('colors') ? 'true' : 'false'}" aria-controls="settings-body-colors" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.app.toggleSettingsItem('colors')}" onclick="window.app.toggleSettingsItem('colors')">
           <div class="flex items-center gap-2 text-xs font-medium text-zinc-900">
             ${getIcon("palette", "w-4 h-4 text-zinc-500")}
             <span>Couleurs & Thème graphique</span>
@@ -1465,7 +1465,7 @@ function renderSettingsAccordions(project, state = {}) {
 
       <!-- 4. Typographie -->
       <div class="section-card">
-        <div class="section-card-header" onclick="window.app.toggleSettingsItem('typography')">
+        <div class="section-card-header" role="button" tabindex="0" aria-expanded="${isOpen('typography') ? 'true' : 'false'}" aria-controls="settings-body-typography" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.app.toggleSettingsItem('typography')}" onclick="window.app.toggleSettingsItem('typography')">
           <div class="flex items-center gap-2 text-xs font-medium text-zinc-900">
             ${getIcon("edit", "w-4 h-4 text-zinc-500")}
             <span>Typographie</span>
@@ -1490,7 +1490,7 @@ function renderSettingsAccordions(project, state = {}) {
 
       <!-- 5. Boutons & Call to Action (Sizes & Radii with real-time update) -->
       <div class="section-card">
-        <div class="section-card-header" onclick="window.app.toggleSettingsItem('buttons')">
+        <div class="section-card-header" role="button" tabindex="0" aria-expanded="${isOpen('buttons') ? 'true' : 'false'}" aria-controls="settings-body-buttons" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.app.toggleSettingsItem('buttons')}" onclick="window.app.toggleSettingsItem('buttons')">
           <div class="flex items-center gap-2 text-xs font-medium text-zinc-900">
             ${getIcon("sparkles", "w-4 h-4 text-zinc-500")}
             <span>Boutons & Call to Action</span>
@@ -1621,7 +1621,7 @@ function renderSettingsAccordions(project, state = {}) {
 
       <!-- 6. Domaines & Export -->
       <div class="section-card">
-        <div class="section-card-header" onclick="window.app.toggleSettingsItem('export')">
+        <div class="section-card-header" role="button" tabindex="0" aria-expanded="${isOpen('export') ? 'true' : 'false'}" aria-controls="settings-body-export" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.app.toggleSettingsItem('export')}" onclick="window.app.toggleSettingsItem('export')">
           <div class="flex items-center gap-2 text-xs font-medium text-zinc-900">
             ${getIcon("download", "w-4 h-4 text-zinc-500")}
             <span>Domaines & Export</span>
@@ -1646,7 +1646,7 @@ function renderSettingsAccordions(project, state = {}) {
 
       <!-- 7. SEO & Google Ads -->
       <div class="section-card">
-        <div class="section-card-header" onclick="window.app.toggleSettingsItem('seo')">
+        <div class="section-card-header" role="button" tabindex="0" aria-expanded="${isOpen('seo') ? 'true' : 'false'}" aria-controls="settings-body-seo" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.app.toggleSettingsItem('seo')}" onclick="window.app.toggleSettingsItem('seo')">
           <div class="flex items-center gap-2 text-xs font-medium text-zinc-900">
             ${getIcon("badgeCheck", "w-4 h-4 text-zinc-500")}
             <span>Google & Référencement local</span>
@@ -1707,7 +1707,7 @@ function renderSettingsAccordions(project, state = {}) {
 
       <!-- 9. Navigation & Mode Multi-Pages (MVP Feature 7) -->
       <div class="section-card">
-        <div class="section-card-header" onclick="window.app.toggleSettingsItem('navigation')">
+        <div class="section-card-header" role="button" tabindex="0" aria-expanded="${isOpen('navigation') ? 'true' : 'false'}" aria-controls="settings-body-navigation" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.app.toggleSettingsItem('navigation')}" onclick="window.app.toggleSettingsItem('navigation')">
           <div class="flex items-center gap-2 text-xs font-medium text-zinc-900">
             ${getIcon("compass", "w-4 h-4 text-zinc-500")}
             <span>Navigation & Mode Multi-Pages</span>
@@ -1737,7 +1737,7 @@ function renderSettingsAccordions(project, state = {}) {
 
       <!-- 10. Preuve Sociale en Direct (MVP Feature 2) -->
       <div class="section-card">
-        <div class="section-card-header" onclick="window.app.toggleSettingsItem('socialProof')">
+        <div class="section-card-header" role="button" tabindex="0" aria-expanded="${isOpen('socialProof') ? 'true' : 'false'}" aria-controls="settings-body-socialProof" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.app.toggleSettingsItem('socialProof')}" onclick="window.app.toggleSettingsItem('socialProof')">
           <div class="flex items-center gap-2 text-xs font-medium text-zinc-900">
             ${getIcon("bell", "w-4 h-4 text-zinc-500")}
             <span>Preuve Sociale (Notifications Leads)</span>
@@ -1761,7 +1761,7 @@ function renderSettingsAccordions(project, state = {}) {
 
       <!-- 11. Protection & PIN Démo Client (MVP Feature 10) -->
       <div class="section-card">
-        <div class="section-card-header" onclick="window.app.toggleSettingsItem('pinLock')">
+        <div class="section-card-header" role="button" tabindex="0" aria-expanded="${isOpen('pinLock') ? 'true' : 'false'}" aria-controls="settings-body-pinLock" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.app.toggleSettingsItem('pinLock')}" onclick="window.app.toggleSettingsItem('pinLock')">
           <div class="flex items-center gap-2 text-xs font-medium text-zinc-900">
             ${getIcon("lock", "w-4 h-4 text-zinc-500")}
             <span>Protection Démo Client (Anti-modification)</span>

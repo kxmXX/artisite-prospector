@@ -1700,3 +1700,11 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Mesure sur un projet de reference : zero doublon dans hero, header et services (contre 1 et 12 avant).
 - Tests : 393 → 395, dont un test qui parcourt toutes les sections et refuse tout libelle en double.
 - Reste : PRODUCT.md/DESIGN.md, geste de deplacement (validation utilisateur), puis 4d, 3b, 7, export 2d.
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.48 (lot 4d clos, reglages accessibles)
+
+- Verification en fermant 4d : les dix groupes de reglages globaux sont deja des accordeons (business, favicon, colors, typography, buttons, export, seo, navigation, socialProof, pinLock), mais leurs en-tetes etaient des div onclick — ni focusables, ni annonces, sans etat.
+- Correctif : role=button, tabindex=0, aria-controls, aria-expanded calcule a l'ouverture, et reponse a Entree et Espace sur les dix en-tetes. Type d'element et mise en page inchanges. toggleSettingsItem met aria-expanded a jour.
+- Lot 4d clos : animation de section (alpha.29), reglages d'element (alpha.40), dix accordeons globaux (alpha.48). Le groupe Mise en page de section n'en a pas besoin.
+- Tests : 395/395, un test nouveau sur l'accessibilite des en-tetes.
+- Reste : lot 3b (source de selection unique, arbre des elements, 830 lignes inertes), lot 7, export 2d, PRODUCT.md/DESIGN.md, geste de deplacement (validation utilisateur).
