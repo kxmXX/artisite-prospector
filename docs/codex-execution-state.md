@@ -1437,3 +1437,27 @@ Erreur de manipulation : mon premier script de remplacement a été rejeté par 
 dans une chaîne ; corrigé en utilisant l'apostrophe typographique, plus correcte en français.
 
 Vérifications : 340/340 tests. Non vérifié : l'apparence à l'écran, comme depuis le lot 4b.
+
+---
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.22 (lot 7a/9)
+
+Catalogue d'animations unique, première moitié du chantier « mouvement » : le modèle, sans branchement.
+
+L'audit relevait six catalogues parallèles (10, 7, 5, 6, 6, 6 entrées) et des noms divergents pour
+les mêmes effets. motionPresets.js devient la source unique : 14 animations avec nom français,
+description de ce qu'elles font, nature (entrance / attention / loop), durée et courbe ; plus
+MOTION_REPEAT (une fois, deux fois, trois fois, en continu) et MOTION_TRIGGERS (apparition,
+chargement, survol, clic).
+
+Un test vérifie qu'aucune des trois surfaces principales ne redéclare un catalogue local — c'est la
+garantie structurelle que la divergence ne pourra pas se réinstaller.
+
+Erreur de test corrigée pendant le lot : ma première assertion sur les noms français rejetait
+« Zoom avant » parce qu'il commence par un mot anglais. Remplacée par une liste explicite des noms
+anglais interdits, plus juste et sans faux positif.
+
+Vérifications : tests/motion_presets.test.js (6 tests) ; 346/346 tests complets.
+
+Reste (7b) : brancher les surfaces, exposer durée, délai, courbe et direction, et les actions
+tester / rejouer / arrêter / réinitialiser. Le catalogue existe mais n'est pas encore utilisé.

@@ -7,6 +7,29 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.22) — Lot 7a : catalogue d'animations unique
+
+- **Cause racine traitée** : l'audit relevait **six surfaces d'animation avec six catalogues
+  différents** (10, 7, 5, 6, 6 et 6 entrées) et les mêmes effets portant des noms distincts selon
+  l'endroit — « Fade » ici, « Fondu » là. `public/js/data/motionPresets.js` devient la **source
+  unique** : quatorze animations décrites par un nom français, ce qu'elles font, et leur nature
+  (apparition, attention, continu).
+- **Les mots de l'auteur, pas ceux du code** : « Apparition en fondu », « Montée douce », « Rebond »,
+  « Rideau », « Cascade », « Magnétique », « Pulsation », « Reflet », « Barre qui se remplit ». Un test
+  interdit qu'un nom anglais brut revienne s'afficher.
+- **La répétition devient explicite**, comme le demandait la mission : *Une fois · Deux fois ·
+  Trois fois · En continu*, avec l'avertissement que le continu ne s'arrête jamais et doit rester
+  réservé aux éléments décoratifs. Les **déclencheurs** sont posés : à l'apparition, au chargement,
+  au survol, au clic.
+- **Replis sûrs** : un identifiant inconnu (projet ancien) retombe sur « Aucune » ou s'affiche tel
+  quel, plutôt que de disparaître silencieusement.
+- **QA** : `tests/motion_presets.test.js` (6 tests) — unicité, absence de doublon, noms lisibles,
+  nature explicite, répétition et déclencheurs, replis, et vérification qu'aucune surface ne
+  redéclare son propre catalogue. **346/346 tests**.
+- **Ce qui reste (7b)** : brancher les six surfaces sur ce catalogue, exposer durée, délai, courbe et
+  direction, et ajouter les actions tester / rejouer / arrêter / réinitialiser. En l'état, le
+  catalogue existe et les surfaces **ne l'utilisent pas encore** : rien ne change pour l'auteur.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.21) — Wording humain dans le chrome
 
 - **23 formulations techniques remplacées par du français lisible**, comme le demandait la mission
