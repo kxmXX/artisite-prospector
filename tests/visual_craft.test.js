@@ -65,3 +65,13 @@ test('les derniers glyphes du chrome et du rendu passent par les icones', async 
   assert.ok(!read('public/js/components/renderer.js').includes('>▶</span>'), 'plus de triangle de lecture en glyphe');
   assert.ok(!read('public/js/components/inspector.js').includes('▶ Tester'), 'plus de triangle dans le bouton de test');
 });
+
+test('changer de section rafraichit le panneau de proprietes', () => {
+  const app = read('public/js/app.js');
+  const start = app.indexOf('selectSection(sectionId, options = {}) {');
+  assert.ok(start > 0, 'selectSection doit exister');
+  const end = app.indexOf('\n  }', start);
+  const body = app.slice(start, end);
+  assert.ok(body.includes('this.updateSelectedSectionUI();'), 'le panneau doit suivre la section choisie');
+  assert.ok(!body.includes('if (alreadySelected)'), 'l ancienne condition ne doit pas revenir');
+});

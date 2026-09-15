@@ -120,6 +120,11 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
       du tableau de bord supprimés ; tous les glyphes du chrome et du rendu remplacés par le système
       d'icônes (statuts, sélection freeform, bouton de lecture, étapes de l'assistant). *Reste* :
       unification du vocabulaire de boutons, vérification mobile.
+- [ ] **Panneau de propriétés inatteignable à 1280 px** (relevé en `4.9.0-alpha.36`) : à cette largeur il
+      devient une surtoile masquée jusqu'à la classe `is-responsive-open`, et je n'ai pas réussi à le faire
+      apparaître via la flèche « Inspecter ». Le rafraîchissement au changement de section est corrigé, mais
+      **l'accessibilité du panneau elle-même reste à prouver**. Conséquence : réglages de section, d'élément
+      et champs de position non vérifiés à l'écran.
 - [ ] **Lot 6 — Positionnement, entamé** (`4.9.0-alpha.35`) : champs numériques X / Y / Largeur / Hauteur /
       Rotation branchés sur l'inspecteur, avec bornes, « flux par défaut » tenu (aucune règle CSS sans
       valeur saisie) et retour au flux. *Reste* : position libre en option explicite, boîtes de sélection

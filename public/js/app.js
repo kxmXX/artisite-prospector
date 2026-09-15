@@ -1580,9 +1580,11 @@ export class App {
 
   // Actions on Sections
   selectSection(sectionId, options = {}) {
-    const alreadySelected = state.selectedSectionId === sectionId;
     state.setSelectedSection(sectionId);
-    if (alreadySelected) this.updateSelectedSectionUI();
+    // Le panneau de proprietes doit suivre la section choisie, qu'elle ait change ou
+    // non. L'ancienne condition ne le rafraichissait qu'au second clic sur la meme
+    // section : le panneau affichait donc les proprietes de la section precedente.
+    this.updateSelectedSectionUI();
     if (options.scroll) {
       this.scrollToSection(sectionId);
     }

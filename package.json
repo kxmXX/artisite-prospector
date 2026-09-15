@@ -1,6 +1,6 @@
 {
   "name": "artisite-prospector",
-  "version": "4.9.0-alpha.35",
+  "version": "4.9.0-alpha.36",
   "type": "module",
   "scripts": {
     "start": "node server.js",

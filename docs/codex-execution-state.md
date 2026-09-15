@@ -1599,3 +1599,11 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Vérification : par test (8 nouveaux) et non par capture. La sélection libre demande un geste de glisser que l'outillage navigateur ne fournit pas ; le chemin par clic n'a pas été confirmé à l'écran. À reprendre au prochain tour, éventuellement en exposant la sélection libre par un bouton plutôt que par un geste.
 - Tests : 374 → 382. `node --check` sur les trois fichiers touchés, `scripts/build-utilities.mjs` relancé.
 - Reste : position libre explicite, boîtes de sélection unifiées, gestes par appareil ; puis 3b, 4d, 7, export. 3 tours de budget.
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.36 (panneau de propriétés : bug corrigé, accessibilité non prouvée)
+
+- Bug certain trouvé en lisant le code : `selectSection` ne rafraîchissait le panneau de propriétés qu'au second clic sur la même section ; il affichait donc les propriétés de la section précédente. Corrigé (rafraîchissement inconditionnel) et couvert par un test.
+- Enquête navigateur : à 1280 px, `.studio-v3-inspector-panel` passe en surtoile (`@media (max-width:1280px)`) avec `transform: translateX(calc(100% + 24px))`, `opacity: 0`, `pointer-events: none`, et ne s'affiche qu'avec `is-responsive-open`. Après correctif et rechargement complet, la flèche « Inspecter » n'a pas fait apparaître le panneau : `handleSectionNavigation` ne passe vraisemblablement pas par `selectSection`.
+- Conséquence assumée : les réglages de section (lots 4a/4b), les états (5a/5b), les styles d'élément (4c) et les champs de position (6) sont **test-verifiés mais pas vérifiés à l'écran**, et possiblement inatteignables à 1280 px.
+- Tests : 382 → 383. `node --check` sur app.js, `scripts/build-utilities.mjs` relancé.
+- Reste, par ordre d'importance : rendre le panneau réellement accessible (`handleSectionNavigation` ou un bouton explicite), puis lot 3b (sélection unique), 4d, 7, export. 2 tours de budget.

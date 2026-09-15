@@ -7,6 +7,14 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.36) — Le panneau de propriétés suivait la mauvaise section
+
+- Bug certain, trouvé en lisant le code après une capture : `selectSection` ne rafraîchissait le panneau de propriétés que si la section était **déjà** sélectionnée (`if (alreadySelected) this.updateSelectedSectionUI()`). Changer de section laissait donc le panneau afficher les propriétés de la section précédente ; il fallait cliquer deux fois pour voir les bonnes.
+- Correctif : le panneau est rafraîchi à chaque sélection, sans condition. Un test empêche le retour de l'ancienne condition.
+- Découverte non résolue, documentée telle quelle : à 1280 px, le panneau de propriétés devient une **surtoile** (`.studio-v3-inspector-panel` en `@media (max-width:1280px)` : `transform: translateX(100% + 24px)`, `opacity: 0`, `pointer-events: none`) qui n'apparaît qu'avec la classe `is-responsive-open`. Malgré le correctif ci-dessus et un rechargement complet du navigateur, je n'ai pas réussi à la faire apparaître en cliquant la flèche « Inspecter » d'une section. Conséquence : **toute la surface de propriétés (sections, éléments, position) reste non vérifiée à l'écran** et peut être inatteignable à cette largeur.
+- Tests : 1 nouveau ; 382 → **383/383**.
+- Vérification : le correctif est démontré par lecture et par test, pas par capture — je n'ai pas pu rendre le panneau visible.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.35) — Lot 6 entamé : position et taille en nombres
 
 - Fait : nouveau module `public/js/engine/elementTransform.js` — lecture, écriture et retrait des valeurs `x`, `y`, largeur, hauteur et rotation d'un élément, **palier par palier** (desktop / tablette / mobile), avec bornes (une largeur ne peut pas être nulle, la rotation reste dans ±180°).
