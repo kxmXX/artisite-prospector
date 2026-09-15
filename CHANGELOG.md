@@ -7,6 +7,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 15 septembre 2026 (4.8.0-alpha.16)
+
+- Images éditeur : les actions Remplacer / drop / suppression des images imbriquées utilisent désormais le chemin réel du contenu et conservent Undo.
+- Modales V3 : hauteur maximale bornée au viewport et scroll interne pour éviter les headers/footers hors écran sur laptop.
+- Accessibilité : focus initial explicite pour Wizard, Closer, Share, Command Palette, Ajouter et Image, avec fermeture Escape conservée.
+- Validation : navigateur 1440×900, 1024×800 et 390×844 ; tests V3 ciblés et suite complète exécutés avant publication.
+
 ### Consolidation — 15 septembre 2026 (4.8.0-alpha.15)
 
 - Éditeur V3 : la sélection de section synchronise désormais la ligne Structure, le canvas et l’inspecteur depuis un état unique.

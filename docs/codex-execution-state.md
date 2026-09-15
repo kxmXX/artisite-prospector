@@ -1,5 +1,13 @@
 # État de reprise Codex — 15 septembre 2026
 
+## LOT DE LIVRAISON — images et modales V3 4.8.0-alpha.16
+
+- Images imbriquées : le helper d’image utilise désormais le chemin de donnée réel pour ouvrir, déposer et supprimer (`services.N.image`, `items.N.image`) au lieu du champ générique `image`; application et Undo vérifiés en navigateur.
+- Modales : la surface V3 est bornée à `100vh - 32px`, les corps Image/Share/Closer scrollent dans leur propre zone et ne repoussent plus header/footer hors écran.
+- Focus : Wizard, Closer, Share, Command Palette, Ajouter et Image reçoivent un focus initial déterministe ; Escape ferme les surfaces.
+- Validation navigateur : 1440×900, 1024×800 et 390×844, surfaces dans le viewport, aucun message console.
+- Nouveau cap demandé : éditeur libre type Canva/Figma. Prochaine action bornée : modèle de layout persistant + sélection universelle + déplacement/redimensionnement initial, puis commit séparé avant multi-sélection/groupes.
+
 ## LOT DE LIVRAISON — interactions V3 4.8.0-alpha.15
 
 - Sélection : `section_selected` synchronise désormais canvas, lignes `.studio-v3-sectionrow`, contexte de scène et contenu de l’inspecteur sans détruire son shell.

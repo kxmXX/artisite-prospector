@@ -238,6 +238,12 @@ export class App {
       document.body.appendChild(modalContainer);
     }
 
+    const drawer = state.activeDrawer || null;
+    const previousDrawer = this._lastRenderedDrawer || null;
+    if (drawer && !previousDrawer) {
+      this._modalReturnFocus = document.activeElement || null;
+    }
+
     if (state.activeDrawer === "new_project") {
       modalContainer.innerHTML = renderWizardModal();
     } else if (state.activeDrawer === "closer") {
@@ -262,6 +268,37 @@ export class App {
       canvaDock.style.display = state.activeDrawer ? "none" : "";
     }
     document.body.classList.toggle("modal-open", Boolean(state.activeDrawer));
+
+    const focusSelectors = {
+      new_project: "#wiz-name",
+      closer: "#tab-closer-script",
+      share_modal: "#share-modal-url-input",
+      command_palette: "#cmd-palette-input",
+      add_section: "#catalog-search",
+      image_modal: "#tab-img-library"
+    };
+    if (drawer) {
+      const focusModal = () => {
+        const preferred = document.querySelector(focusSelectors[drawer] || "");
+        const fallback = modalContainer.querySelector?.("input:not([type='hidden']), textarea, select, button, [href], [tabindex]:not([tabindex='-1'])");
+        const target = preferred || fallback;
+        if (target && !target.disabled && typeof target.focus === "function") {
+          try { target.focus({ preventScroll: true }); } catch { target.focus(); }
+        }
+      };
+      if (typeof window !== "undefined" && typeof window.requestAnimationFrame === "function") {
+        window.requestAnimationFrame(focusModal);
+      } else {
+        setTimeout(focusModal, 0);
+      }
+    } else if (previousDrawer) {
+      const returnTarget = this._modalReturnFocus;
+      this._modalReturnFocus = null;
+      if (returnTarget?.isConnected && typeof returnTarget.focus === "function") {
+        try { returnTarget.focus({ preventScroll: true }); } catch { returnTarget.focus(); }
+      }
+    }
+    this._lastRenderedDrawer = drawer;
   }
 
   // Navigation methods

@@ -520,7 +520,7 @@
 
 /* ---------- system surfaces V3 ---------- */
 .studio-system-modal{background:rgba(20,27,25,.32)!important;backdrop-filter:blur(18px) saturate(.9)!important}
-.studio-v3-modal{background:#f6f4ee!important;color:#1e2725!important;border:1px solid rgba(24,32,31,.10)!important;border-radius:24px!important;box-shadow:0 30px 90px rgba(18,25,23,.24)!important}
+.studio-v3-modal{background:#f6f4ee!important;color:#1e2725!important;border:1px solid rgba(24,32,31,.10)!important;border-radius:24px!important;box-shadow:0 30px 90px rgba(18,25,23,.24)!important;max-height:calc(100vh - 32px)!important;min-height:0!important;overflow:hidden!important}
 .studio-v3-modal input:not([type=range]):not([type=color]),.studio-v3-modal textarea,.studio-v3-modal select{background:#fff!important;border-color:rgba(24,32,31,.12)!important;color:#202826!important;box-shadow:none!important}
 .studio-v3-modal .bg-white,.studio-v3-modal .bg-zinc-50,.studio-v3-modal .bg-zinc-100{background:#f1efe9!important}
 .studio-v3-modal .border-zinc-100,.studio-v3-modal .border-zinc-200,.studio-v3-modal .border-zinc-300{border-color:rgba(24,32,31,.10)!important}
@@ -543,7 +543,7 @@
 .studio-v3-share>div:nth-child(2),.studio-v3-image>div:nth-child(2){grid-column:1!important;grid-row:2!important;display:flex!important;flex-direction:column!important;gap:4px!important;padding:14px 10px!important;border-right:1px solid rgba(24,32,31,.09)!important;border-bottom:0!important;background:#eceae4!important;overflow:auto!important}
 .studio-v3-share>div:nth-child(2)>button,.studio-v3-image>div:nth-child(2)>button{width:100%!important;text-align:left!important;border:0!important;border-radius:10px!important;padding:10px 11px!important;background:transparent!important;color:#69736f!important}
 .studio-v3-share>div:nth-child(2)>button[class*='border-zinc-900'],.studio-v3-image>div:nth-child(2)>button[class*='bg-white']{background:#1b2422!important;color:#fff!important}
-.studio-v3-share>div:nth-child(3),.studio-v3-image>div:nth-child(3){grid-column:2!important;grid-row:2!important;min-width:0!important;padding:22px 24px!important;background:#f6f4ee!important}
+.studio-v3-share>div:nth-child(3),.studio-v3-image>div:nth-child(3){grid-column:2!important;grid-row:2!important;min-width:0!important;min-height:0!important;overflow-y:auto!important;padding:22px 24px!important;background:#f6f4ee!important}
 .studio-v3-share>div:last-child,.studio-v3-image>div:last-child{grid-column:1/-1!important;background:#efede7!important}
 
 .studio-v3-closer{max-width:1180px!important;display:grid!important;grid-template-columns:210px minmax(0,1fr)!important;grid-template-rows:auto minmax(0,1fr) auto!important}
@@ -551,7 +551,7 @@
 .studio-v3-closer>.studio-modal-tabs{grid-column:1!important;grid-row:2!important;display:flex!important;flex-direction:column!important;gap:5px!important;padding:14px 10px!important;border-right:1px solid rgba(24,32,31,.10)!important;border-bottom:0!important;background:#eceae4!important;overflow:auto!important}
 .studio-v3-closer>.studio-modal-tabs>button{width:100%!important;text-align:left!important;border:0!important;border-radius:10px!important;padding:10px 11px!important;background:transparent!important;color:#6e7874!important;box-shadow:none!important}
 .studio-v3-closer>.studio-modal-tabs>button.bg-white{background:#1b2422!important;color:#fff!important}
-.studio-v3-closer>div:nth-child(3){grid-column:2!important;grid-row:2!important;min-width:0!important;padding:22px 24px!important;background:#f6f4ee!important}
+.studio-v3-closer>div:nth-child(3){grid-column:2!important;grid-row:2!important;min-width:0!important;min-height:0!important;overflow-y:auto!important;padding:22px 24px!important;background:#f6f4ee!important}
 .studio-v3-closer>div:last-child{grid-column:1/-1!important;background:#efede7!important}
 .studio-v3-closer #closer-panel-script>div,.studio-v3-closer #closer-panel-objections>div>div,.studio-v3-closer #closer-panel-contract>div,.studio-v3-closer #closer-panel-roi>div{border-radius:14px!important;box-shadow:none!important}
 

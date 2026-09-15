@@ -153,12 +153,12 @@ export function renderEditableImage(url, { sectionId = "", fieldPath = "", targe
          ${imageTargetId ? `data-ui-id="${imageTargetId}" data-ui-code="${imageUiCode}" data-ui-type="field" data-ui-target="true" data-ui-index="${imageElementIndex}" data-ui-index-size="m"` : ''}
          ondragover="event.preventDefault(); this.classList.add('ring-2', 'ring-zinc-900');"
          ondragleave="this.classList.remove('ring-2', 'ring-zinc-900');"
-         ondrop="event.preventDefault(); this.classList.remove('ring-2', 'ring-zinc-900'); window.app.handleImageElementDrop(event, '${sectionId}', '${fieldPath}', ${indexParam});">
+         ondrop="event.preventDefault(); this.classList.remove('ring-2', 'ring-zinc-900'); window.app.handleImageElementDrop(event, '${sectionId}', '${uiFieldPath}', ${indexParam});">
       <img src="${displayUrl}" data-fallback-src="${fallbackSvg}" alt="${alt}" class="${className}${motionClass}" ${perfAttrs} ${onErrorAttr}${motionAttr}>
 
       <div class="absolute inset-0 bg-zinc-950/60 backdrop-blur-[2px] opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center gap-2 z-20 pointer-events-auto p-2">
         <button type="button"
-                onclick="event.stopPropagation(); window.app.openImagePicker('${sectionId}', '${fieldPath}', ${indexParam})"
+                onclick="event.stopPropagation(); window.app.openImagePicker('${sectionId}', '${uiFieldPath}', ${indexParam})"
                 class="btn-keycap btn-keycap-light px-2.5 py-1.5 text-zinc-900 rounded-lg text-xs font-medium shadow-xs flex items-center gap-1.5 transition-all"
                 title="Modifier / Remplacer cette image">
           ${getIcon("eye", "w-3.5 h-3.5 text-zinc-700")}
@@ -195,7 +195,7 @@ export function renderEditableImage(url, { sectionId = "", fieldPath = "", targe
           </div>
         </div>
         <button type="button"
-                onclick="event.stopPropagation(); window.app.deletePhoto('${sectionId}', '${fieldPath}', ${indexParam})"
+                onclick="event.stopPropagation(); window.app.deletePhoto('${sectionId}', '${uiFieldPath}', ${indexParam})"
                 class="btn-keycap btn-keycap-danger p-1.5 text-white rounded-lg text-xs font-medium shadow-xs flex items-center justify-center transition-all"
                 title="Supprimer la photo (Poubelle 🗑️)">
           ${getIcon("trash", "w-4 h-4")}

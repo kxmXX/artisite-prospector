@@ -108,3 +108,22 @@ test('V3 inspector becomes a responsive editing drawer below desktop width', () 
   assert.ok(appSource.includes('window.matchMedia?.("(max-width: 1280px)").matches'));
   assert.ok(appSource.includes('rightInspector.classList.add("is-responsive-open")'));
 });
+
+test('V3 nested image actions target the real service and realisation fields', () => {
+  const project = generateDemoSite({ name: 'Esprit Nature', tradeId: 'paysagiste', city: 'Montauban' });
+  const html = renderWebsiteHTML(project, { isEditor: true, isStandalone: false });
+  assert.ok(html.includes("openImagePicker('sec-services', 'services.0.image'"));
+  assert.ok(html.includes("handleImageElementDrop(event, 'sec-services', 'services.0.image'"));
+  assert.ok(html.includes("deletePhoto('sec-services', 'services.0.image'"));
+  assert.ok(html.includes("openImagePicker('sec-realisations', 'items.0.image'"));
+});
+
+test('V3 modals stay viewport-bounded and receive a deliberate initial focus', () => {
+  const appSource = fs.readFileSync(path.resolve(process.cwd(), 'public/js/app.js'), 'utf8');
+  assert.ok(css.includes('max-height:calc(100vh - 32px)!important'));
+  assert.ok(css.includes('min-height:0!important;overflow-y:auto!important'));
+  assert.ok(appSource.includes('new_project: "#wiz-name"'));
+  assert.ok(appSource.includes('image_modal: "#tab-img-library"'));
+  assert.ok(appSource.includes('share_modal: "#share-modal-url-input"'));
+  assert.ok(appSource.includes('this._modalReturnFocus = document.activeElement || null'));
+});

@@ -67,8 +67,23 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - [x] P1 — Actions de structure : cibles critiques portées à 32 px minimum.
 - [x] P0 — Contrôles de contenu accessibles à 1280/1024/mobile via un inspecteur responsive V3 ; sélection d’une section ouvre la surface et mobile ferme le panneau Structure concurrent.
 - [x] P0/P1 — Sélection, visibilité, drag-and-drop souris, réordre clavier, édition texte, Assistant et Undo rejoués dans la V3.
-- [ ] P0/P1 — Rejouer le sélecteur d’images et les contrôles CTA/popovers, puis leurs chemins Undo.
-- [ ] P1 — Auditer modales, focus, scroll et responsive dashboard après stabilisation des fonctions d’édition.
+- [x] P0/P1 — Image picker : les actions imbriquées Services/Réalisations ciblent le vrai chemin (`services.N.image` / `items.N.image`) ; application URL + Undo rejoués en navigateur. CTA/popover desktop : ouverture, suppression et Undo validés.
+- [x] P1 — Modales V3 : hauteur bornée au viewport, scroll interne, focus initial explicite, Escape et retour de fermeture validés à 1440/1024/390 sur Image/Share/Ajouter/Commande/Wizard/Closer.
+- [ ] P1 — Auditer le dashboard responsive hors modales et les derniers chemins tactiles CTA/mobile.
+
+
+## Édition libre Canva / Figma — nouveau cap produit
+
+- [ ] Fondation — définir un modèle de layout libre persistant par élément stable (`#E…`) sans casser le HTML sémantique, le responsive, l’Undo/Redo ni l’export.
+- [ ] Sélection universelle — cliquer n’importe quel texte, image, CTA ou bloc éditable affiche un cadre de sélection unique avec poignées, coordonnées et dimensions.
+- [ ] Déplacement — drag Pointer Events au pixel, clavier fléché accessible, contraintes à la section, guides et snapping ; aucune dépendance au drag HTML5 pour le canvas.
+- [ ] Redimensionnement — poignées côtés/coins, conservation optionnelle du ratio, dimensions min/max et aperçu direct pendant le geste.
+- [ ] Multi-sélection — Shift/cadre de sélection, déplacement et redimensionnement collectif.
+- [ ] Groupes — grouper/dégrouper des éléments, transformer le groupe sans perdre les transformations individuelles, ordre/z-index contrôlable.
+- [ ] Alignement — aligner gauche/centre/droite/haut/milieu/bas, distribuer horizontalement/verticalement et afficher guides intelligents.
+- [ ] Responsive — positions/dimensions par breakpoint desktop/tablette/mobile, reset/adaptation propre lorsqu’aucune surcharge n’existe.
+- [ ] Persistance & livraison — toutes les transformations passent par l’état projet, Undo/Redo, sauvegarde locale, preview et export standalone.
+- [ ] Robustesse — tests unitaires + navigateur pour texte/image/CTA/groupe, souris/tactile/clavier, sans collision avec inline editing, popovers ou modales.
 
 ## Stabilité async / backend — reprise après l’éditeur
 
@@ -102,4 +117,5 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - Lot `4.8.0-alpha.13` : déduplication `in-flight` exacte des générations IA ; 10/10 backend ciblés, 184/184 complets.
 - Lot `4.8.0-alpha.14` : premier correctif V3 post-`f49ec7f` — Réglages, previews appareil, collisions toolbar/dock, SVG et cibles de structure stabilisés ; audit navigateur 1440/390, 39/39 ciblés, 189/189 complets et `git diff --check`.
 - Lot `4.8.0-alpha.15` : sélection V3 synchronisée, inspecteur responsive sous 1280 px, drag/drop V3 rebranché sur les nouvelles lignes et édition de contenu vérifiée à 1280/1024/390 ; 27/27 ciblés, 191/191 complets.
-- Prochaine action unique : auditer image picker + CTA/popovers puis modales/focus/scroll/dashboard responsive avant de revenir au lot factuel IA.
+- Lot `4.8.0-alpha.16` : chemins d’images imbriquées corrigés, modales V3 bornées au viewport et focus d’ouverture fiabilisé ; validation navigateur 1440/1024/390.
+- Prochaine action unique : démarrer la fondation Canva/Figma — modèle de layout libre persistant + sélection universelle + premier déplacement/redimensionnement sur cibles stables, avant multi-sélection/groupes.
