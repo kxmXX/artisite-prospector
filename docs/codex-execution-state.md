@@ -1299,3 +1299,24 @@ Ce qui n'est PAS fait, et qu'il faut lever avant de considérer le lot 4 livré 
 Prochaine action recommandée : ouvrir l'éditeur dans un navigateur réel, sélectionner une section,
 vérifier que les trois rangées apparaissent dans l'inspecteur et qu'un changement de largeur modifie
 réellement le rendu et l'export ; puis rétablir le test d'intégration une fois la cause identifiée.
+
+---
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.16 (lot 4b vérifié)
+
+Le doute consigné au lot précédent est levé. Diagnostic : mon assertion cherchait
+data-section-layout="custom" dans toute la page rendue, or la feuille de style injectée contient
+elle-même ce sélecteur — quatre occurrences venaient du CSS, aucune du balisage. Le test compare
+désormais le balisage seul, après retrait des blocs <style>.
+
+Conséquence : le branchement du lot 4b est VÉRIFIÉ au niveau du rendu — une section personnalisée
+porte l'attribut et la variable dans l'aperçu comme dans le site autonome exporté, une démo non
+modifiée n'émet rien, et la feuille partagée est bien injectée pour les trois surfaces.
+
+Leçon de méthode, à garder : quand une assertion de rendu échoue, vérifier d'abord CE QU'ELLE ATTEINT
+VRAIMENT (balisage ou feuille de style) avant de suspecter le code. J'ai retiré un test valide et
+consigné un avertissement inutile parce que je n'ai pas fait ce contrôle tout de suite.
+
+Reste, honnêtement : l'inspecteur n'a pas pu être observé à l'écran (hors champ des captures à
+1280 px, pas de redimensionnement ni de styles calculés disponibles). Le modèle, le rendu, la parité
+et l'annulation sont prouvés par test ; l'apparence des trois rangées de contrôles ne l'est pas.

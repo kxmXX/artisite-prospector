@@ -52,3 +52,32 @@ test('les identifiants de section sont valides avant usage', () => {
   assert.equal(section.isValidSectionId('<script>'), false);
   assert.equal(section.isValidSectionId(null), false);
 });
+
+const { renderWebsiteHTML } = await import('../public/js/components/renderer.js');
+const { exportStandaloneHTML } = await import('../public/js/engine/exporter.js');
+const { SAMPLE_PROJECTS } = await import('../public/js/data/sampleProjects.js');
+
+// Les feuilles de style injectées contiennent elles aussi le sélecteur
+// [data-section-layout="custom"] : on les retire avant de conclure quoi que ce soit
+// sur le balisage. C'est l'erreur qui avait fait échouer la première version du test.
+const markupOnly = (html) => html.replace(/<style[\s\S]*?<\/style>/g, '');
+
+test('le rendu partage applique la mise en page sans toucher aux sections par defaut', () => {
+  const base = JSON.parse(JSON.stringify(SAMPLE_PROJECTS[0]));
+  const plain = markupOnly(renderWebsiteHTML(base, { isEditor: false, isStandalone: false }));
+  assert.ok(!plain.includes('data-section-layout="custom"'),
+    'aucune section personnalisee : le balisage doit rester identique');
+  assert.ok(renderWebsiteHTML(base, { isEditor: false, isStandalone: false }).includes('<style data-section-layout>'),
+    'la feuille partagee doit etre injectee pour les trois surfaces');
+
+  const custom = JSON.parse(JSON.stringify(SAMPLE_PROJECTS[0]));
+  custom.sections[0] = section.setSectionLayout(custom.sections[0], { width: 'narrow', spacing: 'airy' });
+  const rendered = renderWebsiteHTML(custom, { isEditor: false, isStandalone: false });
+  assert.ok(markupOnly(rendered).includes('data-section-layout="custom"'), 'la section personnalisee est marquee');
+  assert.match(rendered, /--section-max: 56rem/, 'la largeur passe en variable CSS');
+
+  const exported = exportStandaloneHTML(custom);
+  assert.ok(markupOnly(exported).includes('data-section-layout="custom"'),
+    'le site autonome recoit le meme marquage, donc le meme rendu');
+  assert.match(exported, /--section-max: 56rem/);
+});

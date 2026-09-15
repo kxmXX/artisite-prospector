@@ -7,6 +7,20 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.16) — Lot 4b vérifié
+
+- **Le doute du lot précédent est levé, et l'erreur était dans mon test, pas dans le code.** L'assertion
+  « le rendu partagé n'applique rien par défaut » échouait parce qu'elle cherchait
+  `data-section-layout="custom"` dans **toute** la page : or la feuille de style injectée contient
+  elle-même ce sélecteur. Le test compare désormais le **balisage seul**, feuilles retirées.
+- **Preuve rétablie et exécutée** : une section personnalisée porte bien `data-section-layout="custom"`
+  et `--section-max: 56rem` dans l'aperçu **et** dans le site autonome exporté ; une démo non modifiée
+  n'émet aucun marquage, et la feuille partagée est injectée pour les trois surfaces.
+- **QA** : `tests/section_layout.test.js` passe de 6 à 7 tests. **331/331 tests**.
+- *Reste sur ce lot* : la seule chose que je n'ai pas pu faire est de **regarder** l'inspecteur à
+  l'écran (il est hors du champ de mes captures à 1280 px). Le modèle, le branchement du rendu, la
+  parité éditeur/aperçu/export et l'application annulable sont, eux, prouvés par test.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.15) — Lot 4b : réglages de section branchés
 
 - **Renderer** : les deux réglages sont posés sur l'élément `<section>` (variables CSS et attribut
