@@ -1,3 +1,11 @@
+## LOT DE LIVRAISON — garde-fous API IA 4.8.0-alpha.39 — 15 septembre 2026
+
+- CORS : suppression de `Access-Control-Allow-Origin: *`. La production connue, localhost, l’hôte effectivement servi et les origines explicites `ALLOWED_ORIGINS` sont acceptés ; les autres origines reçoivent 403 sans en-tête permissif.
+- Débit : `/api/ai/generate`, `/api/ai/copilot` et `/api/ai/image` consomment un budget par IP, configurable par `AI_RATE_LIMIT_MAX` et `AI_RATE_LIMIT_WINDOW_MS`, avec métadonnées RateLimit et réponse 429.
+- Limite connue : compteur mémoire adapté à l’instance Node/Vercel courante ; une coordination globale multi-instance nécessiterait un store partagé, explicitement hors périmètre de cette mission.
+- Tests : 16/16 ciblés verts sur CORS, corps de requête, cache et appels IA ; 240/240 tests complets verts.
+- Prochaine action exacte : lot léger wizard `label/for` + déduplication de fontes, puis progression IA réseau. Les faux avis Google restent inchangés.
+
 ## LOT DE LIVRAISON — PIN de démo honnête 4.8.0-alpha.38 — 15 septembre 2026
 
 - Validation : le PIN doit être explicitement saisi et contenir 4 à 6 chiffres ; l’absence de code ne retombe plus sur `1234` et ne peut jamais déverrouiller une démo.

@@ -49,7 +49,14 @@ function extractImageUrl(data) {
 // preventing duplicate model calls during bursts without weakening context isolation.
 const aiResponseCache = new Map();
 const aiGenerationInFlight = new Map();
+const aiRateLimits = new Map();
 const CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes TTL
+const DEFAULT_ALLOWED_ORIGINS = new Set([
+  "https://artisite-prospector.vercel.app",
+  "http://localhost:5173",
+  "http://127.0.0.1:5173"
+]);
+const RATE_LIMITED_AI_PATHS = new Set(["/api/ai/generate", "/api/ai/copilot", "/api/ai/image"]);
 
 export function getCachedAiResult(cacheKey) {
   const entry = aiResponseCache.get(cacheKey);
@@ -73,6 +80,65 @@ export function setCachedAiResult(cacheKey, data, ttlMs = CACHE_TTL_MS) {
 export function clearAiCache() {
   aiResponseCache.clear();
   aiGenerationInFlight.clear();
+}
+
+export function clearAiRateLimits() {
+  aiRateLimits.clear();
+}
+
+function allowedOrigins() {
+  const configured = String(process.env.ALLOWED_ORIGINS || "")
+    .split(",")
+    .map(origin => origin.trim())
+    .filter(Boolean);
+  return new Set([...DEFAULT_ALLOWED_ORIGINS, ...configured]);
+}
+
+export function isAllowedOrigin(req, origin) {
+  if (!origin) return true;
+  if (allowedOrigins().has(origin)) return true;
+  try {
+    const requestHost = String(req?.headers?.host || "").toLowerCase();
+    return requestHost !== "" && new URL(origin).host.toLowerCase() === requestHost;
+  } catch {
+    return false;
+  }
+}
+
+function applyCorsHeaders(req, res) {
+  const origin = req?.headers?.origin;
+  if (typeof res.setHeader === "function") {
+    res.setHeader("Vary", "Origin");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, If-None-Match, Accept");
+    if (origin) res.setHeader("Access-Control-Allow-Origin", origin);
+  }
+}
+
+function corsHeaders(req) {
+  const headers = {
+    "Vary": "Origin",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization, If-None-Match, Accept"
+  };
+  if (req?.headers?.origin) headers["Access-Control-Allow-Origin"] = req.headers.origin;
+  return headers;
+}
+
+function clientIp(req) {
+  const forwarded = req?.headers?.["x-forwarded-for"];
+  return String(forwarded || req?.headers?.["cf-connecting-ip"] || req?.headers?.["x-real-ip"] || req?.socket?.remoteAddress || "")
+    .split(",")[0]
+    .trim() || null;
+}
+
+export function consumeAiRateLimit(ip, { now = Date.now(), max = 20, windowMs = 60_000 } = {}) {
+  if (!ip) return { allowed: true, remaining: max, resetAt: now + windowMs };
+  let entry = aiRateLimits.get(ip);
+  if (!entry || now >= entry.resetAt) entry = { count: 0, resetAt: now + windowMs };
+  entry.count += 1;
+  aiRateLimits.set(ip, entry);
+  return { allowed: entry.count <= max, remaining: Math.max(0, max - entry.count), resetAt: entry.resetAt };
 }
 
 async function generateWithDeduplication(cacheKey, context) {
@@ -170,34 +236,28 @@ export async function readBodyJSON(req) {
 
 export function sendJSON(res, statusCode, data) {
   if (typeof res.status === "function" && typeof res.json === "function") {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, If-None-Match, Accept");
     return res.status(statusCode).json(data);
   }
   res.writeHead(statusCode, {
-    "Content-Type": "application/json; charset=utf-8",
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization, If-None-Match, Accept"
+    "Content-Type": "application/json; charset=utf-8"
   });
   res.end(JSON.stringify(data));
 }
 
 export async function handleApiRequest(req, res) {
+  const origin = req?.headers?.origin;
+  if (!isAllowedOrigin(req, origin)) {
+    sendJSON(res, 403, { error: "Origine non autorisée" });
+    return;
+  }
+  applyCorsHeaders(req, res);
+
   // CORS Preflight
   if (req.method === "OPTIONS") {
     if (typeof res.status === "function") {
-      res.setHeader("Access-Control-Allow-Origin", "*");
-      res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-      res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, If-None-Match, Accept");
       return res.status(204).end();
     }
-    res.writeHead(204, {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization, If-None-Match, Accept"
-    });
+    res.writeHead(204, corsHeaders(req));
     res.end();
     return;
   }
@@ -207,6 +267,21 @@ export async function handleApiRequest(req, res) {
   let normalizedPath = rawUrl;
   if (!normalizedPath.startsWith("/api/")) {
     normalizedPath = "/api/" + normalizedPath.replace(/^\/+/, "");
+  }
+
+  if (req.method === "POST" && RATE_LIMITED_AI_PATHS.has(normalizedPath)) {
+    const max = Math.max(1, Number(process.env.AI_RATE_LIMIT_MAX) || 20);
+    const windowMs = Math.max(1_000, Number(process.env.AI_RATE_LIMIT_WINDOW_MS) || 60_000);
+    const limit = consumeAiRateLimit(clientIp(req), { max, windowMs });
+    if (typeof res.setHeader === "function") {
+      res.setHeader("RateLimit-Limit", String(max));
+      res.setHeader("RateLimit-Remaining", String(limit.remaining));
+      res.setHeader("RateLimit-Reset", String(Math.ceil(limit.resetAt / 1000)));
+    }
+    if (!limit.allowed) {
+      sendJSON(res, 429, { error: "Trop de requêtes, réessayez plus tard" });
+      return;
+    }
   }
 
   try {

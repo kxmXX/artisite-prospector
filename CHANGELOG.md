@@ -7,6 +7,12 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 15 septembre 2026 (4.8.0-alpha.39)
+
+- API : les origines navigateur sont limitées à la production, au développement local, aux hôtes servis ou à la liste `ALLOWED_ORIGINS` ; le wildcard CORS global est supprimé.
+- Coûts IA : génération, copilote et image sont limités par IP avec budget/fenêtre configurables et réponse HTTP 429 explicite.
+- Exploitation : les réglages sont documentés dans `.env.example`. Validation : 16/16 tests serveur ciblés et 240/240 complets, origines autorisée/refusée et dépassement de quota compris.
+
 ### Consolidation — 15 septembre 2026 (4.8.0-alpha.38)
 
 - Démo client : suppression du code implicite `1234` ; seul un PIN explicitement configuré de 4 à 6 chiffres peut déverrouiller une présentation.

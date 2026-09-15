@@ -72,6 +72,12 @@ Cette section prévaut sur le tableau historique des lots 5–13 ci-dessous sans
 - Le verrou est présenté honnêtement comme une protection de la démo interne ; l’export statique n’est pas vendu comme confidentiel.
 - Prochaine étape : sécurisation réseau bornée des routes IA par CORS et limitation de débit, puis lots légers wizard/fontes/progression.
 
+### Lot protection des routes IA — 4.8.0-alpha.39
+
+- Le wildcard CORS est remplacé par une allowlist avec prise en charge sûre de l’hôte réellement servi et d’origines additionnelles configurables.
+- Les trois routes capables de consommer Gemini sont limitées par IP et répondent 429 après le budget configuré ; la limite mémoire et son besoin futur de stockage partagé sont documentés.
+- Prochaine étape bornée : accessibilité du wizard et fonte dupliquée, puis progression IA fidèle au réseau.
+
 ## État initial vérifié
 
 - Vanilla JS, serveur Node natif, aucune dépendance npm déclarée ; `npm test` : **136/136**.

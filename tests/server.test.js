@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { handleApiRequest } from "../server/apiHandler.js";
+import { handleApiRequest, clearAiRateLimits } from "../server/apiHandler.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -62,6 +62,9 @@ test("handleApiRequest handles /api/health, /api/ai/status and CORS preflight", 
 
   function createMockRes() {
     return {
+      setHeader(name, value) {
+        headers[name] = value;
+      },
       writeHead(code, h) {
         statusCode = code;
         headers = h;
@@ -86,11 +89,50 @@ test("handleApiRequest handles /api/health, /api/ai/status and CORS preflight", 
   assert.ok(Array.isArray(aiStatus.models));
 
   // 3. OPTIONS preflight
-  await handleApiRequest({ method: "OPTIONS", url: "/api/ai/generate" }, createMockRes());
+  await handleApiRequest({ method: "OPTIONS", url: "/api/ai/generate", headers: { origin: "http://localhost:5173", host: "localhost:5173" } }, createMockRes());
   assert.equal(statusCode, 204);
-  assert.equal(headers["Access-Control-Allow-Origin"], "*");
+  assert.equal(headers["Access-Control-Allow-Origin"], "http://localhost:5173");
 
-  // 4. Unknown endpoint
+  // 4. Cross-origin callers outside the allowlist are rejected.
+  headers = {};
+  await handleApiRequest({ method: "OPTIONS", url: "/api/ai/generate", headers: { origin: "https://attacker.example", host: "artisite-prospector.vercel.app" } }, createMockRes());
+  assert.equal(statusCode, 403);
+  assert.equal(headers["Access-Control-Allow-Origin"], undefined);
+
+  // 5. Unknown endpoint
   await handleApiRequest({ method: "GET", url: "/api/unknown" }, createMockRes());
   assert.equal(statusCode, 404);
+});
+
+test("AI endpoints return 429 after the configured per-IP budget", async t => {
+  const previousMax = process.env.AI_RATE_LIMIT_MAX;
+  process.env.AI_RATE_LIMIT_MAX = "2";
+  clearAiRateLimits();
+  t.after(() => {
+    if (previousMax === undefined) delete process.env.AI_RATE_LIMIT_MAX;
+    else process.env.AI_RATE_LIMIT_MAX = previousMax;
+    clearAiRateLimits();
+  });
+
+  const request = async () => {
+    let statusCode;
+    let body;
+    await handleApiRequest({
+      method: "POST",
+      url: "/api/ai/image",
+      headers: { "x-forwarded-for": "203.0.113.50" },
+      body: { prompt: "Jardin", tradeId: "paysagiste", sectionType: "hero" }
+    }, {
+      setHeader() {},
+      writeHead(code) { statusCode = code; },
+      end(value) { body = JSON.parse(value); }
+    });
+    return { statusCode, body };
+  };
+
+  assert.equal((await request()).statusCode, 200);
+  assert.equal((await request()).statusCode, 200);
+  const blocked = await request();
+  assert.equal(blocked.statusCode, 429);
+  assert.match(blocked.body.error, /Trop de requêtes/);
 });
