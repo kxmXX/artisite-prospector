@@ -1625,3 +1625,11 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Leçon de méthode : deux fois de suite j'ai conclu qu'une fonctionnalité avait disparu parce que mes chaînes de recherche ne correspondaient pas aux libellés réels (casse, accents, « 100 % » au lieu d'« opacité »). Lire la capture, pas seulement l'arbre.
 - Tests : 384 → 386. `node --check`, `scripts/build-utilities.mjs` relancé.
 - Reste, 2 tours : voir le bloc position à l'écran ; 3b, 4d complet, 7, export 2d ne seront pas terminés.
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.39 (position et taille vérifiés à l'écran)
+
+- Vérifié à l'écran : le bloc « POSITION ET TAILLE » s'affiche avec les cinq champs (X, Y, Largeur, Hauteur, Rotation) et la pastille « flux normal ». La règle « flux par défaut » est donc visible, pas seulement testée.
+- Non vérifié : l'écriture. `browser_fill` remplit le champ sans déclencher `onchange`, donc la valeur n'est pas commitée et la pastille ne bascule pas. Aucune preuve de défaut ; les tests unitaires du modèle passent.
+- Fausse alerte rectifiée : le canevas « perturbé » que j'ai cru voir (contour en pointillés, badge, boutons Remplacer/Anim) est le chrome de sélection d'élément, comportement attendu. Mauvaise lecture de ma part.
+- Tests : 386/386, aucun code modifié dans ce lot.
+- Bilan de vérification visuelle à ce stade : lots 4a, 4b, 4c, 5a, 5b, 7a, 7b, 7c confirmés à l'écran ; lot 4d confirmé pour son premier bloc (repli) ; lot 6 confirmé pour l'affichage, pas pour l'écriture. Non vérifiés : 3b, 7 (courbe/direction/tester), 2d.

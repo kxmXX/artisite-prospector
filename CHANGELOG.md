@@ -7,6 +7,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.39) — Le bloc « Position et taille » est vérifié à l'écran
+
+- **Vérifié à l'écran** : après sélection d'un élément dans la liste, le panneau affiche « POSITION ET TAILLE » avec la pastille « flux normal » et les cinq champs — X, Y, Largeur, Hauteur, Rotation — tous à `auto` tant que rien n'est saisi. La règle « flux par défaut, position libre en option » est donc **visible**, et pas seulement testée.
+- **Non vérifié** : l'écriture. Mes outils de navigateur remplissent le champ mais ne déclenchent pas l'événement `onchange` ; la valeur n'est jamais validée et la pastille reste sur « flux normal ». Je n'ai **aucune preuve d'un défaut** — seulement l'impossibilité de valider ce chemin autrement que par les tests unitaires, qui passent.
+- Correction d'une fausse alerte que j'avais émise en cours de route : le canevas « perturbé » (contour en pointillés, badge d'élément, boutons Remplacer / Anim sur l'image) n'est pas une casse de mise en page — c'est le chrome de sélection d'élément qui s'affiche, ce qui est le comportement attendu. J'avais mal interprété une capture, et je le note pour ne pas laisser cette inquiétude dans le dossier.
+- Tests : inchangés à **386/386** — ce lot ne modifie aucun code, il consigne une vérification.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.38) — Les réglages d'élément deviennent accessibles, et vérifiés
 
 - Cause : la sélection d'élément n'avait qu'un seul point d'entrée, la **sélection libre**, c'est-à-dire un geste de glisser que rien n'annonçait. Les réglages d'élément — styles du lot 4c, états des lots 5a/5b, position du lot 6 — étaient donc **inatteignables** par un clic, ce qui explique aussi pourquoi je n'avais jamais pu les voir.

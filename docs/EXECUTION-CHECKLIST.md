@@ -130,10 +130,12 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
       panneau, cliquable, calculée sur la même référence que le rendu. **Vérifié à l'écran** : les cinq états
       d'élément, le remplissage, les angles, l'opacité, le fond, la bordure et l'ombre (lots 4c et 5a/5b
       confirmés). *Reste* : voir à l'écran le bloc « Position et taille » (lot 6), plus bas dans le panneau.
-- [ ] **Lot 6 — Positionnement, entamé** (`4.9.0-alpha.35`) : champs numériques X / Y / Largeur / Hauteur /
-      Rotation branchés sur l'inspecteur, avec bornes, « flux par défaut » tenu (aucune règle CSS sans
-      valeur saisie) et retour au flux. *Reste* : position libre en option explicite, boîtes de sélection
-      unifiées, gestes de déplacement vérifiés sur desktop, tablette et mobile.
+- [ ] **Lot 6 — Positionnement, entamé et partiellement vérifié** (`4.9.0-alpha.35` → `.39`) : champs
+      numériques X / Y / Largeur / Hauteur / Rotation branchés sur l'inspecteur, avec bornes, « flux par
+      défaut » tenu (aucune règle CSS sans valeur saisie) et retour au flux. **Vérifié à l'écran** : les cinq
+      champs et la pastille « flux normal ». *Non vérifié* : l'écriture (l'outillage navigateur ne déclenche
+      pas `onchange`), faute de preuve d'un défaut. *Reste* : position libre explicite, boîtes de sélection
+      unifiées, gestes de déplacement par appareil.
 - [ ] **Lot 6 — Positionnement** : flux par défaut, position libre en option, champs numériques
       X/Y/L/H/rotation, boîte de sélection réduite à un menu `⋯`, bornes clavier = bornes souris.
 - [ ] **Lot 7 — Mouvement unifié** : catalogue unique, déclencheur, durée, délai, courbe, direction,
