@@ -7,6 +7,30 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.5) — Lot 9a : comptes côté serveur
+
+- **Persistance serveur sans aucune dépendance** : `server/store.js` tient un fichier JSON unique
+  (utilisateurs, sessions, projets) écrit de façon atomique — fichier temporaire puis renommage —
+  avec un dossier configurable par `DATA_DIR`. Node 18 suffit.
+- **Mots de passe** : `scrypt` avec un sel aléatoire de 16 octets par utilisateur et comparaison à
+  temps constant. Le mot de passe en clair n'apparaît ni dans la réponse HTTP ni dans le fichier de
+  données (vérifié par test).
+- **Sessions** : jeton aléatoire de 32 octets, **seul son SHA-256 est stocké**, cookie `HttpOnly`,
+  `SameSite=Lax`, `Secure` derrière HTTPS, expiration à 30 jours configurable.
+- **Routes** : `POST /api/auth/register|login|logout`, `GET /api/auth/session`,
+  `GET /api/projects`, `PUT|DELETE /api/projects/:id`, `POST /api/projects/import`. Chaque projet
+  porte un `ownerId` ; toute lecture ou écriture hors propriétaire répond **404**, identique au cas
+  « inexistant », pour ne pas révéler l'existence d'un projet. La connexion renvoie le **même message**
+  pour un identifiant inconnu et un mot de passe faux (pas d'énumération des comptes).
+- **Freinage** : 20 tentatives par adresse IP et par tranche de 5 minutes sur connexion et inscription.
+- **Honnêteté de déploiement** : sur un hébergement sans disque persistant (Vercel), les routes de
+  compte répondent **503 avec un message explicite** au lieu de laisser croire que les données sont
+  conservées.
+- **QA** : `tests/accounts_api.test.js` (8 tests) — hachage vérifié sur le contenu du fichier,
+  inscription, doublon, saisies invalides, connexion, session anonyme, déconnexion et révocation,
+  isolation entre deux comptes, mise à jour et suppression par le propriétaire, refus 503.
+  **303/303 tests**.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.4) — Lot 8 : annulation réellement fiable
 
 - **Motif corrigé** : onze commandes **enregistraient l'instantané après avoir modifié le projet**.

@@ -1020,3 +1020,34 @@ qui échoue si updateProject(..., false) réapparaît ; **295/295 tests**.
 
 Reste ouvert pour ce chantier : les glissers freeform et le glisser du bandeau collant persistent
 directement sans transaction ; à traiter avec le lot positionnement (6).
+
+---
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.5 (lot 9a/9)
+
+Périmètre : moitié serveur de la Mission 3 (comptes et persistance multi-appareils), volontairement
+simple comme demandé, sans nouvelle dépendance npm.
+
+Ajouté :
+- server/store.js : fichier db.json unique (version, users, sessions, projects), écriture atomique
+  (fichier temporaire puis renommage), dossier configurable par DATA_DIR, purge des sessions
+  expirées, cache mémoire invalidable pour les tests.
+- server/accounts.js : scrypt + sel de 16 octets par utilisateur et comparaison timingSafeEqual ;
+  jetons de session aléatoires de 32 octets dont seul le SHA-256 est stocké ; cookie HttpOnly,
+  SameSite=Lax, Secure derrière HTTPS, 30 jours configurables ; ownerId par projet ; 404 uniforme
+  pour un projet inexistant ou appartenant à autrui ; message de connexion identique dans les deux
+  cas d'échec ; freinage de 20 tentatives par IP et par 5 minutes ; refus 503 explicite quand
+  l'hébergement n'a pas de disque persistant (VERCEL sans DATA_DIR).
+- Routes branchées en tête du routeur de server/apiHandler.js, avant la santé et les routes IA.
+- .env.example documente DATA_DIR, SESSION_TTL_DAYS et COOKIE_SECURE ; .data/ rejoint .gitignore.
+
+Vérifications : tests/accounts_api.test.js, 8 tests, dont la vérification que le mot de passe en
+clair n'apparaît pas dans le fichier de données, que le doublon d'identifiant répond 409, que la
+connexion échoue avec le même message pour un compte inconnu et un mot de passe faux, que deux
+comptes ne voient ni ne modifient les projets de l'autre (404 et non 403), et que l'hébergement non
+persistant répond 503. **303/303 tests complets.**
+
+Reste pour ce chantier (9b) : le client (api.js, session.js, modale de connexion, pastille de compte
+dans le dashboard), la migration des projets locaux à la première connexion avec copie de secours,
+et le passage du localStorage en cache hors ligne. Aucun test de navigateur n'a encore été fait sur
+ce chantier : la partie serveur est testée, pas l'interface.

@@ -1,4 +1,5 @@
 import { getFallbackModels, enrichSiteWithAI, callGeminiWithFallback } from "./gemini.js";
+import { handleAccountsRoute } from "./accounts.js";
 import { getTradeFallbackDataUrl } from "../public/js/data/imageFallbacks.js";
 import { createHash } from "node:crypto";
 
@@ -285,6 +286,11 @@ export async function handleApiRequest(req, res) {
   }
 
   try {
+    // 0. Comptes et projets par utilisateur (auth + propriété des données)
+    if (await handleAccountsRoute(req, res, normalizedPath, { sendJSON, readBodyJSON, clientIp })) {
+      return;
+    }
+
     // 1. Health check
     if (normalizedPath === "/api/health" && req.method === "GET") {
       sendJSON(res, 200, {

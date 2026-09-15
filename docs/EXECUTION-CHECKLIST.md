@@ -100,8 +100,14 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
       *Reste* : le regroupement n'est branché que sur les deux curseurs de taille de texte et
       l'assombrissement du hero ; les glissers freeform et le glisser du bandeau collant ne sont pas
       encore transactionnels.
-- [ ] **Lot 9 — Comptes et persistance** : `scrypt` + sel, sessions hachées, `ownerId` par projet,
-      migration des projets locaux à la première connexion, échec explicite sur Vercel.
+- [~] **Lot 9 — Comptes et persistance** (9a serveur livré en `4.9.0-alpha.5`) :
+      `server/store.js` (fichier JSON atomique, `DATA_DIR`) et `server/accounts.js` (scrypt + sel,
+      jetons de session stockés hachés, cookie `HttpOnly`/`SameSite=Lax`/`Secure`, `ownerId` par
+      projet, 404 uniforme hors propriétaire, freinage 20 tentatives/5 min, refus 503 explicite sans
+      disque persistant). Routes branchées dans `server/apiHandler.js`, 8 tests dédiés, **303/303**.
+      **Reste (9b)** : le client — `api.js`, `session.js`, modale de connexion, pastille de compte,
+      migration des projets locaux à la première connexion, et le passage du `localStorage` en cache
+      hors ligne.
 
 ## Reprise P0 qualité produit — signalement du 15 septembre
 
