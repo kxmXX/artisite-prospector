@@ -176,3 +176,16 @@ test('comparison tables scroll instead of clipping editable cells', () => {
   assert.ok(appCss.includes('overflow-x: auto;'));
   assert.ok(appCss.includes('min-width: 40rem;'));
 });
+
+test('every editor CTA wrapper can open its contextual controls', async () => {
+  const { renderWebsiteHTML } = await import('../public/js/components/renderer.js');
+  const rendererSource = fs.readFileSync(new URL('../public/js/components/renderer.js', import.meta.url), 'utf8');
+  const project = generateSite({ name: 'CTA Probe', tradeId: 'paysagiste' });
+  const editorHtml = renderWebsiteHTML(project, { isEditor: true, isStandalone: false });
+  const publicHtml = renderWebsiteHTML(project, { isEditor: false, isStandalone: false });
+  const headerWrapper = (editorHtml.match(/<div[^>]*data-button-type="ctaText"[^>]*>/) || [''])[0];
+  assert.ok(headerWrapper.includes('data-cta-popover-wrapper'), 'the header CTA wrapper must exist');
+  assert.ok(headerWrapper.includes('data-ui-target="true"'), 'header CTA must be bound in the editor');
+  assert.ok(!publicHtml.includes('data-ui-target="true"'), 'public CTAs keep native navigation');
+  assert.ok(rendererSource.includes('data-ui-target="true">'));
+});

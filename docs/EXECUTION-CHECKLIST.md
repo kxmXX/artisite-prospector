@@ -29,7 +29,7 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - [x] Validation visuelle dédiée vitrine/template : Chrome 1440 et 390 sur démo canonique + nouvelle instance ; largeur viewport exacte, header 1280 desktop, hero pleine largeur, ordre stable, simulateur avant footer et footer dernier.
 - [x] Bibliothèque nettoyable : sélection multi-projets 34×34, Tout sélectionner sur les cartes visibles, compteur, annulation et suppression groupée persistée ; une bibliothèque volontairement vide reste vide après reload.
 - [x] Coordonner les overlays de l'éditeur : Texte, Section, Freeform et CTA sont mutuellement exclusifs, leurs couches sont centralisées et la sélection reste intacte (`4.8.0-alpha.36`).
-- [x] Rendre les CTA et cellules réellement manipulables : chemin CTA unique, entrée Freeform explicite par « Position », chrome non superposé et redimensionnement borné au parent (`4.8.0-alpha.41`).
+- [x] Rendre les CTA et cellules réellement manipulables : chemin CTA unique, entrée Freeform explicite par « Position », chrome non superposé et redimensionnement borné au parent (`4.8.0-alpha.41`). Le CTA d’en-tête, auparavant non lié, ouvre désormais ses réglages (`4.8.0-alpha.49`).
 
 ## Audit reçu après `4.8.0-alpha.35`
 

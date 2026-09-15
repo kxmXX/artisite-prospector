@@ -1,3 +1,12 @@
+## LOT DE LIVRAISON — CTA d’en-tête réparé 4.8.0-alpha.49 — 15 septembre 2026
+
+- Cause : le wrapper du CTA d’en-tête (`renderHeader`, renderer.js) omettait `data-ui-target="true"`, contrairement aux CTA de hero/CTA. La liaison éditeur (`initCanvasInteractivity`) sort tôt quand cet attribut est absent : le bouton principal de l’en-tête n’avait donc aucun gestionnaire de réglages et son clic suivait `href="#simulateur"`.
+- Correctif : `decorateLayoutKeys` reçoit `isEditor` et garantit `data-ui-target="true"` sur chaque wrapper `data-cta-popover-wrapper` en mode éditeur, avant l’ajout de la clé de layout. Le site public et l’aperçu client conservent zéro cible éditeur, donc leur navigation native.
+- Preuve navigateur : cliquer le CTA d’en-tête affiche désormais le panneau (curseur « Taille continue », « Bords », « Animation »). Avant, le wrapper n’était pas lié du tout.
+- Tests : 10/10 tests d’intégrité éditeur, 256/256 complets, `node --check` et `git diff --check` propres.
+- Limite connue : l’ancre d’en-tête peut encore changer le hash `#simulateur` selon la séquence de clic ; à rendre inerte en mode éditeur au prochain lot.
+- Prochaine action exacte : rendre l’ancre CTA inerte en mode éditeur, puis construire la matrice de non-régression des gestes et simplifier les barres d’outils.
+
 ## LOT DE LIVRAISON — cellules de tableau éditables 4.8.0-alpha.48 — 15 septembre 2026
 
 - Cause : le conteneur `.component-table` portait `overflow-hidden`. Sur un canevas étroit (mobile simulé ou téléphone réel), les trois colonnes se comprimaient puis étaient coupées, rendant la sélection et l’édition tactile imprévisibles — exactement le symptôme « édition des cellules mal conçue ».

@@ -7,6 +7,11 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 15 septembre 2026 (4.8.0-alpha.49)
+
+- CTA d’en-tête : son conteneur ne portait pas `data-ui-target="true"`, il était donc exclu de la liaison éditeur. Cliquer le bouton principal de l’en-tête ouvrait uniquement son lien `#simulateur` au lieu de ses réglages — le contrôle le plus visible de la page était inutilisable. Le renderer garantit désormais cette liaison pour chaque CTA en mode éditeur, sans modifier le site public.
+- QA : test de rendu vérifiant que l’en-tête CTA est lié dans l’éditeur et que le site public conserve zéro cible éditeur ; ouverture du panneau confirmée en navigateur.
+
 ### Consolidation — 15 septembre 2026 (4.8.0-alpha.48)
 
 - Tableau comparatif : le conteneur était en `overflow-hidden`, si bien que sur un canevas étroit les trois colonnes se comprimaient et le contenu était coupé. Le tableau vit maintenant dans un conteneur à défilement horizontal, avec une largeur minimale de 40 rem pour garder des cellules lisibles.

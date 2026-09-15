@@ -78,7 +78,7 @@ function getFreeformPlacementAttributes(project, layoutKey, originSectionId) {
   return attrs.join("");
 }
 
-function decorateLayoutKeys(markup, project, section) {
+function decorateLayoutKeys(markup, project, section, isEditor = false) {
   let output = markup.replace(/<([a-z][\w-]*)(\s[^>]*data-editable="([^"]+)"[^>]*)>/gi, (full, _tag, _attrs, fieldPath) => {
     if (/\sdata-layout-key=/.test(full)) return full;
     const code = getUiCode(project?.id, section?.id, fieldPath);
@@ -92,6 +92,9 @@ function decorateLayoutKeys(markup, project, section) {
   });
 
   output = output.replace(/<div(\s[^>]*data-cta-popover-wrapper[^>]*)>/gi, (full, attrs) => {
+    // Every editor CTA must be bound to the contextual controls, including the
+    // header button. Public and client-preview markup stays untouched.
+    if (isEditor && !/\sdata-ui-target=/.test(full)) full = full.replace(/>$/, ' data-ui-target="true">');
     if (/\sdata-layout-key=/.test(full)) return full;
     const buttonType = attrs.match(/data-button-type="([^"]+)"/)?.[1];
     if (!buttonType) return full;
@@ -534,7 +537,7 @@ function renderSection(sec, project, options) {
   }
 
   if (isEditor) innerHTML = decorateEditableMarkup(innerHTML, project, sec);
-  innerHTML = decorateLayoutKeys(innerHTML, project, sec);
+  innerHTML = decorateLayoutKeys(innerHTML, project, sec, isEditor);
 
   const globalBg = String(project.branding?.bgColor || "").toLowerCase();
   const inferredTheme = sec.type === "cta" ? "primary" : (["#09090b", "#0f0f11", "#111318", "#18181b"].includes(globalBg) ? "dark" : ["#f4f4f5", "#f8fafc"].includes(globalBg) ? "mineral" : "white");
