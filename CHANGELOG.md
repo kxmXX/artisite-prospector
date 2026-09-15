@@ -7,6 +7,12 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 15 septembre 2026 (4.8.0-alpha.42)
+
+- Wizard : les six étapes du terminal suivent désormais le cycle réel de la requête et de la construction du projet ; aucun minuteur ne valide la rédaction avant la réponse réseau.
+- Transparence : une réponse IA indisponible ou limitée affiche explicitement la reprise par le modèle local, tandis que l’éditeur ne s’ouvre qu’après l’assemblage effectif.
+- Accessibilité : état courant exposé avec `aria-current`, annonces polies et animation neutralisée avec `prefers-reduced-motion`. Validation : 11/11 tests async ciblés, 246/246 complets, syntaxe et `git diff --check`.
+
 ### Consolidation — 15 septembre 2026 (4.8.0-alpha.41)
 
 - Éditeur CTA : un clic ouvre uniquement les réglages du bouton ; le déplacement/redimensionnement passe désormais par l’action explicite « Position », sans superposer les outils CTA et Freeform.

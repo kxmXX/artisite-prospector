@@ -103,6 +103,92 @@ test('wizard completion cannot open a project after its drawer closes', async t 
   assert.equal(state.projects.length, 1);
 });
 
+function setupWizardProgress(t) {
+  const app = Object.create(App.prototype);
+  app.showToast = () => {};
+  const originalProject = generateSite({ name: 'Avant génération', tradeId: 'plombier' });
+  state.currentProject = originalProject;
+  state.projects = [originalProject];
+  state.currentView = 'dashboard';
+  state.activeDrawer = 'new_project';
+  state.undoStack = []; state.redoStack = [];
+
+  const makeStep = () => {
+    const icon = { textContent: '' };
+    const label = { textContent: '' };
+    const attributes = new Map();
+    return {
+      dataset: { status: 'idle' },
+      icon,
+      label,
+      setAttribute(name, value) { attributes.set(name, value); },
+      removeAttribute(name) { attributes.delete(name); },
+      querySelector(selector) { return selector === '.step-icon' ? icon : selector === '[data-terminal-step-label]' ? label : null; }
+    };
+  };
+  const steps = Object.fromEntries(Array.from({ length: 6 }, (_, index) => [`step-${index + 1}`, makeStep()]));
+  const terminal = { dataset: {}, style: {} };
+  const status = { textContent: '' };
+  const elements = { ...steps, 'wizard-terminal': terminal, 'term-status': status, 'term-name': { textContent: '' } };
+  document.getElementById = id => elements[id] || null;
+  document.querySelector = () => null;
+
+  const originalFetch = globalThis.fetch;
+  const originalTimeout = globalThis.setTimeout;
+  const timers = [];
+  let resolveFetch;
+  globalThis.fetch = () => new Promise(resolve => { resolveFetch = resolve; });
+  globalThis.setTimeout = callback => { timers.push(callback); return timers.length; };
+  t.after(() => {
+    globalThis.fetch = originalFetch;
+    globalThis.setTimeout = originalTimeout;
+    app._aiRequests?.forEach(request => request.dispose());
+  });
+  return {
+    app, originalProject, steps, terminal, status, timers,
+    respond(response) { resolveFetch(response); }
+  };
+}
+
+test('wizard terminal keeps network generation active until the response settles', async t => {
+  const { app, originalProject, steps, terminal, status, timers, respond } = setupWizardProgress(t);
+  const pending = app.handleWizardSubmit(event);
+
+  assert.equal(steps['step-3'].dataset.status, 'running');
+  assert.match(status.textContent, /contenus personnalisés en cours/);
+  assert.equal(steps['step-6'].dataset.status, 'idle');
+  assert.equal(state.currentProject, originalProject);
+
+  respond({ ok: true, status: 200, json: async () => ({ success: true, data: { heroTitle: 'Titre IA' }, modelUsed: 'test-model' }) });
+  await pending;
+
+  assert.equal(steps['step-3'].dataset.status, 'done');
+  assert.equal(steps['step-6'].dataset.status, 'done');
+  assert.equal(terminal.dataset.status, 'done');
+  assert.match(status.textContent, /Site prêt/);
+  assert.equal(state.currentProject, originalProject, 'editor opens only after the completed-state handoff');
+  assert.equal(timers.length, 1, 'only the final, post-work handoff uses a timer');
+
+  timers[0]();
+  assert.notEqual(state.currentProject, originalProject);
+  assert.equal(state.currentProject.sections.find(section => section.type === 'hero').content.title, 'Titre IA');
+});
+
+test('wizard terminal names the local fallback when AI is rate limited', async t => {
+  const { app, originalProject, steps, terminal, status, timers, respond } = setupWizardProgress(t);
+  const pending = app.handleWizardSubmit(event);
+  respond({ ok: false, status: 429, json: async () => ({ error: 'rate limit' }) });
+  await pending;
+
+  assert.equal(steps['step-3'].dataset.status, 'fallback');
+  assert.match(steps['step-3'].label.textContent, /création locale/);
+  assert.equal(terminal.dataset.status, 'fallback');
+  assert.match(status.textContent, /modèle local/);
+  timers[0]();
+  assert.notEqual(state.currentProject, originalProject);
+  assert.notEqual(state.currentProject.aiGenerated, true);
+});
+
 
 function setupImageGeneration(t) {
   const app = Object.create(App.prototype);

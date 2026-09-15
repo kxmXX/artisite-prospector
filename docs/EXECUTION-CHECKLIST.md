@@ -39,12 +39,12 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - [x] Protection des routes IA — CORS restreint/configurable et budget par IP sur génération, copilote et image livré dans `4.8.0-alpha.39`.
 - [x] Labels du wizard — associations natives `for`/`id` complètes dans `4.8.0-alpha.40`.
 - [x] Polices — import CSS Google Fonts bloquant supprimé ; chargement unique par `<link>` dans `4.8.0-alpha.40`.
-- [ ] Progression du terminal IA — dernière étape encore cochée avant la résolution réseau.
+- [x] Progression du terminal IA — étapes liées à la requête et à la construction réelles, fallback local explicite et ouverture après assemblage (`4.8.0-alpha.42`).
 - [ ] Bundling/performance — à mesurer avant d’introduire Vite ; ne pas créer une migration globale sans preuve de gain et sans préserver le serveur Node/Vercel.
 - [~] Persistance serveur et audit SEO réel — exclus explicitement par l’utilisateur pour cette mission.
 - [~] Avis Google fictifs / badges associés — conservation explicitement demandée par l’utilisateur.
 
-Prochaine action exacte : vérifier en navigateur les gestes Freeform complexes restants (multi-sélection, reparenting et responsive) puis rendre la progression du terminal IA fidèle à la requête réelle.
+Prochaine action exacte : mesurer le poids et les requêtes du chargement actuel avant toute décision de bundling, sans lancer de migration Vite sans gain démontré.
 
 ## État exact à `4.8.0-alpha.8`
 

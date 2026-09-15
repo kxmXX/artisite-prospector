@@ -170,36 +170,38 @@ export function renderWizardModal() {
         </form>
 
         <!-- Dynamic Generation Animation Terminal (Overlay during generation) -->
-        <div id="wizard-terminal" class="absolute inset-0 bg-zinc-950 text-zinc-300 p-6 flex flex-col justify-center space-y-3 font-mono text-xs z-50" style="display:none;">
+        <div id="wizard-terminal" class="wizard-terminal absolute inset-0 bg-zinc-950 text-zinc-300 p-6 flex flex-col justify-center space-y-3 font-mono text-xs z-50" style="display:none;" role="status" aria-live="polite" aria-atomic="false">
           <div class="flex items-center gap-3 text-white text-sm font-semibold pb-2 border-b border-zinc-800">
-            <div class="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            <div class="wizard-terminal-spinner w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" aria-hidden="true"></div>
             <span>Génération en cours : <span id="term-name" class="text-zinc-300 font-normal">...</span></span>
           </div>
 
+          <p id="term-status" class="wizard-terminal-status" aria-live="polite">Préparation de la génération…</p>
+
           <div id="term-steps" class="space-y-2 text-xs text-zinc-400">
-            <div id="step-1" class="flex items-center gap-2 opacity-40 transition-opacity">
-              <span class="step-icon">○</span>
-              <span>Analyse de l'activité locale et des mots-clés...</span>
+            <div id="step-1" class="wizard-terminal-step flex items-center gap-2" data-status="idle">
+              <span class="step-icon" aria-hidden="true">○</span>
+              <span data-terminal-step-label>Validation des informations du projet</span>
             </div>
-            <div id="step-2" class="flex items-center gap-2 opacity-40 transition-opacity">
-              <span class="step-icon">○</span>
-              <span>Création de la structure & sélection des 16 sections...</span>
+            <div id="step-2" class="wizard-terminal-step flex items-center gap-2" data-status="idle">
+              <span class="step-icon" aria-hidden="true">○</span>
+              <span data-terminal-step-label>Connexion au service de génération IA</span>
             </div>
-            <div id="step-3" class="flex items-center gap-2 opacity-40 transition-opacity">
-              <span class="step-icon">○</span>
-              <span>Adaptation du design system, palette & typographies...</span>
+            <div id="step-3" class="wizard-terminal-step flex items-center gap-2" data-status="idle">
+              <span class="step-icon" aria-hidden="true">○</span>
+              <span data-terminal-step-label>Rédaction des contenus personnalisés</span>
             </div>
-            <div id="step-4" class="flex items-center gap-2 opacity-40 transition-opacity">
-              <span class="step-icon">○</span>
-              <span>Génération des contenus & avis clients...</span>
+            <div id="step-4" class="wizard-terminal-step flex items-center gap-2" data-status="idle">
+              <span class="step-icon" aria-hidden="true">○</span>
+              <span data-terminal-step-label>Assemblage de la structure et des sections</span>
             </div>
-            <div id="step-5" class="flex items-center gap-2 opacity-40 transition-opacity">
-              <span class="step-icon">○</span>
-              <span>Curations photographiques & module avant/après...</span>
+            <div id="step-5" class="wizard-terminal-step flex items-center gap-2" data-status="idle">
+              <span class="step-icon" aria-hidden="true">○</span>
+              <span data-terminal-step-label>Application du design system et des médias</span>
             </div>
-            <div id="step-6" class="flex items-center gap-2 opacity-40 transition-opacity font-medium text-white">
-              <span class="step-icon">○</span>
-              <span>Finalisation et ouverture immédiate de l'éditeur...</span>
+            <div id="step-6" class="wizard-terminal-step flex items-center gap-2 font-medium" data-status="idle">
+              <span class="step-icon" aria-hidden="true">○</span>
+              <span data-terminal-step-label>Ouverture de l’éditeur</span>
             </div>
           </div>
         </div>

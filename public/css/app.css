@@ -3292,6 +3292,66 @@ p[data-motion], div[data-motion], section[data-motion], h1[data-motion], h2[data
   z-index: 999 !important;
 }
 
+/* Wizard generation progress follows actual work rather than a decorative timer. */
+.wizard-terminal-status {
+  margin: 0;
+  min-height: 1.4em;
+  color: #d4d4d8;
+  font: 500 11px/1.4 Inter, sans-serif;
+}
+.wizard-terminal-step {
+  min-width: 0;
+  opacity: 0.42;
+  color: #a1a1aa;
+  transition: opacity 160ms ease, color 160ms ease;
+}
+.wizard-terminal-step .step-icon {
+  display: inline-grid;
+  flex: 0 0 18px;
+  width: 18px;
+  height: 18px;
+  place-items: center;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  font-weight: 800;
+  line-height: 1;
+}
+.wizard-terminal-step[data-status="running"] {
+  opacity: 1;
+  color: #ffffff;
+}
+.wizard-terminal-step[data-status="running"] .step-icon {
+  animation: wizard-terminal-pulse 900ms ease-in-out infinite alternate;
+}
+.wizard-terminal-step[data-status="done"] {
+  opacity: 1;
+  color: #6ee7b7;
+}
+.wizard-terminal-step[data-status="fallback"] {
+  opacity: 1;
+  color: #fbbf24;
+}
+.wizard-terminal-step[data-status="error"] {
+  opacity: 1;
+  color: #fca5a5;
+}
+.wizard-terminal[data-status="done"] .wizard-terminal-spinner,
+.wizard-terminal[data-status="fallback"] .wizard-terminal-spinner {
+  animation: none;
+  border-color: currentColor;
+}
+@keyframes wizard-terminal-pulse {
+  from { opacity: 0.45; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wizard-terminal-step,
+  .wizard-terminal-step[data-status="running"] .step-icon {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
 /* 2. Quick Generation Bar (Never squashed, 100% robust layout) */
 .quick-gen-bar {
   display: flex !important;

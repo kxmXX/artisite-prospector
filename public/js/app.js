@@ -1176,6 +1176,29 @@ export class App {
     this.showToast("Pack complet de production téléchargé (HTML, Sitemap, Robots, Manifest) !", "success");
   }
 
+  setWizardTerminalStep(stepId, status, message = "") {
+    const step = document.getElementById(stepId);
+    if (!step) return;
+    const normalizedStatus = ["idle", "running", "done", "fallback", "error"].includes(status) ? status : "idle";
+    step.dataset.status = normalizedStatus;
+    if (normalizedStatus === "running") step.setAttribute("aria-current", "step");
+    else step.removeAttribute("aria-current");
+    const icon = step.querySelector(".step-icon");
+    if (icon) icon.textContent = { idle: "○", running: "…", done: "✓", fallback: "!", error: "×" }[normalizedStatus];
+    const label = step.querySelector("[data-terminal-step-label]");
+    if (label && message) label.textContent = message;
+  }
+
+  resetWizardTerminal() {
+    const terminal = document.getElementById("wizard-terminal");
+    if (terminal) terminal.dataset.status = "running";
+    for (let index = 1; index <= 6; index += 1) {
+      this.setWizardTerminalStep(`step-${index}`, "idle");
+    }
+    const status = document.getElementById("term-status");
+    if (status) status.textContent = "Préparation de la génération…";
+  }
+
   // Wizard Generation Submission with Animated Terminal & AI Call
   async handleWizardSubmit(e) {
     e.preventDefault();
@@ -1198,39 +1221,49 @@ export class App {
     if (nameDisplay) nameDisplay.textContent = `${name} (${city})`;
     if (terminal) terminal.style.display = "flex";
 
-    // Launch AI request in parallel
+    this.resetWizardTerminal();
+    this.setWizardTerminalStep("step-1", "running");
+    this.setWizardTerminalStep("step-1", "done");
+    this.setWizardTerminalStep("step-2", "running");
+
+    // The request lifecycle owns the progress state. Timers never mark network
+    // work as complete before the response has actually settled.
     const aiPromise = fetch("/api/ai/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, trade: tradeId, city, phone, region, tone, ambiance })
-    }).then(r => r.ok ? r.json() : null).catch(() => null);
+    }).then(async response => ({
+      response,
+      payload: await response.json().catch(() => null)
+    })).catch(error => ({ error }));
 
-    const steps = [
-      { id: "step-1", delay: 250 },
-      { id: "step-2", delay: 550 },
-      { id: "step-3", delay: 850 },
-      { id: "step-4", delay: 1150 },
-      { id: "step-5", delay: 1450 },
-      { id: "step-6", delay: 1750 }
-    ];
-
-    steps.forEach(({ id, delay }) => {
-      setTimeout(() => {
-        if (!request.current()) return;
-        const el = document.getElementById(id);
-        if (el) {
-          el.classList.remove("opacity-40");
-          el.classList.add("text-emerald-400");
-          const icon = el.querySelector(".step-icon");
-          if (icon) icon.textContent = "✓";
-        }
-      }, delay);
-    });
-
-    const aiRes = await aiPromise;
+    this.setWizardTerminalStep("step-2", "done");
+    this.setWizardTerminalStep("step-3", "running");
+    const terminalStatus = document.getElementById("term-status");
+    if (terminalStatus) terminalStatus.textContent = "Génération des contenus personnalisés en cours…";
+    const aiResult = await aiPromise;
     if (!request.current()) { request.dispose(); return; }
 
-    setTimeout(() => {
+    const aiRes = aiResult?.response?.ok && aiResult?.payload?.success ? aiResult.payload : null;
+    if (aiRes) {
+      this.setWizardTerminalStep("step-3", "done");
+      if (terminalStatus) terminalStatus.textContent = "Contenus reçus, assemblage du site…";
+    } else {
+      const rateLimited = aiResult?.response?.status === 429;
+      this.setWizardTerminalStep(
+        "step-3",
+        "fallback",
+        rateLimited ? "Service IA temporairement limité — création locale" : "Service IA indisponible — création locale"
+      );
+      if (terminalStatus) {
+        terminalStatus.textContent = rateLimited
+          ? "Quota temporairement atteint. Le modèle local prend le relais."
+          : "Connexion IA indisponible. Le modèle local prend le relais.";
+      }
+    }
+
+    this.setWizardTerminalStep("step-4", "running");
+    {
       if (!request.current()) { request.dispose(); return; }
       const validColor = customColor && /^#[0-9a-f]{6}$/i.test(customColor) ? customColor : undefined;
       const newProject = instantiateSiteTemplate(templateId, {
@@ -1243,6 +1276,8 @@ export class App {
         email,
         primaryColor: validColor
       });
+      this.setWizardTerminalStep("step-4", "done");
+      this.setWizardTerminalStep("step-5", "running");
 
       if (ambiance === "white") {
         newProject.branding.bgColor = "#ffffff";
@@ -1324,10 +1359,21 @@ export class App {
         newProject.aiModel = aiRes.modelUsed || "gemini-flash";
       }
 
-      request.dispose();
-      state.closeDrawer();
-      state.addProject(newProject, true);
-    }, 2000);
+      this.setWizardTerminalStep("step-5", "done");
+      this.setWizardTerminalStep("step-6", "running");
+      this.setWizardTerminalStep("step-6", "done");
+      if (terminal) terminal.dataset.status = aiRes ? "done" : "fallback";
+      if (terminalStatus) terminalStatus.textContent = aiRes
+        ? "Site prêt — ouverture de l’éditeur."
+        : "Site prêt avec le modèle local — ouverture de l’éditeur.";
+
+      setTimeout(() => {
+        if (!request.current()) { request.dispose(); return; }
+        request.dispose();
+        state.closeDrawer();
+        state.addProject(newProject, true);
+      }, 350);
+    }
   }
 
   handleQuickGenerate(e) {

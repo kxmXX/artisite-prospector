@@ -1,3 +1,11 @@
+## LOT DE LIVRAISON — terminal IA fidèle au réseau 4.8.0-alpha.42 — 15 septembre 2026
+
+- Progression : les étapes ne sont plus cochées par délais décoratifs ; rédaction, assemblage, design et finalisation avancent selon la réponse réseau et la construction effective du projet.
+- Transparence : HTTP 429, erreur réseau ou réponse invalide annoncent le modèle local au lieu de simuler une génération IA réussie.
+- Accessibilité : état courant exposé, annonce `role=status` et animations neutralisées si le mouvement est réduit.
+- QA navigateur : génération locale réelle depuis le wizard, terminal affiché puis éditeur ouvert sur le projet `Jardin Test`; 11/11 tests async ciblés et 246/246 complets couvrent réponse lente, succès et rate limit ; syntaxe et `git diff --check` propres.
+- Prochaine action exacte : établir la mesure initiale poids/requêtes avant toute décision de bundling ou migration Vite.
+
 ## LOT DE LIVRAISON — édition CTA/cellules sans collision 4.8.0-alpha.41 — 15 septembre 2026
 
 - Interaction : un CTA ne déclenche plus le pointeur Freeform par propagation. Son panneau conserve taille, casse, rayon, animations et suppression ; « Position » bascule volontairement vers le cadre de manipulation.
