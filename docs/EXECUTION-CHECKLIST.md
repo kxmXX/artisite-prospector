@@ -79,7 +79,7 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - [x] Sélection universelle phase 2 — cartes, conteneurs, sous-blocs et icônes métiers ont des clés structurelles stables ; clic profond + ⌘/Ctrl-clic remonte la hiérarchie de calques.
 - [x] Déplacement phase 1 — Pointer Events via poignée Move, flèches clavier (Shift = 10 px) et contrainte à la section ; pas de drag HTML5 sur le canvas.
 - [x] Déplacement phase 2a — drag direct du corps sélectionné avec seuil 5 px, suivi 1:1 sans transition, snapping bords/centres et Alt pour désactiver temporairement l’accroche.
-- [ ] Déplacement phase 2b — débordement contrôlé entre zones/sections et reparenting explicite.
+- [x] Déplacement phase 2b — mode `Page` explicite, reparenting persistant par breakpoint entre sections, dimensions visuelles conservées, aller/retour et Undo cohérents jusque dans preview/export.
 - [x] Redimensionnement phase 1 — 8 poignées côtés/coins, dimensions min et aperçu direct, persistées à la fin du geste.
 - [x] Redimensionnement phase 2a — rotation libre persistante sur élément ou sélection, orbite collective autour du centre et Shift = pas de 15°.
 - [x] Redimensionnement phase 2b — ratio individuel verrouillable par breakpoint, Shift temporaire, bornes de section et neutralisation des anciennes contraintes min/max lors d’une taille libre explicite.
@@ -117,6 +117,8 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 7. Noter ici : commit, tests réellement exécutés, anomalies connues et prochaine action unique.
 
 ## Dernière livraison validée
+
+- Lot `4.8.0-alpha.30` : reparenting inter-sections explicite via `Page`, `parentSectionId` par breakpoint, couche libre commune éditeur/preview/export et retour vers toute section sans changement de dimensions. QA Chrome : Header→Hero puis Hero→Header, 87,625×72 avant/après, Undo replace dans Hero ; preview/standalone reparentent réellement le DOM. 50/50 ciblés, 225/225 complets et `git diff --check`.
 
 - Lot `4.8.0-alpha.29` : multi-sélection tactile sans Shift + auto-scroll de bord du marquee. QA Chrome : Multi 50×34 px, 1→2→1 éléments au tap, +102 px de scroll pendant le marquee, zéro erreur console. 48/48 ciblés, 223/223 complets et `git diff --check`.
 

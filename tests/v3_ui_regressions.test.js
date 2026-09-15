@@ -176,8 +176,8 @@ test('Freeform layout persistence is breakpoint-scoped and Undo restores the pre
     state.currentProject = project;
     state.undoStack = [];
     state.redoStack = [];
-    state.setFreeformLayout('E_TEST', 'desktop', { x: 31, y: 14, width: 280, height: 80, scaleX: 1.25, scaleY: 0.75, rotation: 30, aspectLocked: true }, 'Move test');
-    assert.deepEqual(state.currentProject.freeformLayout.desktop.E_TEST, { x: 31, y: 14, width: 280, height: 80, scaleX: 1.25, scaleY: 0.75, rotation: 30, aspectLocked: true });
+    state.setFreeformLayout('E_TEST', 'desktop', { x: 31, y: 14, width: 280, height: 80, scaleX: 1.25, scaleY: 0.75, rotation: 30, aspectLocked: true, parentSectionId: 'sec-services' }, 'Move test');
+    assert.deepEqual(state.currentProject.freeformLayout.desktop.E_TEST, { x: 31, y: 14, width: 280, height: 80, scaleX: 1.25, scaleY: 0.75, rotation: 30, aspectLocked: true, parentSectionId: 'sec-services' });
     assert.equal(state.currentProject.freeformLayout.tablet.E_TEST, undefined);
     assert.equal(state.undoStack.length, 1);
     state.undo();
@@ -365,7 +365,7 @@ test('Freeform rotation persists, supports group orbiting and Shift angle snappi
 
 test('Freeform resize snapping and equal-spacing guides stay visible and deterministic', () => {
   const appSource = fs.readFileSync(path.resolve(process.cwd(), 'public/js/app.js'), 'utf8');
-  assert.ok(appSource.includes('(action === "move" || action === "resize") ? this.buildFreeformSnapContext'));
+  assert.ok(appSource.includes('(action === "move" || action === "resize") && !crossSectionMove ? this.buildFreeformSnapContext'));
   assert.ok(appSource.includes('resolveFreeformSnap(entry.rect.right + adjustedDx, 0'));
   assert.ok(appSource.includes('resolveEqualSpacingSnap(proposedX, snapContext.rects, "x"'));
   assert.ok(appSource.includes('showFreeformSpacingGuides(spacingX, spacingY, snappedRect)'));
@@ -394,7 +394,8 @@ test('Freeform responsive tools adapt selected layouts across breakpoints withou
   assert.ok(appSource.includes('copyFreeformSelectionToViewport(targetViewport, sourceViewport = state.viewport)'));
   assert.ok(appSource.includes('adaptFreeformLayoutToViewport(sourceLayout, sourceViewport, targetViewport)'));
   assert.ok(appSource.includes('state.setFreeformLayouts(updates, targetViewport'));
-  assert.ok(appSource.includes('this._freeformViewportSyncTimer = setTimeout(() => this.updateFreeformOverlay(), 340)'));
+  assert.ok(appSource.includes('this._freeformViewportSyncTimer = setTimeout(() => {'));
+  assert.ok(appSource.includes('this.applyFreeformReparenting();'));
   assert.ok(appSource.includes('const responsiveBar = overlay.querySelector(".freeform-responsivebar")'));
   assert.ok(appSource.includes('responsiveBar.style.left = `${desiredLeft - left}px`'));
   assert.ok(!appSource.match(/copyShareUrl[\s\S]{0,900}responsiveBar\.style\.left/));
@@ -430,4 +431,43 @@ test('Freeform touch multi-select and marquee edge auto-scroll stay explicit', (
   assert.ok(appSource.includes('const coarsePointer = Boolean(window.matchMedia?.("(pointer: coarse)")?.matches)'));
   assert.ok(appSource.includes('moveHandle.style.left = coarsePointer ? "18px" : "50%"'));
   assert.ok(css.includes('[data-freeform-additive].is-active'));
+});
+
+test('Freeform cross-section parenting persists across editor, preview and standalone export', () => {
+  const project = generateDemoSite({ name: 'Reparent Test', tradeId: 'paysagiste', city: 'Tours' });
+  const initial = renderWebsiteHTML(project, { isEditor: true, isStandalone: false });
+  const titleKey = initial.match(/data-editable="title"[^>]*data-layout-key="([^"]+)"/)?.[1];
+  assert.ok(titleKey);
+  project.freeformLayout = {
+    desktop: { [titleKey]: { x: 44, y: 28, width: 280, height: 80, parentSectionId: 'sec-services' } },
+    tablet: {},
+    mobile: {}
+  };
+  const editorHtml = renderWebsiteHTML(project, { isEditor: true, isStandalone: false });
+  const publicHtml = renderWebsiteHTML(project, { isEditor: false, isStandalone: false });
+  const cssOut = buildFreeformLayoutCSS(project);
+  const standalone = exportStandaloneHTML(project);
+  assert.ok(editorHtml.includes(`data-layout-key="${titleKey}"`));
+  assert.ok(editorHtml.includes('data-freeform-parent-desktop="sec-services"'));
+  assert.ok(editorHtml.includes('data-layout-origin-section="sec-hero"'));
+  assert.ok(publicHtml.includes('data-section-id="sec-services"'));
+  assert.ok(publicHtml.includes('data-freeform-parent-desktop="sec-services"'));
+  assert.ok(cssOut.includes('position:absolute!important'));
+  assert.ok(cssOut.includes('left:44px!important'));
+  assert.ok(cssOut.includes('top:28px!important'));
+  assert.ok(cssOut.includes('translate:0 0!important'));
+  assert.ok(standalone.includes('initFreeformReparenting'));
+  assert.ok(standalone.includes('freeform-reparent-layer'));
+});
+
+test('Freeform Page mode explicitly highlights and commits a cross-section drop', () => {
+  const appSource = fs.readFileSync(path.resolve(process.cwd(), 'public/js/app.js'), 'utf8');
+  const stateSource = fs.readFileSync(path.resolve(process.cwd(), 'public/js/state.js'), 'utf8');
+  assert.ok(appSource.includes('data-freeform-cross-section'));
+  assert.ok(appSource.includes('const crossSectionMove = action === "move" && Boolean(this._freeformCrossSectionMode)'));
+  assert.ok(appSource.includes('this.findFreeformReparentTarget(snappedRect)'));
+  assert.ok(appSource.includes('this.commitFreeformReparent(entries, liveUpdates, reparentTarget)'));
+  assert.ok(appSource.includes('applyFreeformReparenting(root = document.querySelector(".artisite-root"))'));
+  assert.ok(stateSource.includes('normalized.parentSectionId = nextLayout.parentSectionId.trim()'));
+  assert.ok(css.includes('.editor-section-wrapper.is-freeform-reparent-target'));
 });

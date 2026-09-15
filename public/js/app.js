@@ -661,9 +661,15 @@ export class App {
     document.querySelectorAll(".studio-v3-device-switch [data-viewport]").forEach(button => {
       button.classList.toggle("is-active", button.dataset.viewport === vp);
     });
-    requestAnimationFrame(() => this.updateFreeformOverlay());
+    requestAnimationFrame(() => {
+      this.applyFreeformReparenting();
+      this.updateFreeformOverlay();
+    });
     clearTimeout(this._freeformViewportSyncTimer);
-    this._freeformViewportSyncTimer = setTimeout(() => this.updateFreeformOverlay(), 340);
+    this._freeformViewportSyncTimer = setTimeout(() => {
+      this.applyFreeformReparenting();
+      this.updateFreeformOverlay();
+    }, 340);
   }
 
   setSidebarTab(tab) {
@@ -3745,6 +3751,7 @@ export class App {
 
   // Interactive hooks for the canvas
   initCanvasInteractivity() {
+    this.applyFreeformReparenting();
     document.querySelectorAll("[data-site-theme-toggle]").forEach(button => {
       button.onclick = (event) => {
         event.preventDefault();
@@ -4089,6 +4096,7 @@ export class App {
           <button type="button" data-freeform-layer="forward" title="Avancer d’un plan" aria-label="Avancer d’un plan">+</button>
           <button type="button" data-freeform-layer="front" title="Mettre au premier plan" aria-label="Mettre au premier plan">⇥</button>
           <span></span>
+          <button type="button" data-freeform-cross-section title="Autoriser le déplacement entre sections" aria-label="Déplacement entre sections" aria-pressed="false">Page</button>
           <button type="button" data-freeform-responsive-toggle title="Ouvrir les outils responsive" aria-label="Ouvrir les outils responsive" aria-expanded="false">Resp.</button>
           <button type="button" data-freeform-ratio title="Verrouiller le ratio largeur/hauteur" aria-label="Verrouiller le ratio largeur/hauteur">Ratio libre</button>
           <button type="button" data-freeform-lock title="Verrouiller la sélection" aria-label="Verrouiller la sélection">Verrouiller</button>
@@ -4139,6 +4147,12 @@ export class App {
         event.preventDefault();
         event.stopPropagation();
         this.ungroupFreeformSelection();
+      });
+      overlay.querySelector("[data-freeform-cross-section]")?.addEventListener("click", event => {
+        event.preventDefault();
+        event.stopPropagation();
+        this._freeformCrossSectionMode = !this._freeformCrossSectionMode;
+        this.updateFreeformOverlay();
       });
       overlay.querySelector("[data-freeform-responsive-toggle]")?.addEventListener("click", event => {
         event.preventDefault();
@@ -4291,6 +4305,8 @@ export class App {
     this._freeformSelectedElement = null;
     this._freeformSelectedKey = null;
     this._freeformAdditiveMode = false;
+    this._freeformCrossSectionMode = false;
+    this.clearFreeformReparentTarget();
     if (this._freeformOverlay) {
       this._freeformOverlay.classList.remove("is-visible", "is-multi", "is-group", "is-locked");
       this._freeformOverlay.setAttribute("aria-hidden", "true");
@@ -4392,6 +4408,13 @@ export class App {
         ? `${keys.length} éléments · ${Math.round(right - left)}×${Math.round(bottom - top)}${rotationText}`
         : `${primaryLabel} · ${Math.round(right - left)}×${Math.round(bottom - top)}${rotationText}`;
     }
+    const crossSectionButton = overlay.querySelector("[data-freeform-cross-section]");
+    if (crossSectionButton) {
+      const active = Boolean(this._freeformCrossSectionMode);
+      crossSectionButton.classList.toggle("is-active", active);
+      crossSectionButton.setAttribute("aria-pressed", active ? "true" : "false");
+      crossSectionButton.textContent = active ? "Page ✓" : "Page";
+    }
     const additiveButton = overlay.querySelector("[data-freeform-additive]");
     if (additiveButton) {
       const active = Boolean(this._freeformAdditiveMode);
@@ -4421,14 +4444,146 @@ export class App {
     }
   }
 
+  getFreeformRuntimeViewport(root = document.querySelector(".artisite-root")) {
+    const canvas = document.getElementById("canvas-container");
+    if (canvas && root && canvas.contains(root) && ["desktop", "tablet", "mobile"].includes(canvas.dataset.viewport)) return canvas.dataset.viewport;
+    const width = root?.getBoundingClientRect?.().width || window.innerWidth;
+    return width < 640 ? "mobile" : (width < 1024 ? "tablet" : "desktop");
+  }
+
+  ensureFreeformReparentLayer(section) {
+    if (!section) return null;
+    const sectionId = section.dataset.sectionId || "section";
+    let layer = [...section.children].find(child => child?.dataset?.freeformReparentLayer === sectionId);
+    if (!layer) {
+      layer = document.createElement("div");
+      layer.className = "freeform-reparent-layer";
+      layer.dataset.freeformReparentLayer = sectionId;
+      Object.assign(layer.style, { position: "absolute", inset: "0", pointerEvents: "none", overflow: "visible" });
+      if (getComputedStyle(section).position === "static") section.style.position = "relative";
+      section.appendChild(layer);
+    }
+    return layer;
+  }
+
+  applyFreeformReparenting(root = document.querySelector(".artisite-root")) {
+    if (!root) return;
+    const viewport = this.getFreeformRuntimeViewport(root);
+    const attr = `data-freeform-parent-${viewport}`;
+    const sections = [...root.querySelectorAll(".editor-section-wrapper[data-section-id], .site-section[data-section-id]")];
+    root.querySelectorAll("[data-layout-key]").forEach(element => {
+      const key = element.dataset.layoutKey;
+      if (!key) return;
+      const parentSectionId = element.getAttribute(attr) || "";
+      const placeholder = root.querySelector(`[data-freeform-placeholder="${key}"]`);
+      if (!parentSectionId) {
+        if (placeholder) placeholder.replaceWith(element);
+        return;
+      }
+      const section = sections.find(candidate => candidate.dataset.sectionId === parentSectionId);
+      if (!section) return;
+      if (!placeholder && !element.closest(".freeform-reparent-layer")) {
+        const marker = document.createElement("span");
+        marker.hidden = true;
+        marker.dataset.freeformPlaceholder = key;
+        element.before(marker);
+      }
+      const layer = this.ensureFreeformReparentLayer(section);
+      if (layer && element.parentElement !== layer) layer.appendChild(element);
+      element.style.pointerEvents = "auto";
+    });
+  }
+
+  clearFreeformReparentTarget() {
+    document.querySelectorAll(".editor-section-wrapper.is-freeform-reparent-target").forEach(section => section.classList.remove("is-freeform-reparent-target"));
+    this._freeformReparentTarget = null;
+  }
+
+  findFreeformReparentTarget(rect) {
+    if (!rect) return null;
+    const cx = (rect.left + rect.right) / 2;
+    const cy = (rect.top + rect.bottom) / 2;
+    return [...document.querySelectorAll(".editor-section-wrapper[data-section-id]")].find(section => {
+      const candidate = section.getBoundingClientRect();
+      return cx >= candidate.left && cx <= candidate.right && cy >= candidate.top && cy <= candidate.bottom;
+    }) || null;
+  }
+
+  setFreeformReparentTarget(section) {
+    if (this._freeformReparentTarget === section) return;
+    this.clearFreeformReparentTarget();
+    if (section) {
+      section.classList.add("is-freeform-reparent-target");
+      this._freeformReparentTarget = section;
+    }
+  }
+
+  fitFreeformVisualBox(element, layout, desiredRect) {
+    const fitted = { ...layout, x: 0, y: 0, width: Math.max(1, desiredRect.width), height: Math.max(1, desiredRect.height) };
+    for (let pass = 0; pass < 4; pass += 1) {
+      this.applyFreeformLiveStyle(element, fitted, false);
+      const painted = element.getBoundingClientRect();
+      if (!(painted.width > 0 && painted.height > 0)) break;
+      const widthRatio = desiredRect.width / painted.width;
+      const heightRatio = desiredRect.height / painted.height;
+      if (Math.abs(widthRatio - 1) < 0.002 && Math.abs(heightRatio - 1) < 0.002) break;
+      fitted.width = Math.max(1, fitted.width * widthRatio);
+      fitted.height = Math.max(1, fitted.height * heightRatio);
+    }
+    this.applyFreeformLiveStyle(element, fitted, false);
+    return fitted;
+  }
+
+  commitFreeformReparent(entries, liveUpdates, targetSection) {
+    const targetSectionId = targetSection?.dataset?.sectionId;
+    if (!targetSectionId || !entries?.length) return false;
+    const currentSections = new Set(entries.map(entry => entry.target.closest(".editor-section-wrapper")?.dataset?.sectionId).filter(Boolean));
+    if (currentSections.size === 1 && currentSections.has(targetSectionId)) return false;
+    const layer = this.ensureFreeformReparentLayer(targetSection);
+    if (!layer) return false;
+    const updates = {};
+    entries.forEach(entry => {
+      const element = entry.target;
+      const key = entry.key;
+      const desiredRect = element.getBoundingClientRect();
+      const live = { ...(liveUpdates[key] || entry.base || {}) };
+      const placeholder = document.querySelector(`[data-freeform-placeholder="${key}"]`);
+
+      if (!placeholder && !element.closest(".freeform-reparent-layer")) {
+        const marker = document.createElement("span");
+        marker.hidden = true;
+        marker.dataset.freeformPlaceholder = key;
+        element.before(marker);
+      }
+      layer.appendChild(element);
+      const detached = this.fitFreeformVisualBox(element, { ...live, parentSectionId: targetSectionId }, desiredRect);
+      const zeroRect = element.getBoundingClientRect();
+      detached.x = desiredRect.left - zeroRect.left;
+      detached.y = desiredRect.top - zeroRect.top;
+      updates[key] = detached;
+      this.applyFreeformLiveStyle(element, detached, false);
+    });
+    state.setFreeformLayouts(updates, state.viewport, entries.length > 1 ? "Déplacer la sélection vers une section" : "Déplacer vers une section");
+    return true;
+  }
+
   getFreeformLayout(layoutKey = this._freeformSelectedKey, viewport = state.viewport) {
     return state.currentProject?.freeformLayout?.[viewport]?.[layoutKey] || { x: 0, y: 0 };
   }
 
   applyFreeformLiveStyle(target, layout, updateOverlay = true) {
     if (!target || !layout) return;
-    target.style.setProperty("position", "relative", "important");
-    target.style.setProperty("translate", `${Number(layout.x) || 0}px ${Number(layout.y) || 0}px`, "important");
+    const reparented = typeof layout.parentSectionId === "string" && layout.parentSectionId.trim();
+    target.style.setProperty("position", reparented ? "absolute" : "relative", "important");
+    if (reparented) {
+      target.style.setProperty("left", `${Number(layout.x) || 0}px`, "important");
+      target.style.setProperty("top", `${Number(layout.y) || 0}px`, "important");
+      target.style.setProperty("translate", "0 0", "important");
+    } else {
+      target.style.removeProperty("left");
+      target.style.removeProperty("top");
+      target.style.setProperty("translate", `${Number(layout.x) || 0}px ${Number(layout.y) || 0}px`, "important");
+    }
     if (Number.isFinite(Number(layout.width)) && Number(layout.width) > 0) {
       target.style.setProperty("width", `${layout.width}px`, "important");
       target.style.setProperty("min-width", "0", "important");
@@ -4657,8 +4812,11 @@ export class App {
       right: Math.max(...entries.map(entry => entry.rect.right)),
       bottom: Math.max(...entries.map(entry => entry.rect.bottom))
     };
-    const boundary = this.getFreeformSelectionBoundary(entries.map(entry => entry.target)) || selectionRect;
-    const snapContext = (action === "move" || action === "resize") ? this.buildFreeformSnapContext(entries, boundary) : null;
+    const crossSectionMove = action === "move" && Boolean(this._freeformCrossSectionMode);
+    const sectionBoundary = this.getFreeformSelectionBoundary(entries.map(entry => entry.target)) || selectionRect;
+    const boundary = crossSectionMove ? (canvas.getBoundingClientRect() || sectionBoundary) : sectionBoundary;
+    const snapContext = (action === "move" || action === "resize") && !crossSectionMove ? this.buildFreeformSnapContext(entries, boundary) : null;
+    let pendingReparentTarget = null;
     let liveUpdates = Object.fromEntries(entries.map(entry => [entry.key, { ...entry.base, x: Number(entry.base.x) || 0, y: Number(entry.base.y) || 0 }]));
     this._freeformOverlay?.classList.add("is-transforming");
     document.body.classList.add("freeform-transforming");
@@ -4703,6 +4861,12 @@ export class App {
           }
         }
         const snappedRect = { left: selectionRect.left + dx, right: selectionRect.right + dx, top: selectionRect.top + dy, bottom: selectionRect.bottom + dy };
+        if (crossSectionMove) {
+          const candidate = this.findFreeformReparentTarget(snappedRect);
+          const currentSections = new Set(entries.map(entry => entry.target.closest(".editor-section-wrapper")?.dataset?.sectionId).filter(Boolean));
+          pendingReparentTarget = candidate && !(currentSections.size === 1 && currentSections.has(candidate.dataset.sectionId)) ? candidate : null;
+          this.setFreeformReparentTarget(pendingReparentTarget);
+        }
         this.showFreeformGuides(snapX, snapY, boundary);
         this.showFreeformSpacingGuides(spacingX, spacingY, snappedRect);
         liveUpdates = {};
@@ -4838,6 +5002,13 @@ export class App {
       document.body.classList.remove("freeform-transforming", "freeform-direct-dragging");
       this.hideFreeformGuides();
       this.hideFreeformSpacingGuides();
+      const reparentTarget = pendingReparentTarget;
+      this.clearFreeformReparentTarget();
+      if (action === "move" && crossSectionMove && reparentTarget && this.commitFreeformReparent(entries, liveUpdates, reparentTarget)) {
+        this._freeformCrossSectionMode = false;
+        this.updateFreeformOverlay();
+        return;
+      }
       state.setFreeformLayouts(liveUpdates, state.viewport, action === "move"
         ? (keys.length > 1 ? "Déplacement sélection libre" : "Déplacement élément libre")
         : (keys.length > 1 ? "Redimensionnement groupe libre" : "Redimensionnement élément libre"));

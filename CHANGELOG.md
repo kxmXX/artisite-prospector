@@ -7,6 +7,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 15 septembre 2026 (4.8.0-alpha.30)
+
+- Reparenting : mode `Page` explicite pour déplacer un calque entre sections ; `parentSectionId` est persisté par breakpoint et les sections publiques exposent le même contrat que l’éditeur.
+- Géométrie : déplacement inter-section conserve la boîte visuelle mesurée au début du geste ; Header→Hero et retour restent à 87,625×72 dans le QA Chrome, sans resize fonctionnel.
+- UX/Undo : la cible de section est surlignée, `Page` repasse réellement à OFF après le drop, un retour vers la section d’origine reste un placement libre explicite et Undo restaure la section précédente.
+- Cohérence : runtime de reparenting partagé dans l’éditeur/preview et script équivalent dans l’export standalone ; test Chrome standalone confirme un élément `position:absolute` dans la couche de la section cible. Validation : 50/50 ciblés, 225/225 complets.
+
 ### Consolidation — 15 septembre 2026 (4.8.0-alpha.29)
 
 - Tactile : bouton `Multi +` accessible au doigt pour ajouter/retirer des éléments sans Shift ; groupes conservés comme unités et état `aria-pressed` explicite.

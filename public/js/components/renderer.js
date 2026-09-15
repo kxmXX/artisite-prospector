@@ -47,24 +47,35 @@ function getButtonLayoutCode(project, section, buttonType) {
   return getUiCode(project?.id, section?.id, `button-${role}`);
 }
 
+function getFreeformPlacementAttributes(project, layoutKey, originSectionId) {
+  if (!layoutKey) return "";
+  const attrs = [` data-layout-origin-section="${escapeHtml(originSectionId || "")}"`];
+  for (const viewport of ["desktop", "tablet", "mobile"]) {
+    const parentSectionId = project?.freeformLayout?.[viewport]?.[layoutKey]?.parentSectionId;
+    if (parentSectionId) attrs.push(` data-freeform-parent-${viewport}="${escapeHtml(parentSectionId)}"`);
+  }
+  return attrs.join("");
+}
+
 function decorateLayoutKeys(markup, project, section) {
   let output = markup.replace(/<([a-z][\w-]*)(\s[^>]*data-editable="([^"]+)"[^>]*)>/gi, (full, _tag, _attrs, fieldPath) => {
     if (/\sdata-layout-key=/.test(full)) return full;
     const code = getUiCode(project?.id, section?.id, fieldPath);
-    return full.replace(/>$/, ` data-layout-key="${code}">`);
+    return full.replace(/>$/, ` data-layout-key="${code}"${getFreeformPlacementAttributes(project, code, section?.id)}>`);
   });
 
   output = output.replace(/<([a-z][\w-]*)(\s[^>]*data-layout-node="([^"]+)"[^>]*)>/gi, (full, _tag, _attrs, nodeId) => {
     if (/\sdata-layout-key=/.test(full)) return full;
     const code = getUiCode(project?.id, section?.id, `node-${nodeId}`);
-    return full.replace(/>$/, ` data-layout-key="${code}" data-layout-type="structure">`);
+    return full.replace(/>$/, ` data-layout-key="${code}" data-layout-type="structure"${getFreeformPlacementAttributes(project, code, section?.id)}>`);
   });
 
   output = output.replace(/<div(\s[^>]*data-cta-popover-wrapper[^>]*)>/gi, (full, attrs) => {
     if (/\sdata-layout-key=/.test(full)) return full;
     const buttonType = attrs.match(/data-button-type="([^"]+)"/)?.[1];
     if (!buttonType) return full;
-    return full.replace(/>$/, ` data-layout-key="${getButtonLayoutCode(project, section, buttonType)}">`);
+    const code = getButtonLayoutCode(project, section, buttonType);
+    return full.replace(/>$/, ` data-layout-key="${code}"${getFreeformPlacementAttributes(project, code, section?.id)}>`);
   });
   return output;
 }
@@ -78,11 +89,10 @@ function freeformDeclarations(layout = {}) {
   const scaleX = Number(layout.scaleX);
   const scaleY = Number(layout.scaleY);
   const rotation = Number(layout.rotation);
-  const declarations = [
-    'position:relative!important',
-    `translate:${x}px ${y}px!important`,
-    'box-sizing:border-box!important'
-  ];
+  const isReparented = typeof layout.parentSectionId === "string" && layout.parentSectionId.trim();
+  const declarations = isReparented
+    ? ['position:absolute!important', `left:${x}px!important`, `top:${y}px!important`, 'translate:0 0!important', 'box-sizing:border-box!important']
+    : ['position:relative!important', `translate:${x}px ${y}px!important`, 'box-sizing:border-box!important'];
   if (Number.isFinite(width) && width > 0) declarations.push(`width:${Math.round(width * 100) / 100}px!important`, 'min-width:0!important', 'max-width:none!important');
   if (Number.isFinite(height) && height > 0) declarations.push(`height:${Math.round(height * 100) / 100}px!important`, 'min-height:0!important', 'max-height:none!important');
   if ((Number.isFinite(scaleX) && scaleX > 0.02) || (Number.isFinite(scaleY) && scaleY > 0.02)) {
@@ -218,19 +228,20 @@ export function renderEditableImage(url, { sectionId = "", fieldPath = "", targe
   const uiFieldPath = targetFieldPath || fieldPath;
   const imageTargetId = project && sec ? getUiId(project, sec, `field-${uiFieldPath}`) : "";
   const imageUiCode = project && sec ? getUiCode(project?.id, sec.id, uiFieldPath) : "";
+  const imagePlacementAttrs = getFreeformPlacementAttributes(project, imageUiCode, sectionId);
   const imgMotion = sec?.settings?.imageMotions?.[imgKey] || sec?.settings?.[`motion_${fieldPath}`] || sec?.settings?.motion_image || "";
   const motionAttr = imgMotion && imgMotion !== "none" ? ` data-motion="${imgMotion}"` : "";
   const motionClass = imgMotion && imgMotion !== "none" ? ` motion-preset-${imgMotion.replace('-in', '')}${imgMotion === 'pulse' ? ' btn-pulse-active' : ''}` : "";
 
   if (!isEditor) {
-    return `<img src="${displayUrl}" data-layout-key="${imageUiCode}" data-fallback-src="${fallbackSvg}" alt="${alt}" class="${className}${motionClass}" ${perfAttrs} ${onErrorAttr}${motionAttr}>`;
+    return `<img src="${displayUrl}" data-layout-key="${imageUiCode}"${imagePlacementAttrs} data-fallback-src="${fallbackSvg}" alt="${alt}" class="${className}${motionClass}" ${perfAttrs} ${onErrorAttr}${motionAttr}>`;
   }
 
   globalElementIndex += 1;
   const imageElementIndex = globalElementIndex;
   return `
     <div class="relative group/img w-full h-full"
-         data-layout-key="${imageUiCode}"
+         data-layout-key="${imageUiCode}"${imagePlacementAttrs}
          ${imageTargetId ? `data-ui-id="${imageTargetId}" data-ui-code="${imageUiCode}" data-ui-type="field" data-ui-target="true" data-ui-index="${imageElementIndex}" data-ui-index-size="m"` : ''}
          ondragover="event.preventDefault(); this.classList.add('ring-2', 'ring-zinc-900');"
          ondragleave="this.classList.remove('ring-2', 'ring-zinc-900');"
@@ -511,7 +522,7 @@ function renderSection(sec, project, options) {
     : "";
 
   if (!isEditor) {
-    return `<section id="${sec.type}" class="site-section ${bgTheme} ${isHidden ? 'hidden' : ''}" style="--section-bg: ${themeColor}; ${customBackground}" data-section-type="${sec.type}" data-section-bg="${sectionTheme}" data-has-custom-bg="${customBackground ? 'true' : 'false'}" data-scroll-fx="zoom" data-ui-id="${getSectionUiId(sec)}" data-ui-type="section"${motionPreset ? ` data-motion="${motionPreset}"` : ''}>${innerHTML}</section>`;
+    return `<section id="${sec.type}" class="site-section ${bgTheme} ${isHidden ? 'hidden' : ''}" style="--section-bg: ${themeColor}; ${customBackground}" data-section-id="${sec.id}" data-section-type="${sec.type}" data-section-bg="${sectionTheme}" data-has-custom-bg="${customBackground ? 'true' : 'false'}" data-scroll-fx="zoom" data-ui-id="${getSectionUiId(sec)}" data-ui-type="section"${motionPreset ? ` data-motion="${motionPreset}"` : ''}>${innerHTML}</section>`;
   }
 
   // Editor Wrapper with Controls

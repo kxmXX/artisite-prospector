@@ -403,6 +403,7 @@ class AppStateManager {
       normalized.rotation = Math.round(normalizedRotation * 100) / 100;
     }
     if (nextLayout.aspectLocked === true) normalized.aspectLocked = true;
+    if (typeof nextLayout.parentSectionId === "string" && nextLayout.parentSectionId.trim()) normalized.parentSectionId = nextLayout.parentSectionId.trim();
 
     const current = this.currentProject.freeformLayout?.[safeViewport]?.[layoutKey] || null;
     if (JSON.stringify(current) === JSON.stringify(normalized)) return;
@@ -456,6 +457,7 @@ class AppStateManager {
         normalized.rotation = Math.round(normalizedRotation * 100) / 100;
       }
       if (nextLayout.aspectLocked === true) normalized.aspectLocked = true;
+      if (typeof nextLayout.parentSectionId === "string" && nextLayout.parentSectionId.trim()) normalized.parentSectionId = nextLayout.parentSectionId.trim();
       return normalized;
     };
     const normalizedEntries = entries.map(([key, value]) => [key, normalize(value)]);

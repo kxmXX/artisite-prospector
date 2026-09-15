@@ -374,6 +374,60 @@ ${UTILITY_CSS}
 
   <!-- Interactive Scripts Bundle -->
   <script>
+    // Freeform cross-section parenting — mirrors the editor/preview runtime.
+    (function initFreeformReparenting() {
+      const root = document.querySelector('.artisite-root');
+      if (!root) return;
+      const getViewport = () => {
+        const width = root.getBoundingClientRect().width || window.innerWidth;
+        return width < 640 ? 'mobile' : (width < 1024 ? 'tablet' : 'desktop');
+      };
+      const ensureLayer = section => {
+        const id = section.dataset.sectionId || 'section';
+        let layer = Array.from(section.children).find(child => child.dataset && child.dataset.freeformReparentLayer === id);
+        if (!layer) {
+          layer = document.createElement('div');
+          layer.className = 'freeform-reparent-layer';
+          layer.dataset.freeformReparentLayer = id;
+          Object.assign(layer.style, { position: 'absolute', inset: '0', pointerEvents: 'none', overflow: 'visible' });
+          if (getComputedStyle(section).position === 'static') section.style.position = 'relative';
+          section.appendChild(layer);
+        }
+        return layer;
+      };
+      const apply = () => {
+        const attr = 'data-freeform-parent-' + getViewport();
+        const sections = Array.from(root.querySelectorAll('.site-section[data-section-id]'));
+        root.querySelectorAll('[data-layout-key]').forEach(element => {
+          const key = element.dataset.layoutKey;
+          if (!key) return;
+          const parentId = element.getAttribute(attr) || '';
+          const placeholder = root.querySelector('[data-freeform-placeholder="' + key + '"]');
+          if (!parentId) {
+            if (placeholder) placeholder.replaceWith(element);
+            return;
+          }
+          const section = sections.find(candidate => candidate.dataset.sectionId === parentId);
+          if (!section) return;
+          if (!placeholder && !element.closest('.freeform-reparent-layer')) {
+            const marker = document.createElement('span');
+            marker.hidden = true;
+            marker.dataset.freeformPlaceholder = key;
+            element.before(marker);
+          }
+          const layer = ensureLayer(section);
+          if (element.parentElement !== layer) layer.appendChild(element);
+          element.style.pointerEvents = 'auto';
+        });
+      };
+      apply();
+      let resizeTimer = 0;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(apply, 80);
+      });
+    })();
+
     // 1. Standalone day/night theme toggle
     (function initSiteTheme() {
       const root = document.querySelector('.artisite-root');

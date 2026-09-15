@@ -1,3 +1,12 @@
+## LOT DE LIVRAISON — reparenting inter-sections 4.8.0-alpha.30
+
+- Mode `Page` : activation explicite avant un geste inter-section ; la section sous le centre du calque est surlignée et le mode se désactive visuellement et réellement après un drop réussi.
+- Persistance : `parentSectionId` vit dans `freeformLayout` au breakpoint actif ; le renderer émet origine + parents de breakpoint et le runtime déplace le nœud dans une couche absolue de la section cible.
+- Géométrie : diagnostic du faux 66×45→88×72 — la première variation provenait du focus/inspecteur avant le geste. La preuve correcte pointerdown→drop conserve 87,625×72 sur Header→Hero puis Hero→Header ; aucune variation fonctionnelle.
+- Aller/retour/Undo : revenir vers la section d’origine reste un placement libre absolu dans sa couche, ce qui évite les conversions erronées avec un header sticky ; Reset reste l’action de retour au flow naturel. Undo du retour replace le calque dans la section précédente.
+- Cohérence : preview réutilise `applyFreeformReparenting`; standalone exécute son runtime embarqué et a été ouvert dans Chrome avec parent réel `sec-services`, `position:absolute`, 280×80. Validation : 50/50 ciblés, 225/225 complets.
+- Prochaine action : QA global dashboard + éditeur 1440/1024/390, avec attention aux changements de géométrie lors de l’ouverture de l’inspecteur.
+
 ## LOT DE LIVRAISON — tactile multi-sélection et auto-scroll 4.8.0-alpha.29
 
 - Multi tactile : `Multi +` bascule un mode additif persistant tant que la sélection existe ; les taps ajoutent/retirent les unités de groupe sans dépendre de Shift.
