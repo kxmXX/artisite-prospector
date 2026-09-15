@@ -818,7 +818,7 @@ body.dark-theme .faq-item.active .faq-icon-btn {
   display: none !important;
 }
 .client-preview-mode .editor-section-wrapper {
-  outline: none !important;
+
 }
 
 input, textarea, select, [contenteditable] {

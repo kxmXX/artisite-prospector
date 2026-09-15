@@ -69,6 +69,8 @@
   --ui-line: rgba(24, 32, 31, .11);
   --ui-line-strong: rgba(24, 32, 31, .18);
   --ui-muted: #5f6866;
+  --ui-muted-soft: #6d7674;
+  --ui-muted-on-dark: #aab4b0;
   --ui-accent: #d76a3b;
   --ui-accent-soft: #fae9df;
   --ui-sage: #dce7df;
@@ -111,6 +113,14 @@
   --z-toolbar-text: 80;
   --z-toolbar-freeform: 9400;
 }
+
+/* Échelle typographique du chrome. Le balisage n'écrit plus de tailles arbitraires :
+   toute micro-typographie passe par ces cinq classes et par les jetons ci-dessus. */
+.text-ui-2xs { font-size: var(--ui-text-2xs); line-height: 1.35; }
+.text-ui-xs { font-size: var(--ui-text-xs); line-height: 1.4; }
+.text-ui-sm { font-size: var(--ui-text-sm); line-height: 1.4; }
+.text-ui-base { font-size: var(--ui-text-base); line-height: 1.45; }
+.text-ui-md { font-size: var(--ui-text-md); line-height: 1.45; }
 
 /* Anneau de focus unique pour tout le chrome interactif. */
 :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {

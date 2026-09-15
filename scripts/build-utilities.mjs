@@ -38,7 +38,6 @@ const APP_CSS = [
   'public/css/tokens.css',
   'public/css/app.css',
   'public/css/studio-v3.css',
-  'public/css/product-precision.css',
   'public/css/editor-canvas-viewport.css'
 ];
 // Corpus « export » : tout ce que le fichier HTML autonome embarque.

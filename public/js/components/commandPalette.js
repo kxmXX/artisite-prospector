@@ -10,7 +10,7 @@ export function renderCommandPalette(project, allProjects = []) {
 
   return `
     <div id="cmd-palette-backdrop" class="studio-system-modal fixed inset-0 z-50 flex items-start justify-center pt-20 p-4 animate-fade-in" onclick="if(event.target === this) window.app.closeCommandPalette()">
-      <div class="studio-modal-card studio-v3-modal studio-v3-command w-full max-w-xl overflow-hidden transition-all" onclick="event.stopPropagation()">
+      <div class="studio-v3-modal studio-v3-command w-full max-w-xl overflow-hidden transition-all" onclick="event.stopPropagation()">
         
         <!-- Search Input Bar -->
         <div class="p-3.5 border-b border-zinc-200 flex items-center gap-3 bg-white">
@@ -20,7 +20,7 @@ export function renderCommandPalette(project, allProjects = []) {
                  oninput="window.app.filterCommandPalette(this.value)"
                  onkeydown="window.app.handleCommandPaletteKey(event)"
                  class="w-full bg-transparent text-sm text-zinc-900 placeholder-zinc-400 focus:outline-none font-medium">
-          <kbd class="px-2 py-0.5 text-[10px] font-mono text-zinc-500 bg-zinc-100 border border-zinc-200 rounded">ESC</kbd>
+          <kbd class="px-2 py-0.5 text-ui-xs font-mono text-zinc-500 bg-zinc-100 border border-zinc-200 rounded">ESC</kbd>
         </div>
 
         <!-- Results List -->
@@ -29,15 +29,15 @@ export function renderCommandPalette(project, allProjects = []) {
           ${sections.length > 0 ? `
           <!-- Sections Group -->
           <div class="cmd-group" data-group="sections">
-            <div class="px-2.5 py-1 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Sections du site</div>
+            <div class="px-2.5 py-1 text-ui-xs font-bold text-zinc-400 uppercase tracking-wider">Sections du site</div>
             ${sections.map(s => `
               <div class="cmd-item flex items-center justify-between px-3 py-2 rounded-lg text-xs text-zinc-800 hover:bg-zinc-100 cursor-pointer transition-colors"
                    onclick="window.app.executeCommand('goto-section', '${s.id}')" data-title="${escapeHtml(s.content?.title || s.type)}">
                 <div class="flex items-center gap-2.5">
-                  <span class="text-zinc-400 font-mono text-[10.5px]">${s.type}</span>
+                  <span class="text-zinc-400 font-mono text-ui-xs">${s.type}</span>
                   <span class="font-medium text-zinc-900">${escapeHtml(s.content?.title || s.content?.badge || s.type)}</span>
                 </div>
-                <span class="text-[10px] text-zinc-400">Aller à la section ↵</span>
+                <span class="text-ui-xs text-zinc-400">Aller à la section ↵</span>
               </div>
             `).join('')}
           </div>
@@ -46,16 +46,16 @@ export function renderCommandPalette(project, allProjects = []) {
           ${allProjects.length > 0 ? `
           <!-- Projects Group -->
           <div class="cmd-group pt-2 border-t border-zinc-100" data-group="projects">
-            <div class="px-2.5 py-1 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Mes Projets</div>
+            <div class="px-2.5 py-1 text-ui-xs font-bold text-zinc-400 uppercase tracking-wider">Mes Projets</div>
             ${allProjects.map(p => `
               <div class="cmd-item flex items-center justify-between px-3 py-2 rounded-lg text-xs text-zinc-800 hover:bg-zinc-100 cursor-pointer transition-colors"
                    onclick="window.app.executeCommand('open-project', '${p.id}')" data-title="${escapeHtml(p.name + ' ' + (p.business?.city || ''))}">
                 <div class="flex items-center gap-2.5">
                   <span class="text-xs">📂</span>
                   <span class="font-medium text-zinc-900">${escapeHtml(p.name)}</span>
-                  <span class="text-[10.5px] text-zinc-400">${escapeHtml(p.business?.city || '')}</span>
+                  <span class="text-ui-xs text-zinc-400">${escapeHtml(p.business?.city || '')}</span>
                 </div>
-                <span class="text-[10px] text-zinc-400">Ouvrir ↵</span>
+                <span class="text-ui-xs text-zinc-400">Ouvrir ↵</span>
               </div>
             `).join('')}
           </div>
@@ -63,7 +63,7 @@ export function renderCommandPalette(project, allProjects = []) {
 
           <!-- Actions Group -->
           <div class="cmd-group pt-2 border-t border-zinc-100" data-group="actions">
-            <div class="px-2.5 py-1 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Outils & Actions Vente</div>
+            <div class="px-2.5 py-1 text-ui-xs font-bold text-zinc-400 uppercase tracking-wider">Outils & Actions Vente</div>
             
             <div class="cmd-item flex items-center justify-between px-3 py-2 rounded-lg text-xs text-zinc-800 hover:bg-zinc-100 cursor-pointer transition-colors"
                  onclick="window.app.executeCommand('reset-sendpage-demo')" data-title="reinitialiser recharger modele esprit nature sendpage benchmark demo 100%">
@@ -71,7 +71,7 @@ export function renderCommandPalette(project, allProjects = []) {
                 <span class="text-sm">🌿</span>
                 <span class="font-bold text-emerald-800">Recharger Démo Esprit Nature (Sendpage 100%)</span>
               </div>
-              <span class="text-[10px] text-zinc-400">Recharger ↵</span>
+              <span class="text-ui-xs text-zinc-400">Recharger ↵</span>
             </div>
 
             <div class="cmd-item flex items-center justify-between px-3 py-2 rounded-lg text-xs text-zinc-800 hover:bg-zinc-100 cursor-pointer transition-colors"
@@ -80,7 +80,7 @@ export function renderCommandPalette(project, allProjects = []) {
                 ${getIcon("share", "w-3.5 h-3.5 text-zinc-500")}
                 <span class="font-medium text-zinc-900">Partager la démo avec QR Code</span>
               </div>
-              <span class="text-[10px] text-zinc-400">Ouvrir ↵</span>
+              <span class="text-ui-xs text-zinc-400">Ouvrir ↵</span>
             </div>
 
             <div class="cmd-item flex items-center justify-between px-3 py-2 rounded-lg text-xs text-zinc-800 hover:bg-zinc-100 cursor-pointer transition-colors"
@@ -89,7 +89,7 @@ export function renderCommandPalette(project, allProjects = []) {
                 ${getIcon("sparkles", "w-3.5 h-3.5 text-amber-500")}
                 <span class="font-medium text-zinc-900">Kit Vente Closer & Argumentaire Téléphonique</span>
               </div>
-              <span class="text-[10px] text-zinc-400">Ouvrir ↵</span>
+              <span class="text-ui-xs text-zinc-400">Ouvrir ↵</span>
             </div>
 
             <div class="cmd-item flex items-center justify-between px-3 py-2 rounded-lg text-xs text-zinc-800 hover:bg-zinc-100 cursor-pointer transition-colors"
@@ -98,7 +98,7 @@ export function renderCommandPalette(project, allProjects = []) {
                 ${getIcon("download", "w-3.5 h-3.5 text-zinc-500")}
                 <span class="font-medium text-zinc-900">Imprimer Proposition Commerciale (PDF)</span>
               </div>
-              <span class="text-[10px] text-zinc-400">Imprimer ↵</span>
+              <span class="text-ui-xs text-zinc-400">Imprimer ↵</span>
             </div>
 
             <div class="cmd-item flex items-center justify-between px-3 py-2 rounded-lg text-xs text-zinc-800 hover:bg-zinc-100 cursor-pointer transition-colors"
@@ -107,13 +107,13 @@ export function renderCommandPalette(project, allProjects = []) {
                 ${getIcon("download", "w-3.5 h-3.5 text-zinc-500")}
                 <span class="font-medium text-zinc-900">Télécharger le site autonome (.HTML)</span>
               </div>
-              <span class="text-[10px] text-zinc-400">Télécharger ↵</span>
+              <span class="text-ui-xs text-zinc-400">Télécharger ↵</span>
             </div>
           </div>
 
           <!-- Viewports Group -->
           <div class="cmd-group pt-2 border-t border-zinc-100" data-group="viewports">
-            <div class="px-2.5 py-1 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Affichage Responsive</div>
+            <div class="px-2.5 py-1 text-ui-xs font-bold text-zinc-400 uppercase tracking-wider">Affichage Responsive</div>
             
             <div class="cmd-item flex items-center justify-between px-3 py-2 rounded-lg text-xs text-zinc-800 hover:bg-zinc-100 cursor-pointer transition-colors"
                  onclick="window.app.executeCommand('set-vp', 'desktop')" data-title="desktop grand ecran bureau">
@@ -121,7 +121,7 @@ export function renderCommandPalette(project, allProjects = []) {
                 ${getIcon("laptop", "w-3.5 h-3.5 text-zinc-500")}
                 <span class="font-medium text-zinc-900">Vue Ordinateur (Desktop 100%)</span>
               </div>
-              <span class="text-[10px] text-zinc-400">Activer ↵</span>
+              <span class="text-ui-xs text-zinc-400">Activer ↵</span>
             </div>
 
             <div class="cmd-item flex items-center justify-between px-3 py-2 rounded-lg text-xs text-zinc-800 hover:bg-zinc-100 cursor-pointer transition-colors"
@@ -130,7 +130,7 @@ export function renderCommandPalette(project, allProjects = []) {
                 ${getIcon("tablet", "w-3.5 h-3.5 text-zinc-500")}
                 <span class="font-medium text-zinc-900">Vue Tablette (768px)</span>
               </div>
-              <span class="text-[10px] text-zinc-400">Activer ↵</span>
+              <span class="text-ui-xs text-zinc-400">Activer ↵</span>
             </div>
 
             <div class="cmd-item flex items-center justify-between px-3 py-2 rounded-lg text-xs text-zinc-800 hover:bg-zinc-100 cursor-pointer transition-colors"
@@ -139,13 +139,13 @@ export function renderCommandPalette(project, allProjects = []) {
                 ${getIcon("smartphone", "w-3.5 h-3.5 text-zinc-500")}
                 <span class="font-medium text-zinc-900">Vue Smartphone (Mobile 390px)</span>
               </div>
-              <span class="text-[10px] text-zinc-400">Activer ↵</span>
+              <span class="text-ui-xs text-zinc-400">Activer ↵</span>
             </div>
           </div>
 
           <!-- Ambiances Group -->
           <div class="cmd-group pt-2 border-t border-zinc-100" data-group="themes">
-            <div class="px-2.5 py-1 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Ambiance Globale</div>
+            <div class="px-2.5 py-1 text-ui-xs font-bold text-zinc-400 uppercase tracking-wider">Ambiance Globale</div>
             
             <div class="cmd-item flex items-center justify-between px-3 py-2 rounded-lg text-xs text-zinc-800 hover:bg-zinc-100 cursor-pointer transition-colors"
                  onclick="window.app.executeCommand('switch-theme', 'white')" data-title="theme blanc epure clair">
@@ -153,7 +153,7 @@ export function renderCommandPalette(project, allProjects = []) {
                 <span class="w-3 h-3 rounded-full border border-zinc-300 bg-white"></span>
                 <span class="font-medium text-zinc-900">Épure Blanche (Clair & Net)</span>
               </div>
-              <span class="text-[10px] text-zinc-400">Appliquer ↵</span>
+              <span class="text-ui-xs text-zinc-400">Appliquer ↵</span>
             </div>
 
             <div class="cmd-item flex items-center justify-between px-3 py-2 rounded-lg text-xs text-zinc-800 hover:bg-zinc-100 cursor-pointer transition-colors"
@@ -162,7 +162,7 @@ export function renderCommandPalette(project, allProjects = []) {
                 <span class="w-3 h-3 rounded-full border border-zinc-300 bg-zinc-100"></span>
                 <span class="font-medium text-zinc-900">Minéral Doux (Gris Naturel)</span>
               </div>
-              <span class="text-[10px] text-zinc-400">Appliquer ↵</span>
+              <span class="text-ui-xs text-zinc-400">Appliquer ↵</span>
             </div>
 
             <div class="cmd-item flex items-center justify-between px-3 py-2 rounded-lg text-xs text-zinc-800 hover:bg-zinc-100 cursor-pointer transition-colors"
@@ -171,17 +171,17 @@ export function renderCommandPalette(project, allProjects = []) {
                 <span class="w-3 h-3 rounded-full border border-zinc-700 bg-zinc-900"></span>
                 <span class="font-medium text-zinc-900">Ardoise Sombre (Luxe Nocturne)</span>
               </div>
-              <span class="text-[10px] text-zinc-400">Appliquer ↵</span>
+              <span class="text-ui-xs text-zinc-400">Appliquer ↵</span>
             </div>
           </div>
 
         </div>
 
         <!-- Footer Help -->
-        <div class="p-2.5 border-t border-zinc-200/80 bg-zinc-50 flex items-center justify-between text-[11px] text-zinc-400 px-4">
+        <div class="p-2.5 border-t border-zinc-200/80 bg-zinc-50 flex items-center justify-between text-ui-sm text-zinc-400 px-4">
           <div class="flex items-center gap-3">
-            <span><kbd class="font-mono bg-white border border-zinc-200 px-1 py-0.5 rounded text-[10px]">↑↓</kbd> Naviguer</span>
-            <span><kbd class="font-mono bg-white border border-zinc-200 px-1 py-0.5 rounded text-[10px]">↵</kbd> Exécuter</span>
+            <span><kbd class="font-mono bg-white border border-zinc-200 px-1 py-0.5 rounded text-ui-xs">↑↓</kbd> Naviguer</span>
+            <span><kbd class="font-mono bg-white border border-zinc-200 px-1 py-0.5 rounded text-ui-xs">↵</kbd> Exécuter</span>
           </div>
           <span>Navigation instantanée Linear / Raycast</span>
         </div>

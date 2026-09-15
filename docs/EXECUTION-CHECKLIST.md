@@ -37,12 +37,20 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
       retirés, 8 tests dédiés, **280/280**. *Point ouvert* : l'en-tête de la vitrine rendu dans le
       canvas étroit de l'éditeur (~640 px) est à l'étroit (liens qui se replient, FAQ proche du CTA) —
       traité au lot 2 avec la largeur de canvas et l'en-tête responsive.
-- [ ] **Lot 2 — Finition UI/UX** : retirer `product-precision.css` (179/273 règles mortes) et la
-      couche orpheline `studio-v3.css:373-478`, converger tailles/rayons/ombres/espacements vers les
-      jetons, remplacer les 204 glyphes emoji du chrome par `icons.js`, couvrir tous les états
-      hover/focus/active/disabled, remonter les 16 contrastes < 4,5:1, étendre `pointer:coarse` à
-      44 px partout, réduire la cascade de cartes, corriger le responsive du dashboard ≤ 760 px
-      (rail masqué sans remplacement) et réduire la liste gelée des 34 classes sans règle.
+- [~] **Lot 2 — Finition UI/UX** (2a livré en `4.9.0-alpha.2`) : `product-precision.css` supprimée
+      et marqueur `studio-modal-card` retiré ; 397 tailles arbitraires du chrome remplacées par
+      l'échelle `text-ui-*` ; 33 graisses intermédiaires normalisées ; 7 `outline:0` retirés ;
+      16 couples de contraste < 4,5:1 remontés (pire cas 2,16:1 → 5,50:1) ; `pointer:coarse` étendu
+      à 44 px sur tout le chrome ; `prefers-reduced-motion` étendu au dashboard et aux modales ;
+      13 tests design, **285/285**. **Reste (2b)** : couche orpheline `studio-v3.css:373-478`,
+      204 glyphes emoji du chrome → `icons.js`, convergence rayons/ombres/espacements, cascade de
+      cartes dans l'inspecteur, liste gelée des 34 classes sans règle, navigation du dashboard
+      ≤ 760 px, et le point ouvert ci-dessous.
+      *Point ouvert 2a mesuré* : dans le canvas de l'éditeur (~640 px à 1280 de fenêtre), la vitrine
+      rend sa navigation bureau et déborde (logo replié, FAQ sous le CTA). Cause identifiée : les
+      media queries du site répondent à la fenêtre, pas au canvas. Correction prévue au lot
+      responsive via des requêtes de conteneur sur le canvas — **non appliquée à ce stade**;
+      la vitrine publique, elle, est correcte (vérifiée pleine largeur).
 - [ ] **Lot 3 — Sélection et hiérarchie** : un seul état de sélection (site/section/élément/multi),
       Échap remonte d'un niveau, fil d'Ariane Site ▸ Section ▸ Élément, liste des éléments du canvas,
       suppression des 830 lignes inertes de `renderSectionAccordionContent` après réimplantation de

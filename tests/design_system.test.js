@@ -126,3 +126,76 @@ test('le HTML autonome exporté se suffit à lui-même', async () => {
     .sort();
   assert.deepEqual(missing, [], 'classes sans règle dans le HTML autonome exporté');
 });
+
+const CHROME_FILES = [
+  'public/js/app.js',
+  'public/js/components/editor.js',
+  'public/js/components/inspector.js',
+  'public/js/components/dashboard.js',
+  'public/js/components/commandPalette.js',
+  'public/js/components/shareModal.js',
+  'public/js/components/closerModal.js',
+  'public/js/components/imageModal.js',
+  'public/js/components/addSectionModal.js',
+  'public/js/components/wizard.js'
+];
+
+test('le chrome n\'écrit plus de taille de texte arbitraire', () => {
+  const offenders = [];
+  for (const relative of CHROME_FILES) {
+    const source = read(relative);
+    for (const match of source.matchAll(/text-\[\d+(?:\.\d+)?px\]/g)) offenders.push(relative + ' → ' + match[0]);
+  }
+  assert.deepEqual(offenders, [], 'tailles arbitraires restantes dans le chrome');
+  const tokens = read('public/css/tokens.css');
+  for (const size of ['2xs', 'xs', 'sm', 'base', 'md']) {
+    assert.ok(tokens.includes('.text-ui-' + size), 'classe d\'échelle manquante : text-ui-' + size);
+  }
+});
+
+test('le chrome ne supprime plus l\'anneau de focus et n\'utilise plus de graisses intermédiaires', () => {
+  const offenders = [];
+  for (const relative of ['public/css/app.css', 'public/css/studio-v3.css', 'public/css/tokens.css', 'public/css/editor-canvas-viewport.css']) {
+    const css = read(relative);
+    for (const match of css.matchAll(/outline\s*:\s*(?:0|none)\s*(?:!important)?\s*;?/gi)) {
+      offenders.push(relative + ' → ' + match[0].trim());
+    }
+    for (const match of css.matchAll(/(?:font-weight|font)\s*:\s*(?:600|700)?\s*(640|650|680|690|720|730|750|760)\b/g)) {
+      offenders.push(relative + ' → graisse ' + match[1]);
+    }
+  }
+  assert.deepEqual(offenders, [], 'contour de focus supprimé ou graisse non standard');
+});
+
+test('les couleurs de texte atténuées du chrome atteignent 4,5:1', () => {
+  const luminance = (hex) => {
+    const value = hex.replace('#', '');
+    const channels = [0, 2, 4].map((index) => parseInt(value.slice(index, index + 2), 16) / 255)
+      .map((channel) => (channel <= 0.03928 ? channel / 12.92 : Math.pow((channel + 0.055) / 1.055, 2.4)));
+    return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2];
+  };
+  const ratio = (first, second) => {
+    const a = luminance(first);
+    const b = luminance(second);
+    const high = Math.max(a, b);
+    const low = Math.min(a, b);
+    return (high + 0.05) / (low + 0.05);
+  };
+  const tokens = read('public/css/tokens.css');
+  const value = (name) => (new RegExp(name + ':\\s*(#[0-9a-fA-F]{6})').exec(tokens) || [])[1];
+  assert.ok(ratio(value('--ui-muted'), '#fbfaf7') >= 4.5, 'texte atténué lisible sur panneau clair');
+  assert.ok(ratio(value('--ui-muted'), '#e9ebe7') >= 4.5, 'texte atténué lisible sur canevas');
+  assert.ok(ratio(value('--ui-muted-on-dark'), '#18201f') >= 4.5, 'texte atténué lisible sur fond sombre');
+});
+
+test('la feuille de style morte a bien été retirée', () => {
+  assert.ok(!fs.existsSync(path.join(ROOT, 'public/css/product-precision.css')), 'product-precision.css doit rester supprimé');
+  assert.ok(!read('public/index.html').includes('product-precision'), 'aucun lien vers la feuille retirée');
+});
+
+test('le chrome déclare une alternative de mouvement et des cibles tactiles de 44 px', () => {
+  const css = read('public/css/studio-v3.css');
+  assert.ok(css.includes('@media (pointer:coarse)'), 'bloc pointer:coarse présent');
+  assert.ok(/@media \(pointer:coarse\)[\s\S]*?min-width:44px/.test(css), 'cibles tactiles portées à 44 px');
+  assert.ok(/@media \(prefers-reduced-motion:reduce\)[\s\S]*?\.dashboard-v3-project[\s\S]*?transition:none/.test(css), 'alternative de mouvement sur le dashboard');
+});

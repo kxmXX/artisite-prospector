@@ -7,6 +7,35 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.2) — Lot 2a : finition du chrome
+
+- **Feuille de style morte supprimée** : `product-precision.css` (179 de ses 273 règles n'étaient
+  émises par aucun composant ; ses trois sélecteurs encore vivants étaient déjà écrasés par
+  studio-v3). Le marqueur orphelin `studio-modal-card` est retiré de six modales. Vérifié avant/après
+  au navigateur : dashboard et modale de commande inchangés.
+- **Typographie du chrome unifiée** : 397 tailles arbitraires (`text-[8px]` … `text-[11.5px]`)
+  remplacées par cinq classes d'échelle (`text-ui-2xs/xs/sm/base/md`) adossées aux jetons. Les tailles
+  du *contenu du site* (`renderer.js`) sont conservées : la vitrine garde ses valeurs calibrées.
+- **Graisses normalisées** : 33 déclarations utilisaient des graisses intermédiaires (640, 650, 680,
+  690, 720, 730, 750, 760) que les polices chargées ne contiennent pas et que le navigateur
+  synthétisait. Elles retombent sur 600 ou 700.
+- **Focus** : les 7 `outline:0` / `outline:none` restants sont retirés — l'anneau `:focus-visible`
+  unique n'était plus neutralisé par un sélecteur de classe plus spécifique.
+- **Contraste** : les 16 couples texte/fond sous 4,5:1 sont remplacés par les jetons atténués.
+  Mesure : les pires cas passent de 2,16:1, 2,43:1, 2,57:1 et 3,24:1 à 5,50:1, 5,13:1, 4,78:1 et
+  7,80:1 ; l'audit automatique ne trouve plus aucune couleur de texte sous le seuil.
+- **Tactile** : bloc `pointer:coarse` étendu à tout le chrome (topbar, rail, actions de ligne,
+  commutateurs, actions groupées, barre d'outils de section, boutons freeform) — 44 px minimum.
+- **Mouvement** : l'alternative `prefers-reduced-motion` couvre désormais le dashboard, les cartes
+  projet, les lignes de structure, l'inspecteur, la barre d'étape et les modales.
+- **QA** : 5 tests de non-régression ajoutés (zéro taille arbitraire dans le chrome, aucune
+  suppression d'anneau de focus, aucune graisse intermédiaire, seuil de contraste des jetons,
+  absence de la feuille morte, blocs tactile et mouvement) — **13/13 tests design, 285/285 complets**.
+- *Point ouvert consigné* : dans le canvas de l'éditeur (~640 px à 1280 de fenêtre), la vitrine rend
+  sa navigation bureau et se retrouve à l'étroit (le logo se replie, FAQ frôle le CTA). Cause :
+  les media queries du site répondent à la **fenêtre**, pas à la largeur du canvas. Correction prévue
+  au lot responsive (requêtes de conteneur sur le canvas), pas encore appliquée.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.1) — Lot 1/9 : socle design system
 
 - **Cause racine corrigée** : le balisage utilise un vocabulaire d'utilitaires (hérité de Tailwind)

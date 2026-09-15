@@ -503,7 +503,7 @@ export function renderAddSectionModal(project, activeTab = "sections") {
 
   return `
     <div id="add-section-modal" class="studio-system-modal fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 animate-fade-in">
-      <div class="studio-modal-card studio-v3-modal studio-v3-library-modal max-w-4xl lg:max-w-5xl w-full overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="studio-v3-modal studio-v3-library-modal max-w-4xl lg:max-w-5xl w-full overflow-hidden flex flex-col max-h-[90vh]">
         
         <!-- Header -->
         <div class="px-6 py-4 border-b border-zinc-200 flex items-center justify-between flex-shrink-0 bg-white">
@@ -512,7 +512,7 @@ export function renderAddSectionModal(project, activeTab = "sections") {
               ⊞
             </div>
             <div>
-              <div class="text-[10.5px] font-bold uppercase tracking-wider text-zinc-400">Bibliothèque & Intelligence Composants</div>
+              <div class="text-ui-xs font-bold uppercase tracking-wider text-zinc-400">Bibliothèque & Intelligence Composants</div>
               <h2 class="font-bold text-base sm:text-lg text-zinc-950 mt-0.5">Composants Disponibles pour ${project?.business?.name || 'le Site'}</h2>
             </div>
           </div>
@@ -531,7 +531,7 @@ export function renderAddSectionModal(project, activeTab = "sections") {
               <span>🧩 Composants Individuels (${COMPONENT_CATALOG_ITEMS.length})</span>
             </button>
           </div>
-          <div class="text-[11px] text-zinc-500 font-medium hidden sm:block">
+          <div class="text-ui-sm text-zinc-500 font-medium hidden sm:block">
             ${activeTab === 'sections' ? `${sections.length} sections actives sur la page` : 'Composants Add-on calibrés 2026'}
           </div>
         </div>
@@ -544,7 +544,7 @@ export function renderAddSectionModal(project, activeTab = "sections") {
             </span>
             <input type="text" id="catalog-search" oninput="window.app.filterCatalogItems(this.value)" placeholder="Rechercher un composant (ex: Stepper, Canva, Vidéo, Devis...)" class="w-full bg-zinc-100/80 hover:bg-zinc-100 focus:bg-white border border-zinc-200 rounded-xl pl-8 pr-3 py-1.5 text-xs text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 transition-all">
           </div>
-          <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 text-[11px]">
+          <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 text-ui-sm">
             <button type="button" onclick="window.app.filterCatalogCategory('all', this)" class="catalog-filter-btn is-active px-2.5 py-1 rounded-lg font-semibold bg-zinc-900 text-white transition-all">Tous</button>
             <button type="button" onclick="window.app.filterCatalogCategory('content', this)" class="catalog-filter-btn px-2.5 py-1 rounded-lg font-medium bg-zinc-100 text-zinc-700 hover:bg-zinc-200 transition-all">Contenus</button>
             <button type="button" onclick="window.app.filterCatalogCategory('media', this)" class="catalog-filter-btn px-2.5 py-1 rounded-lg font-medium bg-zinc-100 text-zinc-700 hover:bg-zinc-200 transition-all">Médias</button>
@@ -573,13 +573,13 @@ export function renderAddSectionModal(project, activeTab = "sections") {
                         <div class="flex items-center gap-1.5">
                           <h4 class="font-bold text-xs sm:text-sm text-zinc-900 leading-snug break-words">${secDef.title}</h4>
                         </div>
-                        <p class="text-[11px] text-zinc-500 line-clamp-2 mt-0.5 leading-relaxed">${secDef.description}</p>
+                        <p class="text-ui-sm text-zinc-500 line-clamp-2 mt-0.5 leading-relaxed">${secDef.description}</p>
                       </div>
                     </div>
 
                     <!-- Variant Selection Dropdown -->
                     <div class="mt-3 pt-2.5 border-t border-zinc-200/60">
-                      <label class="block text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-1">Variante :</label>
+                      <label class="block text-ui-xs font-semibold text-zinc-500 uppercase tracking-wider mb-1">Variante :</label>
                       <select id="variant-select-${secDef.type}" class="w-full bg-white border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs text-zinc-800 font-medium focus:border-zinc-900 focus:outline-none">
                         ${secDef.variants.map(v => `
                           <option value="${v.id}">${v.label}</option>
@@ -623,8 +623,8 @@ export function renderAddSectionModal(project, activeTab = "sections") {
               <div class="catalog-card bg-zinc-50/80 hover:bg-white border border-zinc-200 hover:border-zinc-400 rounded-2xl p-4 transition-all space-y-3 flex flex-col justify-between group" data-category="${comp.family}">
                 <div>
                   <div class="flex flex-wrap items-center justify-between gap-1.5 mb-2">
-                    <span class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">${comp.familyName}</span>
-                    <span class="text-[9.5px] font-mono px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold whitespace-nowrap">${comp.badge}</span>
+                    <span class="text-ui-xs font-semibold text-zinc-500 uppercase tracking-wider">${comp.familyName}</span>
+                    <span class="text-ui-2xs font-mono px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold whitespace-nowrap">${comp.badge}</span>
                   </div>
                   <div class="flex items-start gap-3">
                     <div class="w-8 h-8 rounded-xl bg-white border border-zinc-200 text-zinc-800 flex items-center justify-center flex-shrink-0 shadow-2xs">
@@ -632,7 +632,7 @@ export function renderAddSectionModal(project, activeTab = "sections") {
                     </div>
                     <div class="min-w-0 flex-1">
                       <h4 class="font-bold text-xs sm:text-sm text-zinc-900 leading-snug break-words">${comp.name}</h4>
-                      <p class="text-[11px] text-zinc-500 mt-1 leading-relaxed">${comp.description}</p>
+                      <p class="text-ui-sm text-zinc-500 mt-1 leading-relaxed">${comp.description}</p>
                     </div>
                   </div>
                 </div>

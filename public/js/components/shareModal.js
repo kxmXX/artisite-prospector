@@ -30,7 +30,7 @@ export function renderShareModal(project, activeTab = "demo") {
 
   return `
     <div class="studio-system-modal fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in" onclick="if(event.target === this) window.app.closeShareModal()">
-      <div class="studio-modal-card studio-v3-modal studio-v3-share w-full max-w-xl overflow-hidden transition-all flex flex-col max-h-[90vh]" onclick="event.stopPropagation()">
+      <div class="studio-v3-modal studio-v3-share w-full max-w-xl overflow-hidden transition-all flex flex-col max-h-[90vh]" onclick="event.stopPropagation()">
         
         <!-- Header -->
         <div class="p-4 sm:p-5 border-b border-zinc-200/80 flex items-center justify-between bg-zinc-50/80">
@@ -40,7 +40,7 @@ export function renderShareModal(project, activeTab = "demo") {
             </div>
             <div>
               <h3 class="text-sm font-bold text-zinc-900">Partager la Démonstration Client</h3>
-              <p class="text-[11px] text-zinc-500">Lien interactif, QR Code et outils de prospection pour ${escapeHtml(b.name || 'Artisan')}</p>
+              <p class="text-ui-sm text-zinc-500">Lien interactif, QR Code et outils de prospection pour ${escapeHtml(b.name || 'Artisan')}</p>
             </div>
           </div>
           <button type="button" onclick="window.app.closeShareModal()" class="p-1.5 text-zinc-400 hover:text-zinc-700 hover:bg-zinc-200/60 rounded-lg transition-colors">
@@ -78,12 +78,12 @@ export function renderShareModal(project, activeTab = "demo") {
                 ${qrSvg}
               </div>
               <div class="space-y-2 text-center sm:text-left">
-                <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10.5px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-ui-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
                   <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                   <span>Démo Mobile Immédiate</span>
                 </div>
                 <h4 class="text-xs font-bold text-zinc-900">Faites scanner sur smartphone</h4>
-                <p class="text-[11.5px] text-zinc-600 leading-relaxed">
+                <p class="text-ui-sm text-zinc-600 leading-relaxed">
                   Pendant votre échange avec l'artisan, invitez-le à scanner ce QR code avec son appareil photo pour tester le site sur son propre téléphone.
                 </p>
                 <div class="pt-1">
@@ -97,7 +97,7 @@ export function renderShareModal(project, activeTab = "demo") {
 
             <!-- Share Link & Copy -->
             <div class="space-y-1.5">
-              <label class="block text-[11px] font-semibold text-zinc-700 uppercase tracking-wider">Lien direct de présentation</label>
+              <label class="block text-ui-sm font-semibold text-zinc-700 uppercase tracking-wider">Lien direct de présentation</label>
               <div class="flex items-center gap-2">
                 <input type="text" readonly id="share-modal-url-input" value="${demoUrl}" class="flex-1 bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-2 text-xs font-mono text-zinc-800 focus:outline-none select-all">
                 <button type="button" onclick="window.app.copyShareUrl('share-modal-url-input', 'btn-copy-share-label')" class="px-3.5 py-2 rounded-lg text-xs font-semibold text-white bg-zinc-900 hover:bg-black transition-colors flex items-center gap-1.5 shadow-xs shrink-0">
@@ -114,20 +114,20 @@ export function renderShareModal(project, activeTab = "demo") {
                   <span class="text-sm">🔒</span>
                   <div>
                     <span class="text-xs font-bold text-zinc-900 block">Verrouillage par Code PIN Client</span>
-                    <span class="text-[10.5px] text-zinc-500">Exiger un code de 4 à 6 chiffres avant la démo interne</span>
+                    <span class="text-ui-xs text-zinc-500">Exiger un code de 4 à 6 chiffres avant la démo interne</span>
                   </div>
                 </div>
-                <button type="button" onclick="if (state.currentProject?.settings?.clientDemoPin) { window.app.setClientDemoPin(null); window.app.renderModals(); } else { document.getElementById('client-demo-pin-setting')?.focus(); }" class="px-2.5 py-1 rounded-md text-[11px] font-bold transition-colors ${project.settings?.clientDemoPin ? 'bg-emerald-600 text-white shadow-xs' : 'bg-zinc-200 text-zinc-700 hover:bg-zinc-300'}">
+                <button type="button" onclick="if (state.currentProject?.settings?.clientDemoPin) { window.app.setClientDemoPin(null); window.app.renderModals(); } else { document.getElementById('client-demo-pin-setting')?.focus(); }" class="px-2.5 py-1 rounded-md text-ui-sm font-bold transition-colors ${project.settings?.clientDemoPin ? 'bg-emerald-600 text-white shadow-xs' : 'bg-zinc-200 text-zinc-700 hover:bg-zinc-300'}">
                   ${project.settings?.clientDemoPin ? 'Actif — désactiver' : 'Configurer'}
                 </button>
               </div>
               <div class="flex flex-wrap items-center gap-2 pt-2 border-t border-zinc-200/60">
-                <label for="client-demo-pin-setting" class="text-[11px] text-zinc-600 font-medium">${project.settings?.clientDemoPin ? 'Remplacer le code' : 'Nouveau code'} :</label>
+                <label for="client-demo-pin-setting" class="text-ui-sm text-zinc-600 font-medium">${project.settings?.clientDemoPin ? 'Remplacer le code' : 'Nouveau code'} :</label>
                 <input type="password" id="client-demo-pin-setting" maxlength="6" inputmode="numeric" autocomplete="new-password" placeholder="••••"
                        class="w-24 bg-white border border-zinc-300 rounded px-2 py-1 text-xs font-mono font-bold text-center text-zinc-900 focus:outline-none focus:border-zinc-600">
-                <button type="button" onclick="const input = document.getElementById('client-demo-pin-setting'); if (window.app.setClientDemoPin(input?.value)) window.app.renderModals();" class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-zinc-900 text-white hover:bg-black">Enregistrer</button>
+                <button type="button" onclick="const input = document.getElementById('client-demo-pin-setting'); if (window.app.setClientDemoPin(input?.value)) window.app.renderModals();" class="px-2.5 py-1 rounded-md text-ui-sm font-bold bg-zinc-900 text-white hover:bg-black">Enregistrer</button>
               </div>
-              <p class="text-[10.5px] leading-relaxed text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-2">
+              <p class="text-ui-xs leading-relaxed text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-2">
                 Ce code protège uniquement la présentation ouverte via Artist. Un export HTML ou ZIP reste un site public et ne peut pas être protégé par ce réglage.
               </p>
             </div>
@@ -152,14 +152,14 @@ export function renderShareModal(project, activeTab = "demo") {
                 <span class="text-xl">✏️</span>
                 <div class="space-y-1">
                   <h4 class="text-xs font-bold text-blue-950">Accès Collaborateur / Agence</h4>
-                  <p class="text-[11.5px] text-blue-800 leading-relaxed">
+                  <p class="text-ui-sm text-blue-800 leading-relaxed">
                     Ce lien donne un accès complet à l'interface d'édition, aux sections, aux couleurs et aux contenus. Idéal pour déléguer les retouches à un collègue closer ou graphiste.
                   </p>
                 </div>
               </div>
 
               <div class="space-y-1.5">
-                <label class="block text-[11px] font-semibold text-zinc-700 uppercase tracking-wider">Lien de l'éditeur de travail</label>
+                <label class="block text-ui-sm font-semibold text-zinc-700 uppercase tracking-wider">Lien de l'éditeur de travail</label>
                 <div class="flex items-center gap-2">
                   <input type="text" readonly id="share-modal-editor-url" value="${editorUrl}" class="flex-1 bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-2 text-xs font-mono text-zinc-800 focus:outline-none select-all">
                   <button type="button" onclick="window.app.copyShareUrl('share-modal-editor-url', 'btn-copy-editor-label')" class="px-3.5 py-2 rounded-lg text-xs font-semibold text-white bg-zinc-900 hover:bg-black transition-colors flex items-center gap-1.5 shadow-xs shrink-0">
@@ -171,7 +171,7 @@ export function renderShareModal(project, activeTab = "demo") {
 
               <div class="p-3 bg-zinc-50 rounded-xl border border-zinc-200 text-xs text-zinc-600 space-y-1.5">
                 <div class="font-bold text-zinc-800">Conseil pour l'équipe :</div>
-                <p class="text-[11px] text-zinc-500 leading-relaxed">
+                <p class="text-ui-sm text-zinc-500 leading-relaxed">
                   Toutes les modifications apportées via cet éditeur sont automatiquement sauvegardées en temps réel dans le stockage local du navigateur.
                 </p>
               </div>
@@ -185,7 +185,7 @@ export function renderShareModal(project, activeTab = "demo") {
                 <span class="text-xl">🖥️</span>
                 <div class="space-y-1">
                   <h4 class="text-xs font-bold text-purple-950">Idéal pour partage d'écran (Google Meet, Zoom)</h4>
-                  <p class="text-[11.5px] text-purple-800 leading-relaxed">
+                  <p class="text-ui-sm text-purple-800 leading-relaxed">
                     Le mode Plein Écran masque 100% de l'interface technique (barres d'outils, contours, boutons d'édition). L'artisan a la sensation d'être sur son site déjà en ligne !
                   </p>
                 </div>
@@ -211,22 +211,22 @@ export function renderShareModal(project, activeTab = "demo") {
                 <span class="text-xl">🌐</span>
                 <div class="space-y-1">
                   <h4 class="text-xs font-bold text-amber-950">Liez le propre domaine de l'artisan</h4>
-                  <p class="text-[11.5px] text-amber-900 leading-relaxed">
+                  <p class="text-ui-sm text-amber-900 leading-relaxed">
                     Configurez le nom de domaine personnalisé acheté pour l'artisan (ex: chez OVH, Gandi, Hostinger).
                   </p>
                 </div>
               </div>
 
               <div class="space-y-1.5">
-                <label class="block text-[11px] font-semibold text-zinc-700 uppercase tracking-wider">Nom de domaine personnalisé</label>
+                <label class="block text-ui-sm font-semibold text-zinc-700 uppercase tracking-wider">Nom de domaine personnalisé</label>
                 <input type="text" placeholder="ex: www.${slugify(b.name || 'artisan')}.fr" value="${project.settings?.customDomain || ''}"
                        onchange="if(state.currentProject){state.currentProject.settings = state.currentProject.settings || {}; state.currentProject.settings.customDomain = this.value; state.save(); window.app.showToast('Domaine configuré !', 'success');}"
                        class="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-2 text-xs font-mono text-zinc-800 focus:border-zinc-900 focus:outline-none">
               </div>
 
               <div class="border border-zinc-200 rounded-xl overflow-hidden text-xs">
-                <div class="bg-zinc-100 p-2.5 font-bold text-zinc-700 text-[11px] uppercase tracking-wider">Configuration DNS requise :</div>
-                <div class="p-3 space-y-2 bg-white font-mono text-[11px]">
+                <div class="bg-zinc-100 p-2.5 font-bold text-zinc-700 text-ui-sm uppercase tracking-wider">Configuration DNS requise :</div>
+                <div class="p-3 space-y-2 bg-white font-mono text-ui-sm">
                   <div class="flex justify-between border-b border-zinc-100 pb-1.5">
                     <span class="text-zinc-500 font-bold">Type A :</span>
                     <span class="text-zinc-800">@  ➔  76.76.21.21</span>
@@ -252,15 +252,15 @@ export function renderShareModal(project, activeTab = "demo") {
                 <span class="text-xl">📦</span>
                 <div class="space-y-1">
                   <h4 class="text-xs font-bold text-emerald-950">Pack de Déploiement Autonome Pure Vanilla</h4>
-                  <p class="text-[11.5px] text-emerald-900 leading-relaxed">
+                  <p class="text-ui-sm text-emerald-900 leading-relaxed">
                     Téléchargez une archive ZIP complète sans dépendances (zéro build step, zéro npm). Déployable en 5 secondes sur n'importe quel hébergement web (Vercel, Netlify, Apache, cPanel).
                   </p>
                 </div>
               </div>
 
               <div class="border border-zinc-200 rounded-xl p-3 bg-zinc-50 space-y-2 text-xs">
-                <div class="font-bold text-zinc-800 uppercase tracking-wider text-[10.5px]">Contenu de l'archive :</div>
-                <ul class="space-y-1 text-zinc-600 font-mono text-[11px]">
+                <div class="font-bold text-zinc-800 uppercase tracking-wider text-ui-xs">Contenu de l'archive :</div>
+                <ul class="space-y-1 text-zinc-600 font-mono text-ui-sm">
                   <li class="flex items-center gap-1.5">📄 <strong>index.html</strong> — Site vitrine complet et interactif</li>
                   <li class="flex items-center gap-1.5">🗺️ <strong>sitemap.xml</strong> — Indexation Google & SEO local</li>
                   <li class="flex items-center gap-1.5">🤖 <strong>robots.txt</strong> — Autorisation d'exploration des moteurs</li>
@@ -284,7 +284,7 @@ export function renderShareModal(project, activeTab = "demo") {
 
         <!-- Footer -->
         <div class="p-4 border-t border-zinc-200/80 bg-zinc-50/60 flex items-center justify-between text-xs">
-          <span class="text-[11px] text-zinc-500">Mode démo commerciale • Prêt pour appel prospect</span>
+          <span class="text-ui-sm text-zinc-500">Mode démo commerciale • Prêt pour appel prospect</span>
           <button type="button" onclick="window.app.closeShareModal()" class="px-3.5 py-1.5 rounded-lg border border-zinc-200 font-medium text-zinc-700 hover:bg-zinc-100 transition-colors">
             Fermer
           </button>

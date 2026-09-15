@@ -32,7 +32,7 @@ export function renderCloserModal(project) {
 
   return `
     <div id="closer-modal" class="studio-system-modal fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
-      <div class="studio-modal-card studio-v3-modal studio-v3-closer max-w-3xl w-full overflow-hidden flex flex-col max-h-[92vh]">
+      <div class="studio-v3-modal studio-v3-closer max-w-3xl w-full overflow-hidden flex flex-col max-h-[92vh]">
         
         <!-- Header with Live Call Teleprompter Status -->
         <div class="px-6 py-3.5 bg-zinc-950 text-white flex items-center justify-between flex-shrink-0">
@@ -43,9 +43,9 @@ export function renderCloserModal(project) {
             <div>
               <div class="flex items-center gap-2">
                 <h2 class="font-bold text-xs sm:text-sm text-white tracking-tight">Cockpit de Closing & Vente</h2>
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Michel Closer Pro</span>
+                <span class="text-ui-xs font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Michel Closer Pro</span>
               </div>
-              <p class="text-[11px] text-zinc-400 font-normal">Prospect : <strong>${project.business.name}</strong> (${project.business.tradeLabel} • ${project.business.city})</p>
+              <p class="text-ui-sm text-zinc-400 font-normal">Prospect : <strong>${project.business.name}</strong> (${project.business.tradeLabel} • ${project.business.city})</p>
             </div>
           </div>
 
@@ -54,7 +54,7 @@ export function renderCloserModal(project) {
             <div class="flex items-center gap-1.5 bg-zinc-900 border border-zinc-800 px-2.5 py-1 rounded-lg text-xs font-mono text-zinc-200" id="call-timer-box">
               <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
               <span id="call-timer-display">00:00</span>
-              <button type="button" onclick="window.app?.toggleCallTimer?.()" class="ml-1 text-[10px] text-zinc-400 hover:text-white" title="Démarrer / Mettre en pause le chronomètre d'appel">
+              <button type="button" onclick="window.app?.toggleCallTimer?.()" class="ml-1 text-ui-xs text-zinc-400 hover:text-white" title="Démarrer / Mettre en pause le chronomètre d'appel">
                 ⏯️
               </button>
             </div>
@@ -66,7 +66,7 @@ export function renderCloserModal(project) {
         </div>
 
         <!-- Cockpit Navigation Tabs (7 Power Tabs) -->
-        <div class="studio-modal-tabs px-6 py-2 bg-zinc-100/80 border-b border-zinc-200 flex gap-1.5 text-xs overflow-x-auto flex-shrink-0">
+        <div class="px-6 py-2 bg-zinc-100/80 border-b border-zinc-200 flex gap-1.5 text-xs overflow-x-auto flex-shrink-0">
           <button type="button" onclick="window.app.switchCloserTab('script')" id="tab-closer-script" class="px-3 py-1.5 rounded-lg font-bold text-zinc-900 bg-white shadow-xs border border-zinc-200 whitespace-nowrap">
             📞 Script Appel
           </button>
@@ -97,8 +97,8 @@ export function renderCloserModal(project) {
           <div id="closer-panel-script" class="space-y-4">
             <!-- Step Checklist -->
             <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-2xl flex items-center justify-between gap-2">
-              <span class="text-[11px] font-bold text-zinc-700">Déroulement de l'Appel :</span>
-              <div class="flex items-center gap-3 text-[11px]">
+              <span class="text-ui-sm font-bold text-zinc-700">Déroulement de l'Appel :</span>
+              <div class="flex items-center gap-3 text-ui-sm">
                 <label class="inline-flex items-center gap-1 cursor-pointer"><input type="checkbox" onchange="window.app?.updateCallProgress?.(this)" class="rounded text-zinc-900"> <span>1. Accroche</span></label>
                 <label class="inline-flex items-center gap-1 cursor-pointer"><input type="checkbox" onchange="window.app?.updateCallProgress?.(this)" class="rounded text-zinc-900"> <span>2. Envoi WhatsApp</span></label>
                 <label class="inline-flex items-center gap-1 cursor-pointer"><input type="checkbox" onchange="window.app?.updateCallProgress?.(this)" class="rounded text-zinc-900"> <span>3. Visite du Site</span></label>
@@ -110,7 +110,7 @@ export function renderCloserModal(project) {
             <div class="bg-zinc-50 border border-zinc-200 rounded-2xl p-4 space-y-2">
               <div class="flex items-center justify-between font-bold text-zinc-900">
                 <span>${script.intro.step}</span>
-                <span class="text-[10px] bg-zinc-200 px-2 py-0.5 rounded-full text-zinc-700 font-mono">15 secondes</span>
+                <span class="text-ui-xs bg-zinc-200 px-2 py-0.5 rounded-full text-zinc-700 font-mono">15 secondes</span>
               </div>
               <p class="text-xs text-zinc-900 leading-relaxed bg-white p-3.5 rounded-xl border border-zinc-200 italic font-medium">
                 « ${script.intro.speech} »
@@ -121,7 +121,7 @@ export function renderCloserModal(project) {
             <div class="bg-zinc-50 border border-zinc-200 rounded-2xl p-4 space-y-2">
               <div class="flex items-center justify-between font-bold text-zinc-900">
                 <span>${script.pitch.step}</span>
-                <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">Moment Clé</span>
+                <span class="text-ui-xs bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">Moment Clé</span>
               </div>
               <p class="text-xs text-zinc-900 leading-relaxed bg-white p-3.5 rounded-xl border border-zinc-200 italic font-medium">
                 « ${script.pitch.speech} »
@@ -145,13 +145,13 @@ export function renderCloserModal(project) {
 
           <!-- TAB 2: OBJECTION BATTLECARDS (MVP Feature 6) -->
           <div id="closer-panel-objections" class="space-y-3 hidden">
-            <div class="text-[11px] font-bold uppercase tracking-wider text-zinc-400">Cartes d'attaque pour neutraliser toute hésitation :</div>
+            <div class="text-ui-sm font-bold uppercase tracking-wider text-zinc-400">Cartes d'attaque pour neutraliser toute hésitation :</div>
             <div class="grid gap-3">
               ${battlecards.map(b => `
                 <div class="border border-zinc-200 rounded-2xl p-4 bg-zinc-50 hover:bg-white transition-all space-y-2 shadow-2xs">
                   <div class="flex items-center justify-between">
                     <span class="font-bold text-xs text-zinc-900">${b.title}</span>
-                    <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Taux de succès ${b.confidence}</span>
+                    <span class="text-ui-xs font-extrabold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Taux de succès ${b.confidence}</span>
                   </div>
                   <div class="text-xs text-zinc-700 bg-white p-3 rounded-xl border border-zinc-200 leading-relaxed font-medium">
                     ${b.counter}
@@ -169,15 +169,15 @@ export function renderCloserModal(project) {
                   <div class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Benchmark Visibilité Locale</div>
                   <h3 class="text-sm sm:text-base font-extrabold text-white">${audit.title}</h3>
                 </div>
-                <button type="button" id="btn-fetch-live-audit" onclick="window.app?.fetchLiveAudit?.('${project.id}')" class="btn-keycap btn-keycap-light text-[11px] font-bold px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-sm text-zinc-900 bg-white hover:bg-zinc-100 transition-all">
+                <button type="button" id="btn-fetch-live-audit" onclick="window.app?.fetchLiveAudit?.('${project.id}')" class="btn-keycap btn-keycap-light text-ui-sm font-bold px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-sm text-zinc-900 bg-white hover:bg-zinc-100 transition-all">
                   <span>⚡ Actualiser IA Locale</span>
                 </button>
               </div>
-              <p class="text-[11px] text-zinc-400">Montrez ces écarts techniques en direct à l'artisan pour démolir ses réticences.</p>
+              <p class="text-ui-sm text-zinc-400">Montrez ces écarts techniques en direct à l'artisan pour démolir ses réticences.</p>
             </div>
 
-            <div id="closer-audit-gaps" class="space-y-1.5 p-3 rounded-2xl bg-zinc-100 border border-zinc-200 text-[11.5px] text-zinc-800">
-              <div class="text-[10.5px] uppercase font-bold text-emerald-700">Gaps Concurrentiels Détectés (${audit.city}) :</div>
+            <div id="closer-audit-gaps" class="space-y-1.5 p-3 rounded-2xl bg-zinc-100 border border-zinc-200 text-ui-sm text-zinc-800">
+              <div class="text-ui-xs uppercase font-bold text-emerald-700">Gaps Concurrentiels Détectés (${audit.city}) :</div>
               <p>• 82% des artisans ${audit.trade} à ${audit.city} n'ont pas de module Avant / Après interactif</p>
               <p>• Moins de 1 sur 4 propose un devis instantané ou appel direct 1-clic sur smartphone</p>
               <p>• Forte opportunité de positionnement sur Google Maps et requêtes locales urgentes</p>
@@ -189,11 +189,11 @@ export function renderCloserModal(project) {
                   <div class="flex items-center justify-between">
                     <span class="font-bold text-xs text-zinc-900">${p.name}</span>
                     <div class="flex items-center gap-2">
-                      <span class="text-[10px] font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded border border-red-200">Actuel : ${p.currentScore}/100</span>
-                      <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Nouveau : ${p.prospectorScore}/100 ⚡</span>
+                      <span class="text-ui-xs font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded border border-red-200">Actuel : ${p.currentScore}/100</span>
+                      <span class="text-ui-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Nouveau : ${p.prospectorScore}/100 ⚡</span>
                     </div>
                   </div>
-                  <p class="text-[11px] text-zinc-600 leading-relaxed">${p.impact}</p>
+                  <p class="text-ui-sm text-zinc-600 leading-relaxed">${p.impact}</p>
                 </div>
               `).join('')}
             </div>
@@ -210,7 +210,7 @@ export function renderCloserModal(project) {
               <div class="flex items-center justify-between border-b border-zinc-200 pb-3">
                 <div>
                   <h3 class="font-bold text-xs text-zinc-900 uppercase tracking-wider">Bon de Commande & Cession de Droits</h3>
-                  <div class="text-[11px] text-zinc-500">Réf : <strong class="font-mono text-zinc-800">${contract.contractNumber}</strong> • Date : ${contract.date}</div>
+                  <div class="text-ui-sm text-zinc-500">Réf : <strong class="font-mono text-zinc-800">${contract.contractNumber}</strong> • Date : ${contract.date}</div>
                 </div>
                 <div class="text-right">
                   <span class="px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-800 text-xs font-bold">Prêt pour Signature</span>
@@ -220,23 +220,23 @@ export function renderCloserModal(project) {
               <!-- Parties -->
               <div class="grid grid-cols-2 gap-3 text-xs">
                 <div class="bg-white p-3 rounded-xl border border-zinc-200">
-                  <div class="text-[10px] font-bold text-zinc-400 uppercase">Bénéficiaire</div>
+                  <div class="text-ui-xs font-bold text-zinc-400 uppercase">Bénéficiaire</div>
                   <div class="font-bold text-zinc-900 mt-0.5">${contract.client.name}</div>
-                  <div class="text-[11px] text-zinc-600">${contract.client.trade} à ${contract.client.city}</div>
-                  <div class="text-[11px] text-zinc-500 font-mono mt-0.5">${contract.client.phone}</div>
+                  <div class="text-ui-sm text-zinc-600">${contract.client.trade} à ${contract.client.city}</div>
+                  <div class="text-ui-sm text-zinc-500 font-mono mt-0.5">${contract.client.phone}</div>
                 </div>
                 <div class="bg-white p-3 rounded-xl border border-zinc-200">
-                  <div class="text-[10px] font-bold text-zinc-400 uppercase">Prestation & Prix</div>
+                  <div class="text-ui-xs font-bold text-zinc-400 uppercase">Prestation & Prix</div>
                   <div class="font-bold text-emerald-700 mt-0.5">${contract.service.price}</div>
-                  <div class="text-[11px] text-zinc-600">${contract.service.deliveryTime}</div>
-                  <div class="text-[10.5px] text-zinc-400 mt-0.5">${contract.guarantee}</div>
+                  <div class="text-ui-sm text-zinc-600">${contract.service.deliveryTime}</div>
+                  <div class="text-ui-xs text-zinc-400 mt-0.5">${contract.guarantee}</div>
                 </div>
               </div>
 
               <!-- Inclusions -->
               <div class="bg-white p-3.5 rounded-xl border border-zinc-200 space-y-1.5">
-                <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Inclus dans la commande</div>
-                <ul class="grid sm:grid-cols-2 gap-1 text-[11px] text-zinc-700">
+                <div class="text-ui-xs font-bold text-zinc-400 uppercase tracking-wider">Inclus dans la commande</div>
+                <ul class="grid sm:grid-cols-2 gap-1 text-ui-sm text-zinc-700">
                   ${contract.service.inclusions.map(inc => `<li class="flex items-center gap-1.5"><span>✓</span> <span>${inc}</span></li>`).join('')}
                 </ul>
               </div>
@@ -245,12 +245,12 @@ export function renderCloserModal(project) {
               <div class="space-y-2">
                 <div class="flex items-center justify-between">
                   <label class="text-xs font-bold text-zinc-800">Signature électronique du client :</label>
-                  <button type="button" onclick="window.app?.clearSignaturePad?.()" class="text-[11px] text-zinc-500 hover:text-red-600 underline">
+                  <button type="button" onclick="window.app?.clearSignaturePad?.()" class="text-ui-sm text-zinc-500 hover:text-red-600 underline">
                     Effacer la signature
                   </button>
                 </div>
                 <canvas id="closer-signature-pad" width="560" height="140" class="w-full h-32 border-2 border-dashed border-zinc-300 rounded-xl bg-white cursor-crosshair touch-none shadow-inner"></canvas>
-                <div class="text-[10.5px] text-zinc-400 text-center">Signez à l'aide de votre souris, pavé tactile ou directement au doigt sur smartphone.</div>
+                <div class="text-ui-xs text-zinc-400 text-center">Signez à l'aide de votre souris, pavé tactile ou directement au doigt sur smartphone.</div>
               </div>
 
               <div class="pt-2 flex gap-2">
@@ -277,11 +277,11 @@ export function renderCloserModal(project) {
           <!-- TAB 6: EMAIL B2B -->
           <div id="closer-panel-email" class="space-y-3 hidden">
             <div>
-              <label class="block text-[11px] font-medium text-zinc-500 mb-1">Objet :</label>
+              <label class="block text-ui-sm font-medium text-zinc-500 mb-1">Objet :</label>
               <input type="text" id="email-subject" readonly value="${emailData.subject}" class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2 text-xs font-semibold text-zinc-900">
             </div>
             <div class="relative">
-              <label class="block text-[11px] font-medium text-zinc-500 mb-1">Corps du message :</label>
+              <label class="block text-ui-sm font-medium text-zinc-500 mb-1">Corps du message :</label>
               <textarea id="email-body" rows="9" readonly class="w-full bg-zinc-50 border border-zinc-200 rounded-2xl p-4 font-mono text-xs text-zinc-800 leading-relaxed focus:outline-none">${emailData.body}</textarea>
               <button type="button" onclick="window.app.copyText('email-body')" class="absolute top-8 right-3 px-3 py-1.5 rounded-xl bg-zinc-900 text-white text-xs font-medium hover:bg-black flex items-center gap-1.5 shadow-xs transition-colors">
                 ${getIcon("copy", "w-3.5 h-3.5")}
@@ -295,7 +295,7 @@ export function renderCloserModal(project) {
             <div class="bg-zinc-50 p-5 rounded-2xl border border-zinc-200 space-y-4">
               <div class="flex items-center justify-between">
                 <div class="font-bold text-xs text-zinc-900 uppercase tracking-wider">Calculateur de Rentabilité Réelle en Appel</div>
-                <span class="text-[10.5px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">Interactif en direct</span>
+                <span class="text-ui-xs font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">Interactif en direct</span>
               </div>
               <p class="text-xs text-zinc-600 leading-relaxed">
                 Quand l'artisan hésite sur le prix, ajustez son panier moyen en direct au téléphone :
@@ -303,7 +303,7 @@ export function renderCloserModal(project) {
               
               <div class="grid sm:grid-cols-2 gap-3 p-3 bg-white border border-zinc-200 rounded-xl">
                 <div>
-                  <div class="flex justify-between text-[11px] font-bold text-zinc-700 mb-1">
+                  <div class="flex justify-between text-ui-sm font-bold text-zinc-700 mb-1">
                     <span>Panier moyen chantier :</span>
                     <span id="closer-roi-ticket-val" class="font-mono text-zinc-950">${roi.ticketMoyen} €</span>
                   </div>
@@ -320,7 +320,7 @@ export function renderCloserModal(project) {
                          })(this)" id="closer-roi-ticket" class="w-full h-1.5 bg-zinc-200 rounded-lg appearance-none cursor-pointer accent-emerald-600">
                 </div>
                 <div>
-                  <div class="flex justify-between text-[11px] font-bold text-zinc-700 mb-1">
+                  <div class="flex justify-between text-ui-sm font-bold text-zinc-700 mb-1">
                     <span>Prix du site vitrine :</span>
                     <span id="closer-roi-cost-val" class="font-mono text-zinc-950">${roi.siteCost} €</span>
                   </div>
@@ -340,15 +340,15 @@ export function renderCloserModal(project) {
 
               <div class="grid grid-cols-3 gap-3 pt-1">
                 <div class="bg-white p-3.5 rounded-xl border border-zinc-200 text-center shadow-2xs">
-                  <div class="text-[10px] uppercase font-bold text-zinc-400">Panier Moyen</div>
+                  <div class="text-ui-xs uppercase font-bold text-zinc-400">Panier Moyen</div>
                   <div class="text-lg font-extrabold text-zinc-900 mt-0.5 font-mono" id="closer-roi-kpi-ticket">${roi.ticketMoyen} €</div>
                 </div>
                 <div class="bg-white p-3.5 rounded-xl border border-zinc-200 text-center shadow-2xs">
-                  <div class="text-[10px] uppercase font-bold text-zinc-400">Prix du Site</div>
+                  <div class="text-ui-xs uppercase font-bold text-zinc-400">Prix du Site</div>
                   <div class="text-lg font-extrabold text-zinc-900 mt-0.5 font-mono" id="closer-roi-kpi-cost">${roi.siteCost} €</div>
                 </div>
                 <div class="bg-emerald-50 border border-emerald-200 p-3.5 rounded-xl text-center shadow-2xs">
-                  <div class="text-[10px] uppercase font-bold text-emerald-700">Amorti à</div>
+                  <div class="text-ui-xs uppercase font-bold text-emerald-700">Amorti à</div>
                   <div class="text-lg font-extrabold text-emerald-700 mt-0.5 font-mono" id="closer-roi-kpi-break">${roi.chantiersToBreakEven} chantier</div>
                 </div>
               </div>

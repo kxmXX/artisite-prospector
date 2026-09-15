@@ -927,3 +927,38 @@ fichiers modifiés (alertes pré-existantes sur \`btnShimmer\`, halo rouge et fo
 Reste ouvert après ce lot (à ne pas masquer) : l'en-tête de la vitrine rendu dans le canvas étroit de
 l'éditeur est à l'étroit ; 34 classes d'application n'ont toujours aucune règle (liste gelée par test,
 à résorber au lot 2) ; les lots 2 à 9 restent à livrer.
+
+---
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.2 (lot 2a/9)
+
+Périmètre : finition du chrome produit avant les lots fonctionnels (sélection, inspecteur, états,
+positionnement, mouvement, undo, comptes).
+
+Livré :
+- \`public/css/product-precision.css\` supprimé (179/273 règles sans émetteur, thème de modale déjà
+  écrasé par studio-v3) ; \`studio-modal-card\` retiré de six modales car il ne restait qu'un marqueur
+  orphelin après la suppression.
+- Échelle typographique du chrome : 397 remplacements \`text-[Npx]\` → \`text-ui-2xs|xs|sm|base|md\`
+  dans les fichiers de chrome uniquement (app.js, editor, inspector, dashboard, palette, modales,
+  wizard). \`renderer.js\` (contenu du site) conserve ses 56 tailles calibrées.
+- 33 graisses intermédiaires (640…760) normalisées vers 600/700 : les polices chargées ne les
+  contiennent pas, le navigateur les synthétisait.
+- 7 \`outline:0\`/\`outline:none\` retirés : ils reprenaient la main sur l'anneau \`:focus-visible\` global.
+- Contraste : 18 valeurs de texte atténué remplacées par \`--ui-muted\` et \`--ui-muted-on-dark\`.
+  Mesures avant → après : 2,16:1 → 5,50:1 ; 2,43:1 → 5,13:1 ; 2,72:1 → 4,78:1 ; 3,24:1 → 7,80:1.
+  L'audit automatique des couleurs de texte de studio-v3.css et app.css ne remonte plus aucun échec.
+- Bloc \`@media (pointer:coarse)\` complet (44 px) et bloc \`prefers-reduced-motion\` étendu au
+  dashboard, aux cartes projet, aux lignes de structure, à l'inspecteur et aux modales.
+- \`tests/design_system.test.js\` : +5 tests (chrome sans taille arbitraire, focus préservé, graisses
+  standard, seuil de contraste des jetons, feuille morte absente, blocs tactile et mouvement).
+
+Vérifications : \`npm test\` 285/285 ; dashboard, éditeur et modale de commande contrôlés au navigateur
+en 1280 après purge du cache ; audit de contraste automatisé ; générateur d'utilitaires rejoué.
+
+Point ouvert mesuré et non masqué : l'en-tête de la vitrine rendu dans le canvas de l'éditeur est à
+l'étroit parce que les media queries du site évaluent la fenêtre et non le canvas. La vitrine publique
+est correcte. Correction prévue au lot responsive (requêtes de conteneur), pas appliquée ici.
+
+Suite : finir le lot 2 (emojis du chrome, rayons/ombres, densité, dashboard ≤ 760 px) puis ouvrir le
+lot 3 (modèle de sélection unique et hiérarchie visible).

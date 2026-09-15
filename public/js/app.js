@@ -992,7 +992,7 @@ export class App {
         const gapsEl = document.getElementById("closer-audit-gaps");
         if (gapsEl && Array.isArray(audit.competitorGaps)) {
           gapsEl.innerHTML = `
-            <div class="text-[10.5px] uppercase font-bold text-emerald-700">Gaps Concurrentiels Détectés (${escapeHtml(audit.city)}) :</div>
+            <div class="text-ui-xs uppercase font-bold text-emerald-700">Gaps Concurrentiels Détectés (${escapeHtml(audit.city)}) :</div>
             ${audit.competitorGaps.map(g => `<p>• ${escapeHtml(g)}</p>`).join('')}
           `;
         }
@@ -1644,7 +1644,7 @@ export class App {
     const saveStatus = document.getElementById("save-status-text");
     if (saveStatus) {
       saveStatus.textContent = "Modification en cours...";
-      saveStatus.className = "text-[11px] font-medium text-amber-600";
+      saveStatus.className = "text-ui-sm font-medium text-amber-600";
     }
   }
 
@@ -1687,7 +1687,7 @@ export class App {
     const saveStatus = document.getElementById("save-status-text");
     if (saveStatus) {
       saveStatus.textContent = "✓ Enregistré";
-      saveStatus.className = "text-[11px] font-medium text-zinc-500";
+      saveStatus.className = "text-ui-sm font-medium text-zinc-500";
     }
   }
 
@@ -1858,7 +1858,7 @@ export class App {
       const sizes = ['sm', 'md', 'lg', 'xl'];
       sizeBtns.forEach((btn, idx) => {
         const isAct = sizes[idx] === size;
-        btn.className = `py-1 border rounded text-center text-[11px] font-medium ${isAct ? 'border-zinc-900 bg-white font-semibold shadow-xs text-zinc-950' : 'border-zinc-200 bg-white text-zinc-600'}`;
+        btn.className = `py-1 border rounded text-center text-ui-sm font-medium ${isAct ? 'border-zinc-900 bg-white font-semibold shadow-xs text-zinc-950' : 'border-zinc-200 bg-white text-zinc-600'}`;
       });
     }
 
@@ -3714,7 +3714,7 @@ export class App {
             <span class="text-xs font-bold text-zinc-900 flex items-center gap-1.5">
               <span>✨</span> Proposition Studio IA
             </span>
-            <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+            <span class="text-ui-xs font-extrabold uppercase px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
               Confiance 96%
             </span>
           </div>
@@ -4045,7 +4045,7 @@ export class App {
               🔒
             </div>
             <div class="space-y-2">
-              <span class="px-3 py-1 rounded-full text-[10.5px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Présentation Privée</span>
+              <span class="px-3 py-1 rounded-full text-ui-xs font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Présentation Privée</span>
               <h1 class="text-xl font-bold text-white tracking-tight">${escapeHtml(bus.name || "Espace Client")}</h1>
               <p class="text-xs text-zinc-400 leading-relaxed">
                 Cette démonstration interactive pour vos prestations de <strong>${escapeHtml(trade)}</strong> est protégée par un code confidentiel remis par votre conseiller.
@@ -4061,7 +4061,7 @@ export class App {
               </button>
             </form>
 
-            <div class="text-[11px] text-zinc-500 pt-2 border-t border-zinc-800/60">
+            <div class="text-ui-sm text-zinc-500 pt-2 border-t border-zinc-800/60">
               Besoin d'assistance ? Contactez directement votre conseiller Michel.
             </div>
           </div>
@@ -5918,7 +5918,7 @@ export class App {
           const saveStatus = document.getElementById("save-status-text");
           if (saveStatus) {
             saveStatus.textContent = "Modification en cours...";
-            saveStatus.className = "text-[11px] font-medium text-amber-600";
+            saveStatus.className = "text-ui-sm font-medium text-amber-600";
           }
         }
       };

@@ -31,19 +31,19 @@ test('v4.3.0 Polish: Ambiance selector unambiguously marks active theme button',
   project.branding.globalTheme = 'white';
   project.branding.bgColor = '#ffffff';
   let html = renderEditor(state);
-  assert.ok(html.includes("window.app.switchGlobalTheme('white')\" class=\"py-2 border rounded-lg text-center text-[11px] font-medium transition-all border-zinc-950 bg-white ring-2 ring-zinc-950"), 'White is active');
+  assert.ok(html.includes("window.app.switchGlobalTheme('white')\" class=\"py-2 border rounded-lg text-center text-ui-sm font-medium transition-all border-zinc-950 bg-white ring-2 ring-zinc-950"), 'White is active');
 
   // Mineral theme
   project.branding.globalTheme = 'mineral';
   project.branding.bgColor = '#f4f4f5';
   html = renderEditor(state);
-  assert.ok(html.includes("window.app.switchGlobalTheme('mineral')\" class=\"py-2 border rounded-lg text-center text-[11px] font-medium transition-all border-zinc-950 bg-zinc-100 ring-2 ring-zinc-950"), 'Mineral is active');
+  assert.ok(html.includes("window.app.switchGlobalTheme('mineral')\" class=\"py-2 border rounded-lg text-center text-ui-sm font-medium transition-all border-zinc-950 bg-zinc-100 ring-2 ring-zinc-950"), 'Mineral is active');
 
   // Dark theme
   project.branding.globalTheme = 'dark';
   project.branding.bgColor = '#09090b';
   html = renderEditor(state);
-  assert.ok(html.includes("window.app.switchGlobalTheme('dark')\" class=\"py-2 border rounded-lg text-center text-[11px] font-medium transition-all border-amber-400 bg-zinc-900 ring-2 ring-amber-400"), 'Dark is active');
+  assert.ok(html.includes("window.app.switchGlobalTheme('dark')\" class=\"py-2 border rounded-lg text-center text-ui-sm font-medium transition-all border-amber-400 bg-zinc-900 ring-2 ring-amber-400"), 'Dark is active');
 });
 
 test('v4.3.0 Polish: CSS prevents duplicate popover collision and restores hover numbered badges', () => {
