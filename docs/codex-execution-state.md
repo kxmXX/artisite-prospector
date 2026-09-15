@@ -1794,3 +1794,11 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Oubli rattrape dans le meme tour : le rendu n'emettait pas data-motion-easing, donc le reglage n'aurait pas survecu a un rechargement. La sonde l'a montre, corrige avant commit.
 - Tests : 404/404, un test nouveau verifie le catalogue, la regle d'override, la ligne d'inspecteur et l'attribut dans le rendu.
 - Reste sur le lot 7 : direction par animation. Puis export 2d, PRODUCT.md/DESIGN.md, updateListField, et la validation utilisateur (geste de deplacement, mobile).
+
+## Journal — 17 septembre 2026 · verification de mise en production (commit 11d65ec, 4.9.0-alpha.59)
+
+- Verification demandee : commit, merge, et "live". Resultat : HEAD = 11d65ec ; `git ls-remote origin` renvoie 11d65ec pour refs/heads/main ET refs/heads/refactor/artist-consolidation (donc pousse et fusionne) ; le serveur local 127.0.0.1:5173 sert alpha.59.
+- Le site public (artisite-prospector.vercel.app) etait, lui, reste sur alpha.49 : le push Git ne declenche aucun deploiement (le projet n'est pas lie a Git ; les mises en production sont manuelles via la CLI). Le site a ete redeploye en production depuis 11d65ec ; / et /js/version.js servent desormais alpha.59, avec `cache-control: must-revalidate`.
+- Regle a retenir : "push" ne vaut pas "live". Apres chaque lot pousse, relancer `vercel --prod --yes` depuis la racine du depot, puis verifier /js/version.js.
+- Comptage honnete : la suite reelle est 405/405 (mesuree), pas 404 — les entrees alpha.58 et alpha.59 comptaient un test de moins.
+- Reste (inchange) : lot 7 direction par animation, export autonome 2d, PRODUCT.md/DESIGN.md, updateListField, et la validation utilisateur (geste de deplacement, mobile).
