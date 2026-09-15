@@ -131,7 +131,6 @@ export function renderDashboard(state) {
         <main class="dashboard-v3-main">
           <section class="dashboard-v3-command">
             <div class="dashboard-v3-composer-zone">
-              <div class="dashboard-v3-chapter"><span>01</span><i></i><b>Direction commerciale</b></div>
               <h1>Un prospect.<br><em>Une direction.</em><br>Un site prêt à vendre.</h1>
               <p>Passez d’un nom et d’une ville à une direction de site complète. L’outil compose la base ; vous gardez la décision.</p>
 
@@ -189,7 +188,6 @@ export function renderDashboard(state) {
           <section class="dashboard-v3-library">
             <div class="dashboard-v3-library-head">
               <div>
-                <div class="dashboard-v3-chapter"><span>02</span><i></i><b>Directions actives</b></div>
                 <h2>Vos projets, comme une<br>bibliothèque de directions.</h2>
               </div>
               <div class="dashboard-v3-library-tools">

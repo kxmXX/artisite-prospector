@@ -1557,3 +1557,12 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Correction d'une faute du lot précédent : j'avais introduit un second vocabulaire de focus (`--ui-focus` inexistant) alors que le produit a un anneau unique (`--ui-ring`). Corrigé ; un test interdit le retour.
 - Tests : 364 → 368. Détecteur Impeccable relancé sur les fichiers modifiés.
 - Reste : blur/glass décoratif des menus flottants, glyphes résiduels, PRODUCT.md/DESIGN.md ; lots 6, 3b, 7 (courbe, direction, tester/rejouer) et 2d toujours ouverts.
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.31 (lanceur d'assistant, kickers — corrigés sur capture)
+
+- Méthode : la skill impose une passe d'inspection visuelle groupée. Serveur lancé, éditeur ouvert dans un vrai navigateur, captures avant/après — c'est la première vérification visuelle de toute la mission.
+- Défaut confirmé à l'écran : le lanceur « Studio Assistant IA » (pilule fixe de 10 rem) recouvrait la carte « ARTISAN RÉFÉRENCE » du site rendu. Réduit à une pastille ronde de 2,75 rem, nom accessible et infobulle conservés. Le `border-bottom: 3px` qu'il portait était l'antipattern déjà signalé par le détecteur.
+- Craft-floor : les deux kickers numérotés du tableau de bord sont supprimés (interdiction explicite). CSS mort retiré de `studio-v3.css`.
+- Rectification : mon rapport précédent parlait d'un emoji dans le lanceur ; il utilisait `getIcon`. Erreur de lecture de ma part.
+- Tests : 368 → 370, plus la réécriture du test historique du lanceur. `scripts/build-utilities.mjs` relancé, détecteur Impeccable repassé.
+- Reste : glyphes de statut du chrome, vocabulaire de boutons, lot 6 positionnement (Canva), 3b, 4d, 7, 2d.

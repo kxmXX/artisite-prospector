@@ -81,9 +81,18 @@ test("v4.1.0 Enhancements: 60fps animations toolbar button and popover", () => {
 
 test("v4.1.0 Enhancements: Studio Assistant IA launcher pill with online status dot", () => {
   const editorFullHTML = renderEditor(state);
-  assert.ok(editorFullHTML.includes("ai-launcher-pill"), "Editor must render ai-launcher-pill");
-  assert.ok(editorFullHTML.includes("ai-status-dot"), "Editor must render ai-status-dot");
-  assert.ok(editorFullHTML.includes("Studio Assistant IA"), "Editor must render title 'Studio Assistant IA'");
+  assert.ok(editorFullHTML.includes("copilot-launcher"), "l'editeur doit rendre le lanceur de l'assistant");
+  assert.ok(editorFullHTML.includes("ai-status-dot"), "l'editeur doit rendre la pastille d'etat");
+  assert.ok(editorFullHTML.includes('aria-label="Ouvrir Studio Assistant IA"'), "le lanceur garde un nom accessible");
+  assert.ok(editorFullHTML.includes('title="Studio Assistant IA"'), "le lanceur garde une infobulle");
+  // Le lanceur flottait au-dessus du canevas en pilule large : il ne doit plus recouvrir
+  // le travail de l'auteur, ni porter le bord epais que le detecteur Impeccable classe
+  // comme antipattern (border-accent-on-rounded).
+  assert.ok(!editorFullHTML.includes("ai-launcher-pill"), "plus de pilule large au-dessus du canevas");
+  assert.ok(!editorFullHTML.includes("Génération & Édition IA"), "plus de sous-titre envahissant");
+  const launcherCSS = fs.readFileSync(new URL("../public/css/app.css", import.meta.url), "utf8");
+  assert.ok(launcherCSS.includes("width: 2.75rem"), "le lanceur doit etre compact");
+  assert.ok(!launcherCSS.includes("border-bottom: 3px solid #09090b"), "plus de bord epais sur un element arrondi");
 });
 
 test("v4.1.0 Enhancements: Typography catalog includes Uncut / Fontshare fonts with no escaped URL errors", () => {

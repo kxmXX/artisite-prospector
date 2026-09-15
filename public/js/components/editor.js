@@ -407,16 +407,11 @@ export function renderEditor(state) {
           <div id="copilot-feedback" class="copilot-feedback hidden"></div>
         </div>
       ` : `
-        <button type="button" aria-label="Ouvrir Studio Assistant IA" onclick="window.app.toggleCopilotPanel(true)" class="copilot-launcher ai-launcher-pill">
+        <button type="button" aria-label="Ouvrir Studio Assistant IA" title="Studio Assistant IA" onclick="window.app.toggleCopilotPanel(true)" class="copilot-launcher">
           <span class="relative">
             <span class="assistant-avatar">${getIcon("bot", "w-4 h-4 text-amber-300")}</span>
             <span class="ai-status-dot"></span>
           </span>
-          <div class="text-left flex flex-col">
-            <span class="font-bold text-zinc-100 text-xs">Studio Assistant IA</span>
-            <span class="text-ui-xs text-zinc-400 font-normal">Génération & Édition IA</span>
-          </div>
-          <span class="ml-auto text-amber-400 pl-1">${getIcon("sparkles", "w-3.5 h-3.5")}</span>
         </button>
       `}
 

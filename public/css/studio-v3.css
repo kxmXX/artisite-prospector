@@ -267,10 +267,6 @@
 .dashboard-v3-command { min-height:545px;border-radius:26px;overflow:hidden;background:#18201f;display:grid;grid-template-columns:minmax(0,1.7fr) minmax(310px,.72fr);box-shadow:0 28px 75px rgba(27,35,32,.16);position:relative; }
 .dashboard-v3-command::before { content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 74% 26%,rgba(126,151,160,.18),transparent 28%),radial-gradient(circle at 20% 105%,rgba(197,145,107,.10),transparent 28%); }
 .dashboard-v3-composer-zone { padding:54px 58px 44px;position:relative;z-index:1;display:flex;flex-direction:column; }
-.dashboard-v3-chapter { display:flex;align-items:center;gap:9px;color:#8f9995;font:600 8.5px/1 ui-monospace,monospace;text-transform:uppercase;letter-spacing:.13em; }
-.dashboard-v3-chapter span { width:25px;height:25px;border:1px solid rgba(255,255,255,.13);border-radius:50%;display:grid;place-items:center; }
-.dashboard-v3-library .dashboard-v3-chapter span { border-color:rgba(24,32,31,.14); }
-.dashboard-v3-chapter i { width:32px;height:1px;background:currentColor;opacity:.26; }
 .dashboard-v3-command h1 { margin:36px 0 22px;max-width:760px;color:#f7f4ee;font-family:"General Sans",Inter,sans-serif;font-size:clamp(44px,5vw,80px);line-height:.94;letter-spacing:-.065em;font-weight:600; }
 .dashboard-v3-command h1 em { font-family:"Playfair Display",Georgia,serif;font-weight:600;color:#c6d1d5;letter-spacing:-.04em; }
 .dashboard-v3-command .dashboard-v3-composer-zone>p { margin:0;max-width:590px;color:#909b97;font-size:12px;line-height:1.65; }
@@ -298,7 +294,6 @@
 .dashboard-v3-pipeline dd { margin:0;color:#dce3df;font-weight:700; }
 .dashboard-v3-library { padding:66px 8px 0; }
 .dashboard-v3-library-head { display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding:0 8px 22px;border-bottom:1px solid rgba(24,32,31,.11); }
-.dashboard-v3-library .dashboard-v3-chapter { color:var(--ui-muted); }
 .dashboard-v3-library h2 { margin:20px 0 0;font:600 clamp(32px,4vw,58px)/.98 "Playfair Display",Georgia,serif;letter-spacing:-.05em;color:#202826; }
 .dashboard-v3-library-tools { display:flex;align-items:center;gap:10px;color:#949b98;font-size:9px; }
 .dashboard-v3-library-tools button { height:33px;border:0;border-radius:9px;padding:0 11px;display:flex;align-items:center;gap:6px;background:#e4e3dd;color:#48524f;font-size:9.5px;font-weight:700; }

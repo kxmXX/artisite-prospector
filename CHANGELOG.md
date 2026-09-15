@@ -7,6 +7,16 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.31) — Le lanceur d'assistant ne recouvre plus le canevas, les kickers disparaissent
+
+- Cause, **vue à l'écran** et non déduite : le lanceur « Studio Assistant IA » était une pilule fixe de 10 rem posée en bas à droite **au-dessus du canevas** ; sur un site réel elle recouvrait la carte « ARTISAN RÉFÉRENCE » du hero — exactement la superposition que la mission initiale visait. Il portait en plus un `border-bottom: 3px solid` sur un élément entièrement arrondi, soit l'antipattern `border-accent-on-rounded` que le détecteur d'Impeccable signalait déjà à `app.css:2137`.
+- Correctif : lanceur réduit à une pastille ronde compacte (2,75 rem) ancrée dans le coin, nom accessible conservé (`aria-label`) plus une infobulle ; bord épais supprimé ; bloc de texte large retiré ; règle CSS de la pilule devenue morte supprimée (14 lignes en moins dans `app.css`).
+- Craft-floor appliquée telle quelle : les deux kickers numérotés du tableau de bord (« 01 — Direction commerciale », « 02 — Directions actives ») sont supprimés. La règle est explicite — « aucun brief ne le rachète » — et les titres se tiennent seuls. Cinq lignes de CSS devenues mortes retirées de `studio-v3.css`.
+- Vérification **par captures**, la première de la mission : avant/après sur l'éditeur (la carte du hero est de nouveau entièrement lisible, plus aucun recouvrement) et sur le tableau de bord (le titre démarre sans étiquette).
+- Correction d'honnêteté : j'avais annoncé un « emoji ✨ » dans le lanceur. Vérification faite dans le code, il utilisait déjà `getIcon("sparkles")` — c'était une erreur de lecture de ma part, pas un défaut du produit.
+- Tests : 2 nouveaux dans `tests/visual_craft.test.js`, et le test historique du lanceur réécrit pour décrire le nouveau contrat (compact, nom accessible, sans bord épais) au lieu de l'ancienne pilule ; 368 → **370/370**.
+- Reste : glyphes de statut résiduels du chrome (`✓ ○ × !`), unification du vocabulaire de boutons (quatre familles coexistent), puis lot 6 positionnement.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.30) — Les surfaces du navigateur sont thématisées (skill Impeccable)
 
 - Ce que la skill relève et que le produit ne faisait pas : « la sélection de texte, le curseur, les barres de défilement, les anneaux de focus et les chiffres tabulaires arrivent avec les réglages par défaut du navigateur, qui n'appartiennent à aucun design system. C'est le signal le moins coûteux qu'une page a été construite plutôt qu'assemblée — et celui que les modèles oublient le plus systématiquement. » Vérification faite : `::selection`, `caret-color`, `::-webkit-scrollbar`, `scrollbar-color`, `::placeholder`, `::marker` et `font-variant-numeric` étaient **absents** du chrome de l'éditeur.
