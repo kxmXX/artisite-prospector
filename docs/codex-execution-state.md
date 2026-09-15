@@ -1,3 +1,13 @@
+## LOT DE LIVRAISON — transformations libres cohérentes 4.8.0-alpha.45 — 15 septembre 2026
+
+- Cause racine : `freeformDeclarations` et `applyFreeformLiveStyle` n’émettaient `transform-origin:0 0` que lorsqu’une échelle existait. Un élément tourné pivotait donc au centre tant qu’il n’était pas mis à l’échelle, puis basculait sur son coin dès qu’une échelle apparaissait — le même geste produisait deux comportements.
+- Correctif : origine unique `transform-origin:50% 50%!important` émise systématiquement dans le renderer (éditeur, aperçu, export) et dans le style vivant de l’éditeur. Rotation et échelle partagent désormais le centre.
+- Redimensionnement de groupe : l’échelle autour du centre décale chaque bord d’une demi-variation ; le déplacement est compensé (`centerOffsetX/Y`) pour que les bords visés restent exacts.
+- Compatibilité : les éléments simplement tournés conservent leur rendu précédent (ils étaient déjà au centre) ; seuls les éléments mis à l’échelle changent de pivot, justement pour rejoindre le modèle attendu.
+- Preuve : sonde de rendu CSS sur un élément `rotation:30 scale:1.4` → `transform-origin:50% 50%!important` dans les trois contextes ; 5/5 tests d’intégrité, 251/251 complets.
+- Détecteur Impeccable : avertissements préexistants (badge ambre, `animate-bounce`, image lightbox vide) sans lien avec ce lot.
+- Prochaine action exacte : aperçu fiable des presets d’animation et neutralisation des motions pendant un transform (vitesse `--anim-duration-multiplier` ignorée par les animations `!important`).
+
 ## LOT DE LIVRAISON — aperçu mobile/tablette fidèle 4.8.0-alpha.44 — 15 septembre 2026
 
 - Cause racine : les media queries `sm`/`md`/`lg` de `app.css` répondent à la fenêtre, pas à la largeur du cadre simulé. Dans un canevas de 390 px sur un écran 1280, `md:flex` gardait donc la navigation desktop active et celle-ci débordait.

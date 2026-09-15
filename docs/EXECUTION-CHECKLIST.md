@@ -58,7 +58,7 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 
 - [x] Jank de l’aperçu appareil — la bascule Ordinateur/Tablette/Mobile n’anime plus la largeur du canevas (`4.8.0-alpha.44`).
 - [x] Aperçu mobile/tablette simulé — la largeur du canevas gouverne les breakpoints via une couche éditeur dédiée, sans modifier les media queries du site public (`4.8.0-alpha.44`). Les container queries restent la piste si le rendu doit un jour être isolé dans une iframe.
-- Rotation/redimensionnement d’objets déjà tournés ou scalés : géométrie mesurée en AABB écran mais écrite en coordonnées locales ; à unifier avec un `transform-origin` unique.
+- [x] Rotation/redimensionnement d’objets déjà tournés ou scalés — origine unique `50% 50%` dans l’éditeur, l’aperçu et l’export, et compensation du redimensionnement de groupe (`4.8.0-alpha.45`). Reste un audit géométrique des gestes sur éléments tournés (le cadre de sélection reste une AABB).
 - Dégradé indigo résiduel (`app.js:3605`) signalé par le détecteur comme marqueur de palette IA.
 
 Prochaine action exacte : audit navigateur large de l’éditeur Esprit Nature sur 1440/1024/390, inventaire des aberrations mesurées, puis premier lot P0 sur les collisions et gestes de base. Le bundling passe après la remise en état fonctionnelle de l’éditeur.

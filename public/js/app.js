@@ -4865,11 +4865,12 @@ export class App {
       target.style.setProperty("min-height", "0", "important");
       target.style.setProperty("max-height", "none", "important");
     }
+    target.style.setProperty("transform-origin", "50% 50%", "important");
     const scaleX = Number(layout.scaleX);
     const scaleY = Number(layout.scaleY);
     if ((Number.isFinite(scaleX) && scaleX > 0.02) || (Number.isFinite(scaleY) && scaleY > 0.02)) {
       target.style.setProperty("scale", `${Number.isFinite(scaleX) && scaleX > 0.02 ? scaleX : 1} ${Number.isFinite(scaleY) && scaleY > 0.02 ? scaleY : 1}`, "important");
-      target.style.setProperty("transform-origin", "0 0", "important");
+      target.style.setProperty("transform-origin", "50% 50%", "important");
     }
     const rotation = Number(layout.rotation);
     if (Number.isFinite(rotation)) target.style.setProperty("rotate", `${rotation}deg`, "important");
@@ -5202,10 +5203,17 @@ export class App {
           const desiredTop = nextTop + relativeTop * scaleGroupY;
           const baseScaleX = Number(entry.base.scaleX) > 0 ? Number(entry.base.scaleX) : 1;
           const baseScaleY = Number(entry.base.scaleY) > 0 ? Number(entry.base.scaleY) : 1;
+          // `scale` is applied about the element centre, so the box grows by
+          // half its scale delta on each side. Compensate the translate to keep
+          // the group edges where the gesture asks for them.
+          const renderedWidth = Number(entry.base.width) > 0 ? Number(entry.base.width) : entry.target.offsetWidth;
+          const renderedHeight = Number(entry.base.height) > 0 ? Number(entry.base.height) : entry.target.offsetHeight;
+          const centerOffsetX = -(renderedWidth * baseScaleX * (scaleGroupX - 1)) / 2;
+          const centerOffsetY = -(renderedHeight * baseScaleY * (scaleGroupY - 1)) / 2;
           const layout = {
             ...entry.base,
-            x: (Number(entry.base.x) || 0) + (desiredLeft - entry.rect.left),
-            y: (Number(entry.base.y) || 0) + (desiredTop - entry.rect.top),
+            x: (Number(entry.base.x) || 0) + (desiredLeft - entry.rect.left) + centerOffsetX,
+            y: (Number(entry.base.y) || 0) + (desiredTop - entry.rect.top) + centerOffsetY,
             scaleX: baseScaleX * scaleGroupX,
             scaleY: baseScaleY * scaleGroupY
           };

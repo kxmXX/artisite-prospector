@@ -7,6 +7,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 15 septembre 2026 (4.8.0-alpha.45)
+
+- Transformations libres : rotation et échelle partagent désormais une origine unique au centre de l’élément. Auparavant l’ajout d’une échelle faisait passer l’origine de `50% 50%` à `0 0`, si bien qu’un élément déjà redimensionné se mettait soudain à pivoter autour de son coin.
+- Cohérence éditeur / aperçu / export : la même déclaration `transform-origin:50% 50%!important` est émise dans les trois contextes, donc le rendu ne saute plus entre l’édition et la publication.
+- Redimensionnement de groupe : l’échelle étant appliquée autour du centre, le déplacement est compensé de la moitié du delta d’échelle de chaque côté afin que les bords demandés par le geste restent exacts.
+- QA : test d’intégrité sur l’origine unique et la compensation, sonde de rendu CSS vérifiée, 251/251 tests complets, syntaxe et `git diff --check` propres.
+
 ### Consolidation — 15 septembre 2026 (4.8.0-alpha.44)
 
 - Aperçu appareil : la largeur simulée du canevas gouverne désormais les breakpoints. En modes Mobile et Tablette, les utilitaires desktop (`md:flex`, `lg:grid-cols-*`, `lg:col-span-*`, `lg:order-*`, tailles de texte) reviennent à leur valeur de base ; la navigation desktop ne déborde plus dans le cadre 390 px et le hero se recompose en colonne.

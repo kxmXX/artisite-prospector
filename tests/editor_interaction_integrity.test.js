@@ -69,3 +69,19 @@ test('simulated device preview owns the breakpoints without touching client expo
   // Device switching no longer animates layout width.
   assert.ok(!studioCss.includes('transition:width .28s'));
 });
+
+test('freeform transforms share one centre origin that scale cannot change', () => {
+  const rendererSource = fs.readFileSync(new URL('../public/js/components/renderer.js', import.meta.url), 'utf8');
+
+  // Rotation and scale must never use different pivots.
+  assert.ok(rendererSource.includes("declarations.push('transform-origin:50% 50%!important');"));
+  assert.ok(!rendererSource.includes('transform-origin:0 0!important'));
+  assert.ok(appSource.includes('target.style.setProperty("transform-origin", "50% 50%", "important")'));
+  assert.ok(!appSource.includes('"transform-origin", "0 0"'));
+
+  // Group scaling happens about the centre, so the translate compensates by half
+  // the scale delta on each side to keep the requested edges.
+  assert.ok(appSource.includes('centerOffsetX'));
+  assert.ok(appSource.includes('centerOffsetY'));
+  assert.ok(appSource.includes('(renderedWidth * baseScaleX * (scaleGroupX - 1)) / 2'));
+});
