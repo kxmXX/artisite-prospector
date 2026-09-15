@@ -1637,18 +1637,33 @@ export class App {
   }
 
   /**
-   * Selection d'un element depuis la liste de la section : meme etat et meme
-   * indicateur que la selection libre, pour n'avoir qu'une seule source.
+   * Ecriture unique de la selection d'element.
+   *
+   * Quatre chemins la renseignaient chacun de leur cote — la liste des elements,
+   * le clic sur le canevas, le nettoyage, et la selection libre. Ils passent tous
+   * par ici : meme etat, meme indicateur, meme panneau, et un seul endroit a
+   * corriger si la regle change.
    */
+  setElementSelection(layoutKey, options = {}) {
+    state.selectedElementKey = layoutKey || null;
+    if (state.selectedElementKey) state.elementStyleState = "default";
+    if (options.highlight !== false) this.highlightSelectedElement(state.selectedElementKey);
+    if (options.refresh !== false) this.refreshInspectorPanel();
+    this.updateStageContext();
+  }
+
+  /** Selection d'un element depuis la liste de la section. */
   selectElementForEditing(layoutKey) {
     if (!layoutKey) return;
-    state.selectedElementKey = layoutKey;
-    state.elementStyleState = "default";
-    this.highlightSelectedElement(layoutKey);
-    this.refreshInspectorPanel();
+    this.setElementSelection(layoutKey);
   }
 
   selectSection(sectionId, options = {}) {
+    // Changer de section relache l'element selectionne : il appartient a l'ancienne,
+    // et le panneau montrait sinon ses reglages pendant qu'on editait la nouvelle.
+    if (state.selectedSectionId !== sectionId && state.selectedElementKey) {
+      this.setElementSelection(null, { highlight: false, refresh: false });
+    }
     state.setSelectedSection(sectionId);
     // Le panneau de proprietes doit suivre la section choisie, qu'elle ait change ou
     // non. L'ancienne condition ne le rafraichissait qu'au second clic sur la meme
@@ -2425,9 +2440,7 @@ export class App {
     const layoutKey = el.getAttribute("data-layout-key") || "";
     if (layoutKey) {
       if (secId && state.selectedSectionId !== secId) state.setSelectedSection(secId);
-      state.selectedElementKey = layoutKey;
-      state.elementStyleState = "default";
-      this.updateSelectedSectionUI();
+      this.setElementSelection(layoutKey);
     }
     const toolbar = document.getElementById("floating-text-toolbar");
     if (!toolbar) return;
@@ -2521,8 +2534,7 @@ export class App {
     this._freeformSelectedKeys = [];
     this._freeformAdditiveMode = false;
     this._freeformActiveGroup = null;
-    state.selectedElementKey = null;
-    this.updateStageContext();
+    this.setElementSelection(null, { highlight: false });
   }
 
   /** Applique un réglage de style à l'élément sélectionné (annulable). */
@@ -5132,7 +5144,7 @@ export class App {
     this._freeformSelectedKeys = keys;
     this._freeformSelectedKey = primaryKey && keys.includes(primaryKey) ? primaryKey : keys[0];
     // L'inspecteur a besoin de la clé de l'élément pour proposer ses réglages.
-    state.selectedElementKey = this._freeformSelectedKey;
+    this.setElementSelection(this._freeformSelectedKey, { highlight: false, refresh: false });
     this.updateStageContext();
     this.updateSelectedSectionUI();
     this._freeformSelectedElement = canvas.querySelector(`[data-layout-key="${this._freeformSelectedKey}"]`);
@@ -5206,6 +5218,9 @@ export class App {
     }
     this.hideFreeformGuides();
     this.hideFreeformSpacingGuides();
+    // La selection d'element doit tomber avec la selection libre : sinon le panneau
+    // continuait d'editer un element que plus rien n'indiquait sur le canevas.
+    this.setElementSelection(null, { highlight: false });
   }
 
   updateFreeformOverlay() {

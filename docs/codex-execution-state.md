@@ -1708,3 +1708,11 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Lot 4d clos : animation de section (alpha.29), reglages d'element (alpha.40), dix accordeons globaux (alpha.48). Le groupe Mise en page de section n'en a pas besoin.
 - Tests : 395/395, un test nouveau sur l'accessibilite des en-tetes.
 - Reste : lot 3b (source de selection unique, arbre des elements, 830 lignes inertes), lot 7, export 2d, PRODUCT.md/DESIGN.md, geste de deplacement (validation utilisateur).
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.49 (lot 3b : selection d'element a source unique)
+
+- Fait : `setElementSelection(layoutKey, options)` est le seul point d'ecriture de la selection d'element. Un test verifie qu'il ne reste qu'une affectation directe de `state.selectedElementKey` dans app.js.
+- Deux desynchronisations corrigees : vider la selection libre laissait la cle d'element en place ; changer de section gardait l'element de l'ancienne. Les deux passent par le point unique.
+- Verifie a l'ecran : selection depuis la liste -> contour en pointilles sur le canevas et bloc « Element selectionne » (l'indicateur unifie de alpha.43 est enfin visible sur capture) ; changement de section -> panneau sur la nouvelle section, element relache.
+- Tests : 396 → 398. `node --check` sur app.js.
+- Reste sur 3b : arbre des elements dans le panneau Structure ; remplacement des 830 lignes inertes de renderSectionAccordionContent (capacites uniques a reimplementer d'abord : boucle d'animation de section, motifs d'inspiration, assombrissement du hero, curseurs de taille). Puis lot 7, export 2d, PRODUCT.md/DESIGN.md.

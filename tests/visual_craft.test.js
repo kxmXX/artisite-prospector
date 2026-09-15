@@ -111,7 +111,7 @@ test('l inspecteur liste les elements de la section', async () => {
 test('la selection d un element a un seul indicateur, partage avec la selection libre', () => {
   const app = read('public/js/app.js');
   assert.ok(app.includes('highlightSelectedElement(layoutKey) {'), 'l indicateur doit etre partage');
-  assert.ok(app.includes('this.highlightSelectedElement(layoutKey);'), 'la liste doit l appliquer');
+  assert.ok(app.includes('this.highlightSelectedElement(state.selectedElementKey);'), 'le setter unique doit l appliquer');
   assert.ok(app.includes('classList.add("is-freeform-selected")'), 'meme classe que la selection libre');
   const studio = read('public/css/studio-v3.css');
   assert.ok(studio.includes('[data-layout-key].is-freeform-selected'), 'le style doit exister');
@@ -156,4 +156,23 @@ test('les en-tetes de reglages sont des controles accessibles', () => {
   assert.ok(editor.includes('aria-controls="settings-body-'), 'chaque en-tete doit designer son corps');
   assert.ok(editor.includes('window.app.toggleSettingsItem'), 'le basculement doit rester branche');
   assert.ok(app.includes('setAttribute("aria-expanded", body.classList.contains("hidden") ? "false" : "true")'), 'l etat doit suivre le basculement');
+});
+
+test('la selection d element n a qu un seul point d ecriture', () => {
+  const app = read('public/js/app.js');
+  assert.ok(app.includes('setElementSelection(layoutKey, options = {}) {'), 'le point d ecriture unique doit exister');
+  assert.equal(app.split('state.selectedElementKey = ').length - 1, 1,
+    'une seule affectation directe doit subsister, dans le setter');
+  assert.ok(app.includes('this.setElementSelection(this._freeformSelectedKey'), 'la selection libre passe par le setter');
+  assert.ok(app.includes('this.setElementSelection(null, { highlight: false })'), 'le nettoyage passe par le setter');
+});
+
+test('changer de section relache l element selectionne', () => {
+  const app = read('public/js/app.js');
+  const start = app.indexOf('selectSection(sectionId, options = {}) {');
+  assert.ok(start > 0, 'selectSection doit exister');
+  const body = app.slice(start, app.indexOf('\n  }', start));
+  assert.ok(body.includes('state.selectedSectionId !== sectionId && state.selectedElementKey'),
+    'la selection d element doit etre relachee quand la section change');
+  assert.ok(body.includes('this.setElementSelection(null'), 'par le point d ecriture unique');
 });

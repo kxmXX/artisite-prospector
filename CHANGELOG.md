@@ -7,6 +7,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.49) — Lot 3b : une seule source de sélection d'élément
+
+- Fait : `setElementSelection(layoutKey, options)` devient le **seul point d'écriture** de la sélection d'élément. Quatre chemins la renseignaient chacun de leur côté — la liste des éléments, le clic sur le canevas, le nettoyage, et la sélection libre. Un test garantit qu'il ne reste qu'**une seule affectation directe** dans tout le fichier.
+- Deux désynchronisations corrigées au passage, de la même famille : (1) vider la sélection libre laissait `state.selectedElementKey` en place, donc le panneau continuait d'éditer un élément que plus rien n'indiquait sur le canevas ; (2) changer de section gardait l'élément de l'**ancienne** section, donc le panneau montrait ses réglages pendant qu'on éditait la nouvelle. Les deux passent désormais par le point unique.
+- **Vérifié à l'écran** : sélection d'un élément dans la liste → contour en pointillés sur le canevas **et** « Élément sélectionné » dans le panneau — l'indicateur unifié livré en `4.9.0-alpha.43` est enfin visible sur une capture ; puis changement de section → le panneau affiche la nouvelle section et **relâche l'élément** (bloc élément disparu, contour effacé).
+- Tests : 2 nouveaux ; 396 → **398/398**.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.48) — Lot 4d clos, et les réglages deviennent accessibles
 
 - Constat en fermant le lot 4d : les **dix** groupes de réglages globaux (entreprise, favicon, couleurs, typographie, boutons, export, SEO, navigation, preuve sociale, code PIN) étaient déjà des accordéons — mais leurs en-têtes étaient des `<div onclick>` : **non focusables au clavier, invisibles pour un lecteur d'écran**, sans état annoncé.
