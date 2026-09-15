@@ -1,3 +1,11 @@
+## LOT DE LIVRAISON — PIN de démo honnête 4.8.0-alpha.38 — 15 septembre 2026
+
+- Validation : le PIN doit être explicitement saisi et contenir 4 à 6 chiffres ; l’absence de code ne retombe plus sur `1234` et ne peut jamais déverrouiller une démo.
+- Secret : le code enregistré n’apparaît plus dans le bouton, le champ ni le toast. Toute modification révoque l’état déverrouillé courant.
+- Portée : la modale explique que la protection concerne uniquement la présentation interne Artist ; un export statique HTML/ZIP reste public.
+- Tests : 22/22 ciblés et 239/239 complets, dont secret absent du HTML de partage et vérification sans PIN impossible.
+- Prochaine action exacte : CORS et rate limit des routes IA, sans ouvrir le chantier de persistance serveur ni modifier les faux avis Google explicitement conservés.
+
 ## LOT DE LIVRAISON — rendu et export sécurisés 4.8.0-alpha.37 — 15 septembre 2026
 
 - Frontière de confiance : `createSafeRenderProject()` crée une copie non mutante des données métier avant le renderer commun ; texte visible, attributs et URL deviennent inertes dans l’éditeur, la vitrine et l’export.

@@ -114,22 +114,22 @@ export function renderShareModal(project, activeTab = "demo") {
                   <span class="text-sm">🔒</span>
                   <div>
                     <span class="text-xs font-bold text-zinc-900 block">Verrouillage par Code PIN Client</span>
-                    <span class="text-[10.5px] text-zinc-500">Exiger un code à 4 chiffres avant affichage</span>
+                    <span class="text-[10.5px] text-zinc-500">Exiger un code de 4 à 6 chiffres avant la démo interne</span>
                   </div>
                 </div>
-                <button type="button" onclick="window.app.setClientDemoPin(state.currentProject?.settings?.clientDemoPin ? null : '1234'); window.app.renderModals();" class="px-2.5 py-1 rounded-md text-[11px] font-bold transition-colors ${project.settings?.clientDemoPin ? 'bg-emerald-600 text-white shadow-xs' : 'bg-zinc-200 text-zinc-700 hover:bg-zinc-300'}">
-                  ${project.settings?.clientDemoPin ? 'Actif (Code ' + project.settings.clientDemoPin + ')' : 'Désactivé'}
+                <button type="button" onclick="if (state.currentProject?.settings?.clientDemoPin) { window.app.setClientDemoPin(null); window.app.renderModals(); } else { document.getElementById('client-demo-pin-setting')?.focus(); }" class="px-2.5 py-1 rounded-md text-[11px] font-bold transition-colors ${project.settings?.clientDemoPin ? 'bg-emerald-600 text-white shadow-xs' : 'bg-zinc-200 text-zinc-700 hover:bg-zinc-300'}">
+                  ${project.settings?.clientDemoPin ? 'Actif — désactiver' : 'Configurer'}
                 </button>
               </div>
-              ${project.settings?.clientDemoPin ? `
-                <div class="flex items-center gap-2 pt-1 border-t border-zinc-200/60">
-                  <label class="text-[11px] text-zinc-600 font-medium">Modifier le Code PIN :</label>
-                  <input type="text" maxlength="6" value="${project.settings.clientDemoPin}"
-                         onchange="window.app.setClientDemoPin(this.value)"
-                         class="w-20 bg-white border border-zinc-300 rounded px-2 py-1 text-xs font-mono font-bold text-center text-zinc-900 focus:outline-none">
-                  <span class="text-[10.5px] text-zinc-400">Transmettez ce code à l'artisan par SMS.</span>
-                </div>
-              ` : ''}
+              <div class="flex flex-wrap items-center gap-2 pt-2 border-t border-zinc-200/60">
+                <label for="client-demo-pin-setting" class="text-[11px] text-zinc-600 font-medium">${project.settings?.clientDemoPin ? 'Remplacer le code' : 'Nouveau code'} :</label>
+                <input type="password" id="client-demo-pin-setting" maxlength="6" inputmode="numeric" autocomplete="new-password" placeholder="••••"
+                       class="w-24 bg-white border border-zinc-300 rounded px-2 py-1 text-xs font-mono font-bold text-center text-zinc-900 focus:outline-none focus:border-zinc-600">
+                <button type="button" onclick="const input = document.getElementById('client-demo-pin-setting'); if (window.app.setClientDemoPin(input?.value)) window.app.renderModals();" class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-zinc-900 text-white hover:bg-black">Enregistrer</button>
+              </div>
+              <p class="text-[10.5px] leading-relaxed text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-2">
+                Ce code protège uniquement la présentation ouverte via Artist. Un export HTML ou ZIP reste un site public et ne peut pas être protégé par ce réglage.
+              </p>
             </div>
 
             <!-- Direct Dispatch Actions (SMS & WhatsApp) -->

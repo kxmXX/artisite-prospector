@@ -18,6 +18,7 @@ import { getTradeById } from "./data/trades.js";
 import { getTradeFallbackDataUrl } from "./data/imageFallbacks.js";
 import { ensureFontCatalog } from "./data/fonts.js";
 import { getIcon } from "./components/icons.js";
+import { parseClientDemoPin, verifyClientDemoPin } from "./utils/clientDemoPin.js";
 import { createEspritNatureDemoProject } from "./data/sampleProjects.js";
 import { getDefaultTemplateIdForTrade, getSiteTemplate, instantiateSiteTemplate } from "./data/templates.js";
 import { escapeHtml } from "./utils/html.js";
@@ -1135,18 +1136,29 @@ export class App {
 
   // 5. White-Label Client PIN Protection (MVP Feature 10)
   setClientDemoPin(pin) {
-    if (!state.currentProject) return;
+    if (!state.currentProject) return false;
+    const parsed = parseClientDemoPin(pin);
+    if (!parsed.valid) {
+      this.showToast("Le code doit contenir 4 à 6 chiffres", "error");
+      return false;
+    }
     if (!state.currentProject.settings) state.currentProject.settings = {};
-    state.currentProject.settings.clientDemoPin = pin ? String(pin).trim() : null;
+    state.currentProject.settings.clientDemoPin = parsed.pin;
+    this._clientUnlocked = false;
     state._openSettingsItem = "pinLock";
     state.save();
-    this.showToast(pin ? `Code PIN client défini : ${pin}` : "Code PIN désactivé", "info");
+    this.showToast(parsed.pin ? "Code PIN client défini" : "Code PIN désactivé", "info");
+    return true;
   }
 
   unlockClientDemo(enteredPin) {
     const project = state.currentProject;
-    const requiredPin = project?.settings?.clientDemoPin || "1234";
-    if (String(enteredPin).trim() === String(requiredPin).trim()) {
+    const requiredPin = project?.settings?.clientDemoPin;
+    if (!requiredPin) {
+      this.showToast("Aucun code n’est défini pour cette démo", "error");
+      return false;
+    }
+    if (verifyClientDemoPin(enteredPin, requiredPin)) {
       this._clientUnlocked = true;
       this.showToast("Accès démo déverrouillé !", "success");
       this.render();

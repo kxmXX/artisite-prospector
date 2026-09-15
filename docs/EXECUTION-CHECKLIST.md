@@ -34,7 +34,7 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 
 - [x] Collisions des barres flottantes — livré et vérifié dans `4.8.0-alpha.36`.
 - [x] XSS du renderer/export et duplication de `escapeHtml` — rendu métier neutralisé, URL/CSS/scripts filtrés et utilitaire partagé livré dans `4.8.0-alpha.37`.
-- [ ] PIN client — le fallback `1234`, l’affichage en clair et la portée limitée à la démo interne sont encore présents.
+- [x] PIN client — aucun fallback, aucun secret réaffiché, validation 4–6 chiffres et portée « démo interne uniquement » explicite dans `4.8.0-alpha.38`.
 - [ ] Protection des routes IA — CORS `*` et absence de limitation de débit encore présents.
 - [ ] Labels du wizard — associations `for`/`id` encore incomplètes.
 - [ ] Polices — import Google Fonts dupliqué entre HTML et CSS.
@@ -43,7 +43,7 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - [~] Persistance serveur et audit SEO réel — exclus explicitement par l’utilisateur pour cette mission.
 - [~] Avis Google fictifs / badges associés — conservation explicitement demandée par l’utilisateur.
 
-Prochaine action exacte : corriger le PIN client sans fallback `1234` ni affichage du secret, et clarifier dans l’interface qu’il protège uniquement la démo interne — jamais un export HTML statique.
+Prochaine action exacte : protéger les routes IA par limitation de débit et CORS restreint/configurable, avec tests serveur sur origine autorisée, origine refusée et réponse 429.
 
 ## État exact à `4.8.0-alpha.8`
 

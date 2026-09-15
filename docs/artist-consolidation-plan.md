@@ -66,6 +66,12 @@ Cette section prévaut sur le tableau historique des lots 5–13 ci-dessous sans
 - Les assertions historiques comparent désormais le HTML sûr tout en conservant le texte décodé identique dans le navigateur. Validation complète : 237/237.
 - Prochain lot borné : PIN de démo, puis protection CORS/rate limit. Persistance serveur, audit SEO réel et faux avis Google restent exclus.
 
+### Lot PIN de démo — 4.8.0-alpha.38
+
+- Le PIN ne possède plus de valeur par défaut, accepte uniquement 4 à 6 chiffres et n’est jamais réinjecté dans le HTML de la modale ou dans une notification.
+- Le verrou est présenté honnêtement comme une protection de la démo interne ; l’export statique n’est pas vendu comme confidentiel.
+- Prochaine étape : sécurisation réseau bornée des routes IA par CORS et limitation de débit, puis lots légers wizard/fontes/progression.
+
 ## État initial vérifié
 
 - Vanilla JS, serveur Node natif, aucune dépendance npm déclarée ; `npm test` : **136/136**.

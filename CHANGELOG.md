@@ -7,6 +7,12 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 15 septembre 2026 (4.8.0-alpha.38)
+
+- Démo client : suppression du code implicite `1234` ; seul un PIN explicitement configuré de 4 à 6 chiffres peut déverrouiller une présentation.
+- Confidentialité : le PIN sauvegardé n’est plus réaffiché dans le bouton, le champ ou les notifications ; changer le code révoque aussi l’accès déverrouillé courant.
+- Transparence : le partage précise désormais que ce verrou protège la démo interne Artist, pas les exports HTML/ZIP statiques. Validation : 22/22 tests ciblés et 239/239 complets.
+
 ### Consolidation — 15 septembre 2026 (4.8.0-alpha.37)
 
 - Sécurité : le contenu métier modifiable est neutralisé avant tout rendu public, éditeur ou export autonome ; les URL exécutables, injections CSS et fermetures de script JSON-LD sont rejetées.
