@@ -7,6 +7,14 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.59) — Lot 7 : la courbe d'animation devient réglable
+
+- Le catalogue portait une courbe par animation, mais l'auteur ne pouvait pas la changer. Trois courbes sont désormais proposées — **Douce** (départ vif, arrivée posée), **Rebond** (léger dépassement), **Régulière** — dans le repli « Réglages avancés » du panneau, à côté de la vitesse et du délai.
+- Implémentation : la courbe choisie prime sur celle du preset par une règle unique (`animation-timing-function` sur `[data-motion-easing]`), alimentée par une variable par courbe — donc aucune règle d'animation dupliquée.
+- **Le réglage survit au rechargement** : le rendu émet `data-motion-easing`, vérifié sur le HTML produit. C'est le contrôle que j'avais oublié au premier passage de ce tour, et que la sonde a rattrapé.
+- Tests : 1 nouveau ; **404/404**. Vérifié : 3 courbes au catalogue, règle d'override présente, ligne dans l'inspecteur, attribut dans le rendu.
+- Reste sur le lot 7 : la **direction** par animation.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.58) — Lot 7 : arrêter et réinitialiser une animation
 
 - Le panneau proposait « Tester l'animation en direct » mais rien pour **l'arrêter**, ni pour **revenir aux réglages d'origine** : une fois une animation posée, il fallait décocher à la main chaque réglage (preset, répétition, vitesse, délai).

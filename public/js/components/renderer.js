@@ -589,6 +589,7 @@ function renderSection(sec, project, options) {
   const motionLoop = ["twice", "infinite"].includes(sec.settings?.motionLoop) ? sec.settings.motionLoop : "";
   const motionSpeed = sec.settings?.motionSpeed && sec.settings.motionSpeed !== "normal" ? sec.settings.motionSpeed : "";
   const motionDelay = sec.settings?.motionDelay && sec.settings.motionDelay !== "aucun" ? sec.settings.motionDelay : "";
+  const motionEasing = sec.settings?.motionEasing && sec.settings.motionEasing !== "douce" ? sec.settings.motionEasing : "";
   const customBackground = /^#[0-9a-f]{3,8}$/i.test(sec.settings?.customBackground || "")
     ? `background-color: ${sec.settings.customBackground} !important;`
     : "";
@@ -648,6 +649,7 @@ function renderSection(sec, project, options) {
           ${motionPreset ? `data-motion="${motionPreset}"` : ''}
           ${motionPreset && motionSpeed ? `data-motion-speed="${motionSpeed}"` : ''}
           ${motionPreset && motionDelay ? `data-motion-delay="${motionDelay}"` : ''}
+          ${motionPreset && motionEasing ? `data-motion-easing="${motionEasing}"` : ''}
          style="--section-bg: ${themeColor}; ${hasCustomBg ? `--custom-section-bg: ${sec.settings.customBackground};` : ''} ${customBackground}"
          tabindex="-1">
 

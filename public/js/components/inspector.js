@@ -11,7 +11,7 @@ import { escapeHtml } from "../utils/html.js";
 import { SECTION_WIDTHS, SECTION_SPACING, SECTION_ALIGN, getSectionLayout } from "../engine/sectionStyle.js";
 import { ELEMENT_PADDING, ELEMENT_RADIUS, ELEMENT_OPACITY, ELEMENT_BACKGROUND, ELEMENT_BORDER, ELEMENT_SHADOW, getElementStyle } from "../engine/elementStyle.js";
 import { ELEMENT_STATES, ELEMENT_STATE_LABELS, getElementState } from "../engine/elementStates.js";
-import { MOTION_PRESETS, MOTION_SPEEDS, MOTION_DELAYS } from "../data/motionPresets.js";
+import { MOTION_PRESETS, MOTION_SPEEDS, MOTION_DELAYS, MOTION_EASINGS } from "../data/motionPresets.js";
 import { TRANSFORM_FIELDS, getElementTransform, hasElementTransform } from "../engine/elementTransform.js";
 import { collectSectionElements } from "./renderer.js";
 import { numberedLabels } from "../data/elementLabels.js";
@@ -487,6 +487,15 @@ export function renderInspector(section, project, state) {
                     class="motion-loop-btn ${((section.settings?.motionDelay || 'aucun') === delay.id) ? 'is-active' : ''}"
                     title="${delay.description}"
                     onclick="window.app.setSectionMotionDelay('${sectionId}', '${delay.id}')">${delay.label}</button>
+          `).join('')}
+        </div>
+        <div class="motion-loop-row" data-section-timing>
+          <span class="motion-loop-label">Courbe</span>
+          ${MOTION_EASINGS.map((easing) => `
+            <button type="button"
+                    class="motion-loop-btn ${((section.settings?.motionEasing || 'douce') === easing.id) ? 'is-active' : ''}"
+                    title="${easing.description}"
+                    onclick="window.app.setSectionMotionEasing('${sectionId}', '${easing.id}')">${easing.label}</button>
           `).join('')}
         </div>
         `)}

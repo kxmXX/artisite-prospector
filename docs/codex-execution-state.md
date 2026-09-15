@@ -1787,3 +1787,10 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Ajoute sous le bouton de test : Arreter (retire is-revealed, motion-preview, l'etat de pulsation et annule le minuteur) et Reinitialiser (efface preset, repetition, vitesse, delai ; instantane d'historique, donc annulable).
 - Tests : 403/403, un test nouveau verifie les trois boutons sur la sortie reelle de l'inspecteur.
 - Reste sur le lot 7 : courbe (easing) et direction par animation. Puis export 2d, PRODUCT.md/DESIGN.md, updateListField, et la validation utilisateur du geste de deplacement et du mobile.
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.59 (lot 7 : courbe reglable)
+
+- Ajoute : trois courbes (douce, rebond, reguliere) reglables par section, dans le repli avance a cote de la vitesse et du delai. La courbe choisie prime sur celle du preset par une regle unique alimentee par variables.
+- Oubli rattrape dans le meme tour : le rendu n'emettait pas data-motion-easing, donc le reglage n'aurait pas survecu a un rechargement. La sonde l'a montre, corrige avant commit.
+- Tests : 404/404, un test nouveau verifie le catalogue, la regle d'override, la ligne d'inspecteur et l'attribut dans le rendu.
+- Reste sur le lot 7 : direction par animation. Puis export 2d, PRODUCT.md/DESIGN.md, updateListField, et la validation utilisateur (geste de deplacement, mobile).

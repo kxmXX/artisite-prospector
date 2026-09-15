@@ -147,8 +147,29 @@ export function motionTimingCSS() {
     if (delay.ms === 0) continue;
     lines.push('[data-motion-delay="' + delay.id + '"] { --motion-delay: ' + delay.ms + "ms; }");
   }
+  for (const easing of MOTION_EASINGS) {
+    lines.push('[data-motion-easing="' + easing.id + '"] { --motion-ease-override: ' + easing.value + '; }');
+  }
+  lines.push("[data-motion-easing] { animation-timing-function: var(--motion-ease-override) !important; }");
   lines.push("@media (prefers-reduced-motion: reduce) {");
   lines.push("  [data-motion] { animation-delay: 0ms !important; }");
   lines.push("}");
   return lines.join("\n");
+}
+
+/** Courbe de l'animation : la facon dont le mouvement ralentit. */
+export const MOTION_EASINGS = Object.freeze([
+  { id: "douce", label: "Douce", value: "cubic-bezier(.16, 1, .3, 1)", description: "Depart vif, arrivee posee." },
+  { id: "rebond", label: "Rebond", value: "cubic-bezier(.34, 1.56, .64, 1)", description: "Petit depassement avant de se poser." },
+  { id: "lineaire", label: "Régulière", value: "linear", description: "Vitesse constante, sans acceleration." }
+]);
+
+const EASING_BY_ID = new Map(MOTION_EASINGS.map((easing) => [easing.id, easing]));
+
+export function getMotionEasing(id) {
+  return EASING_BY_ID.get(String(id || "")) || EASING_BY_ID.get("douce");
+}
+
+export function motionEasingIds() {
+  return MOTION_EASINGS.map((easing) => easing.id);
 }

@@ -278,3 +278,22 @@ test('l animation de section peut etre testee, arretee et reinitialisee', async 
   assert.ok(app.includes("state.pushHistory(\"Reinitialisation de l'animation\")"), 'la reinitialisation doit etre annulable');
   state.selectedElementKey = null;
 });
+
+test('la courbe d animation est reglable et atteint le rendu', async () => {
+  const m = await import('../public/js/data/motionPresets.js');
+  assert.deepEqual(m.motionEasingIds(), ['douce', 'rebond', 'lineaire']);
+  assert.equal(m.getMotionEasing('rebond').value, 'cubic-bezier(.34, 1.56, .64, 1)');
+  assert.equal(m.getMotionEasing('inconnu').id, 'douce', 'repli sur la courbe douce');
+  const css = m.motionTimingCSS();
+  assert.ok(css.includes('animation-timing-function: var(--motion-ease-override)'), 'la courbe choisie doit primer sur celle du preset');
+  for (const id of m.motionEasingIds()) {
+    assert.ok(css.includes('[data-motion-easing="' + id + '"]'), 'regle manquante pour ' + id);
+  }
+  // Le reglage doit survivre au rechargement : il est emis par le rendu.
+  const { generateSite } = await import('../public/js/engine/generator.js');
+  const { renderWebsiteHTML } = await import('../public/js/components/renderer.js');
+  const project = generateSite({ name: 'Controle Courbe', tradeId: 'plombier' });
+  const hero = project.sections.find((s) => s.type === 'hero');
+  hero.settings = Object.assign({}, hero.settings, { motionPreset: 'fade-in', motionEasing: 'rebond' });
+  assert.ok(renderWebsiteHTML(project, { isEditor: true }).includes('data-motion-easing="rebond"'), 'la courbe doit atteindre le rendu');
+});

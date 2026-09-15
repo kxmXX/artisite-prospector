@@ -3470,7 +3470,9 @@ export class App {
     this.refreshInspectorPanel();
     this.showToast("Element remis dans le flux", "info");
   }
-  setSectionMotionSpeed(sectionId, speedId) {
+  setSectionMotionEasing(sectionId, easingId) {
+    this.setSectionMotionTiming(sectionId, "motionEasing", "douce", easingId, "Courbe de l'animation");
+  }  setSectionMotionSpeed(sectionId, speedId) {
     this.setSectionMotionTiming(sectionId, "motionSpeed", "normal", speedId, "Vitesse de l'animation");
   }
 
@@ -3488,7 +3490,7 @@ export class App {
     if (valueId && valueId !== defaultId) sec.settings[key] = valueId;
     else delete sec.settings[key];
     state.updateProject(updated, true);
-    const attr = key === "motionSpeed" ? "data-motion-speed" : "data-motion-delay";
+    const attr = key === "motionSpeed" ? "data-motion-speed" : (key === "motionEasing" ? "data-motion-easing" : "data-motion-delay");
     const secEl = document.getElementById("section-" + sectionId) || document.querySelector(".editor-section-wrapper[data-section-id=\"" + sectionId + "\"]");
     if (secEl) {
       if (valueId && valueId !== defaultId) secEl.setAttribute(attr, valueId);
