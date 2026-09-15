@@ -12,6 +12,7 @@ import { SECTION_WIDTHS, SECTION_SPACING, SECTION_ALIGN, getSectionLayout } from
 import { ELEMENT_PADDING, ELEMENT_RADIUS, ELEMENT_OPACITY, ELEMENT_BACKGROUND, ELEMENT_BORDER, ELEMENT_SHADOW, getElementStyle } from "../engine/elementStyle.js";
 import { ELEMENT_STATES, ELEMENT_STATE_LABELS, getElementState } from "../engine/elementStates.js";
 import { MOTION_PRESETS, MOTION_SPEEDS, MOTION_DELAYS } from "../data/motionPresets.js";
+import { TRANSFORM_FIELDS, getElementTransform, hasElementTransform } from "../engine/elementTransform.js";
 
 /**
  * Divulgation progressive : l'inspecteur montre d'abord l'essentiel — choisir une
@@ -54,6 +55,41 @@ const ELEMENT_SCALE_ROWS = [
  * Réglages de l'élément sélectionné (clé de mise en page stable).
  * Construit par concaténation, sans valeur libre : tout vient d'énumérations.
  */
+/**
+ * Position et taille de l'element selectionne, en nombres.
+ * Les champs restent vides tant que l'auteur n'a rien saisi : un element sans
+ * valeur reste dans le flux normal. C'est la position libre « en option ».
+ */
+function elementTransformControlsHTML(project, layoutKey, viewport) {
+  const values = getElementTransform(project, layoutKey, viewport);
+  const positioned = hasElementTransform(project, layoutKey, viewport);
+  return `
+    <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-xl space-y-2">
+      <div class="flex items-center justify-between">
+        <label class="text-ui-xs font-bold uppercase tracking-wider text-zinc-700">Position et taille</label>
+        <span class="text-ui-2xs font-mono px-1.5 py-0.5 rounded border ${positioned ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-white text-zinc-500 border-zinc-200'}">
+          ${positioned ? 'position libre' : 'flux normal'}
+        </span>
+      </div>
+      <div class="grid grid-cols-3 gap-1.5">
+        ${TRANSFORM_FIELDS.map((field) => `
+          <label class="flex flex-col gap-0.5">
+            <span class="text-ui-2xs uppercase tracking-wider text-zinc-500">${field.label}${field.unit === 'px' ? '' : ' ' + field.unit}</span>
+            <input type="number" inputmode="decimal" step="${field.step}" data-transform-field="${field.key}"
+                   class="px-1.5 py-1 border border-zinc-300 rounded-md text-ui-xs bg-white text-zinc-800"
+                   value="${values[field.key] === null ? '' : values[field.key]}" placeholder="auto"
+                   title="${field.description}"
+                   onchange="window.app.setElementTransformValue('${layoutKey}', '${field.key}', this.value)">
+          </label>
+        `).join('')}
+      </div>
+      <button type="button"
+              class="w-full py-1 bg-white hover:bg-zinc-100 text-zinc-700 rounded-lg text-ui-xs font-semibold border border-zinc-200 transition-colors"
+              onclick="window.app.resetElementTransform('${layoutKey}')">Revenir au flux</button>
+    </div>
+  `;
+}
+
 function elementStyleControlsHTML(project, layoutKey, activeState) {
   const stateName = ELEMENT_STATES.includes(activeState) ? activeState : 'default';
   // Les réglages et leurs valeurs vivent dans deux magasins selon l'état choisi :
@@ -167,6 +203,7 @@ export function renderInspector(section, project, state) {
       ${sectionLayoutControlsHTML(section, sectionId)}
 
       ${state.selectedElementKey ? elementStyleControlsHTML(project, state.selectedElementKey, state.elementStyleState) : ''}
+      ${state.selectedElementKey ? elementTransformControlsHTML(project, state.selectedElementKey, state.viewport) : ''}
 
       ${variants.length > 1 ? `
         <div class="p-2.5 bg-zinc-50 border border-zinc-200 rounded-lg space-y-1">

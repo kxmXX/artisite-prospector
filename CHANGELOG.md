@@ -7,6 +7,15 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.35) — Lot 6 entamé : position et taille en nombres
+
+- Fait : nouveau module `public/js/engine/elementTransform.js` — lecture, écriture et retrait des valeurs `x`, `y`, largeur, hauteur et rotation d'un élément, **palier par palier** (desktop / tablette / mobile), avec bornes (une largeur ne peut pas être nulle, la rotation reste dans ±180°).
+- Règle tenue : **flux par défaut, position libre en option**. Un élément sans valeur ne produit **aucune** règle CSS — un test le vérifie — et l'entrée de position disparaît dès que le dernier champ est vidé : aucun projet ne se retrouve avec des réglages fantômes.
+- Interface : bloc « Position et taille » pour l'élément sélectionné — cinq champs numériques, une pastille « flux normal / position libre » et un bouton « Revenir au flux ». L'écriture passe par un chemin unique et prend son instantané d'historique **avant** la mutation, comme l'exige le lot 8.
+- Écart structurel découvert : `state.selectedElementKey` n'était renseigné qu'à **un seul endroit** du produit — l'entrée en sélection libre. Les réglages d'élément (les styles qui existaient déjà *et* ces nouveaux champs) n'étaient donc atteignables que par ce chemin, lui-même déclenché par un geste de glisser. Un clic sur un élément le sélectionne désormais pour l'inspecteur.
+- Tests : 8 nouveaux dans `tests/element_transform.test.js` — 7 sur le modèle et le CSS réellement produit par le rendu, 1 sur le rendu des champs par l'inspecteur ; 374 → **382/382**.
+- Vérification : **par test, pas par capture**. La sélection libre exige un geste de glisser que mes outils de navigateur ne savent pas produire ; le chemin par clic n'a pas non plus pu être confirmé à l'écran avant la fin du tour. Le modèle, l'interface et le CSS sont couverts — **le geste ne l'est pas**.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.34) — Le dernier glyphe du produit part, remplacé par une icône
 
 - Trois derniers cas, dont deux que mes tours précédents avaient manqués : le bouton de lecture du composant vidéo (`▶`, affiché sur le site du client), les six pastilles d'étape du terminal de l'assistant (`○`, encore écrites en dur dans le balisage alors que leur mise à jour dynamique utilisait déjà le système d'icônes), et le bouton « Tester l'animation » de l'inspecteur (`▶`).

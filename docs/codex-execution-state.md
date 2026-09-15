@@ -1590,3 +1590,12 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Fausse alerte corrigée : les prétendus glyphes `⋯ ⇄ ⊕ ▼` des barres de section et de texte sont en réalité des icônes SVG ; c'était une erreur de lecture d'une capture basse résolution de ma part.
 - Tests : 373 → 374. `scripts/build-utilities.mjs` relancé, `node --check` sur les quatre fichiers.
 - Reste : vocabulaire de boutons (dette de nommage), puis lot 6 positionnement — le vrai sujet Canva — avec 6 tours de budget.
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.35 (lot 6 entamé : position et taille en nombres)
+
+- Modèle compris et documenté : `project.freeformLayout[viewport][layoutKey]` porte `x`, `y`, width, height, rotation, scaleX/scaleY, z, parentSectionId ; le rendu en dérive le CSS par palier (`buildFreeformLayoutCSS`).
+- Fait : module `elementTransform.js` (lecture/écriture/retrait, bornes, palier par palier) + bloc « Position et taille » dans l'inspecteur + chemin d'écriture unique avec instantané d'historique avant mutation. Un projet sans valeur ne produit aucune règle : la position libre ne s'active jamais seule.
+- Découverte structurelle : `state.selectedElementKey` n'a qu'un seul point d'affectation dans tout le produit — l'entrée en sélection libre (`app.js:5055`). Autrement dit, les réglages d'élément n'étaient atteignables que par un geste de glisser. Un clic sur un élément le sélectionne maintenant.
+- Vérification : par test (8 nouveaux) et non par capture. La sélection libre demande un geste de glisser que l'outillage navigateur ne fournit pas ; le chemin par clic n'a pas été confirmé à l'écran. À reprendre au prochain tour, éventuellement en exposant la sélection libre par un bouton plutôt que par un geste.
+- Tests : 374 → 382. `node --check` sur les trois fichiers touchés, `scripts/build-utilities.mjs` relancé.
+- Reste : position libre explicite, boîtes de sélection unifiées, gestes par appareil ; puis 3b, 4d, 7, export. 3 tours de budget.

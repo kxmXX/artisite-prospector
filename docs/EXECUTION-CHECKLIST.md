@@ -120,6 +120,10 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
       du tableau de bord supprimés ; tous les glyphes du chrome et du rendu remplacés par le système
       d'icônes (statuts, sélection freeform, bouton de lecture, étapes de l'assistant). *Reste* :
       unification du vocabulaire de boutons, vérification mobile.
+- [ ] **Lot 6 — Positionnement, entamé** (`4.9.0-alpha.35`) : champs numériques X / Y / Largeur / Hauteur /
+      Rotation branchés sur l'inspecteur, avec bornes, « flux par défaut » tenu (aucune règle CSS sans
+      valeur saisie) et retour au flux. *Reste* : position libre en option explicite, boîtes de sélection
+      unifiées, gestes de déplacement vérifiés sur desktop, tablette et mobile.
 - [ ] **Lot 6 — Positionnement** : flux par défaut, position libre en option, champs numériques
       X/Y/L/H/rotation, boîte de sélection réduite à un menu `⋯`, bornes clavier = bornes souris.
 - [ ] **Lot 7 — Mouvement unifié** : catalogue unique, déclencheur, durée, délai, courbe, direction,

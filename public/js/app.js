@@ -24,6 +24,7 @@ import { ELEMENT_STATES, ELEMENT_STATE_LABELS, setElementState, clearElementStat
 import { setSectionLayout, isValidSectionId } from "./engine/sectionStyle.js";
 import { setElementStyle, clearElementStyle } from "./engine/elementStyle.js";
 import { getIcon } from "./components/icons.js";
+import { setElementTransform, clearElementTransform } from "./engine/elementTransform.js";
 import { parseClientDemoPin, verifyClientDemoPin } from "./utils/clientDemoPin.js";
 import { createEspritNatureDemoProject } from "./data/sampleProjects.js";
 import { getDefaultTemplateIdForTrade, getSiteTemplate, instantiateSiteTemplate } from "./data/templates.js";
@@ -2350,6 +2351,16 @@ export class App {
     }
     this.closeAllFloatingToolbars("text");
     this._activeEditableEl = el;
+    // Un clic sur un element le selectionne pour l'inspecteur : une seule source de
+    // selection, comme pour la selection libre. Sans cela, les reglages d'element
+    // (styles et position) n'etaient atteignables qu'en entrant en selection libre.
+    const layoutKey = el.getAttribute("data-layout-key") || "";
+    if (layoutKey) {
+      if (secId && state.selectedSectionId !== secId) state.setSelectedSection(secId);
+      state.selectedElementKey = layoutKey;
+      state.elementStyleState = "base";
+      this.updateSelectedSectionUI();
+    }
     const toolbar = document.getElementById("floating-text-toolbar");
     if (!toolbar) return;
 
@@ -3306,6 +3317,21 @@ export class App {
     this.showToast(nextMode === "infinite" ? "Animation de section en boucle continue" : (nextMode === "twice" ? "Animation de section répétée deux fois" : "Animation de section jouée une fois"), "info");
   }
 
+  /** Position libre : ecriture unique, instantane pris AVANT la mutation. */
+  setElementTransformValue(layoutKey, field, value) {
+    if (!state.currentProject || !layoutKey) return;
+    state.pushHistory("Position et taille de l'element");
+    const updated = setElementTransform(state.currentProject, layoutKey, state.viewport || "desktop", field, value);
+    state.updateProject(updated, true);
+  }
+
+  resetElementTransform(layoutKey) {
+    if (!state.currentProject || !layoutKey) return;
+    state.pushHistory("Retour au flux");
+    const updated = clearElementTransform(state.currentProject, layoutKey, state.viewport || "desktop");
+    state.updateProject(updated, true);
+    this.showToast("Element remis dans le flux", "info");
+  }
   setSectionMotionSpeed(sectionId, speedId) {
     this.setSectionMotionTiming(sectionId, "motionSpeed", "normal", speedId, "Vitesse de l'animation");
   }
