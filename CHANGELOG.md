@@ -7,6 +7,15 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.30) — Les surfaces du navigateur sont thématisées (skill Impeccable)
+
+- Ce que la skill relève et que le produit ne faisait pas : « la sélection de texte, le curseur, les barres de défilement, les anneaux de focus et les chiffres tabulaires arrivent avec les réglages par défaut du navigateur, qui n'appartiennent à aucun design system. C'est le signal le moins coûteux qu'une page a été construite plutôt qu'assemblée — et celui que les modèles oublient le plus systématiquement. » Vérification faite : `::selection`, `caret-color`, `::-webkit-scrollbar`, `scrollbar-color`, `::placeholder`, `::marker` et `font-variant-numeric` étaient **absents** du chrome de l'éditeur.
+- Correctif : jetons de surface ajoutés dans `tokens.css` (sélection, curseur, barre, piste), puis thème porté à `.studio-editor`. La racine du chrome existe déjà, donc la portée exclut le site publié par construction — et un test le vérifie plutôt que de le supposer.
+- Second vocabulaire de focus supprimé : la divulgation du lot précédent s'appuyait sur un jeton `--ui-focus` inexistant, d'où un anneau vert de secours alors que le produit n'a qu'un anneau (`--ui-ring`). Corrigé, et un test interdit le retour d'un second jeton.
+- Mode Operate respecté : les chiffres des identifiants et des compteurs passent en chiffres tabulaires, toutes les couleurs viennent des jetons existants (encre, papier, accent), aucune valeur arbitraire ajoutée, et le site publié garde ses surfaces par défaut.
+- Tests : 4 nouveaux dans `tests/browser_surfaces.test.js` (jetons déclarés, surfaces réellement thémées, portée limitée au chrome, focus unique) ; 364 → **368/368**.
+- Reste, signalé par la skill et non traité ici : « glass et blur comme décoration » dans les menus flottants, et des glyphes/emoji résiduels dans le chrome ; PRODUCT.md et DESIGN.md restent à écrire.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.29) — Lot 4d entamé : l'inspecteur cache le secondaire
 
 - Problème : l'inspecteur présentait tous ses contrôles au même niveau. Sur le seul bloc Animation, l'auteur voyait 12 pastilles, la vitesse, le délai et le bouton de test sans aucune hiérarchie — « wall of controls » au sens de la skill Impeccable.

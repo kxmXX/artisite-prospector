@@ -86,6 +86,17 @@
   --v3-radius: var(--ui-radius-xl);
   --v3-shadow: var(--ui-shadow-3);
 
+
+  /* --- Surfaces du navigateur (sélection, curseur, barres de défilement) ---
+     Le chrome thème ce que le navigateur dessine par défaut. C'est le signal le
+     moins coûteux qu'une interface a été construite plutôt qu'assemblée. */
+  --ui-selection-bg: var(--ui-ink);
+  --ui-selection-fg: var(--ui-paper);
+  --ui-caret: var(--ui-accent);
+  --ui-scrollbar-size: 10px;
+  --ui-scrollbar-thumb: rgba(24, 32, 31, .22);
+  --ui-scrollbar-thumb-hover: rgba(24, 32, 31, .38);
+  --ui-scrollbar-track: transparent;
   /* --- Focus : un seul anneau, visible au clavier --- */
   --ui-ring-width: 2px;
   --ui-ring-color: #1f6feb;

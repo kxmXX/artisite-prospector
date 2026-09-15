@@ -3711,7 +3711,7 @@ img[data-motion="pulse"],
 .ui-disclosure-summary::after { content: "+"; font-size: .8rem; line-height: 1; color: #8a928e; }
 .ui-disclosure[open] > .ui-disclosure-summary::after { content: "\2212"; }
 .ui-disclosure-summary:hover { background: rgba(0, 0, 0, .03); }
-.ui-disclosure-summary:focus-visible { outline: 2px solid var(--ui-focus, #527c22); outline-offset: 2px; }
+.ui-disclosure-summary:focus-visible { outline: var(--ui-ring); outline-offset: var(--ui-ring-offset); }
 .ui-disclosure-body { padding: .1rem .5rem .5rem; display: flex; flex-direction: column; gap: .35rem; }
 /* The settings grid tiles preview their motion too. */
 .motion-preset-tile[data-motion-preview="fade-in"]:hover { animation: motion-fade-in 650ms cubic-bezier(.16, 1, .3, 1) both; }
@@ -3730,3 +3730,38 @@ img[data-motion="pulse"],
 @media (prefers-reduced-motion: reduce) {
   .motion-option[data-motion-preview]:hover, .motion-chip[data-motion-preview]:hover { animation: none !important; }
 }
+
+/* ---------------------------------------------------------------------------
+   Surfaces du navigateur — chrome de l'éditeur uniquement.
+   La sélection de texte, le curseur de saisie, les barres de défilement et les
+   chiffres alignés sont dessinés par le navigateur : sans thème, ils jurent avec
+   tout le reste du produit. Portée volontairement limitée à .studio-editor pour
+   que le site publié conserve les surfaces par défaut de son propre design.
+   --------------------------------------------------------------------------- */
+.studio-editor ::selection { background: var(--ui-selection-bg); color: var(--ui-selection-fg); }
+
+.studio-editor input::placeholder,
+.studio-editor textarea::placeholder { color: var(--ui-muted); opacity: 1; }
+
+.studio-editor input,
+.studio-editor textarea,
+.studio-editor [contenteditable="true"] { caret-color: var(--ui-caret); }
+
+.studio-editor ::marker { color: var(--ui-muted); }
+
+/* Les identifiants et compteurs ne doivent pas danser quand le chiffre change. */
+.studio-editor .font-mono,
+.studio-editor .ui-stable-ref { font-variant-numeric: tabular-nums; }
+
+/* Barres de défilement : la couleur est héritée, la forme se déclare par moteur. */
+.studio-editor { scrollbar-width: thin; scrollbar-color: var(--ui-scrollbar-thumb) var(--ui-scrollbar-track); }
+.studio-editor *::-webkit-scrollbar { width: var(--ui-scrollbar-size); height: var(--ui-scrollbar-size); }
+.studio-editor *::-webkit-scrollbar-track { background: var(--ui-scrollbar-track); }
+.studio-editor *::-webkit-scrollbar-thumb {
+  background: var(--ui-scrollbar-thumb);
+  border: 2px solid transparent;
+  border-radius: var(--ui-radius-full);
+  background-clip: content-box;
+}
+.studio-editor *::-webkit-scrollbar-thumb:hover { background: var(--ui-scrollbar-thumb-hover); background-clip: content-box; }
+.studio-editor *::-webkit-scrollbar-corner { background: transparent; }

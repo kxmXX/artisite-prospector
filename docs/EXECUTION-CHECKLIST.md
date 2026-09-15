@@ -129,6 +129,10 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
       primitive partagée (`disclosure`, `<details>/<summary>` natifs, focus clavier, état retenu au
       nouveau rendu) appliquée au rythme de l'animation de section. *Reste* : appliquer le patron aux
       états, aux réglages d'élément et aux groupes de composants.
+- [ ] **Passe anti-slop (skill Impeccable)** : surfaces du navigateur thématisées en `4.9.0-alpha.30`
+      (sélection, curseur de saisie, barres de défilement, chiffres tabulaires, anneau de focus unique),
+      portée bornée à `.studio-editor` et vérifiée par test. *Reste* : « glass et blur comme décoration »
+      dans les menus flottants, glyphes résiduels dans le chrome, PRODUCT.md et DESIGN.md à écrire.
 - [x] **Lot 8 — Undo/Redo exhaustif** (`4.9.0-alpha.4`) : 11 commandes mutaient avant de prendre
       l'instantané (l'annulation ne restaurait rien) et 20 commandes n'avaient aucun historique ;
       toutes prennent désormais leur instantané **avant** la mutation, y compris les six

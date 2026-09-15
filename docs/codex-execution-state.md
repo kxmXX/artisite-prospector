@@ -1548,3 +1548,12 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Détecteur Impeccable : uniquement des avertissements pré-existants (gray-on-color, bounce-easing, border-accent-on-rounded) ; rien de nouveau introduit par ce lot.
 - Tests : 360 → 364. `node --check` sur l'inspecteur, `scripts/build-utilities.mjs` relancé.
 - Reste : étendre la divulgation aux autres groupes de l'inspecteur ; écrire PRODUCT.md et DESIGN.md ; lots 6 (positionnement), 3b (sélection et arbre des éléments), 7 (courbe, direction, tester/rejouer) et 2d (export autonome cassé) toujours ouverts.
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.30 (surfaces du navigateur : passe craft-floor de la skill)
+
+- Démarche : la skill a été lue jusqu'à sa table de commandes (§Commands), ses références obligatoires `craft-floor.md` et `operate.md` ont été lues avant toute édition, et la surface a été classée en mode **Operate** (outil/éditeur).
+- Trouvaille : le point que la skill désigne comme « le signal le moins coûteux qu'une page a été construite plutôt qu'assemblée » était totalement absent — aucune sélection, curseur, barre de défilement ni chiffre tabulaire thématisé dans le chrome.
+- Fait : jetons de surface dans `tokens.css`, thème appliqué sous `.studio-editor` (racine existante du chrome, donc pas de fuite vers le site publié — un test le contrôle), chiffres tabulaires pour les identifiants et compteurs.
+- Correction d'une faute du lot précédent : j'avais introduit un second vocabulaire de focus (`--ui-focus` inexistant) alors que le produit a un anneau unique (`--ui-ring`). Corrigé ; un test interdit le retour.
+- Tests : 364 → 368. Détecteur Impeccable relancé sur les fichiers modifiés.
+- Reste : blur/glass décoratif des menus flottants, glyphes résiduels, PRODUCT.md/DESIGN.md ; lots 6, 3b, 7 (courbe, direction, tester/rejouer) et 2d toujours ouverts.
