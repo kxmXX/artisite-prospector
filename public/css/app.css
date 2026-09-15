@@ -3677,3 +3677,31 @@ img[data-motion="pulse"],
 .motion-loop-btn:hover { border-color: #a1a1aa; }
 .motion-loop-btn.is-active { background: #18181b; color: #fff; border-color: #18181b; }
 .motion-loop-hint { margin-top: .35rem; font-size: .62rem; line-height: 1.35; color: #8a928e; }
+/* Hovering a preset plays it on the control itself, so the author sees the
+   motion before committing it to content. */
+.motion-option[data-motion-preview="fade-in"]:hover, .motion-chip[data-motion-preview="fade-in"]:hover { animation: motion-fade-in 650ms cubic-bezier(.16, 1, .3, 1) both; }
+.motion-option[data-motion-preview="slide-up"]:hover, .motion-chip[data-motion-preview="slide-up"]:hover { animation: motion-slide-up 700ms cubic-bezier(.16, 1, .3, 1) both; }
+.motion-option[data-motion-preview="spring"]:hover, .motion-chip[data-motion-preview="spring"]:hover { animation: motion-spring 750ms cubic-bezier(.34, 1.56, .64, 1) both; }
+.motion-option[data-motion-preview="reveal"]:hover, .motion-chip[data-motion-preview="reveal"]:hover { animation: motion-reveal 750ms cubic-bezier(.16, 1, .3, 1) both; }
+.motion-option[data-motion-preview="stagger"]:hover, .motion-chip[data-motion-preview="stagger"]:hover { animation: motion-stagger 750ms cubic-bezier(.16, 1, .3, 1) both; }
+.motion-option[data-motion-preview="shimmer"]:hover, .motion-chip[data-motion-preview="shimmer"]:hover { animation: motion-shimmer 850ms ease-out both; }
+.motion-option[data-motion-preview="zoom-in"]:hover, .motion-chip[data-motion-preview="zoom-in"]:hover { animation: motion-zoom-in 700ms cubic-bezier(.16, 1, .3, 1) both; }
+.motion-option[data-motion-preview="pulse"]:hover, .motion-chip[data-motion-preview="pulse"]:hover { animation: textPulse 1.6s ease-in-out infinite; }
+.motion-preview-hint { margin-top: .35rem; font-size: .6rem; color: #9aa19e; }
+/* The settings grid tiles preview their motion too. */
+.motion-preset-tile[data-motion-preview="fade-in"]:hover { animation: motion-fade-in 650ms cubic-bezier(.16, 1, .3, 1) both; }
+.motion-preset-tile[data-motion-preview="slide-up"]:hover { animation: motion-slide-up 700ms cubic-bezier(.16, 1, .3, 1) both; }
+.motion-preset-tile[data-motion-preview="slide-in"]:hover { animation: motion-slide-in 700ms cubic-bezier(.16, 1, .3, 1) both; }
+.motion-preset-tile[data-motion-preview="spring"]:hover { animation: motion-spring 750ms cubic-bezier(.34, 1.56, .64, 1) both; }
+.motion-preset-tile[data-motion-preview="reveal"]:hover { animation: motion-reveal 750ms cubic-bezier(.16, 1, .3, 1) both; }
+.motion-preset-tile[data-motion-preview="stagger"]:hover { animation: motion-stagger 750ms cubic-bezier(.16, 1, .3, 1) both; }
+.motion-preset-tile[data-motion-preview="shimmer"]:hover { animation: motion-shimmer 850ms ease-out both; }
+.motion-preset-tile[data-motion-preview="zoom-in"]:hover { animation: motion-zoom-in 700ms cubic-bezier(.16, 1, .3, 1) both; }
+.motion-preset-tile[data-motion-preview="magnetic"]:hover { animation: motion-magnetic 500ms cubic-bezier(.2, .8, .2, 1) both; }
+.motion-preset-tile[data-motion-preview="progress-fill"]:hover { animation: motion-progress-fill 750ms cubic-bezier(.16, 1, .3, 1) both; transform-origin: left; }
+@media (prefers-reduced-motion: reduce) {
+  .motion-preset-tile[data-motion-preview]:hover { animation: none !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .motion-option[data-motion-preview]:hover, .motion-chip[data-motion-preview]:hover { animation: none !important; }
+}

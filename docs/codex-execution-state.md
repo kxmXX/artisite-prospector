@@ -1,3 +1,11 @@
+## LOT DE LIVRAISON — aperçu animé des presets 4.8.0-alpha.54 — 15 septembre 2026
+
+- Demande utilisateur restante : « surtout au niveau graphique pour les mettre en place ». Le survol d’un preset joue désormais son mouvement sur le bouton lui-même, dans les quatre surfaces : panneau de section, menu texte, menu image et grille des Réglages.
+- Implémentation : attribut `data-motion-preview="<preset>"` sur les boutons + règles CSS `:hover` réutilisant les keyframes réelles du rendu final (`motion-fade-in`, `motion-slide-up`, `motion-spring`, `motion-reveal`, `motion-stagger`, `motion-shimmer`, `motion-zoom-in`, `textPulse`, `motion-magnetic`, `motion-progress-fill`). Aucune duplication d’animation : ce qui est survolé est ce qui sera publié.
+- Accessibilité : aperçu désactivé sous `prefers-reduced-motion`; aide « Survolez un preset pour le prévisualiser. » dans chaque menu.
+- Tests : `tests/motion_loop.test.js` compte 5 tests (3 boucles rendues, absence par défaut, reduced-motion, libellés, aperçu) ; 272/272 complets.
+- Peaufinage restant possible (non bloquant) : refonte plus profonde de l’architecture d’information des barres d’outils, exécution Playwright automatisée de la matrice de gestes.
+
 ## LOT DE LIVRAISON — boucles et distinction des animations 4.8.0-alpha.53 — 15 septembre 2026
 
 - Demande utilisateur : rendre les animations plus faciles à mettre en place graphiquement, permettre des boucles, et distinguer nettement animation de section et animation d’élément. Skill Impeccable rechargé et playbook `animate.md` relu.

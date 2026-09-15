@@ -314,7 +314,7 @@ export function renderEditableImage(url, { sectionId = "", fieldPath = "", targe
                 ['shimmer', 'Shimmer'],
                 ['none', 'Aucune']
               ].map(([mPreset, mLabel]) => `
-                <button type="button" onclick="event.stopPropagation(); window.app.setImageMotion('${sectionId}', '${fieldPath}', ${indexParam}, '${mPreset}')"
+                <button type="button" data-motion-preview="${mPreset}" onclick="event.stopPropagation(); window.app.setImageMotion('${sectionId}', '${fieldPath}', ${indexParam}, '${mPreset}')"
                         class="motion-chip ${((imgMotion || 'none') === mPreset) ? 'is-active' : ''} ${mPreset === 'none' ? 'col-span-2 text-zinc-400' : ''}">
                   ${mLabel}${((imgMotion || 'none') === mPreset && mPreset !== 'none') ? ' ✓' : ''}
                 </button>
@@ -326,6 +326,7 @@ export function renderEditableImage(url, { sectionId = "", fieldPath = "", targe
               <button type="button" data-image-loop="twice" class="motion-loop-btn" onclick="event.stopPropagation(); window.app.setImageMotionLoop('${sectionId}', '${fieldPath}', ${indexParam}, 'twice')">×2</button>
               <button type="button" data-image-loop="infinite" class="motion-loop-btn" onclick="event.stopPropagation(); window.app.setImageMotionLoop('${sectionId}', '${fieldPath}', ${indexParam}, 'infinite')">Boucle</button>
             </div>
+            <div class="motion-preview-hint">Survolez un preset pour le prévisualiser.</div>
           </div>
         </div>
         <button type="button"

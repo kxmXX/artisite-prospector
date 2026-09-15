@@ -7,6 +7,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 15 septembre 2026 (4.8.0-alpha.54)
+
+- Aperçu des presets : survoler un preset joue son mouvement **directement sur le bouton**, dans le panneau de section, le menu du texte, celui de l’image et la grille des Réglages. L’auteur voit le mouvement avant de l’appliquer, sans quitter le menu.
+- Fidélité : l’aperçu réutilise exactement les mêmes keyframes que le rendu final — ce qui est survolé est ce qui sera publié — et il est désactivé sous `prefers-reduced-motion`.
+- Aide : chaque menu affiche « Survolez un preset pour le prévisualiser. »
+- QA : 5/5 tests d’animation (boucles + aperçu), 272/272 tests complets, `git diff --check` propre.
+
 ### Consolidation — 15 septembre 2026 (4.8.0-alpha.53)
 
 - Boucles d’animation : chaque animation peut désormais être jouée **une fois, deux fois ou en boucle continue**, au niveau de la section, du texte et de l’image. Un sélecteur « Répétition » est partagé par les trois menus, et la boucle est neutralisée automatiquement avec `prefers-reduced-motion`.

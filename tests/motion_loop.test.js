@@ -70,3 +70,14 @@ test('the editor names the block and the element distinctly', () => {
   assert.ok(rendererSource.includes('Animation de l’image'), 'image-level motion is labelled explicitly');
   assert.ok(!editorSource.includes('Animation du bloc'), 'the ambiguous block label is gone');
 });
+
+test('every preset previews its own motion on hover', () => {
+  assert.ok(appCss.includes('.motion-option[data-motion-preview="fade-in"]:hover, .motion-chip[data-motion-preview="fade-in"]:hover { animation: motion-fade-in 650ms'), 'fade preview');
+  assert.ok(appCss.includes('.motion-option[data-motion-preview="slide-up"]:hover'), 'slide preview');
+  assert.ok(appCss.includes('.motion-option[data-motion-preview="pulse"]:hover, .motion-chip[data-motion-preview="pulse"]:hover { animation: textPulse 1.6s'), 'pulse preview');
+  assert.ok(appCss.includes('.motion-option[data-motion-preview]:hover, .motion-chip[data-motion-preview]:hover { animation: none !important; }'), 'reduced motion disables previews');
+  assert.ok(editorSource.includes('data-motion-preview='), 'editor menus wire the preview');
+  assert.ok(rendererSource.includes('data-motion-preview='), 'image menu wires the preview');
+  assert.ok(editorSource.includes('Survolez un preset pour le prévisualiser'), 'the editor explains the hover preview');
+  assert.ok(rendererSource.includes('motion-preview-hint'), 'the image menu explains the hover preview');
+});

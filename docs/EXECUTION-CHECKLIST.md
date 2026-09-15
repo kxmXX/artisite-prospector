@@ -52,7 +52,7 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - [x] Rendre chaque outil réellement opérant et lisible : l’édition inline et l’inspecteur enregistrent à nouveau une transaction annulable (`4.8.0-alpha.43`).
 - [x] Fiabiliser les animations : origine unique (`4.8.0-alpha.45`), aperçu de section réellement visible et vitesse appliquée à chaque preset (`4.8.0-alpha.46`), boucles une/deux/infinie et distinction explicite section / élément / image (`4.8.0-alpha.53`). Reste à neutraliser les motions pendant un transform libre, au-delà de la suspension déjà posée.
 - [x] Matrice de non-régression des gestes : 9 tests comportementaux sur le moteur libre (souris, tactile, clavier, responsive) et vérification du câblage des trois modalités (`4.8.0-alpha.51`). La géométrie est désormais testée par valeurs, pas par présence de chaînes. Reste à étendre la matrice à un vrai navigateur si un jour Playwright rejoint les dépendances.
-- [ ] Réduire la complexité d’usage : actions principales immédiatement compréhensibles, commandes avancées regroupées sans barre illisible ni vocabulaire technique ambigu.
+- [~] Réduire la complexité d’usage : libellés Freeform clarifiés (`Resp.` → `Responsive`, `Page` → `Entre sections`, `→ D` → `Vers desktop`, `Reset ici` → `Réinitialiser ici`), distinction explicite section / élément / image et sélecteur de boucle unique (`4.8.0-alpha.51` à `4.8.0-alpha.54`). Une refonte plus profonde de l’architecture d’information des barres d’outils reste possible mais n’est pas bloquante.
 
 ### Constats ouverts issus de l’audit et du détecteur
 
