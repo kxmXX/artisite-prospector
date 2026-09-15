@@ -92,7 +92,7 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - [ ] Groupes phase 2b-2 — groupes imbriqués.
 - [x] Alignement phase 1 — gauche/centre/droite/haut/milieu/bas et distribution horizontale/verticale en mutation batch.
 - [x] Alignement phase 2a — guides intelligents visibles et snapping à 6 px pendant le déplacement, y compris bords/centres de section et éléments voisins.
-- [ ] Alignement phase 2b — snapping pendant le resize, équidistances et guides de spacing.
+- [x] Alignement phase 2b — snapping pendant le resize, équidistance entre voisins et guides de spacing avec mesure en px ; Alt désactive toujours les accroches.
 - [x] Responsive phase 1 — positions/dimensions isolées par desktop/tablette/mobile ; le viewport simulé gagne sur la taille réelle du navigateur.
 - [ ] Responsive phase 2 — héritage/adaptation assistée et commandes de copie/reset entre breakpoints.
 - [x] Persistance phase 1 — transformations enregistrées dans l’état projet, sauvegarde locale, Undo/Redo, preview et export standalone.
@@ -117,6 +117,8 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 7. Noter ici : commit, tests réellement exécutés, anomalies connues et prochaine action unique.
 
 ## Dernière livraison validée
+
+- Lot `4.8.0-alpha.25` : snap des bords pendant resize + équidistance intelligente et guides de spacing mesurés ; correction de sérialisation DOMRect. QA Chrome : resize 247→282 px à 0,016 px du bord cible et spacing 22,5/22,5 px avec label 23 px. 41/41 ciblés, 216/216 complets et `git diff --check`.
 
 - Lot `4.8.0-alpha.24` : rotation libre persistante, poignée dédiée, Shift 15°, rotation/orbite collective et parité preview/export ; le libellé du cadre laisse désormais passer les clics hors boutons. QA Chrome validé, 38/38 ciblés, 213/213 complets et `git diff --check`.
 

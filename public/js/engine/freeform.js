@@ -62,3 +62,47 @@ export function marqueeContainsRectCenter(marquee, rect) {
   if (!Number.isFinite(cx) || !Number.isFinite(cy)) return false;
   return cx >= marquee.left && cx <= marquee.right && cy >= marquee.top && cy <= marquee.bottom;
 }
+
+export function resolveEqualSpacingSnap(rect, neighbors = [], axis = "x", threshold = FREEFORM_SNAP_THRESHOLD) {
+  if (!rect) return null;
+  const horizontal = axis === "x";
+  const start = horizontal ? Number(rect.left) : Number(rect.top);
+  const end = horizontal ? Number(rect.right) : Number(rect.bottom);
+  const crossStart = horizontal ? Number(rect.top) : Number(rect.left);
+  const crossEnd = horizontal ? Number(rect.bottom) : Number(rect.right);
+  if (![start, end, crossStart, crossEnd].every(Number.isFinite)) return null;
+  const parsed = (neighbors || []).map(candidate => {
+    const r = candidate?.rect || candidate;
+    if (!r) return null;
+    const cStart = horizontal ? Number(r.left) : Number(r.top);
+    const cEnd = horizontal ? Number(r.right) : Number(r.bottom);
+    const cCrossStart = horizontal ? Number(r.top) : Number(r.left);
+    const cCrossEnd = horizontal ? Number(r.bottom) : Number(r.right);
+    if (![cStart, cEnd, cCrossStart, cCrossEnd].every(Number.isFinite)) return null;
+    const crossOverlap = Math.min(crossEnd, cCrossEnd) - Math.max(crossStart, cCrossStart);
+    return crossOverlap > 0 ? { source: candidate, rect: r, start: cStart, end: cEnd } : null;
+  }).filter(Boolean);
+  const befores = parsed.filter(item => item.end <= start + threshold);
+  const afters = parsed.filter(item => item.start >= end - threshold);
+  const size = end - start;
+  const safeThreshold = Math.max(0, Number(threshold) || 0);
+  let best = null;
+  for (const before of befores) {
+    for (const after of afters) {
+      const available = after.start - before.end;
+      if (available < size) continue;
+      const gap = (available - size) / 2;
+      const targetStart = before.end + gap;
+      const offset = targetStart - start;
+      const distance = Math.abs(offset);
+      if (distance > safeThreshold) continue;
+      const span = after.start - before.end;
+      if (!best || distance < best.distance || (distance === best.distance && span < best.span)) {
+        best = { axis, offset, gap, before: before.rect, after: after.rect, distance, span };
+      }
+    }
+  }
+  if (!best) return null;
+  const { distance, span, ...result } = best;
+  return result;
+}

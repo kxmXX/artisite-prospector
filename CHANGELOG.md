@@ -7,6 +7,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 15 septembre 2026 (4.8.0-alpha.25)
+
+- Resize snapping : les poignées de redimensionnement accrochent désormais les bords/centres voisins et ceux de la section, avec guides visuels ; Alt désactive l’accroche.
+- Équidistance : pendant un déplacement, le moteur compare alignement classique et spacing entre voisins puis choisit l’offset le plus proche ; les gaps égaux sont matérialisés par deux guides et une mesure en px.
+- Fiabilité : les `DOMRect` voisins sont sérialisés explicitement (`left/right/top/bottom/width/height`) au lieu d’un spread vide.
+- QA Chrome : largeur 247→282 px avec écart final 0,016 px au bord cible ; spacing vertical final 22,5/22,5 px, label `23 px`, zéro erreur console. Validation : 41/41 ciblés, 216/216 complets et `git diff --check`.
+
 ### Consolidation — 15 septembre 2026 (4.8.0-alpha.24)
 
 - Rotation libre : poignée dédiée sur le cadre de sélection, angle persistant dans `freeformLayout` et rendu identique en éditeur, preview et export.

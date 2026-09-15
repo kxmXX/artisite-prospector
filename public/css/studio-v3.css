@@ -661,6 +661,10 @@
 .freeform-snap-guide.is-visible{display:block}
 .freeform-snap-guide-x{width:1px}
 .freeform-snap-guide-y{height:1px}
+.freeform-spacing-guide{position:fixed;display:none;z-index:9396;pointer-events:none;border-top:1px dashed #ec4899;transform-origin:0 0}
+.freeform-spacing-guide[id*="-y-"]{border-top:0;border-left:1px dashed #ec4899;width:1px}
+.freeform-spacing-guide.is-visible,.freeform-spacing-label.is-visible{display:block}
+.freeform-spacing-label{position:fixed;display:none;z-index:9397;pointer-events:none;translate:-50% -50%;padding:2px 5px;border-radius:999px;background:#ec4899;color:#fff;font:700 9px/1 ui-monospace,SFMono-Regular,Menlo,monospace;box-shadow:0 1px 4px rgba(15,23,42,.18)}
 body.freeform-direct-dragging,body.freeform-direct-dragging *{cursor:grabbing!important;user-select:none!important;-webkit-user-select:none!important}
 body.freeform-rotating,body.freeform-rotating *{cursor:grabbing!important;user-select:none!important;-webkit-user-select:none!important}
 body.freeform-transforming #canvas-container [data-layout-key].is-freeform-selected{transition:none!important}

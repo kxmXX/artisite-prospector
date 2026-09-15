@@ -11,7 +11,7 @@ import { renderInspector } from "./components/inspector.js";
 import { renderWebsiteHTML, generateLocalBusinessSchema } from "./components/renderer.js";
 import { generateSite, createSectionData } from "./engine/generator.js";
 import { processCopilotPrompt, applyCopilotOperations, resolveProjectUiTarget } from "./engine/copilot.js";
-import { FREEFORM_SNAP_THRESHOLD, marqueeContainsRectCenter, marqueeRectFromPoints, rectAxisLines, resolveFreeformSnap } from "./engine/freeform.js";
+import { FREEFORM_SNAP_THRESHOLD, marqueeContainsRectCenter, marqueeRectFromPoints, rectAxisLines, resolveEqualSpacingSnap, resolveFreeformSnap } from "./engine/freeform.js";
 import { downloadHTML, downloadJSON, generateProductionPackage, downloadProductionPackage } from "./engine/exporter.js";
 import { getStylePresetById } from "./data/styles.js";
 import { getTradeById } from "./data/trades.js";
@@ -4231,6 +4231,7 @@ export class App {
       this._freeformOverlay.setAttribute("aria-hidden", "true");
     }
     this.hideFreeformGuides();
+    this.hideFreeformSpacingGuides();
   }
 
   updateFreeformOverlay() {
@@ -4373,6 +4374,58 @@ export class App {
     [this._freeformGuideX, this._freeformGuideY].forEach(guide => guide?.classList.remove("is-visible"));
   }
 
+  ensureFreeformSpacingGuides() {
+    const ensure = id => {
+      let node = document.getElementById(id);
+      if (!node) {
+        node = document.createElement("div");
+        node.id = id;
+        node.className = id.includes("label") ? "freeform-spacing-label" : "freeform-spacing-guide";
+        node.setAttribute("aria-hidden", "true");
+        document.body.appendChild(node);
+      }
+      return node;
+    };
+    this._freeformSpacingXBefore = ensure("freeform-spacing-x-before");
+    this._freeformSpacingXAfter = ensure("freeform-spacing-x-after");
+    this._freeformSpacingXLabel = ensure("freeform-spacing-x-label");
+    this._freeformSpacingYBefore = ensure("freeform-spacing-y-before");
+    this._freeformSpacingYAfter = ensure("freeform-spacing-y-after");
+    this._freeformSpacingYLabel = ensure("freeform-spacing-y-label");
+  }
+
+  hideFreeformSpacingGuides() {
+    [this._freeformSpacingXBefore, this._freeformSpacingXAfter, this._freeformSpacingXLabel, this._freeformSpacingYBefore, this._freeformSpacingYAfter, this._freeformSpacingYLabel]
+      .forEach(node => node?.classList.remove("is-visible"));
+  }
+
+  showFreeformSpacingGuides(spacingX, spacingY, selectionRect) {
+    this.ensureFreeformSpacingGuides();
+    this.hideFreeformSpacingGuides();
+    if (spacingX) {
+      const gap = Math.max(0, spacingX.gap);
+      const y = Math.max(8, Math.min(window.innerHeight - 8, selectionRect.top + (selectionRect.bottom - selectionRect.top) / 2));
+      const beforeWidth = Math.max(0, selectionRect.left - spacingX.before.right);
+      const afterWidth = Math.max(0, spacingX.after.left - selectionRect.right);
+      Object.assign(this._freeformSpacingXBefore.style, { left: `${spacingX.before.right}px`, top: `${y}px`, width: `${beforeWidth}px` });
+      Object.assign(this._freeformSpacingXAfter.style, { left: `${selectionRect.right}px`, top: `${y}px`, width: `${afterWidth}px` });
+      Object.assign(this._freeformSpacingXLabel.style, { left: `${spacingX.before.right + beforeWidth / 2}px`, top: `${y - 15}px` });
+      this._freeformSpacingXLabel.textContent = `${Math.round(gap)} px`;
+      [this._freeformSpacingXBefore, this._freeformSpacingXAfter, this._freeformSpacingXLabel].forEach(node => node.classList.add("is-visible"));
+    }
+    if (spacingY) {
+      const gap = Math.max(0, spacingY.gap);
+      const x = Math.max(8, Math.min(window.innerWidth - 8, selectionRect.left + (selectionRect.right - selectionRect.left) / 2));
+      const beforeHeight = Math.max(0, selectionRect.top - spacingY.before.bottom);
+      const afterHeight = Math.max(0, spacingY.after.top - selectionRect.bottom);
+      Object.assign(this._freeformSpacingYBefore.style, { left: `${x}px`, top: `${spacingY.before.bottom}px`, height: `${beforeHeight}px` });
+      Object.assign(this._freeformSpacingYAfter.style, { left: `${x}px`, top: `${selectionRect.bottom}px`, height: `${afterHeight}px` });
+      Object.assign(this._freeformSpacingYLabel.style, { left: `${x + 7}px`, top: `${spacingY.before.bottom + beforeHeight / 2}px` });
+      this._freeformSpacingYLabel.textContent = `${Math.round(gap)} px`;
+      [this._freeformSpacingYBefore, this._freeformSpacingYAfter, this._freeformSpacingYLabel].forEach(node => node.classList.add("is-visible"));
+    }
+  }
+
   showFreeformGuides(snapX, snapY, boundary) {
     const guides = this.ensureFreeformGuides();
     const top = Math.max(0, Number(boundary?.top) || 0);
@@ -4399,7 +4452,8 @@ export class App {
     const scope = sections.length === 1 ? sections[0] : document.getElementById("canvas-container");
     const xLines = rectAxisLines(boundary, "x", { source: "section" });
     const yLines = rectAxisLines(boundary, "y", { source: "section" });
-    if (!scope) return { xLines, yLines };
+    const rects = [];
+    if (!scope) return { xLines, yLines, rects };
     scope.querySelectorAll("[data-layout-key]").forEach(element => {
       if (selected.has(element)) return;
       if (entries.some(entry => entry.target?.contains(element) || element.contains(entry.target))) return;
@@ -4408,10 +4462,11 @@ export class App {
       const rect = element.getBoundingClientRect();
       if (rect.width < 2 || rect.height < 2) return;
       const meta = { source: "element", key: element.dataset.layoutKey || "" };
+      rects.push({ left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom, width: rect.width, height: rect.height, key: meta.key });
       xLines.push(...rectAxisLines(rect, "x", meta));
       yLines.push(...rectAxisLines(rect, "y", meta));
     });
-    return { xLines, yLines };
+    return { xLines, yLines, rects };
   }
 
   startFreeformRotation(event) {
@@ -4500,7 +4555,7 @@ export class App {
       bottom: Math.max(...entries.map(entry => entry.rect.bottom))
     };
     const boundary = this.getFreeformSelectionBoundary(entries.map(entry => entry.target)) || selectionRect;
-    const snapContext = action === "move" ? this.buildFreeformSnapContext(entries, boundary) : null;
+    const snapContext = (action === "move" || action === "resize") ? this.buildFreeformSnapContext(entries, boundary) : null;
     let liveUpdates = Object.fromEntries(entries.map(entry => [entry.key, { ...entry.base, x: Number(entry.base.x) || 0, y: Number(entry.base.y) || 0 }]));
     this._freeformOverlay?.classList.add("is-transforming");
     document.body.classList.add("freeform-transforming");
@@ -4519,13 +4574,34 @@ export class App {
         let dy = Math.max(minDy, Math.min(maxDy, rawDy));
         let snapX = null;
         let snapY = null;
+        let spacingX = null;
+        let spacingY = null;
         if (!moveEvent.altKey && snapContext) {
           snapX = resolveFreeformSnap(selectionRect.left + dx, selectionRect.right - selectionRect.left, snapContext.xLines, FREEFORM_SNAP_THRESHOLD);
+          const proposedX = { left: selectionRect.left + dx, right: selectionRect.right + dx, top: selectionRect.top + dy, bottom: selectionRect.bottom + dy };
+          spacingX = resolveEqualSpacingSnap(proposedX, snapContext.rects, "x", FREEFORM_SNAP_THRESHOLD);
+          if (spacingX && (!snapX || Math.abs(spacingX.offset) <= Math.abs(snapX.offset))) {
+            dx = Math.max(minDx, Math.min(maxDx, dx + spacingX.offset));
+            snapX = null;
+          } else {
+            spacingX = null;
+            if (snapX) dx = Math.max(minDx, Math.min(maxDx, dx + snapX.offset));
+          }
+
           snapY = resolveFreeformSnap(selectionRect.top + dy, selectionRect.bottom - selectionRect.top, snapContext.yLines, FREEFORM_SNAP_THRESHOLD);
-          if (snapX) dx = Math.max(minDx, Math.min(maxDx, dx + snapX.offset));
-          if (snapY) dy = Math.max(minDy, Math.min(maxDy, dy + snapY.offset));
+          const proposedY = { left: selectionRect.left + dx, right: selectionRect.right + dx, top: selectionRect.top + dy, bottom: selectionRect.bottom + dy };
+          spacingY = resolveEqualSpacingSnap(proposedY, snapContext.rects, "y", FREEFORM_SNAP_THRESHOLD);
+          if (spacingY && (!snapY || Math.abs(spacingY.offset) <= Math.abs(snapY.offset))) {
+            dy = Math.max(minDy, Math.min(maxDy, dy + spacingY.offset));
+            snapY = null;
+          } else {
+            spacingY = null;
+            if (snapY) dy = Math.max(minDy, Math.min(maxDy, dy + snapY.offset));
+          }
         }
+        const snappedRect = { left: selectionRect.left + dx, right: selectionRect.right + dx, top: selectionRect.top + dy, bottom: selectionRect.bottom + dy };
         this.showFreeformGuides(snapX, snapY, boundary);
+        this.showFreeformSpacingGuides(spacingX, spacingY, snappedRect);
         liveUpdates = {};
         entries.forEach(entry => {
           const layout = { ...entry.base, x: (Number(entry.base.x) || 0) + dx, y: (Number(entry.base.y) || 0) + dy };
@@ -4545,6 +4621,16 @@ export class App {
         if (handle.includes("s")) nextBottom = Math.max(nextTop + minGroupHeight, selectionRect.bottom + rawDy);
         if (handle.includes("w")) nextLeft = Math.min(nextRight - minGroupWidth, selectionRect.left + rawDx);
         if (handle.includes("n")) nextTop = Math.min(nextBottom - minGroupHeight, selectionRect.top + rawDy);
+        let snapX = null;
+        let snapY = null;
+        if (!moveEvent.altKey && snapContext) {
+          if (handle.includes("e")) { snapX = resolveFreeformSnap(nextRight, 0, snapContext.xLines, FREEFORM_SNAP_THRESHOLD); if (snapX) nextRight += snapX.offset; }
+          else if (handle.includes("w")) { snapX = resolveFreeformSnap(nextLeft, 0, snapContext.xLines, FREEFORM_SNAP_THRESHOLD); if (snapX) nextLeft += snapX.offset; }
+          if (handle.includes("s")) { snapY = resolveFreeformSnap(nextBottom, 0, snapContext.yLines, FREEFORM_SNAP_THRESHOLD); if (snapY) nextBottom += snapY.offset; }
+          else if (handle.includes("n")) { snapY = resolveFreeformSnap(nextTop, 0, snapContext.yLines, FREEFORM_SNAP_THRESHOLD); if (snapY) nextTop += snapY.offset; }
+        }
+        this.showFreeformGuides(snapX, snapY, boundary);
+        this.hideFreeformSpacingGuides();
 
         let scaleGroupX = (nextRight - nextLeft) / originalWidth;
         let scaleGroupY = (nextBottom - nextTop) / originalHeight;
@@ -4584,19 +4670,31 @@ export class App {
         const baseHeight = Number(entry.base.height) > 0 ? Number(entry.base.height) : entry.rect.height;
         const minW = 24;
         const minH = 16;
+        let adjustedDx = rawDx;
+        let adjustedDy = rawDy;
+        let snapX = null;
+        let snapY = null;
+        if (!moveEvent.altKey && snapContext) {
+          if (handle.includes("e")) { snapX = resolveFreeformSnap(entry.rect.right + adjustedDx, 0, snapContext.xLines, FREEFORM_SNAP_THRESHOLD); if (snapX) adjustedDx += snapX.offset; }
+          else if (handle.includes("w")) { snapX = resolveFreeformSnap(entry.rect.left + adjustedDx, 0, snapContext.xLines, FREEFORM_SNAP_THRESHOLD); if (snapX) adjustedDx += snapX.offset; }
+          if (handle.includes("s")) { snapY = resolveFreeformSnap(entry.rect.bottom + adjustedDy, 0, snapContext.yLines, FREEFORM_SNAP_THRESHOLD); if (snapY) adjustedDy += snapY.offset; }
+          else if (handle.includes("n")) { snapY = resolveFreeformSnap(entry.rect.top + adjustedDy, 0, snapContext.yLines, FREEFORM_SNAP_THRESHOLD); if (snapY) adjustedDy += snapY.offset; }
+        }
+        this.showFreeformGuides(snapX, snapY, boundary);
+        this.hideFreeformSpacingGuides();
         let width = baseWidth;
         let height = baseHeight;
         let x = Number(entry.base.x) || 0;
         let y = Number(entry.base.y) || 0;
-        if (handle.includes("e")) width = Math.max(minW, baseWidth + rawDx);
-        if (handle.includes("s")) height = Math.max(minH, baseHeight + rawDy);
+        if (handle.includes("e")) width = Math.max(minW, baseWidth + adjustedDx);
+        if (handle.includes("s")) height = Math.max(minH, baseHeight + adjustedDy);
         if (handle.includes("w")) {
-          const next = Math.max(minW, baseWidth - rawDx);
+          const next = Math.max(minW, baseWidth - adjustedDx);
           x += baseWidth - next;
           width = next;
         }
         if (handle.includes("n")) {
-          const next = Math.max(minH, baseHeight - rawDy);
+          const next = Math.max(minH, baseHeight - adjustedDy);
           y += baseHeight - next;
           height = next;
         }
@@ -4613,6 +4711,7 @@ export class App {
       this._freeformOverlay?.classList.remove("is-transforming");
       document.body.classList.remove("freeform-transforming", "freeform-direct-dragging");
       this.hideFreeformGuides();
+      this.hideFreeformSpacingGuides();
       state.setFreeformLayouts(liveUpdates, state.viewport, action === "move"
         ? (keys.length > 1 ? "Déplacement sélection libre" : "Déplacement élément libre")
         : (keys.length > 1 ? "Redimensionnement groupe libre" : "Redimensionnement élément libre"));

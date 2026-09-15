@@ -1,5 +1,14 @@
 # État de reprise Codex — 15 septembre 2026
 
+## LOT DE LIVRAISON — snapping resize et spacing 4.8.0-alpha.25
+
+- Resize : les bords manipulés passent dans le même contexte de snap que le déplacement ; guides x/y et Alt fonctionnent aussi sur les poignées.
+- Spacing : `resolveEqualSpacingSnap` teste tous les couples voisins compatibles sur l’axe perpendiculaire et propose l’équidistance qui demande le plus petit offset.
+- Visuel : guides avant/après et badge de distance en pixels ; l’alignement classique et l’équidistance sont calculés en parallèle et la meilleure accroche gagne.
+- Correctif interne : un `DOMRect` ne peut pas être spreadé pour conserver ses coordonnées ; les rectangles sont maintenant copiés explicitement.
+- QA Chrome : snap resize à 0,016 px du bord, spacing 22,5/22,5 px avec badge 23 px et zéro erreur console. Validation automatisée : 41/41 ciblés, 216/216 complets et `git diff --check`.
+- Prochaine action : ratio individuel verrouillable et contraintes de taille avancées.
+
 ## LOT DE LIVRAISON — rotation libre 4.8.0-alpha.24
 
 - Poignée : contrôle de rotation séparé du Move/resize ; masqué automatiquement si la sélection est verrouillée.

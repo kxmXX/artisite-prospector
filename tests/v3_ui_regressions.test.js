@@ -357,3 +357,14 @@ test('Freeform rotation persists, supports group orbiting and Shift angle snappi
   assert.ok(css.includes('body.freeform-rotating'));
   assert.ok(css.includes('.freeform-selection-label button{pointer-events:auto'));
 });
+
+test('Freeform resize snapping and equal-spacing guides stay visible and deterministic', () => {
+  const appSource = fs.readFileSync(path.resolve(process.cwd(), 'public/js/app.js'), 'utf8');
+  assert.ok(appSource.includes('(action === "move" || action === "resize") ? this.buildFreeformSnapContext'));
+  assert.ok(appSource.includes('resolveFreeformSnap(entry.rect.right + adjustedDx, 0'));
+  assert.ok(appSource.includes('resolveEqualSpacingSnap(proposedX, snapContext.rects, "x"'));
+  assert.ok(appSource.includes('showFreeformSpacingGuides(spacingX, spacingY, snappedRect)'));
+  assert.ok(appSource.includes('this.hideFreeformSpacingGuides()'));
+  assert.ok(css.includes('.freeform-spacing-guide'));
+  assert.ok(css.includes('.freeform-spacing-label'));
+});

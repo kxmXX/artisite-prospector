@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { FREEFORM_SNAP_THRESHOLD, rectAxisLines, resolveFreeformSnap } from "../public/js/engine/freeform.js";
+import { FREEFORM_SNAP_THRESHOLD, rectAxisLines, resolveEqualSpacingSnap, resolveFreeformSnap } from "../public/js/engine/freeform.js";
 
 test("freeform snap chooses the nearest edge or center inside the threshold", () => {
   const snap = resolveFreeformSnap(96, 40, [{ position: 120, source: "peer" }]);
@@ -39,4 +39,23 @@ test("marquee geometry normalizes reverse drags and selects by element center", 
   assert.deepEqual(marquee, { left: 20, top: 10, right: 100, bottom: 80, width: 80, height: 70 });
   assert.equal(marqueeContainsRectCenter(marquee, { left: 40, right: 60, top: 30, bottom: 50 }), true);
   assert.equal(marqueeContainsRectCenter(marquee, { left: 95, right: 125, top: 30, bottom: 50 }), false);
+});
+
+test("equal spacing snap centers a selection between its nearest neighbors", () => {
+  const snap = resolveEqualSpacingSnap(
+    { left: 101, right: 141, top: 20, bottom: 60 },
+    [{ left: 20, right: 80, top: 10, bottom: 70 }, { left: 160, right: 220, top: 10, bottom: 70 }],
+    "x"
+  );
+  assert.equal(snap.offset, -1);
+  assert.equal(snap.gap, 20);
+});
+
+test("equal spacing snap ignores neighbors on another cross-axis lane", () => {
+  const snap = resolveEqualSpacingSnap(
+    { left: 100, right: 140, top: 20, bottom: 60 },
+    [{ left: 20, right: 80, top: 100, bottom: 140 }, { left: 160, right: 220, top: 100, bottom: 140 }],
+    "x"
+  );
+  assert.equal(snap, null);
 });
