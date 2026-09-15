@@ -2970,6 +2970,91 @@ export class App {
     this.showToast(`Animation : ${preset === 'none' ? 'Aucune' : preset}`, "info");
   }
 
+  getFieldMotionLoop(el) {
+    const field = el?.getAttribute?.("data-editable");
+    const secId = el?.closest?.(".editor-section-wrapper")?.getAttribute("data-section-id");
+    const sec = state.currentProject?.sections.find(s => s.id === secId);
+    return sec?.settings?.elementMotionLoops?.[field] || "";
+  }
+
+  getImageMotionLoop(secId, fieldPath, itemIndex) {
+    const idx = (itemIndex !== null && itemIndex !== undefined && itemIndex !== "null") ? itemIndex : 0;
+    const key = fieldPath + "_" + idx;
+    return state.currentProject?.sections.find(s => s.id === secId)?.settings?.imageMotionLoops?.[key] || "";
+  }
+
+  syncMotionLoopButtons(scopeSelector, dataAttr, mode) {
+    document.querySelectorAll(scopeSelector).forEach(node => {
+      node.querySelectorAll("[" + dataAttr + "]").forEach(btn => btn.classList.toggle("is-active", btn.getAttribute(dataAttr) === (mode || "once")));
+    });
+  }
+
+  setSectionMotionLoop(sectionId, mode) {
+    if (!state.currentProject) return;
+    const nextMode = ["twice", "infinite"].includes(mode) ? mode : "";
+    const updated = JSON.parse(JSON.stringify(state.currentProject));
+    const sec = updated.sections.find(s => s.id === sectionId);
+    if (!sec) return;
+    sec.settings = sec.settings || {};
+    if (nextMode) sec.settings.motionLoop = nextMode;
+    else delete sec.settings.motionLoop;
+    state.updateProject(updated, false);
+    const secEl = document.getElementById("section-" + sectionId) || document.querySelector(".editor-section-wrapper[data-section-id=\"" + sectionId + "\"]");
+    if (secEl) {
+      if (nextMode) secEl.setAttribute("data-motion-loop", nextMode);
+      else secEl.removeAttribute("data-motion-loop");
+    }
+    this.syncMotionLoopButtons("#sec-motion-popover-" + sectionId, "data-section-loop", nextMode);
+    this.showToast(nextMode === "infinite" ? "Animation de section en boucle continue" : (nextMode === "twice" ? "Animation de section répétée deux fois" : "Animation de section jouée une fois"), "info");
+  }
+
+  setActiveTextMotionLoop(mode) {
+    const el = this._activeEditableEl;
+    if (!el) return;
+    const nextMode = ["twice", "infinite"].includes(mode) ? mode : "";
+    const field = el.getAttribute("data-editable") || "text";
+    const secWrapper = el.closest(".editor-section-wrapper");
+    const secId = secWrapper?.getAttribute("data-section-id");
+    if (secId && state.currentProject) {
+      const updated = JSON.parse(JSON.stringify(state.currentProject));
+      const sec = updated.sections.find(s => s.id === secId);
+      if (sec) {
+        sec.settings = sec.settings || {};
+        sec.settings.elementMotionLoops = sec.settings.elementMotionLoops || {};
+        if (nextMode) sec.settings.elementMotionLoops[field] = nextMode;
+        else delete sec.settings.elementMotionLoops[field];
+        state.updateProject(updated, false);
+      }
+    }
+    const motion = state.currentProject?.sections.find(s => s.id === secId)?.settings?.elementMotions?.[field] || "";
+    this.previewElementMotion(el, motion, nextMode);
+    this.syncMotionLoopButtons("#ftb-anim-menu", "data-text-loop", nextMode);
+    this.showToast(nextMode ? "Animation d’élément en boucle" : "Animation d’élément jouée une fois", "info");
+  }
+
+  setImageMotionLoop(secId, fieldPath, itemIndex, mode) {
+    const idx = (itemIndex !== null && itemIndex !== undefined && itemIndex !== "null") ? itemIndex : 0;
+    const nextMode = ["twice", "infinite"].includes(mode) ? mode : "";
+    if (!state.currentProject) return;
+    const updated = JSON.parse(JSON.stringify(state.currentProject));
+    const sec = updated.sections.find(s => s.id === secId);
+    if (!sec) return;
+    sec.settings = sec.settings || {};
+    sec.settings.imageMotionLoops = sec.settings.imageMotionLoops || {};
+    const imgKey = fieldPath + "_" + idx;
+    if (nextMode) sec.settings.imageMotionLoops[imgKey] = nextMode;
+    else delete sec.settings.imageMotionLoops[imgKey];
+    state.updateProject(updated, false);
+    const secEl = document.getElementById("section-" + secId) || document.querySelector(".editor-section-wrapper[data-section-id=\"" + secId + "\"]");
+    const imgEl = secEl?.querySelector("[data-image-field=\"" + fieldPath + "\"][data-image-index=\"" + idx + "\"]") || secEl?.querySelector("img");
+    if (imgEl) {
+      if (nextMode) imgEl.setAttribute("data-motion-loop", nextMode);
+      else imgEl.removeAttribute("data-motion-loop");
+    }
+    this.syncMotionLoopButtons("#img-motion-menu-" + secId + "-" + String(fieldPath || "").replace(/\./g, "-") + "-" + idx, "data-image-loop", nextMode);
+    this.showToast(nextMode ? "Animation d’image en boucle" : "Animation d’image jouée une fois", "info");
+  }
+
   toggleImageMotionMenu(secId, fieldPath, itemIndex) {
     const idx = (itemIndex !== null && itemIndex !== undefined && itemIndex !== "null") ? itemIndex : 0;
     const sanitizedField = String(fieldPath || "").replace(/\./g, "-");
@@ -3011,6 +3096,8 @@ export class App {
 
   toggleTextMotionMenu() {
     const menu = document.getElementById("ftb-anim-menu");
+    const loop = this._activeEditableEl ? this.getFieldMotionLoop(this._activeEditableEl) : "";
+    this.syncMotionLoopButtons("#ftb-anim-menu", "data-text-loop", loop);
     if (menu) menu.classList.toggle("hidden");
   }
 
@@ -3048,11 +3135,15 @@ export class App {
     this.showToast(`Animation texte : ${preset === 'none' ? 'Aucune' : preset}`, "info");
   }
 
-  previewElementMotion(el, preset) {
+  previewElementMotion(el, preset, loop) {
     if (!el) return;
     const motion = preset === "none" ? "" : preset;
     if (motion) el.setAttribute("data-motion", motion);
     else el.removeAttribute("data-motion");
+    if (loop !== undefined) {
+      if (loop) el.setAttribute("data-motion-loop", loop);
+      else el.removeAttribute("data-motion-loop");
+    }
 
     el.classList.remove("is-revealed");
     el.classList.add("motion-preview");
@@ -4375,18 +4466,18 @@ export class App {
           <button type="button" data-freeform-layer="forward" title="Avancer d’un plan" aria-label="Avancer d’un plan">+</button>
           <button type="button" data-freeform-layer="front" title="Mettre au premier plan" aria-label="Mettre au premier plan">⇥</button>
           <span></span>
-          <button type="button" data-freeform-cross-section title="Autoriser le déplacement entre sections" aria-label="Déplacement entre sections" aria-pressed="false">Page</button>
-          <button type="button" data-freeform-responsive-toggle title="Ouvrir les outils responsive" aria-label="Ouvrir les outils responsive" aria-expanded="false">Resp.</button>
+          <button type="button" data-freeform-cross-section title="Autoriser le déplacement entre sections" aria-label="Déplacement entre sections" aria-pressed="false">Entre sections</button>
+          <button type="button" data-freeform-responsive-toggle title="Ouvrir les outils responsive" aria-label="Ouvrir les outils responsive" aria-expanded="false">Responsive</button>
           <button type="button" data-freeform-ratio title="Verrouiller le ratio largeur/hauteur" aria-label="Verrouiller le ratio largeur/hauteur">Ratio libre</button>
           <button type="button" data-freeform-lock title="Verrouiller la sélection" aria-label="Verrouiller la sélection">Verrouiller</button>
         </div>
         <div class="freeform-responsivebar" role="toolbar" aria-label="Adapter la sélection aux breakpoints">
           <span data-freeform-responsive-label>Responsive</span>
-          <button type="button" data-freeform-copy="desktop" title="Adapter vers ordinateur">→ D</button>
-          <button type="button" data-freeform-copy="tablet" title="Adapter vers tablette">→ T</button>
-          <button type="button" data-freeform-copy="mobile" title="Adapter vers mobile">→ M</button>
-          <button type="button" data-freeform-inherit-desktop title="Adapter Desktop vers le breakpoint actuel">Hériter D</button>
-          <button type="button" data-freeform-breakpoint-reset title="Réinitialiser la sélection sur ce breakpoint">Reset ici</button>
+          <button type="button" data-freeform-copy="desktop" title="Adapter vers ordinateur">Vers desktop</button>
+          <button type="button" data-freeform-copy="tablet" title="Adapter vers tablette">Vers tablette</button>
+          <button type="button" data-freeform-copy="mobile" title="Adapter vers mobile">Vers mobile</button>
+          <button type="button" data-freeform-inherit-desktop title="Adapter Desktop vers le breakpoint actuel">Hériter du desktop</button>
+          <button type="button" data-freeform-breakpoint-reset title="Réinitialiser la sélection sur ce breakpoint">Réinitialiser ici</button>
         </div>
         <div class="freeform-alignbar" role="toolbar" aria-label="Aligner et distribuer la sélection">
           <button type="button" data-freeform-align="left" title="Aligner à gauche" aria-label="Aligner à gauche">L</button>
@@ -4710,7 +4801,7 @@ export class App {
       const active = Boolean(this._freeformCrossSectionMode);
       crossSectionButton.classList.toggle("is-active", active);
       crossSectionButton.setAttribute("aria-pressed", active ? "true" : "false");
-      crossSectionButton.textContent = active ? "Page ✓" : "Page";
+      crossSectionButton.textContent = active ? "Entre sections ✓" : "Entre sections";
     }
     const additiveButton = overlay.querySelector("[data-freeform-additive]");
     if (additiveButton) {

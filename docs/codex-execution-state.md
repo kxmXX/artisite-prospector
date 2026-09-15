@@ -1,3 +1,12 @@
+## LOT DE LIVRAISON — boucles et distinction des animations 4.8.0-alpha.53 — 15 septembre 2026
+
+- Demande utilisateur : rendre les animations plus faciles à mettre en place graphiquement, permettre des boucles, et distinguer nettement animation de section et animation d’élément. Skill Impeccable rechargé et playbook `animate.md` relu.
+- Boucles : nouveau vocabulaire `once | twice | infinite`. Modèle `settings.motionLoop` (section), `settings.elementMotionLoops[field]` (texte), `settings.imageMotionLoops[key]` (image). Le renderer émet `data-motion-loop` sur la section, l’élément et l’image. CSS : `animation-iteration-count` piloté par l’attribut, neutralisé sous `prefers-reduced-motion`.
+- UI : sélecteur « Répétition » partagé (Une fois / ×2 / Boucle) dans le panneau de section, le menu du texte et celui de l’image, avec état actif synchronisé à l’ouverture (`syncMotionLoopButtons`) et à chaque changement.
+- Clarté : « Animation du bloc » → « Animation de la section » ; « Animation Texte 60fps » → « Animation de l’élément · texte » ; « Animation Image » → « Animation de l’image · élément », chacun avec un texte d’aide qui renvoie vers le bon outil. Glyphes ajoutés aux presets.
+- Tests : 4 nouveaux tests (`tests/motion_loop.test.js`) — rendu des trois boucles, absence de boucle par défaut, neutralisation reduced-motion, libellés distincts ; 271/271 complets. Sonde de rendu confirmée.
+- Prochaine action exacte : finaliser la lisibilité graphique des menus (aperçu animé des presets) et clôturer la mission.
+
 ## LOT DE LIVRAISON — sortie d’édition explicite 4.8.0-alpha.52 — 15 septembre 2026
 
 - Cause : le bouton de fermeture de la barre d’outils texte se contentait de `style.display = "none"` sans blur, et la cellule n’écoutait pas Échap. Une fois dans une cellule, l’utilisateur restait en édition sans sortie claire.

@@ -183,9 +183,10 @@ function decorateEditableMarkup(markup, project, section) {
     if (isUnderline === false) customStyles.push(`text-decoration: none !important;`);
     if (textColor) customStyles.push(`color: ${textColor} !important;`);
 
+    const textLoop = ["twice", "infinite"].includes(section?.settings?.elementMotionLoops?.[fieldPath]) ? section.settings.elementMotionLoops[fieldPath] : "";
     let motionAttrs = "";
     if (textMotion && textMotion !== "none") {
-      motionAttrs = ` data-motion="${textMotion}"`;
+      motionAttrs = ` data-motion="${textMotion}"${textLoop ? ' data-motion-loop="' + textLoop + '"' : ''}`;
       if (textMotion === "pulse") {
         motionAttrs += ` data-btn-motion="pulse"`;
       }
@@ -264,7 +265,8 @@ export function renderEditableImage(url, { sectionId = "", fieldPath = "", targe
   const imageUiCode = project && sec ? getUiCode(project?.id, sec.id, uiFieldPath) : "";
   const imagePlacementAttrs = getFreeformPlacementAttributes(project, imageUiCode, sectionId);
   const imgMotion = sec?.settings?.imageMotions?.[imgKey] || sec?.settings?.[`motion_${fieldPath}`] || sec?.settings?.motion_image || "";
-  const motionAttr = imgMotion && imgMotion !== "none" ? ` data-motion="${imgMotion}"` : "";
+  const imgLoop = ["twice", "infinite"].includes(sec?.settings?.imageMotionLoops?.[imgKey]) ? sec.settings.imageMotionLoops[imgKey] : "";
+  const motionAttr = imgMotion && imgMotion !== "none" ? ` data-motion="${imgMotion}"${imgLoop ? ' data-motion-loop="' + imgLoop + '"' : ''}` : "";
   const motionClass = imgMotion && imgMotion !== "none" ? ` motion-preset-${imgMotion.replace('-in', '')}${imgMotion === 'pulse' ? ' btn-pulse-active' : ''}` : "";
 
   if (!isEditor) {
@@ -300,7 +302,7 @@ export function renderEditableImage(url, { sectionId = "", fieldPath = "", targe
           </button>
           <div id="img-motion-menu-${sectionId}-${String(fieldPath).replace(/\./g, '-')}-${indexParam !== 'null' ? indexParam : '0'}" class="hidden absolute left-0 bottom-full mb-2 w-56 bg-zinc-900/95 backdrop-blur-md border border-white/20 rounded-xl p-2.5 shadow-2xl z-50 text-white text-[11px]">
             <div class="text-[9px] font-bold uppercase tracking-wider text-zinc-400 mb-1.5 flex items-center justify-between">
-              <span>Animation Image</span>
+              <span>Animation de l’image · élément</span>
               <span class="text-amber-400 font-mono">${imgMotion || 'aucune'}</span>
             </div>
             <div class="grid grid-cols-2 gap-1.5">
@@ -317,6 +319,12 @@ export function renderEditableImage(url, { sectionId = "", fieldPath = "", targe
                   ${mLabel}${((imgMotion || 'none') === mPreset && mPreset !== 'none') ? ' ✓' : ''}
                 </button>
               `).join('')}
+            </div>
+            <div class="motion-loop-row" data-image-loop-row>
+              <span class="motion-loop-label">Répétition</span>
+              <button type="button" data-image-loop="once" class="motion-loop-btn" onclick="event.stopPropagation(); window.app.setImageMotionLoop('${sectionId}', '${fieldPath}', ${indexParam}, 'once')">Une fois</button>
+              <button type="button" data-image-loop="twice" class="motion-loop-btn" onclick="event.stopPropagation(); window.app.setImageMotionLoop('${sectionId}', '${fieldPath}', ${indexParam}, 'twice')">×2</button>
+              <button type="button" data-image-loop="infinite" class="motion-loop-btn" onclick="event.stopPropagation(); window.app.setImageMotionLoop('${sectionId}', '${fieldPath}', ${indexParam}, 'infinite')">Boucle</button>
             </div>
           </div>
         </div>
@@ -353,7 +361,7 @@ export function renderWebsiteHTML(project, options = { isEditor: false, isStanda
     contact: ["header", "bookingBlock", "hours", "location", "faq", "cta", "footer"]
   };
 
-  const sectionsHTML = project.sections
+  let sectionsHTML = project.sections
     .filter(sec => {
       if (options.isEditor) return true;
       if (sec.visibility === false) return false;
@@ -372,6 +380,14 @@ export function renderWebsiteHTML(project, options = { isEditor: false, isStanda
     })
     .map(sec => renderSection(sec, project, options))
     .join("\n");
+
+  // Loop control: an entrance preset runs once unless the author asks for more.
+  sectionsHTML = sectionsHTML.replace(/<[a-z][^>]*data-section-id="([^"]+)"[^>]*>/gi, (tag, id) => {
+    if (/data-motion-loop=/.test(tag)) return tag;
+    const sec = project.sections.find(s => s.id === id);
+    const loop = ["twice", "infinite"].includes(sec?.settings?.motionLoop) ? sec.settings.motionLoop : "";
+    return loop ? tag.replace(/>$/, ' data-motion-loop="' + loop + '">') : tag;
+  });
 
   const lightboxHTML = `
     <div id="lightbox-modal" class="lightbox-modal" style="display:none;">
@@ -552,12 +568,13 @@ function renderSection(sec, project, options) {
   const bgTheme = `bg-sec-${sectionTheme}`;
   const themeColor = sectionTheme === "dark" ? "#09090b" : sectionTheme === "navy" ? "#0c1527" : sectionTheme === "warm" ? "#faf8f5" : sectionTheme === "mineral" ? "#f8fafc" : sectionTheme === "primary" ? (project.branding?.primaryColor || "#059669") : "#ffffff";
   const motionPreset = sec.settings?.motionPreset || sec.motionPreset || (project.branding?.motionPreset && project.branding.motionPreset !== "none" ? project.branding.motionPreset : "");
+  const motionLoop = ["twice", "infinite"].includes(sec.settings?.motionLoop) ? sec.settings.motionLoop : "";
   const customBackground = /^#[0-9a-f]{3,8}$/i.test(sec.settings?.customBackground || "")
     ? `background-color: ${sec.settings.customBackground} !important;`
     : "";
 
   if (!isEditor) {
-    return `<section id="${sec.type}" class="site-section ${bgTheme} ${isHidden ? 'hidden' : ''}" style="--section-bg: ${themeColor}; ${customBackground}" data-section-id="${sec.id}" data-section-type="${sec.type}" data-section-bg="${sectionTheme}" data-has-custom-bg="${customBackground ? 'true' : 'false'}" data-scroll-fx="zoom" data-ui-id="${getSectionUiId(sec)}" data-ui-type="section"${motionPreset ? ` data-motion="${motionPreset}"` : ''}>${innerHTML}</section>`;
+    return `<section id="${sec.type}" class="site-section ${bgTheme} ${isHidden ? 'hidden' : ''}" style="--section-bg: ${themeColor}; ${customBackground}" data-section-id="${sec.id}" data-section-type="${sec.type}" data-section-bg="${sectionTheme}" data-has-custom-bg="${customBackground ? 'true' : 'false'}" data-scroll-fx="zoom"${motionLoop ? ' data-motion-loop="' + motionLoop + '"' : ''} data-ui-id="${getSectionUiId(sec)}" data-ui-type="section"${motionPreset ? ` data-motion="${motionPreset}"` : ''}>${innerHTML}</section>`;
   }
 
   // Editor Wrapper with Controls

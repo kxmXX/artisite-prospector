@@ -316,15 +316,21 @@ export function renderEditor(state) {
                 <span>✨ Anim</span>
               </button>
               <div id="ftb-anim-menu" class="hidden absolute left-0 top-full mt-2 w-56 bg-zinc-900/95 backdrop-blur-md border border-white/20 rounded-xl p-2.5 shadow-2xl z-50 text-white text-[11px]">
-                <div class="text-[9px] font-bold uppercase tracking-wider text-zinc-400 mb-1.5">Animation Texte 60fps</div>
+                <div class="text-[9px] font-bold uppercase tracking-wider text-zinc-400 mb-1.5">Animation de l’élément · texte</div>
                 <div class="grid grid-cols-2 gap-1.5">
-                  <button type="button" onclick="window.app.setActiveTextMotion('fade-in')" class="motion-chip">Fade</button>
-                  <button type="button" onclick="window.app.setActiveTextMotion('slide-up')" class="motion-chip">Slide</button>
-                  <button type="button" onclick="window.app.setActiveTextMotion('spring')" class="motion-chip">Spring</button>
-                  <button type="button" onclick="window.app.setActiveTextMotion('pulse')" class="motion-chip">Pulse</button>
-                  <button type="button" onclick="window.app.setActiveTextMotion('shimmer')" class="motion-chip">Shimmer</button>
-                  <button type="button" onclick="window.app.setActiveTextMotion('zoom-in')" class="motion-chip">Zoom</button>
+                  <button type="button" onclick="window.app.setActiveTextMotion('fade-in')" class="motion-chip">Fade ◐</button>
+                  <button type="button" onclick="window.app.setActiveTextMotion('slide-up')" class="motion-chip">Slide ↑</button>
+                  <button type="button" onclick="window.app.setActiveTextMotion('spring')" class="motion-chip">Spring ⤒</button>
+                  <button type="button" onclick="window.app.setActiveTextMotion('pulse')" class="motion-chip">Pulse ◉</button>
+                  <button type="button" onclick="window.app.setActiveTextMotion('shimmer')" class="motion-chip">Shimmer ✨</button>
+                  <button type="button" onclick="window.app.setActiveTextMotion('zoom-in')" class="motion-chip">Zoom ⤢</button>
                   <button type="button" onclick="window.app.setActiveTextMotion('none')" class="motion-chip col-span-2 text-zinc-400">Aucune</button>
+                </div>
+                <div class="motion-loop-row" data-text-loop-row>
+                  <span class="motion-loop-label">Répétition</span>
+                  <button type="button" data-text-loop="once" class="motion-loop-btn is-active" onclick="window.app.setActiveTextMotionLoop('once')">Une fois</button>
+                  <button type="button" data-text-loop="twice" class="motion-loop-btn" onclick="window.app.setActiveTextMotionLoop('twice')">×2</button>
+                  <button type="button" data-text-loop="infinite" class="motion-loop-btn" onclick="window.app.setActiveTextMotionLoop('infinite')">Boucle</button>
                 </div>
               </div>
             </div>
@@ -1183,14 +1189,20 @@ function renderSectionAccordionContent(sec, project, variants) {
 
       <!-- Per-block motion catalog -->
       <div class="pt-2 border-t border-zinc-200/60">
-        <label class="block text-[10px] font-medium text-zinc-400 uppercase tracking-wider mb-1">Animation du bloc</label>
+        <label class="block text-[10px] font-medium text-zinc-400 uppercase tracking-wider mb-1">Animation de la section</label>
         <div class="motion-fan-grid">
           ${[
             ['none', 'Aucune'], ['fade-in', 'Fade'], ['slide-up', 'Slide'], ['spring', 'Spring'],
             ['reveal', 'Reveal'], ['stagger', 'Stagger'], ['shimmer', 'Shimmer'], ['pulse', 'Pulse']
           ].map(([preset, label]) => `<button type="button" class="motion-option ${((sec.settings?.motionPreset || 'none') === preset || (!sec.settings?.motionPreset && preset === 'none')) ? 'is-active' : ''}" onclick="window.app.setSectionMotion('${sectionId}', '${preset}')">${label}</button>`).join('')}
         </div>
-        <p class="text-[10px] text-zinc-500 mt-1">Le mouvement est appliqué au bloc complet et respecte la réduction des mouvements.</p>
+        <div class="motion-loop-row">
+          <span class="motion-loop-label">Répétition</span>
+          <button type="button" data-section-loop="once" class="motion-loop-btn ${(sec.settings?.motionLoop || 'once') === 'once' ? 'is-active' : ''}" onclick="window.app.setSectionMotionLoop('${sectionId}', 'once')">Une fois</button>
+          <button type="button" data-section-loop="twice" class="motion-loop-btn ${(sec.settings?.motionLoop || 'once') === 'twice' ? 'is-active' : ''}" onclick="window.app.setSectionMotionLoop('${sectionId}', 'twice')">×2</button>
+          <button type="button" data-section-loop="infinite" class="motion-loop-btn ${(sec.settings?.motionLoop || 'once') === 'infinite' ? 'is-active' : ''}" onclick="window.app.setSectionMotionLoop('${sectionId}', 'infinite')">Boucle</button>
+        </div>
+        <p class="motion-loop-hint">Ce mouvement s’applique à toute la section. Pour animer un seul texte ou une image, ouvrez l’outil Anim de l’élément.</p>
         <div class="pattern-catalog mt-2" aria-label="Patterns d'inspiration">
           ${INSPIRATION_PATTERNS.slice(0, 4).map(pattern => {
             const motionKey = pattern.id === 'progress' ? 'progress-fill' : pattern.id;

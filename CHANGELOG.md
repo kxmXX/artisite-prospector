@@ -7,6 +7,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 15 septembre 2026 (4.8.0-alpha.53)
+
+- Boucles d’animation : chaque animation peut désormais être jouée **une fois, deux fois ou en boucle continue**, au niveau de la section, du texte et de l’image. Un sélecteur « Répétition » est partagé par les trois menus, et la boucle est neutralisée automatiquement avec `prefers-reduced-motion`.
+- Distinction section / élément : les intitulés deviennent « Animation de la section », « Animation de l’élément · texte » et « Animation de l’image · élément », avec un texte d’aide qui renvoie vers le bon outil — fini le « Animation du bloc » ambigu.
+- Lisibilité : chaque preset porte un glyphe, et l’état actif est conservé à l’ouverture des menus.
+- QA : 4 tests de boucle (rendu section/élément/image, absence de boucle par défaut, neutralisation reduced-motion, libellés distincts), 271/271 tests complets.
+
 ### Consolidation — 15 septembre 2026 (4.8.0-alpha.52)
 
 - Sortie de l’édition en ligne : Échap termine désormais l’édition d’une cellule ou d’un texte en confirmant la valeur et en retirant le focus, au lieu de laisser le curseur actif. Le bouton de la barre d’outils texte devient une validation explicite (« Terminer l’édition », coche) qui blur la cellule.
