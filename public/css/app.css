@@ -3208,9 +3208,18 @@ p[data-motion], div[data-motion], section[data-motion], h1[data-motion], h2[data
   position: relative;
 }
 
+.component-table-scroll {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
 .component-table table {
   border-collapse: separate;
   border-spacing: 0;
+  min-width: 40rem;
+}
+@media (pointer: coarse) {
+  .component-table td[data-editable] { padding: 0.9rem 0.85rem; }
 }
 
 .component-slider input[type="range"] {

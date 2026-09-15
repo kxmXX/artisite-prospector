@@ -48,7 +48,7 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 
 - [~] Auditer largement les gestes réels : premier passage desktop 1280 et mobile simulé 390 effectué (`4.8.0-alpha.43`). Restent tablette, rotation et rotation+scale, multi-sélection tactile et parité export.
 - [x] Éliminer les superpositions de chrome et les layouts cassés : dock de contact client masqué en édition, pile Freeform mesurée anti-collision, repères libres exclus de l’aperçu (`4.8.0-alpha.43`).
-- [~] Repenser l’édition des cellules autour d’un modèle spatial cohérent : historique d’édition réparé (Undo/Redo réels sur cellules et champs) dans `4.8.0-alpha.43` ; limites spatiales et sortie de mode restent à traiter.
+- [~] Repenser l’édition des cellules autour d’un modèle spatial cohérent : historique d’édition réparé (`4.8.0-alpha.43`) et tableau comparatif rendu défilable pour ne plus couper les cellules sur canevas étroit (`4.8.0-alpha.48`) ; restent les limites spatiales et la sortie de mode explicite.
 - [x] Rendre chaque outil réellement opérant et lisible : l’édition inline et l’inspecteur enregistrent à nouveau une transaction annulable (`4.8.0-alpha.43`).
 - [x] Fiabiliser les animations : origine unique (`4.8.0-alpha.45`), aperçu de section réellement visible et vitesse appliquée à chaque preset (`4.8.0-alpha.46`). Reste à neutraliser les motions pendant un transform libre, au-delà de la suspension déjà posée.
 - [ ] Ajouter une matrice de non-régression navigateur couvrant souris, tactile et clavier, plutôt que de considérer la présence du code comme une fonctionnalité livrée.

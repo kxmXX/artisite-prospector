@@ -164,3 +164,15 @@ test('freeform origin is only claimed when a rotation or scale needs it', async 
   assert.ok(cssFor({ x: 10, y: 20, rotation: 30 }).includes('transform-origin:50% 50%!important'));
   assert.ok(cssFor({ x: 10, y: 20, scaleX: 1.2, scaleY: 1.2 }).includes('transform-origin:50% 50%!important'));
 });
+
+test('comparison tables scroll instead of clipping editable cells', () => {
+  const rendererSource = fs.readFileSync(new URL('../public/js/components/renderer.js', import.meta.url), 'utf8');
+  const appCss = fs.readFileSync(new URL('../public/css/app.css', import.meta.url), 'utf8');
+  // The table sits in its own horizontal scroller so narrow canvases keep
+  // readable, tappable cells instead of compressing three columns.
+  assert.ok(rendererSource.includes('component-table-scroll'));
+  assert.ok(rendererSource.includes('data-layout-node="comparison-table"'));
+  assert.ok(appCss.includes('.component-table-scroll {'));
+  assert.ok(appCss.includes('overflow-x: auto;'));
+  assert.ok(appCss.includes('min-width: 40rem;'));
+});

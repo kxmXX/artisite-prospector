@@ -1,3 +1,11 @@
+## LOT DE LIVRAISON — cellules de tableau éditables 4.8.0-alpha.48 — 15 septembre 2026
+
+- Cause : le conteneur `.component-table` portait `overflow-hidden`. Sur un canevas étroit (mobile simulé ou téléphone réel), les trois colonnes se comprimaient puis étaient coupées, rendant la sélection et l’édition tactile imprévisibles — exactement le symptôme « édition des cellules mal conçue ».
+- Correctif : le tableau est enveloppé dans `.component-table-scroll` (`overflow-x:auto`, `overscroll-behavior-x:contain`), conservant les coins arrondis et le clip de l’en-tête sur le conteneur parent. Le tableau garde une largeur minimale de 40 rem afin que les cellules restent lisibles et saisissables.
+- Tactile : sous `pointer:coarse`, les cellules `data-editable` du tableau reçoivent un rembourrage renforcé.
+- Tests : 9/9 tests d’intégrité éditeur, 255/255 complets, `node --check` et `git diff --check` propres.
+- Prochaine action exacte : construire la matrice de non-régression des gestes (souris / tactile / clavier) puis simplifier les barres d’outils et leurs libellés.
+
 ## LOT DE LIVRAISON — origine libre non prédatrice 4.8.0-alpha.47 — 15 septembre 2026
 
 - Conflit identifié au tour précédent : `freeformDeclarations` émettait `transform-origin:50% 50%!important` sur tout élément disposant d’un layout libre, y compris un simple déplacement sans rotation ni échelle. L’animation `progress-fill` (qui définit `transform-origin:left`) pivotait donc au centre, et un élément librement déplacé ne pouvait plus faire tourner correctement une barre de progression.

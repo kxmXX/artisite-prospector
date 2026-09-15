@@ -7,6 +7,12 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 15 septembre 2026 (4.8.0-alpha.48)
+
+- Tableau comparatif : le conteneur était en `overflow-hidden`, si bien que sur un canevas étroit les trois colonnes se comprimaient et le contenu était coupé. Le tableau vit maintenant dans un conteneur à défilement horizontal, avec une largeur minimale de 40 rem pour garder des cellules lisibles.
+- Tactile : les cellules éditables du tableau reçoivent un rembourrage renforcé sous pointeur grossier, pour une cible de saisie fiable.
+- QA : test de rendu sur le conteneur de défilement et la largeur minimale ; 9/9 tests d’intégrité éditeur, 255/255 tests complets.
+
 ### Consolidation — 15 septembre 2026 (4.8.0-alpha.47)
 
 - Conflit d’origine : la couche libre émettait `transform-origin:50% 50%!important` sur tout élément positionné, même sans rotation ni échelle. Elle écrasait donc l’origine propre à certaines animations, notamment `progress-fill` qui doit progresser depuis la gauche. L’origine n’est désormais revendiquée que lorsqu’une rotation ou une échelle l’exige.

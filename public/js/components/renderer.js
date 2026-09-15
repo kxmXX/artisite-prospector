@@ -3016,6 +3016,7 @@ function renderTableBlock(sec, project, options = {}) {
         </div>
 
         <div class="component-table rounded-2xl border border-zinc-200 overflow-hidden shadow-xs" data-layout-node="comparison-table" data-layout-label="Tableau comparatif">
+          <div class="component-table-scroll">
           <table class="w-full text-left text-xs sm:text-sm">
             <thead class="bg-zinc-900 text-white font-semibold">
               <tr>
@@ -3034,6 +3035,7 @@ function renderTableBlock(sec, project, options = {}) {
               `).join('')}
             </tbody>
           </table>
+          </div>
         </div>
       </div>
     </div>
