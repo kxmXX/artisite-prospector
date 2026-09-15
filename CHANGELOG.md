@@ -7,6 +7,14 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.33) — La barre de sélection freeform quitte les glyphes
+
+- Craft-floor : « les glyphes Unicode ou emoji tenant lieu d'un système d'icônes » sont refusés. La sélection freeform — le contrôle le plus « Canva » du produit — en portait sept : `↻` (pivoter), `⇤ − + ⇥` (ordre des plans), `H↔` et `V↕` (distribuer). Mon tour précédent avait conclu trop vite que le chrome était nettoyé : je n'avais cherché que dans les `textContent`, jamais dans le balisage des barres d'outils.
+- Correctif : sept icônes ajoutées à la bibliothèque (`rotateCw`, `bringToFront`, `sendToBack`, `bringForward`, `sendBackward`, `distributeHorizontal`, `distributeVertical`), dessinées dans le même vocabulaire que les 89 existantes — SVG 24×24, trait, `currentColor` — et branchées dans la barre freeform.
+- Tests : 2 nouveaux dans `tests/visual_craft.test.js` (aucun glyphe restant, et chaque icône rend un SVG bien formé sans glyphe) ; 371 → **373/373**.
+- Vérification : **par test, pas par capture**. J'ai ouvert l'éditeur et cliqué un élément, mais cela déclenche l'édition de texte en ligne et non la boîte freeform ; je n'ai pas réussi à la faire apparaître dans le navigateur dans le temps imparti. Les icônes sont donc garanties présentes et bien formées, pas validées à l'œil — je préfère l'écrire que de le laisser supposer.
+- Découverte au passage : les barres d'outils de section et de texte portent encore des glyphes (`⋯ ⇄ ⊕ ▼`). Relevé pour le prochain tour.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.32) — Les statuts du chrome passent par le système d'icônes
 
 - Craft-floor : « les glyphes Unicode ou emoji tenant lieu d'un système d'icônes » sont refusés. Le chrome en portait encore cinq : la confirmation de copie, le message Schema.org, le statut « Enregistré », la copie générique, et surtout la table d'état des étapes de l'assistant (`○ … ✓ ! ×`), cinq glyphes qui tenaient lieu d'icônes.

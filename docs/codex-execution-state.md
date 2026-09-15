@@ -1575,3 +1575,11 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Tests : 370 → 371. `scripts/build-utilities.mjs` relancé, détecteur Impeccable repassé.
 - Honnêteté sur la vérification : ce lot est couvert par test et non par capture, ces états étant transitoires. Les lots précédents (lanceur, kickers) ont bien été vérifiés à l'écran.
 - Reste : vocabulaire de boutons, lot 6 positionnement (Canva), 3b, 4d, 7, 2d.
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.33 (barre freeform : 7 glyphes remplacés par de vraies icônes)
+
+- Correction de mon propre tour précédent : j'avais annoncé le chrome débarrassé de ses glyphes en n'ayant cherché que dans les `textContent` et les `alert`. Le balisage des barres d'outils n'avait pas été inspecté. La sélection freeform en portait sept.
+- Fait : sept icônes authored ajoutées à `icons.js` dans le vocabulaire existant (24×24, trait, currentColor) et branchées dans `app.js` ; plus aucun des sept glyphes dans le fichier.
+- Vérification : par test uniquement. La boîte freeform ne s'est pas laissée déclencher dans le navigateur (cliquer un élément ouvre l'édition en ligne) ; je n'ai donc pas pu confirmer l'aspect des nouvelles icônes à l'écran.
+- Tests : 371 → 373. `scripts/build-utilities.mjs` relancé, `node --check` sur les deux fichiers touchés.
+- Nouvelle dette repérée : glyphes `⋯ ⇄ ⊕ ▼` dans les barres de section et de texte ; vocabulaire de boutons (quatre familles, valeurs arbitraires `34px`/`10px`/`.16s` au lieu des jetons) ; puis lot 6.

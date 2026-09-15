@@ -4864,12 +4864,12 @@ export class App {
         </div>
         <button type="button" class="freeform-move-handle" data-freeform-action="move" aria-label="Déplacer la sélection">${getIcon("move", "w-3.5 h-3.5")}</button>
         ${["nw","n","ne","e","se","s","sw","w"].map(handle => `<button type="button" class="freeform-resize-handle freeform-resize-${handle}" data-freeform-action="resize" data-freeform-handle="${handle}" aria-label="Redimensionner ${handle}"></button>`).join("")}
-        <button type="button" class="freeform-rotate-handle" data-freeform-rotate aria-label="Faire pivoter la sélection" title="Faire pivoter · Shift = pas de 15°">↻</button>
+        <button type="button" class="freeform-rotate-handle" data-freeform-rotate aria-label="Faire pivoter la sélection" title="Faire pivoter · Shift = pas de 15°">${getIcon("rotateCw", "w-3.5 h-3.5")}</button>
         <div class="freeform-layerbar" role="toolbar" aria-label="Ordre et verrouillage du calque">
-          <button type="button" data-freeform-layer="back" title="Envoyer à l’arrière-plan" aria-label="Envoyer à l’arrière-plan">⇤</button>
-          <button type="button" data-freeform-layer="backward" title="Reculer d’un plan" aria-label="Reculer d’un plan">−</button>
-          <button type="button" data-freeform-layer="forward" title="Avancer d’un plan" aria-label="Avancer d’un plan">+</button>
-          <button type="button" data-freeform-layer="front" title="Mettre au premier plan" aria-label="Mettre au premier plan">⇥</button>
+          <button type="button" data-freeform-layer="back" title="Envoyer à l’arrière-plan" aria-label="Envoyer à l’arrière-plan">${getIcon("sendToBack", "w-3.5 h-3.5")}</button>
+          <button type="button" data-freeform-layer="backward" title="Reculer d’un plan" aria-label="Reculer d’un plan">${getIcon("sendBackward", "w-3.5 h-3.5")}</button>
+          <button type="button" data-freeform-layer="forward" title="Avancer d’un plan" aria-label="Avancer d’un plan">${getIcon("bringForward", "w-3.5 h-3.5")}</button>
+          <button type="button" data-freeform-layer="front" title="Mettre au premier plan" aria-label="Mettre au premier plan">${getIcon("bringToFront", "w-3.5 h-3.5")}</button>
           <span></span>
           <button type="button" data-freeform-cross-section title="Autoriser le déplacement entre sections" aria-label="Déplacement entre sections" aria-pressed="false">Entre sections</button>
           <button type="button" data-freeform-responsive-toggle title="Ouvrir les outils responsive" aria-label="Ouvrir les outils responsive" aria-expanded="false">Responsive</button>
@@ -4893,8 +4893,8 @@ export class App {
           <button type="button" data-freeform-align="middle" title="Centrer verticalement" aria-label="Centrer verticalement">M</button>
           <button type="button" data-freeform-align="bottom" title="Aligner en bas" aria-label="Aligner en bas">B</button>
           <span></span>
-          <button type="button" data-freeform-distribute="horizontal" title="Distribuer horizontalement" aria-label="Distribuer horizontalement">H↔</button>
-          <button type="button" data-freeform-distribute="vertical" title="Distribuer verticalement" aria-label="Distribuer verticalement">V↕</button>
+          <button type="button" data-freeform-distribute="horizontal" title="Distribuer horizontalement" aria-label="Distribuer horizontalement">${getIcon("distributeHorizontal", "w-3.5 h-3.5")}</button>
+          <button type="button" data-freeform-distribute="vertical" title="Distribuer verticalement" aria-label="Distribuer verticalement">${getIcon("distributeVertical", "w-3.5 h-3.5")}</button>
         </div>
       `;
       document.body.appendChild(overlay);

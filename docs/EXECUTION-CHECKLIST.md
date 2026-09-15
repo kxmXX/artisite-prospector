@@ -115,10 +115,11 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
       « Revenir au style principal » n'existe que par l'entrée « Principal » du menu ; seuls la
       **couleur** est éditable par état — fond, bordure, ombre et opacité sont prévus par le modèle
       (`ALLOWED_PROPERTIES`) mais aucun contrôle ne les expose.
-- [ ] **Défauts visuels relevés à l'inspection** (`4.9.0-alpha.31` → `.32`) : lanceur d'assistant réduit à
+- [ ] **Défauts visuels relevés à l'inspection** (`4.9.0-alpha.31` → `.33`) : lanceur d'assistant réduit à
       une pastille compacte (il recouvrait la carte du hero) avec le bord épais retiré ; kickers numérotés
-      du tableau de bord supprimés ; statuts du chrome passés au système d'icônes. *Reste* : unification du
-      vocabulaire de boutons, vérification mobile.
+      du tableau de bord supprimés ; statuts du chrome et sélection freeform (7 icônes) passés au système
+      d'icônes. *Reste* : glyphes des barres de section et de texte (`⋯ ⇄ ⊕ ▼`), unification du vocabulaire
+      de boutons, vérification mobile.
 - [ ] **Lot 6 — Positionnement** : flux par défaut, position libre en option, champs numériques
       X/Y/L/H/rotation, boîte de sélection réduite à un menu `⋯`, bornes clavier = bornes souris.
 - [ ] **Lot 7 — Mouvement unifié** : catalogue unique, déclencheur, durée, délai, courbe, direction,

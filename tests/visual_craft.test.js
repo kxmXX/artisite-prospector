@@ -37,3 +37,23 @@ test('les statuts du chrome passent par le systeme d icones, pas par des glyphes
   assert.ok(app.includes('getIcon("check"'), 'la coche vient du systeme d icones');
   assert.ok(app.includes('getIcon("helpCircle"'), 'le repli vient du systeme d icones');
 });
+
+test('la barre de selection freeform utilise le systeme d icones', () => {
+  const app = read('public/js/app.js');
+  for (const g of ['>↻</button>', '>⇤</button>', '>⇥</button>', '>−</button>', '>+</button>', '>H↔</button>', '>V↕</button>']) {
+    assert.ok(!app.includes(g), 'glyphe encore present : ' + g);
+  }
+  for (const key of ['rotateCw', 'bringToFront', 'sendToBack', 'bringForward', 'sendBackward', 'distributeHorizontal', 'distributeVertical']) {
+    assert.ok(app.includes('getIcon("' + key + '"'), 'icone non utilisee : ' + key);
+  }
+});
+
+test('les nouvelles icones sont des SVG bien formes, sans glyphe', async () => {
+  const { getIcon } = await import('../public/js/components/icons.js');
+  for (const key of ['rotateCw', 'bringToFront', 'sendToBack', 'bringForward', 'sendBackward', 'distributeHorizontal', 'distributeVertical']) {
+    const svg = getIcon(key, 'w-3.5 h-3.5');
+    assert.ok(svg.startsWith('<svg'), key + ' doit rendre un svg');
+    assert.ok(svg.includes('viewBox'), key + ' doit declarer un viewBox');
+    assert.ok(!/[\u2190-\u21FF\u2600-\u27BF]/.test(svg), key + ' ne doit contenir aucun glyphe');
+  }
+});
