@@ -124,9 +124,14 @@ function elementTransformControlsHTML(project, layoutKey, viewport) {
           </label>
         `).join('')}
       </div>
+      ${positioned ? `
       <button type="button"
               class="w-full py-1 bg-white hover:bg-zinc-100 text-zinc-700 rounded-lg text-ui-xs font-semibold border border-zinc-200 transition-colors"
-              onclick="window.app.resetElementTransform('${layoutKey}')">Revenir au flux</button>
+              onclick="window.app.resetElementTransform('${layoutKey}')">Revenir au flux</button>` : `
+      <p class="text-ui-2xs text-zinc-500">Cet element suit le flux normal. Activez la position libre pour le placer au pixel pres.</p>
+      <button type="button"
+              class="w-full py-1 bg-white hover:bg-zinc-100 text-zinc-700 rounded-lg text-ui-xs font-semibold border border-zinc-200 transition-colors"
+              onclick="window.app.enableElementTransform('${layoutKey}')">Activer la position libre</button>`}
     </div>
   `;
 }

@@ -7,6 +7,15 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.41) — Position libre explicite, et le panneau ne se referme plus
+
+- Fait : `enableElementTransform` active la position libre d'un élément **sans le déplacer** (décalage nul), et l'inspecteur propose « Activer la position libre » tant que l'élément suit le flux, puis « Revenir au flux » ensuite. L'option existait déjà, mais rien ne l'annonçait : elle ne s'activait qu'en tapant une valeur dans un champ.
+- Bug corrigé au passage, et il comptait : **chaque modification refermait le panneau de propriétés**. `state.updateProject(..., true)` reconstruit l'éditeur, ce qui emportait la classe `is-responsive-open` avec l'ancien nœud. Un helper partagé, `refreshInspectorPanel()`, le rouvre et le re-rend après chaque écriture — les quatre chemins (activation, retour au flux, saisie d'une valeur, sélection d'un élément) passent désormais par lui.
+- Correction de forme : un commentaire de documentation avait glissé au-dessus de la mauvaise méthode lors d'un ajout précédent ; remis sur la sienne.
+- **Vérifié à l'écran, de bout en bout** : sélection d'un élément dans la liste → « Activer la position libre » → la pastille passe à « position libre », X et Y passent à 0 **sans que l'élément bouge**, le bouton devient « Revenir au flux », et **le panneau reste ouvert**. C'est le premier chemin d'écriture du lot 6 que je peux confirmer, et la première fois que je vois la bascule flux → position libre.
+- Tests : 2 nouveaux ; 386 → **388/388**.
+- Reste sur le lot 6 : le **geste** de déplacement à la souris (validation utilisateur demandée), la position libre pour les images et les boutons, et les boîtes de sélection unifiées.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.40) — Lot 4d : le bloc d'élément se replie aussi
 
 - L'élément sélectionné affichait six rangées de réglages au même niveau. Désormais l'espacement et la forme — les deux qui font l'essentiel du travail — restent immédiats, et l'opacité, le fond, la bordure et l'ombre passent derrière « Réglages avancés : opacité, fond, bordure, ombre », replié par défaut, avec indicateur +/− et état retenu au nouveau rendu.

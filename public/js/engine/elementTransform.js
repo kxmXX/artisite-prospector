@@ -83,3 +83,23 @@ export function clearElementTransform(project, layoutKey, viewport) {
   if (entries && entries[layoutKey]) delete entries[layoutKey];
   return next;
 }
+
+/**
+ * Activation explicite de la position libre.
+ *
+ * Jusqu'ici, un element ne devenait positionnable qu'en tapant une valeur dans un
+ * champ : l'option existait mais rien ne l'annoncait. Cette fonction cree l'entree
+ * avec un decalage nul — l'element ne bouge pas, il devient seulement positionnable.
+ */
+export function enableElementTransform(project, layoutKey, viewport) {
+  if (!project || !layoutKey) return project;
+  const view = transformViewport(viewport);
+  const next = JSON.parse(JSON.stringify(project));
+  next.freeformLayout = next.freeformLayout || {};
+  next.freeformLayout[view] = next.freeformLayout[view] || {};
+  const current = next.freeformLayout[view][layoutKey] || {};
+  if (!Number.isFinite(Number(current.x))) current.x = 0;
+  if (!Number.isFinite(Number(current.y))) current.y = 0;
+  next.freeformLayout[view][layoutKey] = current;
+  return next;
+}

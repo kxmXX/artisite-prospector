@@ -1641,3 +1641,11 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Le test qui comptait les parcours de la grille a été réécrit (déclaration unique, partage nommé, divulgation présente) plutôt que supprimé.
 - Tests : 386/386. `node --check` sur l'inspecteur, `scripts/build-utilities.mjs` relancé.
 - Suite : terminer 4d (mise en page de section, réglages globaux), puis 6 (position libre, boîtes unifiées), 3b, 7, export 2d. Validations demandées à l'utilisateur : geste de déplacement, écriture d'un champ de position, rendu mobile, export cassé.
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.41 (position libre explicite, panneau maintenu ouvert)
+
+- Fait : `enableElementTransform` (decalage nul, l'element ne bouge pas) + bouton « Activer la position libre » dans l'inspecteur, qui devient « Revenir au flux » une fois active.
+- Bug corrige : chaque modification refermait le panneau de proprietes, car `updateProject(..., true)` reconstruit l'editeur et emporte `is-responsive-open`. Helper partage `refreshInspectorPanel()` appele par les quatre chemins d'ecriture.
+- Verifie a l'ecran de bout en bout : selection depuis la liste, activation, pastille « position libre », X et Y a 0, panneau ouvert. Premier chemin d'ecriture du lot 6 confirme visuellement.
+- Tests : 386 → 388. `node --check` sur les trois fichiers, `scripts/build-utilities.mjs` relance.
+- Reste : geste de deplacement (validation utilisateur), position libre pour images et boutons, boites de selection unifiees, gestes par appareil ; puis 3b, 4d (mise en page de section, reglages globaux), 7, export 2d.

@@ -24,7 +24,7 @@ import { ELEMENT_STATES, ELEMENT_STATE_LABELS, setElementState, clearElementStat
 import { setSectionLayout, isValidSectionId } from "./engine/sectionStyle.js";
 import { setElementStyle, clearElementStyle } from "./engine/elementStyle.js";
 import { getIcon } from "./components/icons.js";
-import { setElementTransform, clearElementTransform } from "./engine/elementTransform.js";
+import { setElementTransform, clearElementTransform, enableElementTransform } from "./engine/elementTransform.js";
 import { parseClientDemoPin, verifyClientDemoPin } from "./utils/clientDemoPin.js";
 import { createEspritNatureDemoProject } from "./data/sampleProjects.js";
 import { getDefaultTemplateIdForTrade, getSiteTemplate, instantiateSiteTemplate } from "./data/templates.js";
@@ -1594,6 +1594,33 @@ export class App {
   }
 
   /**
+   * Reaffiche le panneau de proprietes apres un re-rendu complet.
+   *
+   * `state.updateProject(..., true)` reconstruit l'editeur : la classe
+   * `is-responsive-open` disparait avec l'ancien noeud. Sans ce rappel, chaque
+   * modification refermait le panneau de proprietes.
+   */
+  refreshInspectorPanel() {
+    const panel = document.getElementById("right-inspector-panel");
+    const section = state.currentProject?.sections.find(s => s.id === state.selectedSectionId) || state.currentProject?.sections[0];
+    if (!panel || !section) return;
+    panel.classList.add("is-responsive-open");
+    panel.setAttribute("aria-hidden", "false");
+    const shell = panel.querySelector(".studio-v3-inspector-shell");
+    if (shell) shell.innerHTML = renderInspector(section, state.currentProject, state);
+  }
+
+  /** Active la position libre d'un element sans le deplacer. Instantane avant mutation. */
+  enableElementTransform(layoutKey) {
+    if (!state.currentProject || !layoutKey) return;
+    state.pushHistory("Activation de la position libre");
+    const updated = enableElementTransform(state.currentProject, layoutKey, state.viewport || "desktop");
+    state.updateProject(updated, true);
+    this.refreshInspectorPanel();
+    this.showToast("Position libre activee : deplacez l'element ou saisissez ses valeurs", "info");
+  }
+
+  /**
    * Selection d'un element depuis la liste de la section : meme etat que la
    * selection libre, pour n'avoir qu'une seule source de selection d'element.
    */
@@ -1601,13 +1628,7 @@ export class App {
     if (!layoutKey) return;
     state.selectedElementKey = layoutKey;
     state.elementStyleState = "default";
-    // Rendu direct du panneau : updateSelectedSectionUI() repart de la section et
-    // ne laissait pas les reglages d'element a l'ecran. Ici on re-rend exactement le
-    // meme contenu que lui, avec la selection d'element posee.
-    const panel = document.getElementById("right-inspector-panel");
-    const shell = panel?.querySelector(".studio-v3-inspector-shell");
-    const section = state.currentProject?.sections.find(s => s.id === state.selectedSectionId) || state.currentProject?.sections[0];
-    if (shell && section) shell.innerHTML = renderInspector(section, state.currentProject, state);
+    this.refreshInspectorPanel();
   }
 
   selectSection(sectionId, options = {}) {
@@ -3356,6 +3377,7 @@ export class App {
     state.pushHistory("Position et taille de l'element");
     const updated = setElementTransform(state.currentProject, layoutKey, state.viewport || "desktop", field, value);
     state.updateProject(updated, true);
+    this.refreshInspectorPanel();
   }
 
   resetElementTransform(layoutKey) {
@@ -3363,6 +3385,7 @@ export class App {
     state.pushHistory("Retour au flux");
     const updated = clearElementTransform(state.currentProject, layoutKey, state.viewport || "desktop");
     state.updateProject(updated, true);
+    this.refreshInspectorPanel();
     this.showToast("Element remis dans le flux", "info");
   }
   setSectionMotionSpeed(sectionId, speedId) {

@@ -72,3 +72,34 @@ test('l inspecteur expose les champs numeriques quand un element est selectionne
   assert.ok(html.includes('flux normal'), 'un element sans reglage est annonce dans le flux');
   state.selectedElementKey = null;
 });
+
+test('la position libre s active explicitement, sans deplacer l element', async () => {
+  const t = await import('../public/js/engine/elementTransform.js');
+  assert.equal(typeof t.enableElementTransform, 'function', 'le chemin explicite doit exister');
+  const enabled = t.enableElementTransform(project(), 'E1', 'desktop');
+  assert.equal(t.hasElementTransform(enabled, 'E1', 'desktop'), true, 'l element devient positionnable');
+  assert.equal(t.getElementTransform(enabled, 'E1', 'desktop').x, 0, 'sans etre deplace');
+  assert.equal(t.getElementTransform(enabled, 'E1', 'desktop').y, 0, 'sans etre deplace');
+  const cleaned = t.clearElementTransform(enabled, 'E1', 'desktop');
+  assert.equal(t.hasElementTransform(cleaned, 'E1', 'desktop'), false, 'et on peut revenir au flux');
+});
+
+test('l inspecteur propose l activation explicite tant que rien n est positionne', async () => {
+  const t = await import('../public/js/engine/elementTransform.js');
+  const { generateSite } = await import('../public/js/engine/generator.js');
+  const { renderEditor } = await import('../public/js/components/editor.js');
+  const { state } = await import('../public/js/state.js');
+  const base = generateSite({ name: 'Controle Opt-in', tradeId: 'menuisier' });
+  state.currentProject = base;
+  state.currentView = 'editor';
+  state.editorMode = 'edit';
+  state.selectedElementKey = 'EL-OPTIN';
+  const flow = renderEditor(state);
+  assert.ok(flow.includes('Activer la position libre'), 'le bouton explicite doit apparaitre');
+  assert.ok(!flow.includes("resetElementTransform('EL-OPTIN')"), 'pas de retour au flux s il n y en a pas');
+  state.currentProject = t.enableElementTransform(base, 'EL-OPTIN', 'desktop');
+  const free = renderEditor(state);
+  assert.ok(free.includes("resetElementTransform('EL-OPTIN')"), 'le retour au flux doit apparaitre');
+  assert.ok(free.includes('position libre'), 'la pastille doit l annoncer');
+  state.selectedElementKey = null;
+});
