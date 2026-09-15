@@ -7,6 +7,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.55) — Les contrôles de carte redeviennent accessibles
+
+- Réimplanté : le **mode d'affichage de la carte** du bloc horaires (carte interactive / image personnalisée) et le **choix de l'image de carte**. Ces deux réglages n'existaient que dans le gabarit jamais rendu — c'est précisément ce que décrivait le test tombé au tour précédent, et donc une capacité que ma suppression ratée aurait emportée.
+- Vérifié : les contrôles apparaissent sur la section horaires et **nulle part ailleurs** (contrôle négatif systématique).
+- Reste pour rendre la suppression des 843 lignes sûre : les contrôles de contenu de la vitrine (un autre test tombé les décrit), puis la reprise avec un inventaire complet — appels **et** libellés cette fois.
+- Tests : **403/403**.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.54) — La boucle d'animation de section retrouve une interface, et une suppression ratée
 
 - **Capacité restaurée** : la boucle d'animation de section (Une fois / ×2 / Boucle) n'avait **aucune** interface vivante — le popover du canevas ne contient aucun `data-section-loop` (vérifié : 0 occurrence dans `renderer.js`). Elle n'existait que dans le gabarit mort. Elle est maintenant dans le panneau de propriétés, sous les presets d'animation.

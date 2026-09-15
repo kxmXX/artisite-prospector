@@ -1757,3 +1757,11 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Decision : editor.js restaure (git checkout). Une suppression ne se justifie que si aucune fonction ne disparait. La boucle de section, elle, est gardee — c'est un gain reel.
 - Tests : 403/403. Les tests qui validaient le code mort sont desormais signales comme dette : ils doivent pointer vers le vivant.
 - Reste : reprendre la suppression avec un inventaire complet (appels + libelles), reimplementer les controles de carte et de vitrine, puis lot 7, export 2d, PRODUCT.md/DESIGN.md.
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.55 (controles de carte reimplantes)
+
+- Reimplemente : mode d'affichage de la carte (interactive / image) et choix de l'image de carte pour la section horaires. Ces reglages n'existaient que dans le gabarit mort, comme l'a revele le test tombe au tour 54.
+- Verifie : presents sur hours, absents ailleurs (controle negatif).
+- Reste avant suppression : les controles de contenu de la vitrine (test 401), puis reprise de la suppression avec un inventaire complet (appels + libelles).
+- Tests : 403/403.
+- Contexte : fenetre de contexte presque saturee ; tours suivants plus courts, priorite aux lots restants (3b, 7, export 2d, PRODUCT.md/DESIGN.md).

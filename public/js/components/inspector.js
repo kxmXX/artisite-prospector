@@ -140,6 +140,30 @@ function sectionGalleryHTML(section, sectionId) {
  * Boutons masques : le seul endroit pour les remettre.
  * Sans ce bloc, retirer un bouton etait definitif dans l'interface.
  */
+/**
+ * Carte du bloc horaires : mode d'affichage et image personnalisee.
+ * Ce reglage n'existait que dans le gabarit jamais rendu.
+ */
+function sectionMapHTML(section, sectionId) {
+  if (section?.type !== "hours") return "";
+  const content = section?.content || {};
+  const mode = content.mapMode || "interactive";
+  return `
+    <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-xl space-y-2">
+      <label class="text-ui-xs font-bold uppercase tracking-wider text-zinc-700">Carte</label>
+      <select class="w-full px-2 py-1 border border-zinc-200 rounded-md text-ui-xs bg-white text-zinc-800"
+              onchange="window.app.updateSectionContent('${sectionId}', 'mapMode', this.value)">
+        <option value="interactive" ${mode === "interactive" ? "selected" : ""}>Carte interactive</option>
+        <option value="image" ${mode === "image" ? "selected" : ""}>Image personnalisée</option>
+      </select>
+      <div class="flex items-center gap-2">
+        ${content.mapImage ? `<img src="${content.mapImage}" alt="Carte" class="w-20 h-12 rounded border border-zinc-200 object-cover">` : ''}
+        <button type="button" class="text-ui-2xs font-semibold text-zinc-700 border border-zinc-200 rounded-md px-2 py-1 bg-white hover:border-zinc-400"
+                onclick="window.app.openImagePicker('${sectionId}', 'mapImage')">Choisir l'image de carte</button>
+      </div>
+    </div>`;
+}
+
 function sectionButtonsHTML(section, sectionId) {
   const hidden = Array.isArray(section?.settings?.hiddenButtons) ? section.settings.hiddenButtons : [];
   const targets = [["primary", "Bouton principal"], ["phone", "Bouton téléphone"]].filter((pair) => hidden.includes(pair[0]));
@@ -401,6 +425,7 @@ export function renderInspector(section, project, state) {
       ${sectionContentSettingsHTML(section, sectionId)}
       ${sectionGalleryHTML(section, sectionId)}
       ${sectionButtonsHTML(section, sectionId)}
+      ${sectionMapHTML(section, sectionId)}
 
       ${variants.length > 1 ? `
         <div class="p-2.5 bg-zinc-50 border border-zinc-200 rounded-lg space-y-1">
