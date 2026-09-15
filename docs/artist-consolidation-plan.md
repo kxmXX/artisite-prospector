@@ -38,15 +38,16 @@ V4.3 PRO sur l'accueil et v4.7 dans les tests : cette divergence sera supprimée
 - Ensuite seulement : reprendre les contrôles d’édition encore prioritaires (typo, fonds,
   rayon, animations) sans modifier les données personnalisées des vitrines.
 
-## État de consolidation courant — après 4.8.0-alpha.31
+## État de consolidation courant — après 4.8.0-alpha.32
 
 Cette section prévaut sur le tableau historique des lots 5–13 ci-dessous sans le supprimer.
 
-- Vitrine/hero/FAQ/personnalisation/export/responsive : les sous-lots correspondants ont été livrés et régressés jusqu'à alpha.31 ; le tableau historique conserve leur état initial pour traçabilité.
-- Éditeur libre : sélection universelle, drag/resize/rotation, groupes imbriqués, snapping, tactile, responsive par breakpoint et reparenting inter-sections sont livrés.
-- Production : Vercel sert alpha.31 ; contrôle navigateur 390 px tactile validé, sans overflow horizontal sur le scénario CTA.
-- Restent réellement ouverts : robustesse consolidée texte/image/CTA/groupe, audit factuel des prompts/fallbacks, limites partage/multi-utilisateur et contre-audit sécurité/performance.
-- Dette suivie : concentration de logique dans `app.js` et duplication du runtime de reparenting editor/export. Aucun refactor lourd n'est engagé sans besoin mesuré.
+- Incident qualité du 15/09 : la vitrine "Voir la vitrine" réutilisait la copie Esprit Nature persistée ; des modifications freeform pouvaient donc dégrader la démo de référence. Alpha.32 sépare désormais la démo canonique de la bibliothèque et lui garantit une instance fraîche.
+- Navigation SPA : dashboard, éditeur, aperçu projet et vitrine disposent maintenant de routes internes avec historique Retour/Avancer ; `Voir le site` vise le projet courant.
+- Vitrine/hero/FAQ/personnalisation/export/responsive : les sous-lots historiques restent livrés, mais ils doivent maintenant être protégés par une validation visuelle de template avant tout nouveau chantier Figma lourd.
+- Prochaine priorité produit : registre de templates explicite dans le wizard, Esprit Nature 1:1 comme première template, puis directions alternatives réellement distinctes ; ensuite QA visuel et nettoyage bibliothèque.
+- Restent ouverts après stabilisation template : robustesse texte/image/CTA/groupe, audit factuel des prompts/fallbacks, limites partage/multi-utilisateur et contre-audit sécurité/performance.
+- Dette suivie : concentration de logique dans `app.js` et duplication du runtime de reparenting editor/export. Aucun refactor lourd sans besoin mesuré.
 
 ## État initial vérifié
 

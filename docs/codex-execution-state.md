@@ -1,3 +1,12 @@
+## LOT DE LIVRAISON — démo canonique et historique SPA 4.8.0-alpha.32 — 15 septembre 2026
+
+- Cause racine du signalement vitrine : `openVitrineDemo()` relisait `proj-esprit-nature` dans `localStorage`. Une copie de projet modifiée/freeform pouvait donc devenir la démo publique de référence.
+- Correctif : `createEspritNatureDemoProject()` fournit une instance fraîche hors bibliothèque pour `?vitrine=1`; une corruption volontaire du CTA + freeform persistant n'apparaît plus dans la vitrine.
+- Navigation : routes `?view=editor&project=…`, `?view=preview&project=…`, `?vitrine=1`, `pushState/popstate` et restauration Retour/Avancer. Le bouton éditeur `Voir le site` cible le projet courant.
+- QA Chrome 1440 : vitrine canonique = 1440 px sur body/root, CTA propre, style freeform vide ; Retour dashboard. Dupont : dashboard → éditeur → aperçu → Retour éditeur → Retour dashboard → Avancer éditeur, zéro erreur console.
+- Validation : 43/43 ciblés, 228/228 complets et `git diff --check`.
+- Prochaine action unique : créer un registre de templates sélectionnable dans le wizard, avec Esprit Nature 1:1 instanciable sans réutiliser la copie de bibliothèque.
+
 ## AUDIT RENFORCÉ — post-alpha.31 — 15 septembre 2026
 
 - Régression : suite complète 226/226 et `git diff --check` propres sur `6d70267`; `main` et `refactor/artist-consolidation` synchronisés.

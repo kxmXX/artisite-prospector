@@ -20,6 +20,16 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - Mouvement : navigation d’ancre douce native, un seul langage de révélation discret, jamais de
   scroll-jacking ; respecter `prefers-reduced-motion`.
 
+## Reprise P0 qualité produit — signalement du 15 septembre
+
+- [x] Séparer la vitrine canonique Esprit Nature des données persistées de la bibliothèque : `Voir la vitrine` repart d'une instance fraîche et ne reprend ni freeform ni contenu corrompu localement.
+- [x] Donner aux vues dashboard/éditeur/aperçu/vitrine une vraie navigation navigateur : URL interne, Retour et Avancer via `history.pushState/popstate`.
+- [x] `Voir le site` depuis l'éditeur affiche le projet réellement ouvert, pas Esprit Nature par défaut.
+- [ ] Mettre en place un registre de templates explicite dans le wizard : Esprit Nature 1:1 + autres directions visuelles distinctes, avec instanciation propre avant personnalisation.
+- [ ] Ajouter une validation visuelle navigateur dédiée à la vitrine canonique et à une nouvelle instance issue de la template pour empêcher toute nouvelle dérive de largeur/centrage/ordre.
+- [ ] Rendre la bibliothèque plus facile à nettoyer : sélection multi-projets + suppression groupée claire, sans recréer automatiquement une démo supprimée.
+- [ ] Refaire l'audit UI/UX des overlays de l'éditeur après stabilisation template : aucune toolbar/popover ne doit masquer une action ou du contenu utile.
+
 ## État exact à `4.8.0-alpha.8`
 
 - [x] Navigation vitrine Services / À propos / Avis / Galerie / FAQ, sticky et compensée sous un header de 80 px.
@@ -117,6 +127,8 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 7. Noter ici : commit, tests réellement exécutés, anomalies connues et prochaine action unique.
 
 ## Dernière livraison validée
+
+- Lot `4.8.0-alpha.32` : séparation démo canonique / projet local + vraie navigation navigateur. QA Chrome avec `proj-esprit-nature` volontairement corrompu : vitrine fraîche, CTA canonique, aucun freeform, largeur 1440/1440 ; Retour dashboard. Dupont éditeur → aperçu propre → Retour éditeur → Retour dashboard → Avancer éditeur. 43/43 ciblés, 228/228 complets et `git diff --check`.
 
 - Lot audit renforcé post-`4.8.0-alpha.31` : 226/226 complets et `git diff --check` ; diff alpha.29→31 relu, production cohérente. Dette tracée : `app.js` volumineux, runtime reparenting dupliqué editor/export et mentions factuelles secondaires encore à auditer. Aucun changement produit/version dans ce lot.
 

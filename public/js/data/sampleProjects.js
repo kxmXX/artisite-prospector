@@ -63,3 +63,8 @@ export const SAMPLE_PROJECTS = [
     createdAt: "2026-09-04T16:45:00.000Z"
   })
 ];
+
+
+export function createEspritNatureDemoProject() {
+  return JSON.parse(JSON.stringify(SAMPLE_PROJECTS[0]));
+}

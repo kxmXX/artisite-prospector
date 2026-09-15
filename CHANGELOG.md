@@ -7,6 +7,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 15 septembre 2026 (4.8.0-alpha.32)
+
+- Démo canonique : `Voir la vitrine` instancie désormais une copie fraîche de la référence Esprit Nature au lieu de relire `proj-esprit-nature` depuis `localStorage`; les déplacements/freeform ou contenus cassés d'une copie de bibliothèque ne contaminent plus la vitrine de référence.
+- Navigation : dashboard, éditeur, aperçu projet et vitrine canonique utilisent de vraies entrées `history.pushState` et restaurent la vue via `popstate`; Retour/Avancer reste dans l'application.
+- Aperçu éditeur : `Voir le site` prévisualise maintenant le projet courant au lieu d'ouvrir systématiquement Esprit Nature.
+- QA Chrome : avec une copie Esprit Nature volontairement corrompue en storage, la vitrine affiche le CTA canonique, `freeformLayout` vide et 1440/1440 px; Retour revient au dashboard. Dupont éditeur → aperçu → Retour revient à l'éditeur Dupont, puis au dashboard; zéro erreur console. Validation : 43/43 ciblés, 228/228 complets et `git diff --check`.
+
 ### Consolidation — 15 septembre 2026 (4.8.0-alpha.31)
 
 - Responsive : audit navigateur du dashboard et de l’éditeur à 1440×900, 1024×800 et 390×844 sans débordement horizontal ; sticky client masquée en conception mobile.

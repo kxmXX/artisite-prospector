@@ -130,7 +130,7 @@ export function renderEditor(state) {
             ${getIcon("search", "w-4 h-4")}<span>Rechercher</span><kbd>⌘K</kbd>
           </button>
           <button type="button" onclick="window.app.openShareModal()" class="studio-v3-iconbtn" title="Partager la démo">${getIcon("share", "w-4 h-4")}</button>
-          <button type="button" onclick="window.app.openVitrineDemo()" class="studio-v3-previewbtn">${getIcon("eye", "w-4 h-4")}<span>Voir le site</span></button>
+          <button type="button" onclick="window.app.openPreview('${project.id}')" class="studio-v3-previewbtn">${getIcon("eye", "w-4 h-4")}<span>Voir le site</span></button>
           <div class="relative">
             <button type="button" id="export-menu-button" aria-expanded="false" aria-controls="export-menu" aria-haspopup="menu" onclick="window.app.toggleExportMenu()" class="studio-v3-publishbtn">
               ${getIcon("download", "w-4 h-4")}<span>Exporter</span>${getIcon("chevronDown", "w-3 h-3")}

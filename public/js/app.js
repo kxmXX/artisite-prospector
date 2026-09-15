@@ -18,6 +18,7 @@ import { getTradeById } from "./data/trades.js";
 import { getTradeFallbackDataUrl } from "./data/imageFallbacks.js";
 import { ensureFontCatalog } from "./data/fonts.js";
 import { getIcon } from "./components/icons.js";
+import { createEspritNatureDemoProject } from "./data/sampleProjects.js";
 
 function escapeHtml(str) {
   if (!str) return "";
@@ -179,26 +180,10 @@ export class App {
       }
     });
 
-    // Check URL parameters (e.g. ?vitrine=1, ?demo=esprit-nature, ?view=preview)
-    const urlParams = new URLSearchParams(window.location.search);
-    const isVitrine = urlParams.get("vitrine") === "1" || urlParams.get("view") === "preview" || urlParams.get("demo") === "esprit-nature" || urlParams.get("demo") === "1";
-    if (isVitrine) {
-      const esprit = state.projects.find(x => x.id === "proj-esprit-nature") || state.projects[0];
-      if (esprit) {
-        state.setCurrentProject(esprit);
-        state.setView("preview");
-      }
-    } else {
-      const demoId = urlParams.get("demo");
-      if (demoId) {
-        const p = state.projects.find(x => x.id === demoId || x.name.toLowerCase().includes(demoId.toLowerCase()));
-        if (p) {
-          state.setCurrentProject(p);
-          state.setView("preview");
-        }
-      }
-    }
-
+    this.installNavigationHistory();
+    const initialRoute = this.readNavigationRoute();
+    this.applyNavigationRoute(initialRoute);
+    this.writeNavigationHistory(initialRoute, true);
 
     this.render();
   }
@@ -306,24 +291,86 @@ export class App {
   }
 
   // Navigation methods
+  installNavigationHistory() {
+    if (this._navigationHistoryBound || typeof window === "undefined") return;
+    window.addEventListener("popstate", () => {
+      this.applyNavigationRoute(this.readNavigationRoute());
+    });
+    this._navigationHistoryBound = true;
+  }
+
+  readNavigationRoute() {
+    if (typeof window === "undefined") return { view: "dashboard" };
+    const params = new URLSearchParams(window.location.search);
+    const demo = params.get("demo");
+    if (params.get("vitrine") === "1" || demo === "esprit-nature" || demo === "1") {
+      return { view: "preview", canonicalDemo: true };
+    }
+    if (demo) return { view: "preview", projectId: demo };
+    const view = params.get("view");
+    if (view === "editor" || view === "preview") {
+      return { view, projectId: params.get("project") || undefined };
+    }
+    return { view: "dashboard" };
+  }
+
+  navigationUrl(route = {}) {
+    if (typeof window === "undefined") return "";
+    const url = new URL(window.location.href);
+    url.search = "";
+    url.hash = "";
+    if (route.canonicalDemo) {
+      url.searchParams.set("vitrine", "1");
+    } else if (route.view === "editor" || route.view === "preview") {
+      url.searchParams.set("view", route.view);
+      if (route.projectId) url.searchParams.set("project", route.projectId);
+    }
+    return `${url.pathname}${url.search}${url.hash}`;
+  }
+
+  writeNavigationHistory(route, replace = false) {
+    if (typeof window === "undefined" || !window.history) return;
+    const payload = { artisite: true, view: route.view || "dashboard", projectId: route.projectId || null, canonicalDemo: Boolean(route.canonicalDemo) };
+    window.history[replace ? "replaceState" : "pushState"](payload, "", this.navigationUrl(route));
+  }
+
+  resolveRouteProject(projectId) {
+    if (!projectId) return null;
+    return state.projects.find(project => project.id === projectId || project.name?.toLowerCase().includes(String(projectId).toLowerCase())) || null;
+  }
+
+  applyNavigationRoute(route = {}) {
+    const view = ["editor", "preview"].includes(route.view) ? route.view : "dashboard";
+    if (route.canonicalDemo) {
+      state.setCurrentProject(createEspritNatureDemoProject());
+    } else if (route.projectId) {
+      const project = this.resolveRouteProject(route.projectId);
+      if (project) state.setCurrentProject(project);
+    }
+    state.setView(view);
+  }
+
+  navigate(route) {
+    this.writeNavigationHistory(route, false);
+    this.applyNavigationRoute(route);
+  }
+
   openDashboard() {
-    state.setView("dashboard");
+    this.navigate({ view: "dashboard" });
   }
 
   openEditor(projectId) {
-    if (projectId) state.setCurrentProject(projectId);
-    state.setView("editor");
+    const id = projectId || state.currentProject?.id;
+    this.navigate({ view: "editor", projectId: id });
   }
 
   openPreview(projectId) {
-    if (projectId) state.setCurrentProject(projectId);
-    state.setView("preview");
+    const id = projectId || state.currentProject?.id;
+    this.navigate({ view: "preview", projectId: id });
   }
 
   openVitrineDemo() {
-    const esprit = state.projects.find(x => x.id === "proj-esprit-nature") || state.projects[0];
-    if (esprit) state.setCurrentProject(esprit);
-    state.setView("preview");
+    this.navigate({ view: "preview", canonicalDemo: true });
   }
 
   resetDemoProject() {
@@ -374,7 +421,7 @@ export class App {
 
   enterCommercialDemoMode() {
     this.closeShareModal();
-    state.setView("preview");
+    this.openPreview(state.currentProject?.id);
     this.showToast("Mode Démonstration Commerciale Activé (Plein Écran)", "info");
   }
 
