@@ -118,6 +118,8 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 
 ## Dernière livraison validée
 
+- Lot vérification production (base `4.8.0-alpha.31`) : Vercel a d’abord servi un HTML `alpha.30` pendant que `/js/version.js` était déjà `alpha.31`, puis l’HTML a convergé 12 s plus tard avec `x-vercel-cache: MISS`. QA direct sur `https://artisite-prospector.vercel.app/` en 390 tactile : titre `alpha.31`, CTA ouvert, `aria-expanded=true`, popover dans le viewport, overflow horizontal 0 et zéro erreur console. 226/226 complets et `git diff --check`.
+
 - Lot `4.8.0-alpha.31` : QA global dashboard/éditeur 1440/1024/390 et fiabilisation CTA mobile. Aucun overflow horizontal ; inspecteur responsive 390 px = 374×694 dans le viewport ; binding CTA rendu idempotent et tap tactile résolu au Pointer Event avant le clic synthétique retargeté. QA Chrome : popover ouvert à 1024 et 390, `aria-expanded=true`, entièrement visible, zéro erreur console. 51/51 ciblés, 226/226 complets et `git diff --check`.
 
 - Lot `4.8.0-alpha.30` : reparenting inter-sections explicite via `Page`, `parentSectionId` par breakpoint, couche libre commune éditeur/preview/export et retour vers toute section sans changement de dimensions. QA Chrome : Header→Hero puis Hero→Header, 87,625×72 avant/après, Undo replace dans Hero ; preview/standalone reparentent réellement le DOM. 50/50 ciblés, 225/225 complets et `git diff --check`.

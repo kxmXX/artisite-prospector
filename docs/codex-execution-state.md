@@ -1,3 +1,13 @@
+## LOT DE VÉRIFICATION — production Vercel après 4.8.0-alpha.31
+
+- Git : `main` et `refactor/artist-consolidation` convergent sur `3e08275`, version produit `4.8.0-alpha.31`.
+- Propagation : premier fetch HTML encore `alpha.30` avec `x-vercel-cache: MISS`, alors que `/js/version.js` servait déjà `alpha.31`; douze secondes plus tard l’HTML a convergé vers `alpha.31`.
+- Santé : `/api/health` renvoie `status=ok`, `platform=vercel`.
+- QA production Chrome 390 tactile : titre alpha.31, éditeur ouvert, CTA mobile `is-active`, `aria-expanded=true`, popover entièrement dans le viewport, aucun overflow horizontal ni erreur console.
+- Conclusion : aucun décalage persistant Git/production ; fenêtre transitoire de propagation seulement. Aucun bump de version pour ce lot de vérification.
+- Validation locale : 226/226 complets et `git diff --check`.
+- Prochaine action : audit renforcé après trois lots — suite complète, relecture diff cumulée alpha.30/31, dette/régressions silencieuses, cohérence avec `artist-consolidation-plan.md`.
+
 ## LOT DE LIVRAISON — QA responsive et CTA tactile 4.8.0-alpha.31
 
 - Dashboard/éditeur : contrôle Chrome 1440/1024/390, `scrollWidth == clientWidth` sur les surfaces racines ; aucun overflow horizontal ni erreur console.
