@@ -1566,3 +1566,12 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Rectification : mon rapport précédent parlait d'un emoji dans le lanceur ; il utilisait `getIcon`. Erreur de lecture de ma part.
 - Tests : 368 → 370, plus la réécriture du test historique du lanceur. `scripts/build-utilities.mjs` relancé, détecteur Impeccable repassé.
 - Reste : glyphes de statut du chrome, vocabulaire de boutons, lot 6 positionnement (Canva), 3b, 4d, 7, 2d.
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.32 (statuts du chrome vers le système d'icônes)
+
+- Craft-floor appliquée : les glyphes Unicode tenant lieu d'icônes sont refusés. Cinq cas dans le chrome : confirmations de copie, message Schema.org, statut d'enregistrement, copie générique, et la table d'état des étapes de l'assistant (`○ … ✓ ! ×`).
+- Correctif : glyphes décoratifs retirés du texte ; états d'étape confiés à `getIcon` (`clock`, `check`, `helpCircle`, `x`).
+- Périmètre respecté : le `✓` du badge de confiance est du contenu du site client, explicitement hors périmètre depuis l'origine — non touché.
+- Tests : 370 → 371. `scripts/build-utilities.mjs` relancé, détecteur Impeccable repassé.
+- Honnêteté sur la vérification : ce lot est couvert par test et non par capture, ces états étant transitoires. Les lots précédents (lanceur, kickers) ont bien été vérifiés à l'écran.
+- Reste : vocabulaire de boutons, lot 6 positionnement (Canva), 3b, 4d, 7, 2d.

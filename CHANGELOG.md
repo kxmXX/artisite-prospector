@@ -7,6 +7,15 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.32) — Les statuts du chrome passent par le système d'icônes
+
+- Craft-floor : « les glyphes Unicode ou emoji tenant lieu d'un système d'icônes » sont refusés. Le chrome en portait encore cinq : la confirmation de copie, le message Schema.org, le statut « Enregistré », la copie générique, et surtout la table d'état des étapes de l'assistant (`○ … ✓ ! ×`), cinq glyphes qui tenaient lieu d'icônes.
+- Correctif : les glyphes décoratifs qui préfixaient du texte sont retirés (le mot porte déjà le sens), et les cinq états d'étape passent par `getIcon` (`clock`, `check`, `helpCircle`, `x`) dans le créneau d'icône qui leur était destiné.
+- Distinction maintenue : le `✓` du badge « Assurance décennale valide » est du **contenu** affiché sur le site du client, pas du chrome. La mission avait explicitement mis les badges hors périmètre — il reste intact.
+- Tests : 1 nouveau dans `tests/visual_craft.test.js` ; 370 → **371/371**.
+- Vérification : par test, pas par capture — ces états sont transitoires (toast, alerte, étape d'assistant) et ne se laissent pas photographier de façon fiable. Je le dis plutôt que de prétendre l'inverse.
+- Reste : unification du vocabulaire de boutons (quatre familles coexistent), puis lot 6 positionnement.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.31) — Le lanceur d'assistant ne recouvre plus le canevas, les kickers disparaissent
 
 - Cause, **vue à l'écran** et non déduite : le lanceur « Studio Assistant IA » était une pilule fixe de 10 rem posée en bas à droite **au-dessus du canevas** ; sur un site réel elle recouvrait la carte « ARTISAN RÉFÉRENCE » du hero — exactement la superposition que la mission initiale visait. Il portait en plus un `border-bottom: 3px solid` sur un élément entièrement arrondi, soit l'antipattern `border-accent-on-rounded` que le détecteur d'Impeccable signalait déjà à `app.css:2137`.

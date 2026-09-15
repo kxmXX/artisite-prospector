@@ -452,7 +452,7 @@ export class App {
       navigator.clipboard?.writeText(input.value);
       const label = document.getElementById(labelId);
       if (label) {
-        label.textContent = "✓ Copié !";
+        label.textContent = "Copié !";
         setTimeout(() => { label.textContent = "Copier"; }, 2000);
       }
     }
@@ -594,7 +594,7 @@ export class App {
     if (!state.currentProject) return;
     const schema = generateLocalBusinessSchema(state.currentProject);
     navigator.clipboard?.writeText(schema);
-    alert("✓ Schema.org (LocalBusiness JSON-LD) copié dans le presse-papier !");
+    alert("Schema.org (LocalBusiness JSON-LD) copié dans le presse-papier !");
   }
 
   /* ------------------------------------------------------------------ *
@@ -1335,7 +1335,15 @@ export class App {
     if (normalizedStatus === "running") step.setAttribute("aria-current", "step");
     else step.removeAttribute("aria-current");
     const icon = step.querySelector(".step-icon");
-    if (icon) icon.textContent = { idle: "○", running: "…", done: "✓", fallback: "!", error: "×" }[normalizedStatus];
+    // Les statuts d etape passent par le systeme d icones : un glyphe Unicode tenant
+    // lieu d icone est un refus explicite de la craft-floor d Impeccable.
+    if (icon) icon.innerHTML = {
+      idle: "",
+      running: getIcon("clock", "w-3.5 h-3.5"),
+      done: getIcon("check", "w-3.5 h-3.5"),
+      fallback: getIcon("helpCircle", "w-3.5 h-3.5"),
+      error: getIcon("x", "w-3.5 h-3.5")
+    }[normalizedStatus];
     const label = step.querySelector("[data-terminal-step-label]");
     if (label && message) label.textContent = message;
   }
@@ -1835,7 +1843,7 @@ export class App {
 
     const saveStatus = document.getElementById("save-status-text");
     if (saveStatus) {
-      saveStatus.textContent = "✓ Enregistré";
+      saveStatus.textContent = "Enregistré";
       saveStatus.className = "text-ui-sm font-medium text-zinc-500";
     }
   }
@@ -4309,7 +4317,7 @@ export class App {
     if (el) {
       el.select();
       navigator.clipboard?.writeText(el.value);
-      alert("✓ Copié dans le presse-papier !");
+      alert("Copié dans le presse-papier !");
     }
   }
 
