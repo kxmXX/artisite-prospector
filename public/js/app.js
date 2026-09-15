@@ -11,6 +11,7 @@ import { renderInspector } from "./components/inspector.js";
 import { renderWebsiteHTML, generateLocalBusinessSchema } from "./components/renderer.js";
 import { generateSite, createSectionData } from "./engine/generator.js";
 import { processCopilotPrompt, applyCopilotOperations, resolveProjectUiTarget } from "./engine/copilot.js";
+import { FREEFORM_SNAP_THRESHOLD, rectAxisLines, resolveFreeformSnap } from "./engine/freeform.js";
 import { downloadHTML, downloadJSON, generateProductionPackage, downloadProductionPackage } from "./engine/exporter.js";
 import { getStylePresetById } from "./data/styles.js";
 import { getTradeById } from "./data/trades.js";
@@ -204,8 +205,11 @@ export class App {
 
   render() {
     if (!this.rootEl) return;
-    const previousScrollTop = state.currentView === "editor"
-      ? document.querySelector("main")?.scrollTop
+    const previousScrollPosition = state.currentView === "editor"
+      ? (() => {
+          const host = document.getElementById("editor-main-canvas") || document.querySelector("main");
+          return host ? { top: host.scrollTop, left: host.scrollLeft } : null;
+        })()
       : null;
 
     if (state.currentView === "dashboard") {
@@ -222,10 +226,10 @@ export class App {
     this.syncSiteThemeToggle();
     this.hydrateImageFallbacks();
     this.initScrollObserver();
-    if (previousScrollTop !== null && previousScrollTop !== undefined) {
+    if (previousScrollPosition) {
       requestAnimationFrame(() => {
-        const main = document.querySelector("main");
-        if (main) main.scrollTop = previousScrollTop;
+        const host = document.getElementById("editor-main-canvas") || document.querySelector("main");
+        host?.scrollTo?.({ top: previousScrollPosition.top, left: previousScrollPosition.left, behavior: "instant" });
       });
     }
   }
@@ -4187,6 +4191,7 @@ export class App {
       this._freeformOverlay.classList.remove("is-visible", "is-multi", "is-group");
       this._freeformOverlay.setAttribute("aria-hidden", "true");
     }
+    this.hideFreeformGuides();
   }
 
   updateFreeformOverlay() {
@@ -4276,7 +4281,69 @@ export class App {
     return sections.length === 1 ? sections[0].getBoundingClientRect() : canvasRect;
   }
 
-  startFreeformInteraction(event, action = "move", handle = "") {
+  ensureFreeformGuides() {
+    const ensure = axis => {
+      let guide = document.getElementById(`freeform-snap-guide-${axis}`);
+      if (!guide) {
+        guide = document.createElement("div");
+        guide.id = `freeform-snap-guide-${axis}`;
+        guide.className = `freeform-snap-guide freeform-snap-guide-${axis}`;
+        guide.setAttribute("aria-hidden", "true");
+        document.body.appendChild(guide);
+      }
+      return guide;
+    };
+    this._freeformGuideX = ensure("x");
+    this._freeformGuideY = ensure("y");
+    return { x: this._freeformGuideX, y: this._freeformGuideY };
+  }
+
+  hideFreeformGuides() {
+    [this._freeformGuideX, this._freeformGuideY].forEach(guide => guide?.classList.remove("is-visible"));
+  }
+
+  showFreeformGuides(snapX, snapY, boundary) {
+    const guides = this.ensureFreeformGuides();
+    const top = Math.max(0, Number(boundary?.top) || 0);
+    const bottom = Math.min(window.innerHeight, Number(boundary?.bottom) || window.innerHeight);
+    const left = Math.max(0, Number(boundary?.left) || 0);
+    const right = Math.min(window.innerWidth, Number(boundary?.right) || window.innerWidth);
+    if (snapX) {
+      guides.x.style.left = `${snapX.line}px`;
+      guides.x.style.top = `${top}px`;
+      guides.x.style.height = `${Math.max(0, bottom - top)}px`;
+      guides.x.classList.add("is-visible");
+    } else guides.x.classList.remove("is-visible");
+    if (snapY) {
+      guides.y.style.left = `${left}px`;
+      guides.y.style.top = `${snapY.line}px`;
+      guides.y.style.width = `${Math.max(0, right - left)}px`;
+      guides.y.classList.add("is-visible");
+    } else guides.y.classList.remove("is-visible");
+  }
+
+  buildFreeformSnapContext(entries = [], boundary = null) {
+    const selected = new Set(entries.map(entry => entry.target));
+    const sections = [...new Set(entries.map(entry => entry.target?.closest(".editor-section-wrapper")).filter(Boolean))];
+    const scope = sections.length === 1 ? sections[0] : document.getElementById("canvas-container");
+    const xLines = rectAxisLines(boundary, "x", { source: "section" });
+    const yLines = rectAxisLines(boundary, "y", { source: "section" });
+    if (!scope) return { xLines, yLines };
+    scope.querySelectorAll("[data-layout-key]").forEach(element => {
+      if (selected.has(element)) return;
+      if (entries.some(entry => entry.target?.contains(element) || element.contains(entry.target))) return;
+      const style = getComputedStyle(element);
+      if (style.display === "none" || style.visibility === "hidden") return;
+      const rect = element.getBoundingClientRect();
+      if (rect.width < 2 || rect.height < 2) return;
+      const meta = { source: "element", key: element.dataset.layoutKey || "" };
+      xLines.push(...rectAxisLines(rect, "x", meta));
+      yLines.push(...rectAxisLines(rect, "y", meta));
+    });
+    return { xLines, yLines };
+  }
+
+  startFreeformInteraction(event, action = "move", handle = "", options = {}) {
     const keys = this.getFreeformSelectedKeys();
     const canvas = document.getElementById("canvas-container");
     const elements = keys.map(key => canvas?.querySelector(`[data-layout-key="${key}"]`)).filter(el => el?.isConnected);
@@ -4289,7 +4356,8 @@ export class App {
       const target = elements[index];
       return { key, target, base: { ...this.getFreeformLayout(key, state.viewport) }, rect: target.getBoundingClientRect() };
     }).filter(entry => entry.target);
-    const start = { x: event.clientX, y: event.clientY };
+    const start = options.startPoint || { x: event.clientX, y: event.clientY };
+    const pointerId = options.pointerId ?? event.pointerId;
     const selectionRect = {
       left: Math.min(...entries.map(entry => entry.rect.left)),
       top: Math.min(...entries.map(entry => entry.rect.top)),
@@ -4297,15 +4365,32 @@ export class App {
       bottom: Math.max(...entries.map(entry => entry.rect.bottom))
     };
     const boundary = this.getFreeformSelectionBoundary(entries.map(entry => entry.target)) || selectionRect;
+    const snapContext = action === "move" ? this.buildFreeformSnapContext(entries, boundary) : null;
     let liveUpdates = Object.fromEntries(entries.map(entry => [entry.key, { ...entry.base, x: Number(entry.base.x) || 0, y: Number(entry.base.y) || 0 }]));
     this._freeformOverlay?.classList.add("is-transforming");
+    document.body.classList.add("freeform-transforming");
+    if (options.direct) document.body.classList.add("freeform-direct-dragging");
 
     const onMove = moveEvent => {
+      if (pointerId != null && moveEvent.pointerId != null && moveEvent.pointerId !== pointerId) return;
       const rawDx = moveEvent.clientX - start.x;
       const rawDy = moveEvent.clientY - start.y;
       if (action === "move") {
-        const dx = Math.max(boundary.left - selectionRect.left, Math.min(boundary.right - selectionRect.right, rawDx));
-        const dy = Math.max(boundary.top - selectionRect.top, Math.min(boundary.bottom - selectionRect.bottom, rawDy));
+        const minDx = boundary.left - selectionRect.left;
+        const maxDx = boundary.right - selectionRect.right;
+        const minDy = boundary.top - selectionRect.top;
+        const maxDy = boundary.bottom - selectionRect.bottom;
+        let dx = Math.max(minDx, Math.min(maxDx, rawDx));
+        let dy = Math.max(minDy, Math.min(maxDy, rawDy));
+        let snapX = null;
+        let snapY = null;
+        if (!moveEvent.altKey && snapContext) {
+          snapX = resolveFreeformSnap(selectionRect.left + dx, selectionRect.right - selectionRect.left, snapContext.xLines, FREEFORM_SNAP_THRESHOLD);
+          snapY = resolveFreeformSnap(selectionRect.top + dy, selectionRect.bottom - selectionRect.top, snapContext.yLines, FREEFORM_SNAP_THRESHOLD);
+          if (snapX) dx = Math.max(minDx, Math.min(maxDx, dx + snapX.offset));
+          if (snapY) dy = Math.max(minDy, Math.min(maxDy, dy + snapY.offset));
+        }
+        this.showFreeformGuides(snapX, snapY, boundary);
         liveUpdates = {};
         entries.forEach(entry => {
           const layout = { ...entry.base, x: (Number(entry.base.x) || 0) + dx, y: (Number(entry.base.y) || 0) + dy };
@@ -4385,16 +4470,22 @@ export class App {
       }
       this.updateFreeformOverlay();
     };
-    const onUp = () => {
+    const onUp = upEvent => {
+      if (pointerId != null && upEvent?.pointerId != null && upEvent.pointerId !== pointerId) return;
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onUp);
       this._freeformOverlay?.classList.remove("is-transforming");
+      document.body.classList.remove("freeform-transforming", "freeform-direct-dragging");
+      this.hideFreeformGuides();
       state.setFreeformLayouts(liveUpdates, state.viewport, action === "move"
         ? (keys.length > 1 ? "Déplacement sélection libre" : "Déplacement élément libre")
         : (keys.length > 1 ? "Redimensionnement groupe libre" : "Redimensionnement élément libre"));
     };
     window.addEventListener("pointermove", onMove);
-    window.addEventListener("pointerup", onUp, { once: true });
+    window.addEventListener("pointerup", onUp);
+    window.addEventListener("pointercancel", onUp);
+    if (options.initialMoveEvent) onMove(options.initialMoveEvent);
   }
 
   nudgeFreeformSelection(dx, dy) {
@@ -4500,10 +4591,47 @@ export class App {
     requestAnimationFrame(() => this.selectFreeformKeys(keys, keys[0]));
   }
 
+  armFreeformDirectDrag(event, target, { wasSelected = false } = {}) {
+    if (!target?.dataset?.layoutKey || event.shiftKey) return;
+    if (event.target.closest("input, textarea, select, option")) return;
+    const textLike = target.hasAttribute("data-editable") || target.matches("[contenteditable='true']");
+    if (textLike && !wasSelected) return;
+    const startPoint = { x: event.clientX, y: event.clientY };
+    const pointerId = event.pointerId;
+    let started = false;
+    const cleanup = () => {
+      window.removeEventListener("pointermove", onArmMove);
+      window.removeEventListener("pointerup", onArmUp);
+      window.removeEventListener("pointercancel", onArmUp);
+    };
+    const onArmMove = moveEvent => {
+      if (pointerId != null && moveEvent.pointerId != null && moveEvent.pointerId !== pointerId) return;
+      if (Math.hypot(moveEvent.clientX - startPoint.x, moveEvent.clientY - startPoint.y) < 5) return;
+      started = true;
+      cleanup();
+      moveEvent.preventDefault();
+      window.getSelection?.()?.removeAllRanges?.();
+      this.startFreeformInteraction({
+        clientX: startPoint.x,
+        clientY: startPoint.y,
+        pointerId,
+        preventDefault() {},
+        stopPropagation() {}
+      }, "move", "", { direct: true, startPoint, pointerId, initialMoveEvent: moveEvent });
+    };
+    const onArmUp = () => {
+      if (!started) cleanup();
+    };
+    window.addEventListener("pointermove", onArmMove);
+    window.addEventListener("pointerup", onArmUp);
+    window.addEventListener("pointercancel", onArmUp);
+  }
+
   initFreeformEditing() {
     const canvas = document.getElementById("canvas-container");
     if (!canvas || state.editorMode === "preview") {
       this._freeformOverlay?.classList.remove("is-visible");
+      this.hideFreeformGuides();
       return;
     }
     this.ensureFreeformOverlay();
@@ -4514,7 +4642,14 @@ export class App {
         if (event.target.closest(".editor-section-toolbar, .cta-direct-badge, .cta-context-popover, .sec-bg-popover, .sec-motion-popover, .floating-text-toolbar")) return;
         const target = event.target.closest("[data-layout-key]");
         if (target && canvas.contains(target)) {
-          this.selectFreeformTarget(target, { additive: event.shiftKey, ignoreGroup: event.shiftKey });
+          const previousKeys = this.getFreeformSelectedKeys();
+          const wasSelected = previousKeys.includes(target.dataset.layoutKey);
+          if (!event.shiftKey && wasSelected && previousKeys.length > 1) {
+            this.selectFreeformKeys(previousKeys, target.dataset.layoutKey);
+          } else {
+            this.selectFreeformTarget(target, { additive: event.shiftKey, ignoreGroup: event.shiftKey });
+          }
+          this.armFreeformDirectDrag(event, target, { wasSelected });
         } else if (!event.target.closest("#freeform-selection-box")) {
           this.clearFreeformSelection();
         }

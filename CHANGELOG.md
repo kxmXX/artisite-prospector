@@ -7,6 +7,14 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 15 septembre 2026 (4.8.0-alpha.20)
+
+- Drag direct : un élément déjà sélectionné peut être tiré directement par son corps après un seuil de 5 px ; les textes conservent le clic simple pour l’édition et passent en déplacement dès qu’un vrai geste est détecté.
+- Snapping : bords et centres de la section et des éléments voisins s’accrochent dans un seuil de 6 px ; Alt désactive temporairement l’accroche.
+- Guides : lignes verticales/horizontales visibles pendant le snap puis retirées au relâchement ; les relations parent/enfant de la sélection sont exclues des cibles parasites.
+- Fluidité : suppression des transitions CSS pendant drag/resize et restauration instantanée du `scrollTop` du vrai canvas après rerender, supprimant le saut de ~420 ms observé.
+- QA navigateur : drag Alt +35 px suivi 1:1, puis snap depuis 4 px d’écart vers 0 px avec guide visible ; zéro erreur console. Validation : 30/30 ciblés, 205/205 complets et `git diff --check`.
+
 ### Consolidation — 15 septembre 2026 (4.8.0-alpha.19)
 
 - Groupes : le cadre d’un groupe possède de nouveau ses huit poignées ; le resize met à l’échelle les membres autour de leur position relative sans provoquer de reflow de la section.

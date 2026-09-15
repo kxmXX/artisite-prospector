@@ -78,7 +78,8 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - [x] Sélection phase 1 — textes, images et CTA stables affichent un cadre unique avec dimensions, poignée Move, Reset et 8 poignées de resize.
 - [ ] Sélection universelle phase 2 — étendre les clés de layout aux cartes, conteneurs, icônes et blocs structurels qui ne portent pas encore `data-editable`.
 - [x] Déplacement phase 1 — Pointer Events via poignée Move, flèches clavier (Shift = 10 px) et contrainte à la section ; pas de drag HTML5 sur le canvas.
-- [ ] Déplacement phase 2 — drag direct du corps sélectionné, snapping/guides et débordement contrôlé entre zones.
+- [x] Déplacement phase 2a — drag direct du corps sélectionné avec seuil 5 px, suivi 1:1 sans transition, snapping bords/centres et Alt pour désactiver temporairement l’accroche.
+- [ ] Déplacement phase 2b — débordement contrôlé entre zones/sections et reparenting explicite.
 - [x] Redimensionnement phase 1 — 8 poignées côtés/coins, dimensions min et aperçu direct, persistées à la fin du geste.
 - [ ] Redimensionnement phase 2 — ratio verrouillable, rotation et contraintes de taille avancées.
 - [x] Multi-sélection phase 1 — Shift-clic ajoute/retire des cibles, cadre englobant unique, déplacement souris/clavier et Reset collectifs en une mutation Undo.
@@ -87,7 +88,8 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - [x] Groupes phase 2a — redimensionnement collectif persistant par scale autour du cadre, ratio uniforme avec Shift et Undo batch unique.
 - [ ] Groupes phase 2b — groupes imbriqués et ordre/z-index contrôlable.
 - [x] Alignement phase 1 — gauche/centre/droite/haut/milieu/bas et distribution horizontale/verticale en mutation batch.
-- [ ] Alignement phase 2 — guides intelligents et snapping pendant le drag/resize.
+- [x] Alignement phase 2a — guides intelligents visibles et snapping à 6 px pendant le déplacement, y compris bords/centres de section et éléments voisins.
+- [ ] Alignement phase 2b — snapping pendant le resize, équidistances et guides de spacing.
 - [x] Responsive phase 1 — positions/dimensions isolées par desktop/tablette/mobile ; le viewport simulé gagne sur la taille réelle du navigateur.
 - [ ] Responsive phase 2 — héritage/adaptation assistée et commandes de copie/reset entre breakpoints.
 - [x] Persistance phase 1 — transformations enregistrées dans l’état projet, sauvegarde locale, Undo/Redo, preview et export standalone.
@@ -129,5 +131,6 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - Lot `4.8.0-alpha.17` : fondation Canva/Figma — clés de layout stables, sélection texte/image/CTA, Move + 8 poignées de resize, clavier/Reset/Undo et layouts distincts desktop/tablette/mobile avec parité preview/export ; 37/37 ciblés, 196/196 complets et `git diff --check`.
 - Lot `4.8.0-alpha.18` : Shift multi-sélection, cadre englobant, groupes persistants Grouper/Dégrouper, déplacement/Reset collectifs et batch Undo unique ; barre d’actions maintenue dans le viewport ; 23/23 ciblés, 198/198 complets et `git diff --check`.
 - Lot `4.8.0-alpha.19` : resize collectif de groupe par scale persistant, Shift ratio, alignements 6 axes et distributions H/V ; QA navigateur avec reload/persistance ; 24/24 ciblés, 199/199 complets et `git diff --check`.
+- Lot `4.8.0-alpha.20` : drag direct du corps sélectionné, snapping 6 px bords/centres, guides visuels, Alt pour désactiver le snap et restauration instantanée du scroll canvas ; 30/30 ciblés, 205/205 complets et `git diff --check`.
 - Prochaine action unique : redimensionnement collectif des groupes puis alignement/distribution dans un commit séparé.
 - Prochaine action unique : démarrer la fondation Canva/Figma — modèle de layout libre persistant + sélection universelle + premier déplacement/redimensionnement sur cibles stables, avant multi-sélection/groupes.

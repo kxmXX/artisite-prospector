@@ -1,5 +1,15 @@
 # État de reprise Codex — 15 septembre 2026
 
+## LOT DE LIVRAISON — drag direct et snapping 4.8.0-alpha.20
+
+- Drag direct : le corps d’une cible sélectionnée devient draggable après 5 px de mouvement ; le premier clic texte reste dédié à l’édition, puis les gestes suivants peuvent déplacer sans revenir à la poignée.
+- Snap : moteur pur `engine/freeform.js` qui choisit la ligne la plus proche parmi start/center/end avec seuil 6 px ; section + éléments voisins alimentent les guides, Alt contourne l’accroche.
+- Guides : deux overlays fixes X/Y suivent le snap et disparaissent au pointerup/cancel ; les cibles imbriquées de la sélection sont exclues pour éviter l’auto-snap.
+- Fluidité : pendant toute transformation, les transitions de la cible sont neutralisées ; la restauration du scroll de `#editor-main-canvas` utilise désormais un `scrollTo(..., behavior: "instant")` au lieu d’un retour animé.
+- QA navigateur : canvas stable à `scrollTop=986` avant/live/après commit, drag Alt +35 px exactement, second drag vers +4 px accroché à 0 px avec guide à `x=442,94`, guide masqué au relâchement, zéro erreur console.
+- Tests : 30/30 ciblés (`state` + `freeform_snap` + `v3_ui_regressions`), 205/205 complets et `git diff --check`.
+- Prochaine action : marquee de multi-sélection par glisser dans le vide, puis extension des clés de layout aux conteneurs/cartes.
+
 ## LOT DE LIVRAISON — resize groupe et alignement 4.8.0-alpha.19
 
 - Resize groupe : une sélection groupée expose les huit poignées ; la transformation conserve le layout naturel et applique `scaleX/scaleY` autour de l'origine de chaque membre, avec déplacement relatif du membre quand le bord nord/ouest bouge.

@@ -646,3 +646,9 @@
 #canvas-container [data-layout-key]{touch-action:manipulation}
 #canvas-container [data-layout-key].is-freeform-selected{outline:1px dashed rgba(37,99,235,.34);outline-offset:2px}
 @media(max-width:640px){.freeform-selection-label{top:-28px;max-width:78vw}.freeform-move-handle{width:34px;height:28px}.freeform-resize-handle{width:16px;height:16px}}
+.freeform-snap-guide{position:fixed;display:none;z-index:9395;pointer-events:none;background:#ec4899;box-shadow:0 0 0 1px rgba(255,255,255,.7)}
+.freeform-snap-guide.is-visible{display:block}
+.freeform-snap-guide-x{width:1px}
+.freeform-snap-guide-y{height:1px}
+body.freeform-direct-dragging,body.freeform-direct-dragging *{cursor:grabbing!important;user-select:none!important;-webkit-user-select:none!important}
+body.freeform-transforming #canvas-container [data-layout-key].is-freeform-selected{transition:none!important}

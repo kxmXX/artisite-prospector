@@ -254,3 +254,18 @@ test('Freeform grouped resize uses non-reflow scale and alignment/distribution s
   assert.ok(rendererSource.includes('scale:${Number.isFinite(scaleX)'));
   assert.ok(css.includes('.freeform-selection-box.is-multi .freeform-alignbar{display:flex}'));
 });
+
+test('Freeform direct drag uses a movement threshold, smart snapping and visible guides', () => {
+  const appSource = fs.readFileSync(path.resolve(process.cwd(), 'public/js/app.js'), 'utf8');
+  assert.ok(appSource.includes('armFreeformDirectDrag(event, target'));
+  assert.ok(appSource.includes('Math.hypot(moveEvent.clientX - startPoint.x, moveEvent.clientY - startPoint.y) < 5'));
+  assert.ok(appSource.includes('resolveFreeformSnap(selectionRect.left + dx'));
+  assert.ok(appSource.includes('FREEFORM_SNAP_THRESHOLD'));
+  assert.ok(appSource.includes('if (!moveEvent.altKey && snapContext)'));
+  assert.ok(appSource.includes('this.showFreeformGuides(snapX, snapY, boundary)'));
+  assert.ok(appSource.includes('behavior: "instant"'));
+  assert.ok(appSource.includes('document.body.classList.add("freeform-transforming")'));
+  assert.ok(css.includes('.freeform-snap-guide.is-visible{display:block}'));
+  assert.ok(css.includes('body.freeform-direct-dragging'));
+  assert.ok(css.includes('body.freeform-transforming #canvas-container [data-layout-key].is-freeform-selected{transition:none!important}'));
+});
