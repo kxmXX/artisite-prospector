@@ -1832,3 +1832,12 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - DEPLOIEMENT BLOQUE : quota Vercel 100/jour. C'est un compteur par jour ; supprimer 44 deploiements preview ne l'a pas libere. La prod tourne donc encore le commit des sessions (bd12e82), sans les correctifs IA. Prochain deploiement des que la fenetre se rouvre.
 - A noter : /api/ai/copilot a repondu success:true en prod pendant ce tour, mais uniquement parce que la capacite Google s'etait retablie — ce n'est pas encore le correctif qui est en ligne.
 - Reste : chrome bleu, animations, vue client = editeur + export 2d, contenu (6 avis, photos galerie), slider avant/apres, medias, editeur d'element, navigation, carte/horaires.
+
+## Journal — 17 septembre 2026 · 4.9.1 : chrome d'edition (une seule famille de controles)
+
+- Defaut constate par l'auteur sur captures : quatre surcouches en meme temps (barre d'element, panneau d'animation de section, selection libre, barre blanche) et la barre blanche par-dessus la mediatheque.
+- Cause exacte : le mecanisme d'exclusion mutuelle body[data-active-editor-toolbar] existait, mais toggleSectionMotionMenu et toggleSectionBgMenu ne l'appelaient pas -> la selection libre restait dessous.
+- Correctif : les deux toggles appellent closeAllFloatingToolbars("section") a l'ouverture et le vidage a la fermeture ; deux regles CSS interdisent toute surcouche d'edition par-dessus une modale (body.modal-open).
+- Tests : 409/409 ; utilitiesCss.js regenere (classe de statut IA).
+- IA : mise en sommeil (image), texte OK ; l'echec image est un 429 quota cote compte Google, hors code. Le repli complete desormais les modeles configures.
+- Reste : animations (demo 1-2x editeur, complete en client, direction), vue client = editeur + export 2d, contenu (6 avis, photos galerie), slider avant/apres, medias, editeur d'element (bug centrage, police, groupe, libelles, volet, retour), navigation (ancres hero, devis->appel), carte/horaires, drag-and-drop a aimants.

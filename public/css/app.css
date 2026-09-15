@@ -1587,6 +1587,18 @@ body[data-active-editor-toolbar="freeform"] .cta-direct-badge {
   display: none !important;
 }
 
+/* Aucune surcouche d'edition ne doit se dessiner par-dessus une modale : c'est ce
+   qui faisait apparaitre la barre blanche et les poignees sur la mediatheque. */
+body.modal-open .freeform-selection-box,
+body.modal-open .floating-text-toolbar,
+body.modal-open .sec-bg-popover,
+body.modal-open .sec-motion-popover,
+body.modal-open .cta-context-popover,
+body.modal-open .cta-direct-badge,
+body.modal-open .editor-section-toolbar {
+  display: none !important;
+}
+
 .ftb-btn {
   display: inline-flex;
   align-items: center;

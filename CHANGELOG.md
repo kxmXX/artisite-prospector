@@ -23,7 +23,16 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 - **Correctif** : ajout d'une génération antérieure dans la chaîne (`gemini-2.5-flash`, `gemini-2.5-flash-lite`) et **réessais avec backoff** sur `429/500/502/503/504`. Un pic de charge sur les modèles récents ne fait plus tomber l'assistant.
 - **Génération d'image** : `/api/ai/image` appelait un modèle **texte** en lui demandant une image — aucun modèle texte ne peut en produire. Il utilise désormais un vrai modèle image (`gemini-3.1-flash-image`, `gemini-2.5-flash-image`, `gemini-3-pro-image`), renvoie une data URL, et expose `aiAvailable` avec la cause exacte quand il retombe sur le visuel du catalogue.
 - Tests : 1 nouveau (`getImageModels`) ; 408 → **409/409**.
+- **Repli réellement actif** : `GEMINI_MODELS` (défini sur Vercel avec les seuls 3.x) **remplaçait** les modèles par défaut au lieu de les compléter — le filet de sécurité était donc inerte. Les modèles d'environnement passent désormais en premier, les défauts sont **ajoutés** ensuite.
+- **L'échec devient visible** dans la modale (« L'IA n'a pas pu produire d'image : [raison]… ») au lieu du silence. L'erreur réelle constatée en production est `429 — quota dépassé` côté compte Google : hors code, mise en sommeil décidée avec l'auteur.
 - **Pas encore en ligne** : le quota Vercel (100 déploiements/jour, compteur journalier que supprimer d'anciens déploiements ne libère pas) a bloqué le déploiement. Le code est sur `main` (`fe0f000`).
+
+#### Chrome d'édition — une seule famille de contrôles à la fois
+
+- Constat à l'usage : jusqu'à **quatre surcouches** se dessinaient en même temps (barre d'élément, panneau d'animation de section, sélection libre, barre blanche), et la barre blanche apparaissait **par-dessus la médiathèque**.
+- Cause : l'exclusion mutuelle existait bien (`body[data-active-editor-toolbar]`), mais **ouvrir le panneau d'animation ou de fond de section ne la déclenchait pas** — la sélection libre restait affichée dessous.
+- Correctif : ouvrir le panneau d'animation ou de fond ferme les autres familles (`closeAllFloatingToolbars("section")`) ; le refermer rend la main. Deux règles CSS interdisent toute surcouche d'édition **par-dessus une modale** (`body.modal-open`).
+- Tests : **409/409** ; `utilitiesCss.js` régénéré pour la classe de statut IA.
 
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.59) — Lot 7 : la courbe d'animation devient réglable
 

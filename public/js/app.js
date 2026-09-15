@@ -1996,8 +1996,14 @@ export class App {
     const pop = document.getElementById(`sec-bg-popover-${secId}`);
     if (!pop) return;
     const isClosed = pop.classList.contains("hidden");
-    document.querySelectorAll(".sec-bg-popover:not(.hidden)").forEach(p => p.classList.add("hidden"));
-    if (isClosed) pop.classList.remove("hidden");
+    document.querySelectorAll(".sec-bg-popover:not(.hidden), .sec-motion-popover:not(.hidden)").forEach(p => p.classList.add("hidden"));
+    if (isClosed) {
+      // Une seule famille de controles a la fois : la selection libre tombe.
+      this.closeAllFloatingToolbars("section");
+      pop.classList.remove("hidden");
+    } else {
+      this.closeAllFloatingToolbars();
+    }
   }
 
   cycleSectionBg(sectionId) {
@@ -3362,9 +3368,14 @@ export class App {
     const pop = document.getElementById(`sec-motion-popover-${secId}`);
     if (!pop) return;
     const isClosed = pop.classList.contains("hidden");
-    document.querySelectorAll(".sec-motion-popover:not(.hidden)").forEach(p => p.classList.add("hidden"));
+    document.querySelectorAll(".sec-motion-popover:not(.hidden), .sec-bg-popover:not(.hidden)").forEach(p => p.classList.add("hidden"));
     if (isClosed) {
+      // Meme regle que pour le fond : le panneau d'animation ne cohabite pas avec
+      // la selection libre ni avec la barre de texte de l'element.
+      this.closeAllFloatingToolbars("section");
       pop.classList.remove("hidden");
+    } else {
+      this.closeAllFloatingToolbars();
     }
   }
 
