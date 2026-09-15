@@ -402,6 +402,7 @@ class AppStateManager {
       const normalizedRotation = ((rotation % 360) + 540) % 360 - 180;
       normalized.rotation = Math.round(normalizedRotation * 100) / 100;
     }
+    if (nextLayout.aspectLocked === true) normalized.aspectLocked = true;
 
     const current = this.currentProject.freeformLayout?.[safeViewport]?.[layoutKey] || null;
     if (JSON.stringify(current) === JSON.stringify(normalized)) return;
@@ -454,6 +455,7 @@ class AppStateManager {
         const normalizedRotation = ((rotation % 360) + 540) % 360 - 180;
         normalized.rotation = Math.round(normalizedRotation * 100) / 100;
       }
+      if (nextLayout.aspectLocked === true) normalized.aspectLocked = true;
       return normalized;
     };
     const normalizedEntries = entries.map(([key, value]) => [key, normalize(value)]);

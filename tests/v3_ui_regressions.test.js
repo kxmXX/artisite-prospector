@@ -151,6 +151,9 @@ test('Freeform foundation keeps stable layout keys across editor/public render a
   assert.ok(cssOut.includes('#canvas-container[data-viewport="mobile"] .artisite-root.public-mode'));
   assert.ok(cssOut.includes('translate:24px -12px!important'));
   assert.ok(cssOut.includes('width:420px!important'));
+  assert.ok(cssOut.includes('min-width:0!important'));
+  assert.ok(cssOut.includes('min-height:0!important'));
+  assert.ok(cssOut.includes('max-height:none!important'));
   assert.ok(cssOut.includes('scale:1.2 0.8!important'));
   assert.ok(cssOut.includes('rotate:22.5deg!important'));
   const standalone = exportStandaloneHTML(project);
@@ -171,8 +174,8 @@ test('Freeform layout persistence is breakpoint-scoped and Undo restores the pre
     state.currentProject = project;
     state.undoStack = [];
     state.redoStack = [];
-    state.setFreeformLayout('E_TEST', 'desktop', { x: 31, y: 14, width: 280, height: 80, scaleX: 1.25, scaleY: 0.75, rotation: 30 }, 'Move test');
-    assert.deepEqual(state.currentProject.freeformLayout.desktop.E_TEST, { x: 31, y: 14, width: 280, height: 80, scaleX: 1.25, scaleY: 0.75, rotation: 30 });
+    state.setFreeformLayout('E_TEST', 'desktop', { x: 31, y: 14, width: 280, height: 80, scaleX: 1.25, scaleY: 0.75, rotation: 30, aspectLocked: true }, 'Move test');
+    assert.deepEqual(state.currentProject.freeformLayout.desktop.E_TEST, { x: 31, y: 14, width: 280, height: 80, scaleX: 1.25, scaleY: 0.75, rotation: 30, aspectLocked: true });
     assert.equal(state.currentProject.freeformLayout.tablet.E_TEST, undefined);
     assert.equal(state.undoStack.length, 1);
     state.undo();
@@ -367,4 +370,16 @@ test('Freeform resize snapping and equal-spacing guides stay visible and determi
   assert.ok(appSource.includes('this.hideFreeformSpacingGuides()'));
   assert.ok(css.includes('.freeform-spacing-guide'));
   assert.ok(css.includes('.freeform-spacing-label'));
+});
+
+test('Freeform single-element ratio lock and section resize constraints stay explicit', () => {
+  const appSource = fs.readFileSync(path.resolve(process.cwd(), 'public/js/app.js'), 'utf8');
+  const stateSource = fs.readFileSync(path.resolve(process.cwd(), 'public/js/state.js'), 'utf8');
+  assert.ok(appSource.includes('data-freeform-ratio'));
+  assert.ok(appSource.includes('toggleFreeformAspectLock()'));
+  assert.ok(appSource.includes('entry.base.aspectLocked === true'));
+  assert.ok(appSource.includes('moveEvent.shiftKey || entry.base.aspectLocked === true'));
+  assert.ok(appSource.includes('adjustedDx = Math.min(adjustedDx, boundary.right - entry.rect.right)'));
+  assert.ok(appSource.includes('const fit = Math.min(1, maxW / width, maxH / height)'));
+  assert.ok(stateSource.includes('nextLayout.aspectLocked === true'));
 });

@@ -1,5 +1,13 @@
 # État de reprise Codex — 15 septembre 2026
 
+## LOT DE LIVRAISON — ratio et bornes de resize 4.8.0-alpha.26
+
+- Ratio : `aspectLocked` est stocké dans le layout du breakpoint ; bouton dédié pour basculer l’état, Shift reste le verrouillage temporaire pendant le geste.
+- Resize : poignée diagonale choisit l’axe dominant, recalcule l’autre dimension selon le ratio puis réduit proportionnellement si la section ne permet pas la taille demandée.
+- Compatibilité CSS : les dimensions libres imposent aussi `min-width:0`, `min-height:0` et `max-height:none`, ce qui neutralise les vieux presets sans patch spécifique par composant.
+- QA Chrome : ratio initial 0,7999907, final 0,7999748 ; CSS calculé 298,016×372,531, état 298,03×372,54 ; resize extrême reste dans la section et unlock supprime `aspectLocked`. Zéro erreur console. Validation automatisée : 42/42 ciblés, 217/217 complets et `git diff --check`.
+- Prochaine action : outils responsive pour copier/resetter les layouts entre desktop/tablette/mobile et héritage assisté.
+
 ## LOT DE LIVRAISON — snapping resize et spacing 4.8.0-alpha.25
 
 - Resize : les bords manipulés passent dans le même contexte de snap que le déplacement ; guides x/y et Alt fonctionnent aussi sur les poignées.

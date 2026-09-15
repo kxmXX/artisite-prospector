@@ -4085,6 +4085,7 @@ export class App {
           <button type="button" data-freeform-layer="forward" title="Avancer d’un plan" aria-label="Avancer d’un plan">+</button>
           <button type="button" data-freeform-layer="front" title="Mettre au premier plan" aria-label="Mettre au premier plan">⇥</button>
           <span></span>
+          <button type="button" data-freeform-ratio title="Verrouiller le ratio largeur/hauteur" aria-label="Verrouiller le ratio largeur/hauteur">Ratio libre</button>
           <button type="button" data-freeform-lock title="Verrouiller la sélection" aria-label="Verrouiller la sélection">Verrouiller</button>
         </div>
         <div class="freeform-alignbar" role="toolbar" aria-label="Aligner et distribuer la sélection">
@@ -4140,6 +4141,11 @@ export class App {
           event.stopPropagation();
           this.changeFreeformLayerOrder(button.dataset.freeformLayer);
         });
+      });
+      overlay.querySelector("[data-freeform-ratio]")?.addEventListener("click", event => {
+        event.preventDefault();
+        event.stopPropagation();
+        this.toggleFreeformAspectLock();
       });
       overlay.querySelector("[data-freeform-lock]")?.addEventListener("click", event => {
         event.preventDefault();
@@ -4310,10 +4316,18 @@ export class App {
     const groupButton = overlay.querySelector("[data-freeform-group]");
     const ungroupButton = overlay.querySelector("[data-freeform-ungroup]");
     const resetButton = overlay.querySelector("[data-freeform-reset]");
+    const ratioButton = overlay.querySelector("[data-freeform-ratio]");
     const lockButton = overlay.querySelector("[data-freeform-lock]");
     if (groupButton) groupButton.hidden = selectionLocked || keys.length < 2 || Boolean(exactGroup);
     if (ungroupButton) ungroupButton.hidden = selectionLocked || !exactGroup;
     if (resetButton) resetButton.hidden = selectionLocked;
+    if (ratioButton) {
+      const aspectLocked = keys.length === 1 && this.getFreeformLayout(keys[0], state.viewport)?.aspectLocked === true;
+      ratioButton.hidden = selectionLocked || keys.length !== 1;
+      ratioButton.textContent = aspectLocked ? "Ratio verrouillé" : "Ratio libre";
+      ratioButton.setAttribute("aria-pressed", aspectLocked ? "true" : "false");
+      ratioButton.title = aspectLocked ? "Libérer le ratio largeur/hauteur" : "Verrouiller le ratio largeur/hauteur";
+    }
     if (lockButton) {
       lockButton.textContent = selectionLocked ? "Déverrouiller" : "Verrouiller";
       lockButton.setAttribute("aria-label", selectionLocked ? "Déverrouiller la sélection" : "Verrouiller la sélection");
@@ -4331,10 +4345,13 @@ export class App {
     target.style.setProperty("translate", `${Number(layout.x) || 0}px ${Number(layout.y) || 0}px`, "important");
     if (Number.isFinite(Number(layout.width)) && Number(layout.width) > 0) {
       target.style.setProperty("width", `${layout.width}px`, "important");
+      target.style.setProperty("min-width", "0", "important");
       target.style.setProperty("max-width", "none", "important");
     }
     if (Number.isFinite(Number(layout.height)) && Number(layout.height) > 0) {
       target.style.setProperty("height", `${layout.height}px`, "important");
+      target.style.setProperty("min-height", "0", "important");
+      target.style.setProperty("max-height", "none", "important");
     }
     const scaleX = Number(layout.scaleX);
     const scaleY = Number(layout.scaleY);
@@ -4621,6 +4638,10 @@ export class App {
         if (handle.includes("s")) nextBottom = Math.max(nextTop + minGroupHeight, selectionRect.bottom + rawDy);
         if (handle.includes("w")) nextLeft = Math.min(nextRight - minGroupWidth, selectionRect.left + rawDx);
         if (handle.includes("n")) nextTop = Math.min(nextBottom - minGroupHeight, selectionRect.top + rawDy);
+        if (handle.includes("e")) nextRight = Math.min(boundary.right, nextRight);
+        if (handle.includes("w")) nextLeft = Math.max(boundary.left, nextLeft);
+        if (handle.includes("s")) nextBottom = Math.min(boundary.bottom, nextBottom);
+        if (handle.includes("n")) nextTop = Math.max(boundary.top, nextTop);
         let snapX = null;
         let snapY = null;
         if (!moveEvent.altKey && snapContext) {
@@ -4672,6 +4693,10 @@ export class App {
         const minH = 16;
         let adjustedDx = rawDx;
         let adjustedDy = rawDy;
+        if (handle.includes("e")) adjustedDx = Math.min(adjustedDx, boundary.right - entry.rect.right);
+        if (handle.includes("w")) adjustedDx = Math.max(adjustedDx, boundary.left - entry.rect.left);
+        if (handle.includes("s")) adjustedDy = Math.min(adjustedDy, boundary.bottom - entry.rect.bottom);
+        if (handle.includes("n")) adjustedDy = Math.max(adjustedDy, boundary.top - entry.rect.top);
         let snapX = null;
         let snapY = null;
         if (!moveEvent.altKey && snapContext) {
@@ -4697,6 +4722,21 @@ export class App {
           const next = Math.max(minH, baseHeight - adjustedDy);
           y += baseHeight - next;
           height = next;
+        }
+        const diagonal = (handle.includes("e") || handle.includes("w")) && (handle.includes("n") || handle.includes("s"));
+        const keepAspect = diagonal && (moveEvent.shiftKey || entry.base.aspectLocked === true);
+        if (keepAspect && baseWidth > 0 && baseHeight > 0) {
+          const aspect = baseWidth / baseHeight;
+          const relativeW = Math.abs(width - baseWidth) / baseWidth;
+          const relativeH = Math.abs(height - baseHeight) / baseHeight;
+          if (relativeW >= relativeH) height = Math.max(minH, width / aspect);
+          else width = Math.max(minW, height * aspect);
+          const maxW = handle.includes("e") ? baseWidth + Math.max(0, boundary.right - entry.rect.right) : baseWidth + Math.max(0, entry.rect.left - boundary.left);
+          const maxH = handle.includes("s") ? baseHeight + Math.max(0, boundary.bottom - entry.rect.bottom) : baseHeight + Math.max(0, entry.rect.top - boundary.top);
+          const fit = Math.min(1, maxW / width, maxH / height);
+          if (fit < 1) { width *= fit; height *= fit; }
+          x = (Number(entry.base.x) || 0) + (handle.includes("w") ? baseWidth - width : 0);
+          y = (Number(entry.base.y) || 0) + (handle.includes("n") ? baseHeight - height : 0);
         }
         liveUpdates = { [entry.key]: { ...entry.base, x, y, width, height } };
         this.applyFreeformLiveStyle(entry.target, liveUpdates[entry.key], false);
@@ -4820,6 +4860,14 @@ export class App {
       selected.forEach(entry => { updates[entry.key] = { ...entry.layout, z: Math.max(-10, Math.min(999, entry.z + delta)) }; });
     }
     state.setFreeformLayouts(updates, state.viewport, mode === "front" ? "Premier plan" : mode === "back" ? "Arrière-plan" : mode === "backward" ? "Reculer un calque" : "Avancer un calque");
+  }
+
+  toggleFreeformAspectLock() {
+    const keys = this.getFreeformSelectedKeys();
+    if (keys.length !== 1 || this.isFreeformSelectionLocked(keys)) return;
+    const current = this.getFreeformLayout(keys[0], state.viewport);
+    const nextLocked = current?.aspectLocked !== true;
+    state.setFreeformLayout(keys[0], state.viewport, { ...current, aspectLocked: nextLocked }, nextLocked ? "Verrouiller le ratio" : "Libérer le ratio");
   }
 
   toggleFreeformSelectionLock() {

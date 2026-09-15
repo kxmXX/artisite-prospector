@@ -7,6 +7,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 15 septembre 2026 (4.8.0-alpha.26)
+
+- Ratio : bouton `Ratio libre / Ratio verrouillé` pour une sélection unique, persisté par breakpoint ; Shift conserve temporairement le ratio sur une poignée diagonale.
+- Contraintes : resize individuel et collectif borné à la section active afin d’éviter les dimensions incontrôlées.
+- Priorité freeform : une largeur/hauteur explicite neutralise désormais `min-width/min-height/max-height` hérités, en live comme dans preview/export.
+- QA Chrome : cadre portrait `537,59×672` redimensionné en `298,02×372,53`, ratio conservé à `0,000016` près ; état `298,03×372,54`, `min-height:0px`, énorme drag toujours contenu dans la section, zéro erreur console. Validation : 42/42 ciblés, 217/217 complets et `git diff --check`.
+
 ### Consolidation — 15 septembre 2026 (4.8.0-alpha.25)
 
 - Resize snapping : les poignées de redimensionnement accrochent désormais les bords/centres voisins et ceux de la section, avec guides visuels ; Alt désactive l’accroche.
