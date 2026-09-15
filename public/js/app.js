@@ -4877,7 +4877,6 @@ export class App {
       target.style.setProperty("min-height", "0", "important");
       target.style.setProperty("max-height", "none", "important");
     }
-    target.style.setProperty("transform-origin", "50% 50%", "important");
     const scaleX = Number(layout.scaleX);
     const scaleY = Number(layout.scaleY);
     if ((Number.isFinite(scaleX) && scaleX > 0.02) || (Number.isFinite(scaleY) && scaleY > 0.02)) {
@@ -4886,6 +4885,10 @@ export class App {
     }
     const rotation = Number(layout.rotation);
     if (Number.isFinite(rotation)) target.style.setProperty("rotate", `${rotation}deg`, "important");
+    const hasScale = (Number.isFinite(scaleX) && scaleX > 0.02) || (Number.isFinite(scaleY) && scaleY > 0.02);
+    const hasRotation = Number.isFinite(rotation) && Math.abs(rotation) > 0.001;
+    if (hasRotation && !hasScale) target.style.setProperty("transform-origin", "50% 50%", "important");
+    if (!hasRotation && !hasScale) target.style.removeProperty("transform-origin");
     if (updateOverlay) this.updateFreeformOverlay();
   }
 

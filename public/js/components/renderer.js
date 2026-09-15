@@ -114,7 +114,9 @@ function freeformDeclarations(layout = {}) {
   const declarations = isReparented
     ? ['position:absolute!important', `left:${x}px!important`, `top:${y}px!important`, 'translate:0 0!important', 'box-sizing:border-box!important']
     : ['position:relative!important', `translate:${x}px ${y}px!important`, 'box-sizing:border-box!important'];
-  declarations.push('transform-origin:50% 50%!important');
+  if ((Number.isFinite(scaleX) && scaleX > 0.02) || (Number.isFinite(scaleY) && scaleY > 0.02) || (Number.isFinite(rotation) && Math.abs(rotation) > 0.001)) {
+    declarations.push('transform-origin:50% 50%!important');
+  }
   if (Number.isFinite(width) && width > 0) declarations.push(`width:${Math.round(width * 100) / 100}px!important`, 'min-width:0!important', 'max-width:none!important');
   if (Number.isFinite(height) && height > 0) declarations.push(`height:${Math.round(height * 100) / 100}px!important`, 'min-height:0!important', 'max-height:none!important');
   if ((Number.isFinite(scaleX) && scaleX > 0.02) || (Number.isFinite(scaleY) && scaleY > 0.02)) {

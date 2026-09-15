@@ -132,3 +132,35 @@ test('previewSectionMotion opts the block out of the editor opacity guard', () =
     clearTimeout(app._sectionMotionPreviewTimer);
   }
 });
+
+test('freeform origin is only claimed when a rotation or scale needs it', async () => {
+  const { renderWebsiteHTML } = await import('../public/js/components/renderer.js');
+  const project = generateSite({ name: 'Origin Probe', tradeId: 'paysagiste' });
+  const first = renderWebsiteHTML(project, { isEditor: true });
+  const key = (first.match(/data-layout-key="([^"]+)"/) || [])[1];
+  assert.ok(key, 'a layout key must exist to probe freeform CSS');
+
+  const cssFor = layout => {
+    project.freeformLayout = { desktop: { [key]: layout } };
+    const html = renderWebsiteHTML(project, { isEditor: true });
+    const open = html.indexOf('data-freeform-layout>');
+    if (open === -1) return '';
+    const close = html.indexOf('</style>', open);
+    const block = html.slice(open + 'data-freeform-layout>'.length, close === -1 ? undefined : close);
+    const marker = 'data-layout-key="' + key + '"]{';
+    const start = block.indexOf(marker);
+    if (start === -1) return '';
+    const body = block.slice(start + marker.length);
+    const end = body.indexOf('}');
+    return end === -1 ? body : body.slice(0, end);
+  };
+
+  // A merely positioned element must not claim the origin, so motions such as
+  // progress-fill keep their own transform-origin: left.
+  const positioned = cssFor({ x: 10, y: 20 });
+  assert.ok(!positioned.includes('transform-origin'), 'positioned element must not claim the origin');
+
+  // Rotation or scale needs a single, explicit centre pivot.
+  assert.ok(cssFor({ x: 10, y: 20, rotation: 30 }).includes('transform-origin:50% 50%!important'));
+  assert.ok(cssFor({ x: 10, y: 20, scaleX: 1.2, scaleY: 1.2 }).includes('transform-origin:50% 50%!important'));
+});

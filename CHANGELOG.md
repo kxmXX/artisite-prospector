@@ -7,6 +7,12 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 15 septembre 2026 (4.8.0-alpha.47)
+
+- Conflit d’origine : la couche libre émettait `transform-origin:50% 50%!important` sur tout élément positionné, même sans rotation ni échelle. Elle écrasait donc l’origine propre à certaines animations, notamment `progress-fill` qui doit progresser depuis la gauche. L’origine n’est désormais revendiquée que lorsqu’une rotation ou une échelle l’exige.
+- Style vivant : l’éditeur retire aussi l’origine dès qu’un élément n’a plus ni rotation ni échelle, afin qu’un preset d’animation reprenne la main après réinitialisation.
+- QA : test de rendu vérifiant l’absence d’origine sur un élément seulement positionné et sa présence sur rotation ou échelle ; 8/8 tests d’intégrité, 254/254 tests complets.
+
 ### Consolidation — 15 septembre 2026 (4.8.0-alpha.46)
 
 - Aperçu des animations de section : la prévisualisation ajoutait `is-revealed` sans `motion-preview`, si bien que le garde-fou d’édition `opacity:1!important` écrasait le fondu. Les presets basés sur l’opacité (Fade, Zoom, Reveal, Shimmer) paraissaient donc morts. L’aperçu bascule désormais sous `motion-preview`, puis restaure le garde-fou.

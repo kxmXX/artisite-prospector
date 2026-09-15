@@ -1,3 +1,11 @@
+## LOT DE LIVRAISON — origine libre non prédatrice 4.8.0-alpha.47 — 15 septembre 2026
+
+- Conflit identifié au tour précédent : `freeformDeclarations` émettait `transform-origin:50% 50%!important` sur tout élément disposant d’un layout libre, y compris un simple déplacement sans rotation ni échelle. L’animation `progress-fill` (qui définit `transform-origin:left`) pivotait donc au centre, et un élément librement déplacé ne pouvait plus faire tourner correctement une barre de progression.
+- Correctif : l’origine n’est émise que si une échelle ou une rotation est présente — les deux cas que le tour alpha.45 devait unifier — et le style vivant retire la propriété dans le cas contraire, pour qu’un preset reprenne la main.
+- Test : rendu réel via `renderWebsiteHTML` — un layout `{x,y}` ne contient pas `transform-origin`, tandis que `{x,y,rotation}` et `{x,y,scaleX,scaleY}` contiennent `transform-origin:50% 50%!important`.
+- Tests : 8/8 tests d’intégrité éditeur, 254/254 complets, `node --check` et `git diff --check` propres.
+- Prochaine action exacte : neutraliser toute motion sur l’élément pendant un transform libre au-delà de la pause déjà posée, et couvrir par une matrice de non-régression souris/tactile/clavier.
+
 ## LOT DE LIVRAISON — aperçu d’animation fidèle 4.8.0-alpha.46 — 15 septembre 2026
 
 - Cause racine : `previewSectionMotion` ajoutait `is-revealed` mais jamais `motion-preview`. Or `#canvas-container [data-motion]:not(.motion-preview){opacity:1!important}` (spécificité d’identifiant, `!important`) gagne sur les animations : le fondu des presets Fade/Zoom/Reveal/Shimmer était donc entièrement écrasé. Les presets à base de transform (Slide, Spring) semblaient marcher, ce qui expliquait l’impression d’animations « partiellement en panne ».
