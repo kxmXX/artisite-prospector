@@ -4168,6 +4168,15 @@ export class App {
     this.updateFreeformOverlay();
   }
 
+  resolveFreeformPointerTarget(rawTarget, canvas, { parentStep = false } = {}) {
+    let target = rawTarget?.closest?.("[data-layout-key]") || null;
+    if (!target || !canvas?.contains(target)) return null;
+    if (!parentStep) return target;
+    const selected = this._freeformSelectedElement;
+    const basis = selected?.isConnected && selected.contains(rawTarget) ? selected : target;
+    return basis.parentElement?.closest?.("[data-layout-key]") || target;
+  }
+
   selectFreeformTarget(target, options = {}) {
     if (!target || !target.dataset?.layoutKey) return;
     const key = target.dataset.layoutKey;
@@ -4242,9 +4251,12 @@ export class App {
       alignBar.style.top = `${desiredTop - top}px`;
       alignBar.style.translate = "0 0";
     }
-    if (label) label.textContent = keys.length > 1
-      ? `${keys.length} éléments · ${Math.round(right - left)}×${Math.round(bottom - top)}`
-      : `#${keys[0]} · ${Math.round(right - left)}×${Math.round(bottom - top)}`;
+    if (label) {
+      const primaryLabel = this._freeformSelectedElement?.dataset?.layoutLabel || `#${keys[0]}`;
+      label.textContent = keys.length > 1
+        ? `${keys.length} éléments · ${Math.round(right - left)}×${Math.round(bottom - top)}`
+        : `${primaryLabel} · ${Math.round(right - left)}×${Math.round(bottom - top)}`;
+    }
     const groupButton = overlay.querySelector("[data-freeform-group]");
     const ungroupButton = overlay.querySelector("[data-freeform-ungroup]");
     if (groupButton) groupButton.hidden = keys.length < 2 || Boolean(exactGroup);
@@ -4618,12 +4630,22 @@ export class App {
     if (!canvas) return [];
     return [...canvas.querySelectorAll(".artisite-root.editor-mode [data-layout-key]")].filter(element => {
       if (!element.isConnected) return false;
-      const ancestor = element.parentElement?.closest?.("[data-layout-key]");
-      if (ancestor && canvas.contains(ancestor)) return false;
       const style = getComputedStyle(element);
       if (style.display === "none" || style.visibility === "hidden" || Number(style.opacity) === 0) return false;
       const rect = element.getBoundingClientRect();
       return rect.width >= 2 && rect.height >= 2;
+    });
+  }
+
+  collapseFreeformMarqueeHierarchy(elements = []) {
+    const hitSet = new Set(elements.filter(Boolean));
+    return [...hitSet].filter(element => {
+      let ancestor = element.parentElement?.closest?.("[data-layout-key]");
+      while (ancestor) {
+        if (hitSet.has(ancestor)) return false;
+        ancestor = ancestor.parentElement?.closest?.("[data-layout-key]");
+      }
+      return true;
     });
   }
 
@@ -4660,8 +4682,8 @@ export class App {
       box.style.height = `${marquee.height}px`;
       box.classList.add("is-visible");
       box.setAttribute("aria-hidden", "false");
-      const rawHits = candidates
-        .filter(element => marqueeContainsRectCenter(marquee, element.getBoundingClientRect()))
+      const hitElements = candidates.filter(element => marqueeContainsRectCenter(marquee, element.getBoundingClientRect()));
+      const rawHits = this.collapseFreeformMarqueeHierarchy(hitElements)
         .map(element => element.dataset.layoutKey)
         .filter(Boolean);
       hitKeys = this.expandFreeformGroupKeys(rawHits);
@@ -4751,8 +4773,8 @@ export class App {
       canvas.addEventListener("pointerdown", event => {
         if (event.button !== undefined && event.button !== 0) return;
         if (event.target.closest(".editor-section-toolbar, .cta-direct-badge, .cta-context-popover, .sec-bg-popover, .sec-motion-popover, .floating-text-toolbar")) return;
-        const target = event.target.closest("[data-layout-key]");
-        if (target && canvas.contains(target)) {
+        const target = this.resolveFreeformPointerTarget(event.target, canvas, { parentStep: event.metaKey || event.ctrlKey });
+        if (target) {
           const previousKeys = this.getFreeformSelectedKeys();
           const wasSelected = previousKeys.includes(target.dataset.layoutKey);
           if (!event.shiftKey && wasSelected && previousKeys.length > 1) {

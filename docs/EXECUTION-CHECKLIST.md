@@ -76,7 +76,7 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 
 - [x] Fondation — modèle `freeformLayout` persistant par clé stable et par breakpoint, réinjecté dans éditeur/preview/export avec Undo/Redo.
 - [x] Sélection phase 1 — textes, images et CTA stables affichent un cadre unique avec dimensions, poignée Move, Reset et 8 poignées de resize.
-- [ ] Sélection universelle phase 2 — étendre les clés de layout aux cartes, conteneurs, icônes et blocs structurels qui ne portent pas encore `data-editable`.
+- [x] Sélection universelle phase 2 — cartes, conteneurs, sous-blocs et icônes métiers ont des clés structurelles stables ; clic profond + ⌘/Ctrl-clic remonte la hiérarchie de calques.
 - [x] Déplacement phase 1 — Pointer Events via poignée Move, flèches clavier (Shift = 10 px) et contrainte à la section ; pas de drag HTML5 sur le canvas.
 - [x] Déplacement phase 2a — drag direct du corps sélectionné avec seuil 5 px, suivi 1:1 sans transition, snapping bords/centres et Alt pour désactiver temporairement l’accroche.
 - [ ] Déplacement phase 2b — débordement contrôlé entre zones/sections et reparenting explicite.
@@ -134,5 +134,6 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - Lot `4.8.0-alpha.19` : resize collectif de groupe par scale persistant, Shift ratio, alignements 6 axes et distributions H/V ; QA navigateur avec reload/persistance ; 24/24 ciblés, 199/199 complets et `git diff --check`.
 - Lot `4.8.0-alpha.20` : drag direct du corps sélectionné, snapping 6 px bords/centres, guides visuels, Alt pour désactiver le snap et restauration instantanée du scroll canvas ; 30/30 ciblés, 205/205 complets et `git diff --check`.
 - Lot `4.8.0-alpha.21` : marquee de multi-sélection, Shift additif, preview des hits et drag direct de la sélection résultante ; 32/32 ciblés, 207/207 complets et `git diff --check`.
+- Lot `4.8.0-alpha.22` : hiérarchie de calques structurels (cartes/conteneurs/icônes), clés stables editor/public/export, ⌘/Ctrl-clic pour remonter parent et marquee hiérarchique ; 35/35 ciblés, 210/210 complets et `git diff --check`.
 - Prochaine action unique : redimensionnement collectif des groupes puis alignement/distribution dans un commit séparé.
 - Prochaine action unique : démarrer la fondation Canva/Figma — modèle de layout libre persistant + sélection universelle + premier déplacement/redimensionnement sur cibles stables, avant multi-sélection/groupes.

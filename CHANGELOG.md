@@ -7,6 +7,14 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 15 septembre 2026 (4.8.0-alpha.22)
+
+- Calques structurels : Services, Galerie, Réalisations, Avis, FAQ, À propos, Stats, Process, Certifications, Tarifs, Stepper, citation, tableau comparatif et blocs custom exposent désormais des parents visuels sélectionnables en plus de leurs champs internes.
+- Hiérarchie : clic normal cible le calque le plus profond ; ⌘/Ctrl + clic répété remonte d’un niveau (ex. titre → contenu carte → carte) sans perdre les clés stables.
+- Marquee hiérarchique : un rectangle serré peut sélectionner un enfant ; si le parent et ses descendants sont tous couverts, le parent gagne afin d’éviter les doubles sélections.
+- Parité : `data-layout-node` reçoit une clé déterministe identique dans editor/public/export ; les transformations d’un parent entraînent naturellement tous ses descendants tandis que les enfants restent ajustables individuellement.
+- QA navigateur : carte Service +20 px → carte/titre/image +20 px ; marquee serré → titre seul, marquee carte → carte seule ; avatar Avis sélectionnable indépendamment ; zéro erreur console. Validation : 35/35 ciblés, 210/210 complets et `git diff --check`.
+
 ### Consolidation — 15 septembre 2026 (4.8.0-alpha.21)
 
 - Marquee : glisser dans une zone vide dessine un rectangle de sélection après un seuil de 5 px ; un clic vide simple conserve la désélection classique.

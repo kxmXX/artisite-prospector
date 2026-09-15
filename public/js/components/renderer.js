@@ -54,6 +54,12 @@ function decorateLayoutKeys(markup, project, section) {
     return full.replace(/>$/, ` data-layout-key="${code}">`);
   });
 
+  output = output.replace(/<([a-z][\w-]*)(\s[^>]*data-layout-node="([^"]+)"[^>]*)>/gi, (full, _tag, _attrs, nodeId) => {
+    if (/\sdata-layout-key=/.test(full)) return full;
+    const code = getUiCode(project?.id, section?.id, `node-${nodeId}`);
+    return full.replace(/>$/, ` data-layout-key="${code}" data-layout-type="structure">`);
+  });
+
   output = output.replace(/<div(\s[^>]*data-cta-popover-wrapper[^>]*)>/gi, (full, attrs) => {
     if (/\sdata-layout-key=/.test(full)) return full;
     const buttonType = attrs.match(/data-button-type="([^"]+)"/)?.[1];
@@ -1123,8 +1129,8 @@ function renderTrust(sec, project) {
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           ${(c.badges || []).map((b, idx) => `
-            <div class="flex items-start gap-3.5 p-4 rounded-xl hover:bg-black/5 transition-colors">
-              <div class="w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center text-white shadow-xs" style="background-color: var(--primary);">
+            <div class="flex items-start gap-3.5 p-4 rounded-xl hover:bg-black/5 transition-colors" data-layout-node="trust-card-${idx}" data-layout-label="Garantie ${idx + 1}">
+              <div class="w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center text-white shadow-xs" data-layout-node="trust-icon-${idx}" data-layout-label="Icône garantie ${idx + 1}" style="background-color: var(--primary);">
                 ${getIcon(idx === 0 ? "clock" : idx === 1 ? "shield" : idx === 2 ? "badgeCheck" : "checkCircle", "w-5 h-5")}
               </div>
               <div class="flex-1 min-w-0">
@@ -1164,8 +1170,8 @@ function renderAbout(sec, project, options = {}) {
 
           <div class="pt-6 grid sm:grid-cols-2 gap-4 text-left max-w-2xl mx-auto">
             ${(c.points || []).map((pt, pIdx) => `
-              <div class="flex items-center gap-3 p-3.5 rounded-xl bg-white border border-black/5 shadow-sm text-sm font-semibold text-gray-800">
-                <div class="w-6 h-6 rounded-full flex items-center justify-center text-white flex-shrink-0" style="background-color: var(--primary);">
+              <div class="flex items-center gap-3 p-3.5 rounded-xl bg-white border border-black/5 shadow-sm text-sm font-semibold text-gray-800" data-layout-node="about-point-${pIdx}" data-layout-label="Point fort ${pIdx + 1}">
+                <div class="w-6 h-6 rounded-full flex items-center justify-center text-white flex-shrink-0" data-layout-node="about-point-icon-${pIdx}" data-layout-label="Icône point fort ${pIdx + 1}" style="background-color: var(--primary);">
                   ${getIcon("check", "w-3.5 h-3.5")}
                 </div>
                 <span data-editable="points.${pIdx}">${pt}</span>
@@ -1188,7 +1194,7 @@ function renderAbout(sec, project, options = {}) {
     return `
       <div id="about" class="py-20 lg:py-28" style="background-color: var(--bg-sec);">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="bg-white rounded-3xl p-8 sm:p-14 shadow-xl border border-black/5 relative overflow-hidden">
+          <div class="bg-white rounded-3xl p-8 sm:p-14 shadow-xl border border-black/5 relative overflow-hidden" data-layout-node="about-quote-card" data-layout-label="Carte À propos">
             <div class="text-6xl font-serif text-gray-200 absolute top-4 left-6 select-none">“</div>
             <div class="relative z-10 space-y-6">
               <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-orange-600" data-editable="badge">
@@ -1234,7 +1240,7 @@ function renderAbout(sec, project, options = {}) {
         <div class="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center vitrine-about-grid">
 
           <!-- Left Column: Story and Content -->
-          <div class="lg:col-span-6 order-1 lg:order-1 space-y-5 vitrine-about-copy">
+          <div class="lg:col-span-6 order-1 lg:order-1 space-y-5 vitrine-about-copy" data-layout-node="about-copy" data-layout-label="Bloc texte À propos">
             <div class="text-xs font-bold uppercase tracking-wider text-[#527c22] dark:text-[#8FA382]" data-editable="badge">
               ${c.badge || "À PROPOS"}
             </div>
@@ -1297,9 +1303,9 @@ function renderAbout(sec, project, options = {}) {
           </div>
 
           <!-- Right Column: Benjamin Portrait Photo -->
-          <div class="lg:col-span-6 order-2 lg:order-2">
+          <div class="lg:col-span-6 order-2 lg:order-2" data-layout-node="about-media" data-layout-label="Bloc média À propos">
             <div class="relative">
-              <div class="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl border-4 border-white dark:border-zinc-800 bg-slate-100 vitrine-about-image">
+              <div class="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl border-4 border-white dark:border-zinc-800 bg-slate-100 vitrine-about-image" data-layout-node="about-media-frame" data-layout-label="Cadre portrait">
                 ${renderEditableImage(c.image, { sectionId: sec.id, fieldPath: 'image', alt: c.title, className: 'w-full h-full object-cover', options })}
               </div>
               ${isPaysagiste ? '' : `
@@ -1340,7 +1346,7 @@ function renderStats(sec, project) {
       <div class="max-w-7xl vitrine-shell mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 text-center divide-y sm:divide-y-0 sm:divide-x divide-white/20">
           ${items.map((item, idx) => `
-            <div class="p-4 flex flex-col justify-center items-center">
+            <div class="p-4 flex flex-col justify-center items-center" data-layout-node="stat-card-${idx}" data-layout-label="Statistique ${idx + 1}">
               <div class="font-heading text-4xl sm:text-5xl font-black text-white tracking-tight leading-none" data-editable="items.${idx}.value">${item.value || '100%'}</div>
               <div class="font-bold text-white/95 text-sm sm:text-base mt-2.5 leading-snug" data-editable="items.${idx}.label">${item.label || 'Engagement Qualité'}</div>
               <div class="text-xs text-white/80 mt-1 font-medium leading-normal" data-editable="items.${idx}.sub">${item.sub || 'Service certifié'}</div>
@@ -1376,8 +1382,8 @@ function renderServices(sec, project, options = {}) {
 
           <div class="grid md:grid-cols-2 gap-8 lg:gap-10">
             ${(c.services || []).map((srv, idx) => `
-              <div class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all border border-black/5 flex flex-col group">
-                <div class="aspect-[16/9] overflow-hidden relative bg-slate-100">
+              <div class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all border border-black/5 flex flex-col group" data-layout-node="service-card-${idx}" data-layout-label="Carte service ${idx + 1}">
+                <div class="aspect-[16/9] overflow-hidden relative bg-slate-100" data-layout-node="service-media-${idx}" data-layout-label="Média service ${idx + 1}">
                   ${renderEditableImage(srv.image, { sectionId: sec.id, fieldPath: 'image', targetFieldPath: `services.${idx}.image`, itemIndex: idx, alt: srv.title, className: 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-500', options })}
                   <span class="absolute top-4 right-4 z-10 bg-black/75 backdrop-blur text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider" data-editable="services.${idx}.tag">
                     ${srv.tag}
@@ -1425,13 +1431,13 @@ function renderServices(sec, project, options = {}) {
             ${(c.services || []).map((srv, idx) => {
               const isEven = idx % 2 === 1;
               return `
-                <div class="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center ${isEven ? 'lg:flex-row-reverse' : ''}">
-                  <div class="lg:col-span-6 ${isEven ? 'lg:order-2' : 'lg:order-1'}">
+                <div class="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center ${isEven ? 'lg:flex-row-reverse' : ''}" data-layout-node="service-card-${idx}" data-layout-label="Bloc service ${idx + 1}">
+                  <div class="lg:col-span-6 ${isEven ? 'lg:order-2' : 'lg:order-1'}" data-layout-node="service-media-${idx}" data-layout-label="Média service ${idx + 1}">
                     <div class="aspect-[16/10] rounded-3xl overflow-hidden shadow-xl border-2 border-black/5 bg-slate-100">
                       ${renderEditableImage(srv.image, { sectionId: sec.id, fieldPath: 'image', targetFieldPath: `services.${idx}.image`, itemIndex: idx, alt: srv.title, className: 'w-full h-full object-cover', options })}
                     </div>
                   </div>
-                  <div class="lg:col-span-6 ${isEven ? 'lg:order-1' : 'lg:order-2'} space-y-4">
+                  <div class="lg:col-span-6 ${isEven ? 'lg:order-1' : 'lg:order-2'} space-y-4" data-layout-node="service-copy-${idx}" data-layout-label="Contenu service ${idx + 1}">
                     <span class="inline-block text-xs font-bold uppercase tracking-wider text-orange-600 bg-orange-50 px-2.5 py-0.5 rounded-full" data-editable="services.${idx}.tag">${srv.tag}</span>
                     <h3 class="font-heading text-2xl sm:text-3xl font-extrabold text-gray-900" data-editable="services.${idx}.title">${srv.title}</h3>
                     <p class="text-gray-600 text-base leading-relaxed" data-editable="services.${idx}.desc">${srv.desc}</p>
@@ -1465,7 +1471,7 @@ function renderServices(sec, project, options = {}) {
 
           <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             ${(c.services || []).map((srv, idx) => `
-              <div class="p-6 rounded-2xl bg-gray-50/80 border border-gray-200/80 hover:bg-white hover:border-orange-300 hover:shadow-lg transition-all space-y-3 flex flex-col justify-between">
+              <div class="p-6 rounded-2xl bg-gray-50/80 border border-gray-200/80 hover:bg-white hover:border-orange-300 hover:shadow-lg transition-all space-y-3 flex flex-col justify-between" data-layout-node="service-card-${idx}" data-layout-label="Carte service ${idx + 1}">
                 <div class="space-y-2">
                   <div class="flex items-center justify-between text-xs">
                     <span class="font-bold uppercase tracking-wider text-orange-600" data-editable="services.${idx}.tag">${srv.tag}</span>
@@ -1511,8 +1517,8 @@ function renderServices(sec, project, options = {}) {
 
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 vitrine-service-grid">
           ${(c.services || []).map((srv, idx) => `
-            <div class="bg-white dark:bg-zinc-900 rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-zinc-800 flex flex-col group transform hover:-translate-y-1">
-              <div class="aspect-[16/10] overflow-hidden relative bg-slate-100">
+            <div class="bg-white dark:bg-zinc-900 rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-zinc-800 flex flex-col group transform hover:-translate-y-1" data-layout-node="service-card-${idx}" data-layout-label="Carte service ${idx + 1}">
+              <div class="aspect-[16/10] overflow-hidden relative bg-slate-100" data-layout-node="service-media-${idx}" data-layout-label="Média service ${idx + 1}">
                 ${renderEditableImage(srv.image, { sectionId: sec.id, fieldPath: 'image', targetFieldPath: `services.${idx}.image`, itemIndex: idx, alt: srv.title, className: 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-500', options })}
                 ${(!isPaysagiste && srv.tag) ? `
                   <span class="absolute top-3 right-3 z-10 bg-black/70 backdrop-blur text-white text-[11px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider" data-editable="services.${idx}.tag">
@@ -1522,7 +1528,7 @@ function renderServices(sec, project, options = {}) {
                   <span class="hidden" data-editable="services.${idx}.tag">${srv.tag}</span>
                 ` : ''}
               </div>
-              <div class="vitrine-service-card-body flex-1 flex flex-col justify-between space-y-4">
+              <div class="vitrine-service-card-body flex-1 flex flex-col justify-between space-y-4" data-layout-node="service-copy-${idx}" data-layout-label="Contenu service ${idx + 1}">
                 <div>
                   <h3 class="font-heading text-2xl font-bold text-gray-900 dark:text-white leading-snug" data-editable="services.${idx}.title">${srv.title}</h3>
                   <p class="text-gray-600 dark:text-zinc-400 text-base mt-3 leading-relaxed" data-editable="services.${idx}.desc">${srv.desc}</p>
@@ -1609,7 +1615,7 @@ function renderBeforeAfter(sec, project, options = {}) {
 
         ${directionToggleBtn}
 
-        <div class="ba-container split-reveal-container shadow-2xl border-4 border-white"
+        <div class="ba-container split-reveal-container shadow-2xl border-4 border-white" data-layout-node="before-after-comparator" data-layout-label="Comparateur Avant / Après"
              data-split-direction="${direction}"
              data-split-pos="${initialSplit}"
              data-sec-id="${sec.id}"
@@ -1672,8 +1678,8 @@ function renderRealisations(sec, project, options = {}) {
 
         <div class="grid md:grid-cols-3 gap-8">
           ${(c.items || []).map((r, idx) => `
-            <div class="rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg transition-all group">
-              <div class="aspect-[16/11] overflow-hidden bg-slate-100">
+            <div class="rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg transition-all group" data-layout-node="realisation-card-${idx}" data-layout-label="Réalisation ${idx + 1}">
+              <div class="aspect-[16/11] overflow-hidden bg-slate-100" data-layout-node="realisation-media-${idx}" data-layout-label="Média réalisation ${idx + 1}">
                 ${renderEditableImage(r.image, { sectionId: sec.id, fieldPath: 'image', targetFieldPath: `items.${idx}.image`, itemIndex: idx, alt: r.title, className: 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-500', options })}
               </div>
               <div class="p-5 space-y-2">
@@ -1702,7 +1708,7 @@ function renderGalleryCard(p, idx, sec, project, options, aspectClass) {
     const beforeSrc = p.beforeImage || getTradeFallbackDataUrl(tradeId, 'beforeAfter', 'Avant');
     const afterSrc = p.afterImage || getTradeFallbackDataUrl(tradeId, 'beforeAfter', 'Après');
     return `
-      <div class="gallery-card bg-white dark:bg-zinc-900 rounded-2xl sm:rounded-3xl border border-zinc-200/80 dark:border-zinc-800 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col group">
+      <div class="gallery-card bg-white dark:bg-zinc-900 rounded-2xl sm:rounded-3xl border border-zinc-200/80 dark:border-zinc-800 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col group" data-layout-node="gallery-card-${idx}" data-layout-label="Carte galerie ${idx + 1}">
         <div class="relative ${aspectClass} overflow-hidden bg-slate-900 select-none">
           <div class="ba-container split-reveal-container ba-card w-full h-full"
                data-split-direction="horizontal"
@@ -1758,7 +1764,7 @@ function renderGalleryCard(p, idx, sec, project, options, aspectClass) {
   // Standard photo card
   const photoUrl = p.url || p.image || getTradeFallbackDataUrl(tradeId, 'gallery', p.title || 'Réalisation');
   return `
-    <div class="gallery-card bg-white dark:bg-zinc-900 rounded-2xl sm:rounded-3xl border border-zinc-200/80 dark:border-zinc-800 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col group cursor-pointer" data-lightbox="${photoUrl}">
+    <div class="gallery-card bg-white dark:bg-zinc-900 rounded-2xl sm:rounded-3xl border border-zinc-200/80 dark:border-zinc-800 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col group cursor-pointer" data-lightbox="${photoUrl}" data-layout-node="gallery-card-${idx}" data-layout-label="Carte galerie ${idx + 1}">
       <div class="relative ${aspectClass} overflow-hidden bg-slate-900">
         ${renderEditableImage(photoUrl, { sectionId: sec.id, fieldPath: `photos.${idx}.url`, itemIndex: idx, alt: p.title || 'Photo', className: 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-500', options })}
         <div class="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -1867,7 +1873,7 @@ function renderReviews(sec, project, options = {}) {
 
           <div class="grid md:grid-cols-3 gap-8">
             ${(c.reviews || []).map((r, idx) => `
-              <div class="bg-gray-50/80 p-8 rounded-3xl border border-gray-100 shadow-sm flex flex-col justify-between space-y-6">
+              <div class="bg-gray-50/80 p-8 rounded-3xl border border-gray-100 shadow-sm flex flex-col justify-between space-y-6" data-layout-node="review-card-${idx}" data-layout-label="Avis ${idx + 1}">
                 <div class="space-y-4">
                   <div class="flex text-amber-400">
                     ${renderRatingStars(r.rating, { editor: options.isEditor, sectionId: sec.id, reviewIndex: idx })}
@@ -1930,11 +1936,11 @@ function renderReviews(sec, project, options = {}) {
           <!-- 3-Column Reviews Grid matching Sendpage Screenshot -->
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-7xl mx-auto vitrine-review-grid">
             ${(c.reviews || []).map((r, idx) => `
-              <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-between space-y-5 vitrine-review-card">
+              <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-between space-y-5 vitrine-review-card" data-layout-node="review-card-${idx}" data-layout-label="Avis ${idx + 1}">
                 <div class="space-y-4">
                   <div class="flex items-start justify-between">
                     <div class="flex items-center gap-3">
-                      <div class="w-10 h-10 rounded-full bg-[#edf4e8] text-[#527c22] font-bold text-sm flex items-center justify-center shrink-0">
+                      <div class="w-10 h-10 rounded-full bg-[#edf4e8] text-[#527c22] font-bold text-sm flex items-center justify-center shrink-0" data-layout-node="review-avatar-${idx}" data-layout-label="Avatar avis ${idx + 1}">
                         ${r.author ? r.author.charAt(0).toUpperCase() : 'C'}
                       </div>
                       <div>
@@ -2001,7 +2007,7 @@ function renderReviews(sec, project, options = {}) {
 
           <div class="lg:col-span-8 grid sm:grid-cols-2 gap-6">
             ${(c.reviews || []).map((r, idx) => `
-              <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm space-y-3 flex flex-col justify-between">
+              <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm space-y-3 flex flex-col justify-between" data-layout-node="review-card-${idx}" data-layout-label="Avis ${idx + 1}">
                 <div class="space-y-2">
                   <div class="flex items-center justify-between">
                     <div class="font-bold text-gray-900 text-sm" data-editable="reviews.${idx}.author">${r.author}</div>
@@ -2337,7 +2343,7 @@ function renderFaq(sec, project) {
 
         <div class="divide-y divide-zinc-200/80 dark:divide-zinc-800 vitrine-faq-list mx-auto">
           ${(c.items || []).map((faq, idx) => `
-            <div class="faq-item group/faq transition-colors py-6 sm:py-7">
+            <div class="faq-item group/faq transition-colors py-6 sm:py-7" data-layout-node="faq-item-${idx}" data-layout-label="Question FAQ ${idx + 1}">
               <button type="button" class="faq-header flex items-center justify-between gap-4 cursor-pointer select-none" aria-expanded="false" aria-controls="faq-answer-${sec.id}-${idx}">
                 <span class="text-base sm:text-lg font-bold text-zinc-900 dark:text-white group-hover/faq:text-emerald-600 dark:group-hover/faq:text-emerald-400 transition-colors leading-snug" data-editable="items.${idx}.q">${faq.q}</span>
                 <span class="faq-icon-btn shrink-0" aria-hidden="true">+</span>
@@ -2561,7 +2567,7 @@ function renderCustomBlock(sec, project, options = {}) {
     return `
       <div class="py-14 bg-white">
         <div class="max-w-5xl mx-auto px-4 sm:px-6">
-          <div class="campaign-card">
+          <div class="campaign-card" data-layout-node="campaign-card" data-layout-label="Carte campagne">
             <div class="space-y-4">
               <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800" data-editable="badge">
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
@@ -2614,7 +2620,7 @@ function renderCustomBlock(sec, project, options = {}) {
   return `
     <div class="py-12 bg-white">
       <div class="max-w-4xl mx-auto px-4 sm:px-6">
-        <div class="p-8 sm:p-10 rounded-2xl border border-zinc-200 bg-zinc-50 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-6">
+        <div class="p-8 sm:p-10 rounded-2xl border border-zinc-200 bg-zinc-50 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-6" data-layout-node="custom-card" data-layout-label="Carte personnalisée">
           <div class="space-y-2 text-center sm:text-left">
             <span class="text-xs font-bold uppercase tracking-wider text-zinc-400" data-editable="badge">${c.badge || c.tag || "Information importante"}</span>
             <h3 class="text-xl font-bold text-zinc-900" data-editable="title">${c.title || "Vous avez un chantier urgent ou sur-mesure ?"}</h3>
@@ -2656,10 +2662,10 @@ function renderProcess(sec, project, options = {}) {
 
         <div class="grid md:grid-cols-3 gap-8 relative">
           ${steps.map((st, idx) => `
-            <div class="relative p-6 sm:p-8 rounded-2xl bg-white border border-black/5 shadow-sm flex flex-col justify-between">
+            <div class="relative p-6 sm:p-8 rounded-2xl bg-white border border-black/5 shadow-sm flex flex-col justify-between" data-layout-node="process-card-${idx}" data-layout-label="Étape ${idx + 1}">
               <div class="flex items-center justify-between mb-6">
                 <span class="text-3xl font-extrabold text-zinc-300 font-mono" data-editable="steps.${idx}.num">${st.num || '0' + (idx + 1)}</span>
-                <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold" style="background-color: var(--primary);">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold" data-layout-node="process-icon-${idx}" data-layout-label="Icône étape ${idx + 1}" style="background-color: var(--primary);">
                   ${getIcon(idx === 0 ? "phone" : idx === 1 ? "fileText" : "checkCircle", "w-5 h-5")}
                 </div>
               </div>
@@ -2702,8 +2708,8 @@ function renderCertifications(sec, project, options = {}) {
 
         <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           ${items.map((it, idx) => `
-            <div class="p-6 rounded-2xl bg-white border border-black/5 shadow-xs flex flex-col items-start gap-3">
-              <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+            <div class="p-6 rounded-2xl bg-white border border-black/5 shadow-xs flex flex-col items-start gap-3" data-layout-node="cert-card-${idx}" data-layout-label="Certification ${idx + 1}">
+              <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center" data-layout-node="cert-icon-${idx}" data-layout-label="Icône certification ${idx + 1}">
                 ${getIcon(it.icon || "shield", "w-5 h-5")}
               </div>
               <h4 class="font-bold text-gray-900 text-base" data-editable="items.${idx}.title">${it.title}</h4>
@@ -2760,7 +2766,7 @@ function renderPricing(sec, project, options = {}) {
 
         <div class="grid lg:grid-cols-3 gap-8 items-stretch">
           ${tiers.map((t, idx) => `
-            <div class="relative p-8 rounded-2xl bg-white border ${t.isPopular ? 'border-2 ring-1 shadow-lg' : 'border-black/5 shadow-sm'} flex flex-col justify-between" style="${t.isPopular ? 'border-color: var(--primary); ring-color: var(--primary);' : ''}">
+            <div class="relative p-8 rounded-2xl bg-white border ${t.isPopular ? 'border-2 ring-1 shadow-lg' : 'border-black/5 shadow-sm'} flex flex-col justify-between" data-layout-node="pricing-card-${idx}" data-layout-label="Formule ${idx + 1}" style="${t.isPopular ? 'border-color: var(--primary); ring-color: var(--primary);' : ''}">
               ${t.isPopular ? `
                 <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider text-white shadow-xs" style="background-color: var(--primary);">
                   Recommandé
@@ -2803,7 +2809,7 @@ function renderQuoteBlock(sec, project, options = {}) {
   return `
     <div class="py-16 sm:py-24 bg-white">
       <div class="max-w-4xl mx-auto px-4 sm:px-6">
-        <div class="component-quote relative p-8 sm:p-12 rounded-3xl bg-zinc-50 border border-zinc-200/80 shadow-xs text-center space-y-6">
+        <div class="component-quote relative p-8 sm:p-12 rounded-3xl bg-zinc-50 border border-zinc-200/80 shadow-xs text-center space-y-6" data-layout-node="quote-card" data-layout-label="Carte citation">
           <div class="text-4xl sm:text-5xl text-amber-500/40 font-serif leading-none select-none">“</div>
           <blockquote class="font-heading text-xl sm:text-2xl lg:text-3xl font-bold text-zinc-900 leading-snug tracking-tight max-w-2xl mx-auto" data-editable="quote">
             ${c.quote || "« Notre priorité absolue n'est pas seulement de réaliser un chantier, c'est de bâtir une relation de confiance durable avec chaque famille. »"}
@@ -2897,14 +2903,14 @@ function renderStepperBlock(sec, project, options = {}) {
 
         <div class="component-stepper grid ${colClass} gap-6 relative">
           ${steps.map((st, idx) => `
-            <div class="bg-white p-6 rounded-2xl border border-zinc-200/80 shadow-xs flex flex-col justify-between space-y-4 relative group/step">
+            <div class="bg-white p-6 rounded-2xl border border-zinc-200/80 shadow-xs flex flex-col justify-between space-y-4 relative group/step" data-layout-node="stepper-card-${idx}" data-layout-label="Étape chantier ${idx + 1}">
               ${options.isEditor && steps.length > 2 ? `
                 <button type="button" onclick="event.stopPropagation(); window.app.removeStepperStep('${sec.id}', ${idx})" class="absolute top-3 right-3 opacity-0 group-hover/step:opacity-100 transition-opacity p-1 text-zinc-400 hover:text-red-500 rounded" title="Supprimer cette étape">
                   ${getIcon("trash", "w-3.5 h-3.5")}
                 </button>
               ` : ''}
               <div class="flex items-center justify-between">
-                <span class="w-9 h-9 rounded-full bg-zinc-900 text-white font-mono text-sm font-bold flex items-center justify-center">
+                <span class="w-9 h-9 rounded-full bg-zinc-900 text-white font-mono text-sm font-bold flex items-center justify-center" data-layout-node="stepper-icon-${idx}" data-layout-label="Numéro étape ${idx + 1}">
                   ${st.step || idx + 1}
                 </span>
                 <span class="text-[10px] uppercase tracking-wider text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded">Étape 0${idx + 1}</span>
@@ -2945,7 +2951,7 @@ function renderTableBlock(sec, project, options = {}) {
           </h2>
         </div>
 
-        <div class="component-table rounded-2xl border border-zinc-200 overflow-hidden shadow-xs">
+        <div class="component-table rounded-2xl border border-zinc-200 overflow-hidden shadow-xs" data-layout-node="comparison-table" data-layout-label="Tableau comparatif">
           <table class="w-full text-left text-xs sm:text-sm">
             <thead class="bg-zinc-900 text-white font-semibold">
               <tr>

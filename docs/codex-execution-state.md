@@ -1,5 +1,15 @@
 # État de reprise Codex — 15 septembre 2026
 
+## LOT DE LIVRAISON — calques structurels 4.8.0-alpha.22
+
+- Renderer : les conteneurs visuels significatifs reçoivent `data-layout-node`, transformé par `decorateLayoutKeys` en clé stable `data-layout-key` + `data-layout-type="structure"` dans tous les modes.
+- Couverture : cartes/medias Services, À propos, Trust, Stats, Réalisations, Galerie, Avis, FAQ, Process, Certifications, Pricing, Stepper, citation, tableau comparatif et plusieurs blocs custom.
+- Hiérarchie : `resolveFreeformPointerTarget` permet de remonter d’un niveau avec ⌘/Ctrl-clic ; le cadre affiche le label métier du calque (`Carte service 1`, `Média service 1`, etc.).
+- Marquee : les descendants ne sont plus exclus globalement ; `collapseFreeformMarqueeHierarchy` ne les retire que lorsqu’un ancêtre est lui-même touché, ce qui conserve la sélection fine.
+- QA navigateur : titre service → ⌘ contenu → ⌘ carte ; Move +20 sur carte entraîne carte/titre/image +20 ; marquee titre sélectionne le titre, marquee carte sélectionne la carte ; avatar Avis indépendant ; zéro erreur console.
+- Tests : 35/35 ciblés (`state` + `freeform_snap` + `v3_ui_regressions`), 210/210 complets et `git diff --check`.
+- Prochaine action : ordre de calques (`z-index`), premier/arrière-plan et verrouillage de cibles, puis rotation.
+
 ## LOT DE LIVRAISON — marquee multi-sélection 4.8.0-alpha.21
 
 - Marquee : `armFreeformMarquee` démarre uniquement depuis une zone vide et après 5 px ; le rectangle utilise des coordonnées viewport et sélectionne par centre de cible pour éviter les contacts accidentels.

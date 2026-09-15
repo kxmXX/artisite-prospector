@@ -281,3 +281,50 @@ test('Freeform marquee previews center hits, supports additive selection and res
   assert.ok(css.includes('.freeform-marquee-box.is-visible{display:block}'));
   assert.ok(css.includes('.is-freeform-marquee-hit'));
 });
+
+test('Freeform structural layers expose stable parent and child keys across editor, preview and export', () => {
+  const project = generateDemoSite({ name: 'Structural Layers', tradeId: 'paysagiste', city: 'Tours' });
+  const editorHtml = renderWebsiteHTML(project, { isEditor: true, isStandalone: false });
+  const publicHtml = renderWebsiteHTML(project, { isEditor: false, isStandalone: false });
+  const keyFor = (html, node) => html.match(new RegExp(`data-layout-node="${node}"[^>]*data-layout-key="([^"]+)"`))?.[1];
+
+  for (const node of ['about-copy', 'about-media', 'service-card-0', 'service-media-0', 'gallery-card-0', 'review-card-0', 'faq-item-0']) {
+    const editorKey = keyFor(editorHtml, node);
+    const publicKey = keyFor(publicHtml, node);
+    assert.ok(editorKey, `${node} must expose a structural layout key in editor mode`);
+    assert.equal(publicKey, editorKey, `${node} must keep the same key in public mode`);
+  }
+
+  const serviceCardKey = keyFor(editorHtml, 'service-card-0');
+  const serviceTitleKey = editorHtml.match(/data-editable="services\.0\.title"[^>]*data-layout-key="([^"]+)"/)?.[1];
+  assert.ok(serviceTitleKey);
+  assert.notEqual(serviceTitleKey, serviceCardKey, 'a card and its title must remain independent layers');
+  assert.match(editorHtml, /data-layout-node="service-card-0"[^>]*data-layout-type="structure"/);
+
+  project.freeformLayout = { desktop: { [serviceCardKey]: { x: 18, y: 12 } }, tablet: {}, mobile: {} };
+  const exported = exportStandaloneHTML(project);
+  assert.ok(exported.includes(`data-layout-node="service-card-0"`));
+  assert.ok(exported.includes(`data-layout-key="${serviceCardKey}"`));
+  assert.ok(exported.includes('translate:18px 12px!important'));
+});
+
+test('Freeform structural layer source covers cards, containers and independent icons', () => {
+  const rendererSource = fs.readFileSync(path.resolve(process.cwd(), 'public/js/components/renderer.js'), 'utf8');
+  assert.ok(rendererSource.includes('data-layout-node="service-card-${idx}"'));
+  assert.ok(rendererSource.includes('data-layout-node="service-media-${idx}"'));
+  assert.ok(rendererSource.includes('data-layout-node="trust-icon-${idx}"'));
+  assert.ok(rendererSource.includes('data-layout-node="process-icon-${idx}"'));
+  assert.ok(rendererSource.includes('data-layout-node="cert-icon-${idx}"'));
+  assert.ok(rendererSource.includes('data-layout-node="pricing-card-${idx}"'));
+  assert.ok(rendererSource.includes('data-layout-node="stepper-card-${idx}"'));
+  assert.ok(rendererSource.includes('data-layout-node="comparison-table"'));
+});
+
+test('Freeform hierarchy supports stepping from deep children to structural parents', () => {
+  const appSource = fs.readFileSync(path.resolve(process.cwd(), 'public/js/app.js'), 'utf8');
+  assert.ok(appSource.includes('resolveFreeformPointerTarget(rawTarget, canvas'));
+  assert.ok(appSource.includes('parentStep: event.metaKey || event.ctrlKey'));
+  assert.ok(appSource.includes('selected.contains(rawTarget) ? selected : target'));
+  assert.ok(appSource.includes('basis.parentElement?.closest?.("[data-layout-key]") || target'));
+  assert.ok(appSource.includes('dataset?.layoutLabel || `#${keys[0]}`'));
+});
