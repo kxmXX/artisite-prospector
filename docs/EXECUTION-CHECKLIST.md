@@ -51,7 +51,7 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - [~] Repenser l’édition des cellules autour d’un modèle spatial cohérent : historique d’édition réparé (`4.8.0-alpha.43`) et tableau comparatif rendu défilable pour ne plus couper les cellules sur canevas étroit (`4.8.0-alpha.48`) ; restent les limites spatiales et la sortie de mode explicite.
 - [x] Rendre chaque outil réellement opérant et lisible : l’édition inline et l’inspecteur enregistrent à nouveau une transaction annulable (`4.8.0-alpha.43`).
 - [x] Fiabiliser les animations : origine unique (`4.8.0-alpha.45`), aperçu de section réellement visible et vitesse appliquée à chaque preset (`4.8.0-alpha.46`). Reste à neutraliser les motions pendant un transform libre, au-delà de la suspension déjà posée.
-- [ ] Ajouter une matrice de non-régression navigateur couvrant souris, tactile et clavier, plutôt que de considérer la présence du code comme une fonctionnalité livrée.
+- [x] Matrice de non-régression des gestes : 9 tests comportementaux sur le moteur libre (souris, tactile, clavier, responsive) et vérification du câblage des trois modalités (`4.8.0-alpha.51`). La géométrie est désormais testée par valeurs, pas par présence de chaînes. Reste à étendre la matrice à un vrai navigateur si un jour Playwright rejoint les dépendances.
 - [ ] Réduire la complexité d’usage : actions principales immédiatement compréhensibles, commandes avancées regroupées sans barre illisible ni vocabulaire technique ambigu.
 
 ### Constats ouverts issus de l’audit et du détecteur

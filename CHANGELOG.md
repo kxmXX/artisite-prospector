@@ -7,6 +7,12 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 15 septembre 2026 (4.8.0-alpha.51)
+
+- Matrice de non-régression des gestes : 9 tests couvrant les trois modalités. Souris — magnétisme d’ancrage (bord, centre, seuil), lignes d’alignement, égalisation des espacements, sélection au cadre. Tactile — défilement automatique en bordure. Clavier — pas de 1 px / 10 px, Échap, groupage ⌘G, magnétisme à 15°. Responsive — mise à l’échelle entre breakpoints.
+- La géométrie du moteur libre est désormais vérifiée par comportement (valeurs exactes) plutôt que par simple présence de chaînes dans le code.
+- QA : 9/9 pour la nouvelle matrice, 266/266 tests complets, détecteur Impeccable sans alerte sur le moteur.
+
 ### Consolidation — 15 septembre 2026 (4.8.0-alpha.50)
 
 - Ancres d’édition : chaque ancre du canevas porte désormais `onclick="event.preventDefault()"` en mode éditeur. `href` reste présent pour la sémantique et la parité d’export, mais un clic ne peut plus déclencher de navigation de fragment ni d’ouverture `tel:`/`sms:` parasite.

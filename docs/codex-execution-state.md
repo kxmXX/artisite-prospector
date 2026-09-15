@@ -1,3 +1,14 @@
+## LOT DE LIVRAISON — matrice de gestes 4.8.0-alpha.51 — 15 septembre 2026
+
+- Nouveau fichier `tests/editor_gesture_matrix.test.js` : 9 tests organisés par modalité, exécutés en valeurs exactes sur le moteur pur `engine/freeform.js`.
+- Souris : `resolveFreeformSnap` (bord droit, centre, hors seuil, entrées invalides), `rectAxisLines` (début/centre/fin), `resolveEqualSpacingSnap` (écart partagé = 40 px), `marqueeContainsRectCenter` (centre dedans/dehors).
+- Tactile : `resolveEdgeAutoScroll` (haut négatif, bas positif, milieu 0, hors cadre 0, rectangle dégénéré 0) et vérification de `pointerType === "touch"`, `touch-action:none`, `@media(pointer:coarse)`.
+- Clavier : pas de 1 px / 10 px, Échap, groupage/dégroupage ⌘G, magnétisme de rotation à 15° et verrou de ratio.
+- Responsive : `adaptFreeformLayoutToViewport` desktop→mobile (x 120→39, y 60→19,5, largeur 600→195, hauteur 300→97,5, rotation conservée).
+- Honnêteté : il s’agit d’une matrice comportementale Node et de câblage, complétée par les passages navigateur manuels des tours précédents ; ce n’est pas encore une exécution Playwright automatisée.
+- Tests : 9/9 matrice, 266/266 complets, détecteur Impeccable 0 alerte sur le moteur.
+- Prochaine action exacte : réduire la complexité d’usage des barres d’outils et de leurs libellés, puis sortie de mode explicite des cellules.
+
 ## LOT DE LIVRAISON — ancres inertes en édition 4.8.0-alpha.50 — 15 septembre 2026
 
 - `decorateLayoutKeys` reçoit `isEditor` et, en mode éditeur uniquement, ajoute `onclick="event.preventDefault()"` à chaque ancre portant `href`. Le canevas n’est pas une page vivante : un clic ne doit jamais naviguer. `href` reste pour la sémantique et la parité d’export.
