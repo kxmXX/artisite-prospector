@@ -130,12 +130,13 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
       panneau, cliquable, calculée sur la même référence que le rendu. **Vérifié à l'écran** : les cinq états
       d'élément, le remplissage, les angles, l'opacité, le fond, la bordure et l'ombre (lots 4c et 5a/5b
       confirmés). *Reste* : voir à l'écran le bloc « Position et taille » (lot 6), plus bas dans le panneau.
-- [ ] **Lot 6 — Positionnement, largement vérifié** (`4.9.0-alpha.35` → `.41`) : champs numériques X / Y /
+- [ ] **Lot 6 — Positionnement, largement vérifié** (`4.9.0-alpha.35` → `.42`) : champs numériques X / Y /
       Largeur / Hauteur / Rotation, bornes, « flux par défaut » tenu (aucune règle CSS sans valeur saisie),
-      activation explicite de la position libre **sans déplacement**, retour au flux. **Vérifié à l'écran de
-      bout en bout** : sélection → activation → pastille « position libre », X et Y à 0, panneau maintenu
-      ouvert. *Reste* : le geste de déplacement à la souris (validation utilisateur demandée), la position
-      libre pour images et boutons, les boîtes de sélection unifiées, les gestes par appareil.
+      activation explicite de la position libre **sans déplacement**, retour au flux. La liste des éléments
+      est dérivée du balisage rendu, donc elle couvre aussi les **images et les boutons** (`4.9.0-alpha.42`).
+      **Vérifié à l'écran de bout en bout** : sélection → activation → pastille « position libre », X et Y à 0,
+      panneau maintenu ouvert. *Reste* : le geste de déplacement à la souris (validation utilisateur demandée),
+      les boîtes de sélection unifiées, les gestes par appareil.
 - [ ] **Lot 6 — Positionnement** : flux par défaut, position libre en option, champs numériques
       X/Y/L/H/rotation, boîte de sélection réduite à un menu `⋯`, bornes clavier = bornes souris.
 - [ ] **Lot 7 — Mouvement unifié** : catalogue unique, déclencheur, durée, délai, courbe, direction,

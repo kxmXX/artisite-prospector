@@ -103,3 +103,39 @@ test('l inspecteur propose l activation explicite tant que rien n est positionne
   assert.ok(free.includes('position libre'), 'la pastille doit l annoncer');
   state.selectedElementKey = null;
 });
+
+test('la liste des elements vient du rendu, pas du contenu', async () => {
+  const { generateSite } = await import('../public/js/engine/generator.js');
+  const { renderWebsiteHTML, collectSectionElements } = await import('../public/js/components/renderer.js');
+  const project = generateSite({ name: 'Controle Liste', tradeId: 'plombier' });
+  const rendered = new Set([...renderWebsiteHTML(project, { isEditor: true }).matchAll(/data-layout-key="([^"]+)"/g)].map((m) => m[1]));
+  // Certaines sections (trust, par exemple) n'ont aucun element decorable : c'est
+  // normal, elles ne doivent simplement rien proposer.
+  let total = 0;
+  for (const section of project.sections) {
+    const elements = collectSectionElements(project, section);
+    total += elements.length;
+    for (const element of elements) {
+      assert.ok(rendered.has(element.key), 'cle proposee mais absente du canevas : ' + element.key);
+      assert.ok(['text', 'image', 'button'].includes(element.kind), 'nature inconnue : ' + element.kind);
+    }
+  }
+  assert.ok(total > 20, 'la liste doit couvrir le site, pas seulement une section : ' + total);
+  const kinds = new Set(project.sections.flatMap((s) => collectSectionElements(project, s).map((e) => e.kind)));
+  assert.ok(kinds.has('image') || kinds.has('button'), 'images ou boutons doivent apparaitre dans la liste');
+});
+
+test('la liste ne propose plus les champs sans element decore', async () => {
+  const { generateSite } = await import('../public/js/engine/generator.js');
+  const { collectSectionElements } = await import('../public/js/components/renderer.js');
+  const ids = await import('../public/js/data/uiIds.js');
+  const project = generateSite({ name: 'Controle Fantomes', tradeId: 'plombier' });
+  const section = project.sections.find((s) => s.type === 'customBlock') || project.sections[0];
+  const keys = collectSectionElements(project, section).map((e) => e.key);
+  // `blockType` et `ctaLink` sont du contenu sans element decorable : leurs cles ne
+  // doivent plus etre proposees, sinon l'auteur regle quelque chose d'invisible.
+  for (const ghost of ['blockType', 'ctaLink']) {
+    const ghostKey = ids.getUiCode(project.id, section.id, ghost);
+    assert.ok(!keys.includes(ghostKey), 'cle fantome encore proposee : ' + ghost);
+  }
+});

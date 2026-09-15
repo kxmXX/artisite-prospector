@@ -1649,3 +1649,12 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Verifie a l'ecran de bout en bout : selection depuis la liste, activation, pastille « position libre », X et Y a 0, panneau ouvert. Premier chemin d'ecriture du lot 6 confirme visuellement.
 - Tests : 386 → 388. `node --check` sur les trois fichiers, `scripts/build-utilities.mjs` relance.
 - Reste : geste de deplacement (validation utilisateur), position libre pour images et boutons, boites de selection unifiees, gestes par appareil ; puis 3b, 4d (mise en page de section, reglages globaux), 7, export 2d.
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.42 (liste des elements derivee du rendu)
+
+- Defaut trouve en sondant le rendu : la liste venait des champs du contenu, et plusieurs d'entre eux (blockType, ctaLink, provenance d'image, compteurs) ne produisent aucun element decorable. Leurs cles etaient proposees sans correspondance sur le canevas.
+- Correctif : `collectSectionElements(project, section)` dans le renderer derive la liste du balisage rendu. Un test verifie que chaque cle proposee existe vraiment, et un autre qu'aucune cle fantome (blockType, ctaLink) ne subsiste.
+- Effet de bord bienvenu : les images et les boutons entrent dans la liste alors qu'ils n'apparaissaient nulle part dans le contenu (un element « Bouton » est desormais visible dans la section Menu).
+- Libelles enrichis (nom de marque, telephone, image principale, reservations, objectif).
+- Tests : 388 → 390. `node --check` sur les deux fichiers, `scripts/build-utilities.mjs` relance.
+- Reste : geste de deplacement, boites de selection unifiees, gestes par appareil ; puis 3b, 4d (mise en page, reglages globaux), 7, export 2d.

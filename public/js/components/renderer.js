@@ -3590,3 +3590,33 @@ export function generateLocalBusinessSchema(project) {
     .replace(/>/g, "\\u003e")
     .replace(/&/g, "\\u0026");
 }
+
+/**
+ * Elements reellement positionnables d'une section.
+ *
+ * Derive du balisage rendu, pas du contenu : certains champs du contenu ne
+ * produisent aucun element decorable (un lien, une provenance d'image, un
+ * compteur), et proposer leur cle donnerait un reglage sans effet sur le canevas.
+ * Inversement, les images et les boutons n'apparaissent nulle part dans le
+ * contenu et doivent pourtant pouvoir etre positionnes.
+ */
+export function collectSectionElements(project, section) {
+  if (!project || !section) return [];
+  const markup = renderSection(section, project, { isEditor: true, selectedSectionId: section.id });
+  const found = new Map();
+  const tagPattern = /<([a-z][\w-]*)([^>]*\sdata-layout-key="([^"]+)"[^>]*)>/gi;
+  let match;
+  while ((match = tagPattern.exec(markup))) {
+    const tag = match[1].toLowerCase();
+    const attrs = match[2];
+    const key = match[3];
+    if (!key || found.has(key)) continue;
+    const editable = /\sdata-editable="([^"]+)"/.exec(attrs);
+    const imageField = /\sdata-image-field="([^"]+)"/.exec(attrs);
+    const isImage = tag === "img" || !!imageField || /img|image|photo|logo|avatar/i.test(attrs);
+    const isButton = !isImage && (/cta|btn|button/i.test(attrs) || tag === "button");
+    const field = editable ? editable[1] : (imageField ? imageField[1] : "");
+    found.set(key, { key, field, kind: isImage ? "image" : (isButton ? "button" : "text") });
+  }
+  return [...found.values()];
+}

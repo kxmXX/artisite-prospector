@@ -13,7 +13,7 @@ import { ELEMENT_PADDING, ELEMENT_RADIUS, ELEMENT_OPACITY, ELEMENT_BACKGROUND, E
 import { ELEMENT_STATES, ELEMENT_STATE_LABELS, getElementState } from "../engine/elementStates.js";
 import { MOTION_PRESETS, MOTION_SPEEDS, MOTION_DELAYS } from "../data/motionPresets.js";
 import { TRANSFORM_FIELDS, getElementTransform, hasElementTransform } from "../engine/elementTransform.js";
-import { getUiCode } from "../data/uiIds.js";
+import { collectSectionElements } from "./renderer.js";
 
 /**
  * Divulgation progressive : l'inspecteur montre d'abord l'essentiel — choisir une
@@ -63,13 +63,21 @@ const ELEMENT_SCALE_ROWS = [
  */
 const ELEMENT_LABELS = {
   title: "Titre", subtitle: "Sous-titre", description: "Description", text: "Texte",
-  badge: "Badge", cta: "Bouton", ctaLabel: "Libelle du bouton", image: "Image",
-  image2: "Image secondaire", price: "Prix", label: "Libelle", name: "Nom", role: "Role"
+  badge: "Badge", cta: "Bouton", ctaLabel: "Libellé du bouton", ctaText: "Texte du bouton",
+  ctaPrimary: "Bouton principal", ctaSecondary: "Bouton secondaire", image: "Image",
+  image2: "Image secondaire", heroImage: "Image principale", logo: "Logo",
+  price: "Prix", priceText: "Texte du prix", label: "Libellé", name: "Nom", role: "Rôle",
+  brandName: "Nom de marque", phone: "Téléphone", trustNote: "Mention de confiance",
+  currentBookings: "Réservations actuelles", targetBookings: "Objectif de réservations"
 };
 
-function elementLabelFor(fieldPath) {
-  const last = String(fieldPath || "").split(".").pop() || "";
-  return ELEMENT_LABELS[last] || last.replace(/[_-]+/g, " ");
+const ELEMENT_KIND_LABELS = { image: "Image", button: "Bouton", text: "Texte" };
+
+function elementLabelFor(field, kind) {
+  const last = String(field || "").split(".").pop() || "";
+  if (ELEMENT_LABELS[last]) return ELEMENT_LABELS[last];
+  if (last) return last.replace(/[_-]+/g, " ");
+  return ELEMENT_KIND_LABELS[kind] || "Element";
 }
 
 /**
@@ -80,21 +88,17 @@ function elementLabelFor(fieldPath) {
  * geste de glisser que rien dans l'interface n'annoncait.
  */
 function sectionElementsHTML(section, project, selectedKey) {
-  const fields = Object.keys(section?.content || {}).filter((key) => {
-    const value = section.content[key];
-    return typeof value === "string" || typeof value === "number";
-  });
-  if (!fields.length) return "";
+  const elements = collectSectionElements(project, section);
+  if (!elements.length) return "";
   return `
     <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-xl space-y-2">
       <label class="text-ui-xs font-bold uppercase tracking-wider text-zinc-700">Elements de la section</label>
       <div class="space-y-1">
-        ${fields.map((fieldPath) => {
-          const layoutKey = getUiCode(project?.id, section?.id, fieldPath);
-          const active = layoutKey === selectedKey;
+        ${elements.map((element) => {
+          const active = element.key === selectedKey;
           return `<button type="button"
                           class="w-full text-left px-2 py-1 rounded-md text-ui-xs border transition-colors ${active ? 'border-zinc-900 bg-zinc-900 text-white font-semibold' : 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-400'}"
-                          onclick="window.app.selectElementForEditing('${layoutKey}')">${elementLabelFor(fieldPath)}</button>`;
+                          onclick="window.app.selectElementForEditing('${element.key}')">${elementLabelFor(element.field, element.kind)}</button>`;
         }).join("")}
       </div>
     </div>

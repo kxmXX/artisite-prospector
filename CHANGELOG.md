@@ -7,6 +7,15 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.42) — La liste des éléments vient du rendu, images et boutons compris
+
+- Défaut trouvé en vérifiant : la liste « Éléments de la section » était dérivée des champs du **contenu**. Or plusieurs champs ne produisent aucun élément décorable (`blockType`, `ctaLink`, une provenance d'image, un compteur) : leurs clés étaient proposées alors qu'elles ne correspondent à **rien** sur le canevas — l'auteur aurait réglé un élément invisible.
+- Correctif : la liste est désormais dérivée du **balisage rendu** (`collectSectionElements`), donc seuls les éléments réellement positionnables apparaissent. Un test vérifie que chaque clé proposée existe bien dans le canevas.
+- Ce changement ajoute du même coup **les images et les boutons**, qui n'apparaissaient nulle part dans le contenu : la section Menu expose maintenant un élément « Bouton » que rien ne montrait auparavant.
+- Libellés enrichis : nom de marque, téléphone, texte du bouton, image principale, mention de confiance, réservations actuelles et objectif.
+- Tests : 2 nouveaux ; 388 → **390/390**.
+- Reste : le geste de déplacement à la souris (validation utilisateur demandée), les boîtes de sélection unifiées, les gestes par appareil.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.41) — Position libre explicite, et le panneau ne se referme plus
 
 - Fait : `enableElementTransform` active la position libre d'un élément **sans le déplacer** (décalage nul), et l'inspecteur propose « Activer la position libre » tant que l'élément suit le flux, puis « Revenir au flux » ensuite. L'option existait déjà, mais rien ne l'annonçait : elle ne s'activait qu'en tapant une valeur dans un champ.
