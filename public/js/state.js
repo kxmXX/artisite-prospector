@@ -376,6 +376,46 @@ class AppStateManager {
     this.closeDrawer();
   }
 
+  setFreeformLayout(layoutKey, viewport = "desktop", nextLayout = {}, historyDesc = "Transformation libre") {
+    if (!this.currentProject || !layoutKey) return;
+    const safeViewport = ["desktop", "tablet", "mobile"].includes(viewport) ? viewport : "desktop";
+    const numberOr = (value, fallback = 0) => {
+      const parsed = Number(value);
+      return Number.isFinite(parsed) ? parsed : fallback;
+    };
+    const normalized = {
+      x: Math.round(numberOr(nextLayout.x) * 100) / 100,
+      y: Math.round(numberOr(nextLayout.y) * 100) / 100
+    };
+    const width = Number(nextLayout.width);
+    const height = Number(nextLayout.height);
+    const z = Number(nextLayout.z);
+    if (Number.isFinite(width) && width > 0) normalized.width = Math.round(width * 100) / 100;
+    if (Number.isFinite(height) && height > 0) normalized.height = Math.round(height * 100) / 100;
+    if (Number.isFinite(z)) normalized.z = Math.max(-10, Math.min(999, Math.round(z)));
+
+    const current = this.currentProject.freeformLayout?.[safeViewport]?.[layoutKey] || null;
+    if (JSON.stringify(current) === JSON.stringify(normalized)) return;
+    this.pushHistory(historyDesc);
+    const project = JSON.parse(JSON.stringify(this.currentProject));
+    project.freeformLayout = project.freeformLayout || { desktop: {}, tablet: {}, mobile: {} };
+    project.freeformLayout.desktop = project.freeformLayout.desktop || {};
+    project.freeformLayout.tablet = project.freeformLayout.tablet || {};
+    project.freeformLayout.mobile = project.freeformLayout.mobile || {};
+    project.freeformLayout[safeViewport][layoutKey] = normalized;
+    this.updateProject(project, false);
+  }
+
+  clearFreeformLayout(layoutKey, viewport = "desktop", historyDesc = "Réinitialisation position libre") {
+    if (!this.currentProject || !layoutKey) return;
+    const safeViewport = ["desktop", "tablet", "mobile"].includes(viewport) ? viewport : "desktop";
+    if (!this.currentProject.freeformLayout?.[safeViewport]?.[layoutKey]) return;
+    this.pushHistory(historyDesc);
+    const project = JSON.parse(JSON.stringify(this.currentProject));
+    delete project.freeformLayout?.[safeViewport]?.[layoutKey];
+    this.updateProject(project, false);
+  }
+
   // Button Management within currentProject (Undo/Redo supported)
   deleteButton(sectionId, buttonType) {
     if (!this.currentProject) return;

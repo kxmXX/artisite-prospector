@@ -608,3 +608,33 @@
 
 /* System overlays always sit above editor chrome, assistants and conversion docks. */
 .studio-system-modal{z-index:10000!important}
+
+/* ---------- freeform canvas controls (Canva/Figma foundation) ---------- */
+.freeform-selection-box{
+  position:fixed;display:none;z-index:9400;pointer-events:none;
+  border:1.5px solid #2563eb;border-radius:4px;box-shadow:0 0 0 1px rgba(255,255,255,.78),0 0 0 3px rgba(37,99,235,.10);
+}
+.freeform-selection-box.is-visible{display:block}
+.freeform-selection-box.is-transforming{box-shadow:0 0 0 1px rgba(255,255,255,.9),0 0 0 4px rgba(37,99,235,.16)}
+.freeform-selection-label{
+  position:absolute;left:-1px;top:-31px;min-height:24px;max-width:min(360px,70vw);display:flex;align-items:center;gap:6px;
+  padding:3px 5px 3px 8px;border-radius:6px;background:#1d4ed8;color:#fff;font:650 10px/1.1 ui-monospace,SFMono-Regular,Menlo,monospace;
+  box-shadow:0 6px 18px rgba(29,78,216,.22);pointer-events:auto;white-space:nowrap;
+}
+.freeform-selection-label span{overflow:hidden;text-overflow:ellipsis}
+.freeform-selection-label button{border:0;border-radius:4px;background:rgba(255,255,255,.17);color:#fff;padding:3px 5px;font:700 9px/1 sans-serif;cursor:pointer}
+.freeform-move-handle{
+  position:absolute;left:50%;top:-15px;translate:-50% -50%;width:30px;height:24px;border:1px solid #1d4ed8;border-radius:7px;
+  background:#fff;color:#1d4ed8;display:grid;place-items:center;pointer-events:auto;touch-action:none;cursor:grab;box-shadow:0 3px 10px rgba(15,23,42,.14)
+}
+.freeform-move-handle:active{cursor:grabbing}
+.freeform-resize-handle{
+  position:absolute;width:14px;height:14px;border:2px solid #2563eb;border-radius:50%;background:#fff;pointer-events:auto;touch-action:none;padding:0;
+  box-shadow:0 1px 5px rgba(15,23,42,.15)
+}
+.freeform-resize-nw{left:0;top:0;translate:-50% -50%;cursor:nwse-resize}.freeform-resize-n{left:50%;top:0;translate:-50% -50%;cursor:ns-resize}.freeform-resize-ne{right:0;top:0;translate:50% -50%;cursor:nesw-resize}
+.freeform-resize-e{right:0;top:50%;translate:50% -50%;cursor:ew-resize}.freeform-resize-se{right:0;bottom:0;translate:50% 50%;cursor:nwse-resize}.freeform-resize-s{left:50%;bottom:0;translate:-50% 50%;cursor:ns-resize}
+.freeform-resize-sw{left:0;bottom:0;translate:-50% 50%;cursor:nesw-resize}.freeform-resize-w{left:0;top:50%;translate:-50% -50%;cursor:ew-resize}
+#canvas-container [data-layout-key]{touch-action:manipulation}
+#canvas-container [data-layout-key].is-freeform-selected{outline:1px dashed rgba(37,99,235,.34);outline-offset:2px}
+@media(max-width:640px){.freeform-selection-label{top:-28px;max-width:78vw}.freeform-move-handle{width:34px;height:28px}.freeform-resize-handle{width:16px;height:16px}}

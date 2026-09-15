@@ -1,5 +1,14 @@
 # État de reprise Codex — 15 septembre 2026
 
+## LOT DE LIVRAISON — fondation Canva/Figma 4.8.0-alpha.17
+
+- Modèle : `project.freeformLayout` stocke x/y/width/height/z par clé stable et par breakpoint `desktop/tablet/mobile`; chaque mutation passe par l’historique projet.
+- Cibles phase 1 : les textes éditables, images et CTA disposent d’une `data-layout-key` neutre identique en éditeur, preview et export, sans exposer les contrôles `data-ui-*` dans le public.
+- Interaction : sélection unique, cadre flottant, poignée Move, huit poignées de redimensionnement, Reset et déplacement clavier 1/10 px. Les gestes utilisent Pointer Events et ne reposent pas sur le drag HTML5 du canvas.
+- Responsive : le CSS généré isole les trois breakpoints et le viewport simulé de l’éditeur prévaut sur la largeur physique de la fenêtre.
+- Validation navigateur : H1 déplacé/redimensionné, image et CTA sélectionnables, desktop `500×180 @ (40,10)` vs mobile `300×160 @ (5,7)` dans la même fenêtre, zéro erreur console. Tests : 37/37 ciblés, 196/196 complets et `git diff --check`.
+- Prochaine action : multi-sélection Shift, groupes persistants, group/ungroup et déplacement collectif.
+
 ## LOT DE LIVRAISON — images et modales V3 4.8.0-alpha.16
 
 - Images imbriquées : le helper d’image utilise désormais le chemin de donnée réel pour ouvrir, déposer et supprimer (`services.N.image`, `items.N.image`) au lieu du champ générique `image`; application et Undo vérifiés en navigateur.

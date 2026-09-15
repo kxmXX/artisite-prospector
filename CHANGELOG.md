@@ -7,6 +7,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 15 septembre 2026 (4.8.0-alpha.17)
+
+- Éditeur libre : première fondation Canva/Figma avec clé de layout stable sur textes, images et CTA, cadre de sélection, Move, Reset et huit poignées de redimensionnement.
+- Interaction : Pointer Events, déplacement clavier accessible et Undo/Redo ; la géométrie est persistée seulement à la fin du geste.
+- Responsive : positions et dimensions séparées entre desktop/tablette/mobile, y compris dans le simulateur de viewport.
+- Livraison : les mêmes règles de layout sont réutilisées en preview et dans l’export standalone. Validation : 37/37 ciblés, 196/196 complets et `git diff --check`.
+
 ### Consolidation — 15 septembre 2026 (4.8.0-alpha.16)
 
 - Images éditeur : les actions Remplacer / drop / suppression des images imbriquées utilisent désormais le chemin réel du contenu et conservent Undo.

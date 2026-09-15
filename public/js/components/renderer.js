@@ -40,6 +40,73 @@ function getButtonSequentialNumber(sec, buttonType) {
   return buttonIndexMap.get(key);
 }
 
+function getButtonLayoutCode(project, section, buttonType) {
+  const role = buttonType === "phone"
+    ? "btn-phone"
+    : (buttonType === "primary" ? (section?.type === "hero" ? "btn" : "btn-primary") : buttonType);
+  return getUiCode(project?.id, section?.id, `button-${role}`);
+}
+
+function decorateLayoutKeys(markup, project, section) {
+  let output = markup.replace(/<([a-z][\w-]*)(\s[^>]*data-editable="([^"]+)"[^>]*)>/gi, (full, _tag, _attrs, fieldPath) => {
+    if (/\sdata-layout-key=/.test(full)) return full;
+    const code = getUiCode(project?.id, section?.id, fieldPath);
+    return full.replace(/>$/, ` data-layout-key="${code}">`);
+  });
+
+  output = output.replace(/<div(\s[^>]*data-cta-popover-wrapper[^>]*)>/gi, (full, attrs) => {
+    if (/\sdata-layout-key=/.test(full)) return full;
+    const buttonType = attrs.match(/data-button-type="([^"]+)"/)?.[1];
+    if (!buttonType) return full;
+    return full.replace(/>$/, ` data-layout-key="${getButtonLayoutCode(project, section, buttonType)}">`);
+  });
+  return output;
+}
+
+function freeformDeclarations(layout = {}) {
+  const x = Number(layout.x) || 0;
+  const y = Number(layout.y) || 0;
+  const width = Number(layout.width);
+  const height = Number(layout.height);
+  const z = Number(layout.z);
+  const declarations = [
+    'position:relative!important',
+    `translate:${x}px ${y}px!important`,
+    'box-sizing:border-box!important'
+  ];
+  if (Number.isFinite(width) && width > 0) declarations.push(`width:${Math.round(width * 100) / 100}px!important`, 'max-width:none!important');
+  if (Number.isFinite(height) && height > 0) declarations.push(`height:${Math.round(height * 100) / 100}px!important`);
+  if (Number.isFinite(z)) declarations.push(`z-index:${Math.max(-10, Math.min(999, Math.round(z)))}!important`);
+  return declarations.join(';');
+}
+
+export function buildFreeformLayoutCSS(project) {
+  const layouts = project?.freeformLayout || {};
+  const escapeKey = key => String(key || '').replace(/[^a-zA-Z0-9_-]/g, '');
+  const makeRules = (viewport, selectorPrefix) => Object.entries(layouts?.[viewport] || {})
+    .filter(([key, layout]) => key && layout && typeof layout === 'object')
+    .map(([key, layout]) => `${selectorPrefix} [data-layout-key="${escapeKey(key)}"]{${freeformDeclarations(layout)}}`)
+    .join('\n');
+
+  const editorDesktop = makeRules('desktop', '#canvas-container[data-viewport="desktop"] .artisite-root.editor-mode');
+  const editorTablet = makeRules('tablet', '#canvas-container[data-viewport="tablet"] .artisite-root.editor-mode');
+  const editorMobile = makeRules('mobile', '#canvas-container[data-viewport="mobile"] .artisite-root.editor-mode');
+  const publicDesktop = makeRules('desktop', '.artisite-root.public-mode');
+  const publicTablet = makeRules('tablet', '.artisite-root.public-mode');
+  const publicMobile = makeRules('mobile', '.artisite-root.public-mode');
+  const previewDesktop = makeRules('desktop', '#canvas-container[data-viewport="desktop"] .artisite-root.public-mode');
+  const previewTablet = makeRules('tablet', '#canvas-container[data-viewport="tablet"] .artisite-root.public-mode');
+  const previewMobile = makeRules('mobile', '#canvas-container[data-viewport="mobile"] .artisite-root.public-mode');
+
+  return [
+    editorDesktop, editorTablet, editorMobile,
+    publicDesktop ? `@media (min-width:1024px){${publicDesktop}}` : '',
+    publicTablet ? `@media (min-width:640px) and (max-width:1023px){${publicTablet}}` : '',
+    publicMobile ? `@media (max-width:639px){${publicMobile}}` : '',
+    previewDesktop, previewTablet, previewMobile
+  ].filter(Boolean).join('\n');
+}
+
 function decorateEditableMarkup(markup, project, section) {
   return markup.replace(/<([a-z][\w-]*)(\s[^>]*data-editable="([^"]+)"[^>]*)>/gi, (full, tag, attrs, fieldPath) => {
     const fontSizeDelta = section?.settings?.[`fontSize_${fieldPath}`] || 0;
@@ -143,13 +210,14 @@ export function renderEditableImage(url, { sectionId = "", fieldPath = "", targe
   const motionClass = imgMotion && imgMotion !== "none" ? ` motion-preset-${imgMotion.replace('-in', '')}${imgMotion === 'pulse' ? ' btn-pulse-active' : ''}` : "";
 
   if (!isEditor) {
-    return `<img src="${displayUrl}" data-fallback-src="${fallbackSvg}" alt="${alt}" class="${className}${motionClass}" ${perfAttrs} ${onErrorAttr}${motionAttr}>`;
+    return `<img src="${displayUrl}" data-layout-key="${imageUiCode}" data-fallback-src="${fallbackSvg}" alt="${alt}" class="${className}${motionClass}" ${perfAttrs} ${onErrorAttr}${motionAttr}>`;
   }
 
   globalElementIndex += 1;
   const imageElementIndex = globalElementIndex;
   return `
     <div class="relative group/img w-full h-full"
+         data-layout-key="${imageUiCode}"
          ${imageTargetId ? `data-ui-id="${imageTargetId}" data-ui-code="${imageUiCode}" data-ui-type="field" data-ui-target="true" data-ui-index="${imageElementIndex}" data-ui-index-size="m"` : ''}
          ondragover="event.preventDefault(); this.classList.add('ring-2', 'ring-zinc-900');"
          ondragleave="this.classList.remove('ring-2', 'ring-zinc-900');"
@@ -308,6 +376,7 @@ export function renderWebsiteHTML(project, options = { isEditor: false, isStanda
     ">
       <div class="site-scroll-progress" aria-hidden="true"></div>
       <style>${HERO_STYLES}</style>
+      <style data-freeform-layout>${buildFreeformLayoutCSS(project)}</style>
       ${sectionsHTML}
       ${stickyBarHTML}
       ${lightboxHTML}
@@ -416,6 +485,7 @@ function renderSection(sec, project, options) {
   }
 
   if (isEditor) innerHTML = decorateEditableMarkup(innerHTML, project, sec);
+  innerHTML = decorateLayoutKeys(innerHTML, project, sec);
 
   const globalBg = String(project.branding?.bgColor || "").toLowerCase();
   const inferredTheme = sec.type === "cta" ? "primary" : (["#09090b", "#0f0f11", "#111318", "#18181b"].includes(globalBg) ? "dark" : ["#f4f4f5", "#f8fafc"].includes(globalBg) ? "mineral" : "white");

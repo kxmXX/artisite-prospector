@@ -13,8 +13,9 @@ globalThis.document = {
 const { App } = await import('../public/js/app.js');
 const { state } = await import('../public/js/state.js');
 const { generateDemoSite } = await import('../public/js/engine/generator.js');
-const { renderWebsiteHTML } = await import('../public/js/components/renderer.js');
+const { renderWebsiteHTML, buildFreeformLayoutCSS } = await import('../public/js/components/renderer.js');
 const { renderEditor } = await import('../public/js/components/editor.js');
+const { exportStandaloneHTML } = await import('../public/js/engine/exporter.js');
 
 const css = fs.readFileSync(path.resolve(process.cwd(), 'public/css/studio-v3.css'), 'utf8');
 
@@ -126,4 +127,67 @@ test('V3 modals stay viewport-bounded and receive a deliberate initial focus', (
   assert.ok(appSource.includes('image_modal: "#tab-img-library"'));
   assert.ok(appSource.includes('share_modal: "#share-modal-url-input"'));
   assert.ok(appSource.includes('this._modalReturnFocus = document.activeElement || null'));
+});
+
+test('Freeform foundation keeps stable layout keys across editor/public render and breakpoint CSS', () => {
+  const project = generateDemoSite({ name: 'Esprit Nature', tradeId: 'paysagiste', city: 'Montauban' });
+  const editorHtml = renderWebsiteHTML(project, { isEditor: true, isStandalone: false });
+  const publicHtml = renderWebsiteHTML(project, { isEditor: false, isStandalone: false });
+  const editorTitle = editorHtml.match(/<h1[^>]*data-editable="title"[^>]*data-layout-key="([^"]+)"/i);
+  const publicTitle = publicHtml.match(/<h1[^>]*data-editable="title"[^>]*data-layout-key="([^"]+)"/i);
+  assert.ok(editorTitle?.[1], 'editor title must expose a neutral layout key');
+  assert.equal(publicTitle?.[1], editorTitle[1], 'public render must keep the exact same layout key');
+
+  project.freeformLayout = {
+    desktop: { [editorTitle[1]]: { x: 24, y: -12, width: 420, height: 96, z: 3 } },
+    tablet: { [editorTitle[1]]: { x: 8, y: 4, width: 360 } },
+    mobile: { [editorTitle[1]]: { x: 0, y: 6, width: 310 } }
+  };
+  const cssOut = buildFreeformLayoutCSS(project);
+  assert.ok(cssOut.includes('#canvas-container[data-viewport="desktop"]'));
+  assert.ok(cssOut.includes('@media (min-width:1024px)'));
+  assert.ok(cssOut.includes('@media (min-width:640px) and (max-width:1023px)'));
+  assert.ok(cssOut.includes('@media (max-width:639px)'));
+  assert.ok(cssOut.includes('#canvas-container[data-viewport="mobile"] .artisite-root.public-mode'));
+  assert.ok(cssOut.includes('translate:24px -12px!important'));
+  assert.ok(cssOut.includes('width:420px!important'));
+  const standalone = exportStandaloneHTML(project);
+  assert.ok(standalone.includes(`data-layout-key="${editorTitle[1]}"`));
+  assert.ok(standalone.includes('translate:24px -12px!important'));
+});
+
+test('Freeform layout persistence is breakpoint-scoped and Undo restores the previous project snapshot', () => {
+  const previous = {
+    projects: state.projects,
+    currentProject: state.currentProject,
+    undoStack: state.undoStack,
+    redoStack: state.redoStack
+  };
+  try {
+    const project = generateDemoSite({ name: 'Layout Test', tradeId: 'paysagiste', city: 'Lyon' });
+    state.projects = [project];
+    state.currentProject = project;
+    state.undoStack = [];
+    state.redoStack = [];
+    state.setFreeformLayout('E_TEST', 'desktop', { x: 31, y: 14, width: 280, height: 80 }, 'Move test');
+    assert.deepEqual(state.currentProject.freeformLayout.desktop.E_TEST, { x: 31, y: 14, width: 280, height: 80 });
+    assert.equal(state.currentProject.freeformLayout.tablet.E_TEST, undefined);
+    assert.equal(state.undoStack.length, 1);
+    state.undo();
+    assert.equal(state.currentProject.freeformLayout, undefined);
+  } finally {
+    state.projects = previous.projects;
+    state.currentProject = previous.currentProject;
+    state.undoStack = previous.undoStack;
+    state.redoStack = previous.redoStack;
+  }
+});
+
+test('Freeform editor uses Pointer Events with move, eight resize handles, keyboard nudge and reset', () => {
+  const appSource = fs.readFileSync(path.resolve(process.cwd(), 'public/js/app.js'), 'utf8');
+  assert.ok(appSource.includes('startFreeformInteraction(event, action = "move"'));
+  assert.ok(appSource.includes('["nw","n","ne","e","se","s","sw","w"]'));
+  assert.ok(appSource.includes('window.addEventListener("pointermove", onMove)'));
+  assert.ok(appSource.includes('nudgeFreeformSelection(-step, 0)'));
+  assert.ok(appSource.includes('state.clearFreeformLayout(this._freeformSelectedKey'));
 });

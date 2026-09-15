@@ -183,8 +183,8 @@ test("Esprit Nature demo matches the reference About and FAQ copy hierarchy", ()
   assert.equal(faq.content.badge, "FAQ");
   assert.equal(faq.content.title, "Questions fréquentes");
   assert.match(html, /Artisan certifié/);
-  assert.match(html, /data-editable="badge">\s*FAQ\s*<\/div>/);
-  assert.match(html, /data-editable="title">\s*Questions fréquentes\s*<\/h2>/);
+  assert.match(html, /data-editable="badge"[^>]*>\s*FAQ\s*<\/div>/);
+  assert.match(html, /data-editable="title"[^>]*>\s*Questions fréquentes\s*<\/h2>/);
 });
 
 test("paysagiste navigation labels stay editable without losing required one-page destinations", () => {
@@ -225,7 +225,7 @@ test("quote simulator exposes editable urgency choices in the rendered conversio
   quote.content.urgencyLabel = "Quand intervenir ?";
   quote.content.urgencyOptions = ["Cette semaine", "Le mois prochain"];
   const html = renderWebsiteHTML(project);
-  assert.match(html, /data-editable="urgencyLabel">Quand intervenir \?<\/label>/);
+  assert.match(html, /data-editable="urgencyLabel"[^>]*>Quand intervenir \?<\/label>/);
   assert.match(html, /<option value="Cette semaine">Cette semaine<\/option>/);
   assert.match(html, /<option value="Le mois prochain">Le mois prochain<\/option>/);
 });

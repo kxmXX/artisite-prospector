@@ -74,15 +74,19 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 
 ## Édition libre Canva / Figma — nouveau cap produit
 
-- [ ] Fondation — définir un modèle de layout libre persistant par élément stable (`#E…`) sans casser le HTML sémantique, le responsive, l’Undo/Redo ni l’export.
-- [ ] Sélection universelle — cliquer n’importe quel texte, image, CTA ou bloc éditable affiche un cadre de sélection unique avec poignées, coordonnées et dimensions.
-- [ ] Déplacement — drag Pointer Events au pixel, clavier fléché accessible, contraintes à la section, guides et snapping ; aucune dépendance au drag HTML5 pour le canvas.
-- [ ] Redimensionnement — poignées côtés/coins, conservation optionnelle du ratio, dimensions min/max et aperçu direct pendant le geste.
+- [x] Fondation — modèle `freeformLayout` persistant par clé stable et par breakpoint, réinjecté dans éditeur/preview/export avec Undo/Redo.
+- [x] Sélection phase 1 — textes, images et CTA stables affichent un cadre unique avec dimensions, poignée Move, Reset et 8 poignées de resize.
+- [ ] Sélection universelle phase 2 — étendre les clés de layout aux cartes, conteneurs, icônes et blocs structurels qui ne portent pas encore `data-editable`.
+- [x] Déplacement phase 1 — Pointer Events via poignée Move, flèches clavier (Shift = 10 px) et contrainte à la section ; pas de drag HTML5 sur le canvas.
+- [ ] Déplacement phase 2 — drag direct du corps sélectionné, snapping/guides et débordement contrôlé entre zones.
+- [x] Redimensionnement phase 1 — 8 poignées côtés/coins, dimensions min et aperçu direct, persistées à la fin du geste.
+- [ ] Redimensionnement phase 2 — ratio verrouillable, rotation et contraintes de taille avancées.
 - [ ] Multi-sélection — Shift/cadre de sélection, déplacement et redimensionnement collectif.
 - [ ] Groupes — grouper/dégrouper des éléments, transformer le groupe sans perdre les transformations individuelles, ordre/z-index contrôlable.
 - [ ] Alignement — aligner gauche/centre/droite/haut/milieu/bas, distribuer horizontalement/verticalement et afficher guides intelligents.
-- [ ] Responsive — positions/dimensions par breakpoint desktop/tablette/mobile, reset/adaptation propre lorsqu’aucune surcharge n’existe.
-- [ ] Persistance & livraison — toutes les transformations passent par l’état projet, Undo/Redo, sauvegarde locale, preview et export standalone.
+- [x] Responsive phase 1 — positions/dimensions isolées par desktop/tablette/mobile ; le viewport simulé gagne sur la taille réelle du navigateur.
+- [ ] Responsive phase 2 — héritage/adaptation assistée et commandes de copie/reset entre breakpoints.
+- [x] Persistance phase 1 — transformations enregistrées dans l’état projet, sauvegarde locale, Undo/Redo, preview et export standalone.
 - [ ] Robustesse — tests unitaires + navigateur pour texte/image/CTA/groupe, souris/tactile/clavier, sans collision avec inline editing, popovers ou modales.
 
 ## Stabilité async / backend — reprise après l’éditeur
@@ -117,5 +121,7 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - Lot `4.8.0-alpha.13` : déduplication `in-flight` exacte des générations IA ; 10/10 backend ciblés, 184/184 complets.
 - Lot `4.8.0-alpha.14` : premier correctif V3 post-`f49ec7f` — Réglages, previews appareil, collisions toolbar/dock, SVG et cibles de structure stabilisés ; audit navigateur 1440/390, 39/39 ciblés, 189/189 complets et `git diff --check`.
 - Lot `4.8.0-alpha.15` : sélection V3 synchronisée, inspecteur responsive sous 1280 px, drag/drop V3 rebranché sur les nouvelles lignes et édition de contenu vérifiée à 1280/1024/390 ; 27/27 ciblés, 191/191 complets.
-- Lot `4.8.0-alpha.16` : chemins d’images imbriquées corrigés, modales V3 bornées au viewport et focus d’ouverture fiabilisé ; validation navigateur 1440/1024/390.
+- Lot `4.8.0-alpha.16` : chemins d’images imbriquées corrigés, modales V3 bornées au viewport et focus d’ouverture fiabilisé ; validation navigateur 1440/1024/390, 9/9 ciblés, 193/193 complets.
+- Lot `4.8.0-alpha.17` : fondation Canva/Figma — clés de layout stables, sélection texte/image/CTA, Move + 8 poignées de resize, clavier/Reset/Undo et layouts distincts desktop/tablette/mobile avec parité preview/export ; 37/37 ciblés, 196/196 complets et `git diff --check`.
+- Prochaine action unique : multi-sélection Shift + groupes persistants + déplacement collectif, dans un commit séparé.
 - Prochaine action unique : démarrer la fondation Canva/Figma — modèle de layout libre persistant + sélection universelle + premier déplacement/redimensionnement sur cibles stables, avant multi-sélection/groupes.

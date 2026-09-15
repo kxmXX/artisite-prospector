@@ -4058,6 +4058,215 @@ export class App {
     }
   }
 
+  ensureFreeformOverlay() {
+    let overlay = document.getElementById("freeform-selection-box");
+    if (!overlay) {
+      overlay = document.createElement("div");
+      overlay.id = "freeform-selection-box";
+      overlay.className = "freeform-selection-box";
+      overlay.setAttribute("aria-hidden", "true");
+      overlay.innerHTML = `
+        <div class="freeform-selection-label"><span data-freeform-label>Élément</span><button type="button" data-freeform-reset title="Réinitialiser position et taille">Reset</button></div>
+        <button type="button" class="freeform-move-handle" data-freeform-action="move" aria-label="Déplacer l'élément">${getIcon("move", "w-3.5 h-3.5")}</button>
+        ${["nw","n","ne","e","se","s","sw","w"].map(handle => `<button type="button" class="freeform-resize-handle freeform-resize-${handle}" data-freeform-action="resize" data-freeform-handle="${handle}" aria-label="Redimensionner ${handle}"></button>`).join("")}
+      `;
+      document.body.appendChild(overlay);
+      overlay.querySelectorAll("[data-freeform-action]").forEach(handle => {
+        handle.addEventListener("pointerdown", event => this.startFreeformInteraction(event, handle.dataset.freeformAction, handle.dataset.freeformHandle || ""));
+      });
+      overlay.querySelector("[data-freeform-reset]")?.addEventListener("click", event => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (!this._freeformSelectedKey) return;
+        state.clearFreeformLayout(this._freeformSelectedKey, state.viewport, "Réinitialisation élément libre");
+      });
+    }
+    this._freeformOverlay = overlay;
+    return overlay;
+  }
+
+  selectFreeformTarget(target) {
+    if (!target || !target.dataset?.layoutKey) return;
+    this._freeformSelectedKey = target.dataset.layoutKey;
+    this._freeformSelectedElement = target;
+    const overlay = this.ensureFreeformOverlay();
+    overlay.classList.add("is-visible");
+    overlay.setAttribute("aria-hidden", "false");
+    target.classList.add("is-freeform-selected");
+    document.querySelectorAll("#canvas-container [data-layout-key].is-freeform-selected").forEach(el => {
+      if (el !== target) el.classList.remove("is-freeform-selected");
+    });
+    this.updateFreeformOverlay();
+  }
+
+  clearFreeformSelection() {
+    this._freeformSelectedElement?.classList?.remove("is-freeform-selected");
+    this._freeformSelectedElement = null;
+    this._freeformSelectedKey = null;
+    if (this._freeformOverlay) {
+      this._freeformOverlay.classList.remove("is-visible");
+      this._freeformOverlay.setAttribute("aria-hidden", "true");
+    }
+  }
+
+  updateFreeformOverlay() {
+    const overlay = this._freeformOverlay;
+    let target = this._freeformSelectedElement;
+    if ((!target || !target.isConnected) && this._freeformSelectedKey) {
+      target = document.querySelector(`#canvas-container [data-layout-key="${this._freeformSelectedKey}"]`);
+      this._freeformSelectedElement = target || null;
+    }
+    if (!overlay || !target?.isConnected || state.editorMode === "preview") {
+      overlay?.classList.remove("is-visible");
+      return;
+    }
+    const rect = target.getBoundingClientRect();
+    if (!rect.width || !rect.height) {
+      overlay.classList.remove("is-visible");
+      return;
+    }
+    overlay.style.left = `${rect.left}px`;
+    overlay.style.top = `${rect.top}px`;
+    overlay.style.width = `${rect.width}px`;
+    overlay.style.height = `${rect.height}px`;
+    overlay.classList.add("is-visible");
+    const label = overlay.querySelector("[data-freeform-label]");
+    if (label) label.textContent = `#${this._freeformSelectedKey} · ${Math.round(rect.width)}×${Math.round(rect.height)}`;
+  }
+
+  getFreeformLayout(layoutKey = this._freeformSelectedKey, viewport = state.viewport) {
+    return state.currentProject?.freeformLayout?.[viewport]?.[layoutKey] || { x: 0, y: 0 };
+  }
+
+  applyFreeformLiveStyle(target, layout) {
+    if (!target || !layout) return;
+    target.style.setProperty("position", "relative", "important");
+    target.style.setProperty("translate", `${Number(layout.x) || 0}px ${Number(layout.y) || 0}px`, "important");
+    if (Number.isFinite(Number(layout.width)) && Number(layout.width) > 0) {
+      target.style.setProperty("width", `${layout.width}px`, "important");
+      target.style.setProperty("max-width", "none", "important");
+    }
+    if (Number.isFinite(Number(layout.height)) && Number(layout.height) > 0) {
+      target.style.setProperty("height", `${layout.height}px`, "important");
+    }
+    this.updateFreeformOverlay();
+  }
+
+  startFreeformInteraction(event, action = "move", handle = "") {
+    const target = this._freeformSelectedElement;
+    const key = this._freeformSelectedKey;
+    if (!target?.isConnected || !key) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const base = { ...this.getFreeformLayout(key, state.viewport) };
+    const rect = target.getBoundingClientRect();
+    const sectionRect = target.closest(".editor-section-wrapper")?.getBoundingClientRect() || document.getElementById("canvas-container")?.getBoundingClientRect() || rect;
+    const start = { x: event.clientX, y: event.clientY };
+    const baseWidth = Number(base.width) > 0 ? Number(base.width) : rect.width;
+    const baseHeight = Number(base.height) > 0 ? Number(base.height) : rect.height;
+    let live = { ...base, x: Number(base.x) || 0, y: Number(base.y) || 0 };
+    this._freeformOverlay?.classList.add("is-transforming");
+
+    const onMove = moveEvent => {
+      const rawDx = moveEvent.clientX - start.x;
+      const rawDy = moveEvent.clientY - start.y;
+      if (action === "move") {
+        const minDx = sectionRect.left - rect.left;
+        const maxDx = sectionRect.right - rect.right;
+        const minDy = sectionRect.top - rect.top;
+        const maxDy = sectionRect.bottom - rect.bottom;
+        const dx = Math.max(minDx, Math.min(maxDx, rawDx));
+        const dy = Math.max(minDy, Math.min(maxDy, rawDy));
+        live = { ...base, x: (Number(base.x) || 0) + dx, y: (Number(base.y) || 0) + dy };
+      } else {
+        const minW = 24;
+        const minH = 16;
+        let width = baseWidth;
+        let height = baseHeight;
+        let x = Number(base.x) || 0;
+        let y = Number(base.y) || 0;
+        if (handle.includes("e")) width = Math.max(minW, baseWidth + rawDx);
+        if (handle.includes("s")) height = Math.max(minH, baseHeight + rawDy);
+        if (handle.includes("w")) {
+          const next = Math.max(minW, baseWidth - rawDx);
+          x += baseWidth - next;
+          width = next;
+        }
+        if (handle.includes("n")) {
+          const next = Math.max(minH, baseHeight - rawDy);
+          y += baseHeight - next;
+          height = next;
+        }
+        live = { ...base, x, y, width, height };
+      }
+      this.applyFreeformLiveStyle(target, live);
+    };
+    const onUp = () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      this._freeformOverlay?.classList.remove("is-transforming");
+      state.setFreeformLayout(key, state.viewport, live, action === "move" ? "Déplacement élément libre" : "Redimensionnement élément libre");
+    };
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp, { once: true });
+  }
+
+  nudgeFreeformSelection(dx, dy) {
+    if (!this._freeformSelectedKey) return;
+    const current = this.getFreeformLayout();
+    state.setFreeformLayout(this._freeformSelectedKey, state.viewport, {
+      ...current,
+      x: (Number(current.x) || 0) + dx,
+      y: (Number(current.y) || 0) + dy
+    }, "Déplacement clavier élément libre");
+  }
+
+  initFreeformEditing() {
+    const canvas = document.getElementById("canvas-container");
+    if (!canvas || state.editorMode === "preview") {
+      this._freeformOverlay?.classList.remove("is-visible");
+      return;
+    }
+    this.ensureFreeformOverlay();
+    if (canvas !== this._freeformBoundCanvas) {
+      this._freeformBoundCanvas = canvas;
+      canvas.addEventListener("pointerdown", event => {
+        if (event.button !== undefined && event.button !== 0) return;
+        if (event.target.closest(".editor-section-toolbar, .cta-direct-badge, .cta-context-popover, .sec-bg-popover, .sec-motion-popover, .floating-text-toolbar")) return;
+        const target = event.target.closest("[data-layout-key]");
+        if (target && canvas.contains(target)) {
+          this.selectFreeformTarget(target);
+        } else if (!event.target.closest("#freeform-selection-box")) {
+          this.clearFreeformSelection();
+        }
+      }, true);
+      const scrollHost = document.getElementById("editor-main-canvas");
+      scrollHost?.addEventListener("scroll", () => this.updateFreeformOverlay(), { passive: true });
+    }
+    if (!this._freeformWindowBound) {
+      window.addEventListener("resize", () => this.updateFreeformOverlay(), { passive: true });
+      document.addEventListener("keydown", event => {
+        if (!this._freeformSelectedKey) return;
+        const editable = event.target?.matches?.("input, textarea, select, [contenteditable='true']");
+        if (editable) return;
+        if (event.key === "Escape") {
+          this.clearFreeformSelection();
+          return;
+        }
+        const step = event.shiftKey ? 10 : 1;
+        if (event.key === "ArrowLeft") { event.preventDefault(); this.nudgeFreeformSelection(-step, 0); }
+        else if (event.key === "ArrowRight") { event.preventDefault(); this.nudgeFreeformSelection(step, 0); }
+        else if (event.key === "ArrowUp") { event.preventDefault(); this.nudgeFreeformSelection(0, -step); }
+        else if (event.key === "ArrowDown") { event.preventDefault(); this.nudgeFreeformSelection(0, step); }
+      });
+      this._freeformWindowBound = true;
+    }
+    if (this._freeformSelectedKey) {
+      const restored = canvas.querySelector(`[data-layout-key="${this._freeformSelectedKey}"]`);
+      if (restored) this.selectFreeformTarget(restored);
+    }
+  }
+
   // Inline editing in canvas
   initInlineEditing() {
     this.initCanvasInteractivity();
@@ -4160,6 +4369,8 @@ export class App {
         }
       };
     });
+
+    this.initFreeformEditing();
 
     // Sidebar Section Reordering via HTML5 Drag & Drop
     document.querySelectorAll(".section-card-grip[draggable='true']").forEach(grip => {
