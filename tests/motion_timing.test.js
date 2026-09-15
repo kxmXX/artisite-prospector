@@ -122,6 +122,3 @@ test('le menu texte rendu par l editeur lit le catalogue et offre vitesse et del
   assert.ok(html.includes('data-text-speed="normal"') && html.includes('data-text-speed="lente"'), 'la vitesse doit etre offerte');
   assert.ok(html.includes('data-text-delay="aucun"') && html.includes('data-text-delay="net"'), 'le delai doit etre offert');
 });
-
-
-
