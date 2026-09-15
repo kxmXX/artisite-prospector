@@ -7,6 +7,15 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.27) — Lot 7c : la durée et le délai viennent du catalogue
+
+- Cause : le catalogue annonçait une durée propre pour chaque animation, mais une règle globale (`--anim-duration-multiplier` sur une base figée à 0,85 s), présente en double dans `app.css` et `exporter.js`, écrasait toutes ces durées. Toutes les animations jouaient au même rythme et l'auteur ne pouvait rien régler.
+- Correctif : `motionTimingCSS()` dérive le CSS du catalogue — une variable `--motion-base` par animation, la vitesse relative et le délai — et le rendu l'injecte (`<style data-motion-timing>`) pour l'éditeur, l'aperçu et l'export. Le réglage global de vitesse reste appliqué par-dessus.
+- Réglages : « Vitesse » (Normale / Lente / Rapide) et « Délai » (Aucun / Léger / Net) dans le panneau Animation de la section ; l'animation est relancée à chaque changement pour que l'effet soit visible. Un seul chemin d'écriture (`setSectionMotionTiming`) et un seul instantané d'historique.
+- Accessibilité : un délai est ramené à 0 sous `prefers-reduced-motion`.
+- Tests : 5 nouveaux dans `tests/motion_timing.test.js`, dont une assertion sur le rendu réel (feuille injectée, attributs posés uniquement quand le réglage n'est pas neutre) ; 351 → **357/357**.
+- Reste : courbe et direction par animation, vitesse et délai pour les animations d'élément et d'image, outil tester/rejouer/arrêter/réinitialiser.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.26) — Lot 7b : le rendu lit enfin le catalogue d'animations
 
 - Cause : le catalogue unique existait depuis `4.9.0-alpha.22` et l'inspecteur le lisait, mais deux surfaces du rendu déclaraient encore leur propre liste — le menu d'animation d'image (6 entrées) et le panneau d'animation de section (7 entrées). La même animation y portait un autre nom, et six animations disponibles n'étaient proposées nulle part.

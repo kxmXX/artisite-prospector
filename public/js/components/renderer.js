@@ -1,7 +1,7 @@
 import { getIcon } from "./icons.js";
 import { HERO_STYLES } from "./heroStyles.js";
 import { elementStateCSS } from "../engine/elementStates.js";
-import { MOTION_PRESETS } from "../data/motionPresets.js";
+import { MOTION_PRESETS, motionTimingCSS } from "../data/motionPresets.js";
 import { sectionLayoutAttributes, SECTION_LAYOUT_CSS } from "../engine/sectionStyle.js";
 import { elementStyleCSS } from "../engine/elementStyle.js";
 import { getTradeFallbackDataUrl } from "../data/imageFallbacks.js";
@@ -453,6 +453,7 @@ export function renderWebsiteHTML(project, options = { isEditor: false, isStanda
       <style data-freeform-layout>${buildFreeformLayoutCSS(project)}</style>
       <style data-element-states>${elementStateCSS(project)}</style>
       <style data-element-style>${elementStyleCSS(project)}</style>
+      <style data-motion-timing>${motionTimingCSS()}</style>
       ${sectionsHTML}
       ${stickyBarHTML}
       ${lightboxHTML}
@@ -570,6 +571,8 @@ function renderSection(sec, project, options) {
   const themeColor = sectionTheme === "dark" ? "#09090b" : sectionTheme === "navy" ? "#0c1527" : sectionTheme === "warm" ? "#faf8f5" : sectionTheme === "mineral" ? "#f8fafc" : sectionTheme === "primary" ? (project.branding?.primaryColor || "#059669") : "#ffffff";
   const motionPreset = sec.settings?.motionPreset || sec.motionPreset || (project.branding?.motionPreset && project.branding.motionPreset !== "none" ? project.branding.motionPreset : "");
   const motionLoop = ["twice", "infinite"].includes(sec.settings?.motionLoop) ? sec.settings.motionLoop : "";
+  const motionSpeed = sec.settings?.motionSpeed && sec.settings.motionSpeed !== "normal" ? sec.settings.motionSpeed : "";
+  const motionDelay = sec.settings?.motionDelay && sec.settings.motionDelay !== "aucun" ? sec.settings.motionDelay : "";
   const customBackground = /^#[0-9a-f]{3,8}$/i.test(sec.settings?.customBackground || "")
     ? `background-color: ${sec.settings.customBackground} !important;`
     : "";
@@ -626,7 +629,9 @@ function renderSection(sec, project, options) {
          data-ui-target="true"
          data-section-bg="${sectionTheme}"
          data-has-custom-bg="${hasCustomBg ? 'true' : 'false'}"
-         ${motionPreset ? `data-motion="${motionPreset}"` : ''}
+          ${motionPreset ? `data-motion="${motionPreset}"` : ''}
+          ${motionPreset && motionSpeed ? `data-motion-speed="${motionSpeed}"` : ''}
+          ${motionPreset && motionDelay ? `data-motion-delay="${motionDelay}"` : ''}
          style="--section-bg: ${themeColor}; ${hasCustomBg ? `--custom-section-bg: ${sec.settings.customBackground};` : ''} ${customBackground}"
          tabindex="-1">
 

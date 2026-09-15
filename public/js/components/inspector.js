@@ -11,7 +11,7 @@ import { escapeHtml } from "../utils/html.js";
 import { SECTION_WIDTHS, SECTION_SPACING, SECTION_ALIGN, getSectionLayout } from "../engine/sectionStyle.js";
 import { ELEMENT_PADDING, ELEMENT_RADIUS, ELEMENT_OPACITY, ELEMENT_BACKGROUND, ELEMENT_BORDER, ELEMENT_SHADOW, getElementStyle } from "../engine/elementStyle.js";
 import { ELEMENT_STATES, ELEMENT_STATE_LABELS, getElementState } from "../engine/elementStates.js";
-import { MOTION_PRESETS } from "../data/motionPresets.js";
+import { MOTION_PRESETS, MOTION_SPEEDS, MOTION_DELAYS } from "../data/motionPresets.js";
 
 const ELEMENT_SCALE_ROWS = [
   ["padding", ELEMENT_PADDING],
@@ -174,6 +174,25 @@ export function renderInspector(section, project, state) {
                     class="py-1 px-1 border rounded text-ui-xs font-medium text-center transition-all ${((section.settings?.motionPreset || section.motionPreset || 'none') === preset || (!section.settings?.motionPreset && !section.motionPreset && preset === 'none')) ? 'border-zinc-900 bg-zinc-900 text-white font-semibold shadow-2xs' : 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-400'}">
               ${label}
             </button>
+          `).join('')}
+        </div>
+
+        <div class="motion-loop-row" data-section-timing>
+          <span class="motion-loop-label">Vitesse</span>
+          ${MOTION_SPEEDS.map((speed) => `
+            <button type="button"
+                    class="motion-loop-btn ${((section.settings?.motionSpeed || 'normal') === speed.id) ? 'is-active' : ''}"
+                    title="${speed.description}"
+                    onclick="window.app.setSectionMotionSpeed('${sectionId}', '${speed.id}')">${speed.label}</button>
+          `).join('')}
+        </div>
+        <div class="motion-loop-row" data-section-timing>
+          <span class="motion-loop-label">Délai</span>
+          ${MOTION_DELAYS.map((delay) => `
+            <button type="button"
+                    class="motion-loop-btn ${((section.settings?.motionDelay || 'aucun') === delay.id) ? 'is-active' : ''}"
+                    title="${delay.description}"
+                    onclick="window.app.setSectionMotionDelay('${sectionId}', '${delay.id}')">${delay.label}</button>
           `).join('')}
         </div>
 

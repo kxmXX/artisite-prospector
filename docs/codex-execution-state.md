@@ -1522,3 +1522,12 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Aperçu : `slide-in`, `magnetic` et `progress-fill` reçoivent leur règle `:hover` manquante, donc toute animation du catalogue se prévisualise.
 - Tests : 349 → 351 (deux garde-fous). `scripts/build-utilities.mjs` relancé, aucune classe utilitaire nouvelle.
 - Reste sur le lot 7 : durée, délai, courbe et direction réglables par animation, outil tester/rejouer/arrêter/réinitialiser, neutralisation pendant un transform libre, runtime partagé à l'export.
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.27 (lot 7c, durée et délai pilotés par le catalogue)
+
+- Découverte : le catalogue annonçait une durée par animation, mais `app.css` et `exporter.js` les remplaçaient toutes par 0,85 s — deux copies divergentes du même réglage global.
+- Fait : `motionTimingCSS()` dans `motionPresets.js` génère le CSS depuis le catalogue (base par preset, vitesse, délai, neutralisation du délai sous `prefers-reduced-motion`). Le rendu l'injecte, donc éditeur, aperçu et export lisent la même feuille. La section émet `data-motion-speed` / `data-motion-delay` seulement quand le réglage n'est pas neutre.
+- Sélecteur `[data-motion][data-motion]` volontaire : le doublement de l'attribut l'emporte sur l'ancienne règle `!important` restée dans `app.css` et `exporter.js`, sans la supprimer tant que l'export cassé (lot 2d) n'est pas réparé.
+- UI : « Vitesse » et « Délai » dans le panneau Animation de la section, avec relance de l'aperçu. Un seul chemin d'écriture (`setSectionMotionTiming`) et un seul instantané d'historique.
+- Tests : 351 → 357. `node --check` sur les quatre fichiers modifiés, `scripts/build-utilities.mjs` relancé, aucune classe utilitaire nouvelle.
+- Reste : courbe et direction par animation, extension de la vitesse et du délai aux animations d'élément et d'image, outil tester/rejouer/arrêter/réinitialiser, motions pendant un transform libre.

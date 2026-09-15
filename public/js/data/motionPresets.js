@@ -78,3 +78,77 @@ export function getMotionRepeat(id) {
 export function motionIterations(id) {
   return getMotionRepeat(id).iterations;
 }
+
+/** Vitesse relative : multiplie la durée propre à chaque animation. */
+export const MOTION_SPEEDS = Object.freeze([
+  { id: "normal", label: "Normale", factor: 1, description: "La durée prévue pour cette animation." },
+  { id: "lente", label: "Lente", factor: 1.6, description: "Plus posée, presque deux fois plus longue." },
+  { id: "rapide", label: "Rapide", factor: 0.65, description: "Plus vive, pour enchaîner sans faire attendre." }
+]);
+
+/** Décalage avant le départ de l'animation. */
+export const MOTION_DELAYS = Object.freeze([
+  { id: "aucun", label: "Aucun", ms: 0, description: "L'animation part dès qu'elle est déclenchée." },
+  { id: "leger", label: "Léger", ms: 150, description: "Un court silence avant de partir." },
+  { id: "net", label: "Net", ms: 350, description: "Un temps d'arrêt visible, pour faire arriver les éléments l'un après l'autre." }
+]);
+
+const SPEED_BY_ID = new Map(MOTION_SPEEDS.map((speed) => [speed.id, speed]));
+const DELAY_BY_ID = new Map(MOTION_DELAYS.map((delay) => [delay.id, delay]));
+
+/** Repli sûr : une valeur inconnue retombe sur le réglage neutre. */
+export function getMotionSpeed(id) {
+  return SPEED_BY_ID.get(String(id || "")) || SPEED_BY_ID.get("normal");
+}
+
+export function getMotionDelay(id) {
+  return DELAY_BY_ID.get(String(id || "")) || DELAY_BY_ID.get("aucun");
+}
+
+export function motionSpeedIds() {
+  return MOTION_SPEEDS.map((speed) => speed.id);
+}
+
+export function motionDelayIds() {
+  return MOTION_DELAYS.map((delay) => delay.id);
+}
+
+/** Durée réellement jouée : la durée du catalogue, ajustée par la vitesse choisie. */
+export function motionDurationMs(presetId, speedId) {
+  const preset = getMotionPreset(presetId);
+  if (preset.id === "none") return 0;
+  return Math.round(preset.durationMs * getMotionSpeed(speedId).factor);
+}
+
+/**
+ * CSS unique de la durée et du délai, dérivé du catalogue.
+ *
+ * Le rendu l'injecte pour l'éditeur, l'aperçu et l'export : une seule source,
+ * donc les trois surfaces se comportent pareil. Le sélecteur d'attribut est
+ * répété pour l'emporter sur l'ancien réglage global encore présent dans
+ * app.css et exporter.js (« 0.85s pour toutes les animations »), qui ignorait
+ * la durée propre de chaque animation.
+ */
+export function motionTimingCSS() {
+  const lines = ["/* Durée propre à chaque animation : le catalogue en est la source. */"];
+  for (const preset of MOTION_PRESETS) {
+    if (preset.id === "none") continue;
+    lines.push('[data-motion="' + preset.id + '"] { --motion-base: ' + preset.durationMs + 'ms; }');
+  }
+  lines.push("[data-motion][data-motion] {");
+  lines.push("  animation-duration: calc(var(--motion-base, 700ms) * var(--motion-speed, 1) * var(--anim-duration-multiplier, 1)) !important;");
+  lines.push("  animation-delay: var(--motion-delay, 0ms);");
+  lines.push("}");
+  for (const speed of MOTION_SPEEDS) {
+    if (speed.id === "normal") continue;
+    lines.push('[data-motion-speed="' + speed.id + '"] { --motion-speed: ' + speed.factor + "; }");
+  }
+  for (const delay of MOTION_DELAYS) {
+    if (delay.ms === 0) continue;
+    lines.push('[data-motion-delay="' + delay.id + '"] { --motion-delay: ' + delay.ms + "ms; }");
+  }
+  lines.push("@media (prefers-reduced-motion: reduce) {");
+  lines.push("  [data-motion] { animation-delay: 0ms !important; }");
+  lines.push("}");
+  return lines.join("\n");
+}

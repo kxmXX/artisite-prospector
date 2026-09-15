@@ -3298,6 +3298,35 @@ export class App {
     this.showToast(nextMode === "infinite" ? "Animation de section en boucle continue" : (nextMode === "twice" ? "Animation de section répétée deux fois" : "Animation de section jouée une fois"), "info");
   }
 
+  setSectionMotionSpeed(sectionId, speedId) {
+    this.setSectionMotionTiming(sectionId, "motionSpeed", "normal", speedId, "Vitesse de l'animation");
+  }
+
+  setSectionMotionDelay(sectionId, delayId) {
+    this.setSectionMotionTiming(sectionId, "motionDelay", "aucun", delayId, "Délai de l'animation");
+  }
+
+  /** Rythme de la section : une seule écriture et un seul historique pour la vitesse et le délai. */
+  setSectionMotionTiming(sectionId, key, defaultId, valueId, label) {
+    if (!state.currentProject) return;
+    const updated = JSON.parse(JSON.stringify(state.currentProject));
+    const sec = updated.sections.find(s => s.id === sectionId);
+    if (!sec) return;
+    sec.settings = sec.settings || {};
+    if (valueId && valueId !== defaultId) sec.settings[key] = valueId;
+    else delete sec.settings[key];
+    state.updateProject(updated, true);
+    const attr = key === "motionSpeed" ? "data-motion-speed" : "data-motion-delay";
+    const secEl = document.getElementById("section-" + sectionId) || document.querySelector(".editor-section-wrapper[data-section-id=\"" + sectionId + "\"]");
+    if (secEl) {
+      if (valueId && valueId !== defaultId) secEl.setAttribute(attr, valueId);
+      else secEl.removeAttribute(attr);
+    }
+    const preset = sec.settings?.motionPreset || sec.motionPreset;
+    if (preset && preset !== "none") this.previewSectionMotion(sectionId, preset);
+    this.showToast(label + " enregistré", "info");
+  }
+
   setActiveTextMotionLoop(mode) {
     const el = this._activeEditableEl;
     if (!el) return;
