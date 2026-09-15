@@ -1,3 +1,12 @@
+## LOT DE LIVRAISON — coordination des outils flottants 4.8.0-alpha.36 — 15 septembre 2026
+
+- État de départ vérifié : branche `refactor/artist-consolidation`, `main` et branche sur `083534b`, dépôt propre, version `4.8.0-alpha.35`.
+- Correction : un coordinateur unique ferme les surfaces concurrentes Texte/Section/Freeform/CTA tout en conservant la sélection et les données freeform. Trois variables CSS documentent l’ordre des couches sous les modales système.
+- QA Chrome réel : clic titre À propos => `active=text`, texte visible, freeform masqué, toolbar section opacity 0 ; pointer sur calque => `active=freeform`, texte masqué, freeform visible, toolbar section opacity 0 ; clic contrôle section => autres outils masqués. Zéro erreur console.
+- Validation : `node --check public/js/app.js`, 31/31 tests `v3_ui_regressions`, 234/234 tests complets et `git diff --check`.
+- Audit additionnel reçu : XSS/escape, PIN, CORS/rate limit, labels wizard, fontes et progression IA confirmés à traiter. Persistance serveur, audit SEO réel et avis Google fictifs sont hors périmètre sur instruction utilisateur.
+- Prochaine action exacte : centraliser `escapeHtml`, sécuriser le renderer commun à l’éditeur et à l’export, puis tester des charges HTML malveillantes sur les sections publiques.
+
 ## LOT DE LIVRAISON — bibliothèque multi-sélection 4.8.0-alpha.35 — 15 septembre 2026
 
 - Dashboard : case explicite 34×34 par projet, Tout sélectionner sur les cartes visibles, compteur, annulation et suppression groupée. Une sélection active est resynchronisée après rerender et les IDs supprimés sont purgés.

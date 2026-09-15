@@ -7,6 +7,12 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 15 septembre 2026 (4.8.0-alpha.36)
+
+- Éditeur : les outils contextuels Texte, Section, Freeform et CTA sont désormais mutuellement exclusifs ; ouvrir l’un masque les autres sans effacer la sélection ni les réglages persistés.
+- Couches : les trois niveaux d’outils utilisent les variables partagées `--z-toolbar-section`, `--z-toolbar-text` et `--z-toolbar-freeform` au lieu de valeurs dispersées.
+- QA Chrome sur l’éditeur Esprit Nature : Texte → une seule barre visible, Freeform → un seul cadre visible, contrôle Section → autres outils masqués ; zéro erreur console. Validation : 31/31 tests ciblés, 234/234 complets, syntaxe et `git diff --check`.
+
 ### Consolidation — 15 septembre 2026 (4.8.0-alpha.35)
 
 - Bibliothèque : sélection multi-projets, sélection de toutes les cartes visibles, compteur, annulation et suppression groupée avec cibles 34×34.

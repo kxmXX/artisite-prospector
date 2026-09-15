@@ -611,10 +611,13 @@
 
 /* ---------- freeform canvas controls (Canva/Figma foundation) ---------- */
 .freeform-selection-box{
-  position:fixed;display:none;z-index:9400;pointer-events:none;
+  position:fixed;display:none;z-index:var(--z-toolbar-freeform);pointer-events:none;
   border:1.5px solid #2563eb;border-radius:4px;box-shadow:0 0 0 1px rgba(255,255,255,.78),0 0 0 3px rgba(37,99,235,.10);
 }
 .freeform-selection-box.is-visible{display:block}
+body[data-active-editor-toolbar="text"] .freeform-selection-box,
+body[data-active-editor-toolbar="section"] .freeform-selection-box,
+body[data-active-editor-toolbar="cta"] .freeform-selection-box{display:none!important}
 .freeform-selection-box.is-transforming{box-shadow:0 0 0 1px rgba(255,255,255,.9),0 0 0 4px rgba(37,99,235,.16)}
 .freeform-selection-label{
   position:absolute;left:-1px;top:-31px;min-height:24px;max-width:min(360px,70vw);display:flex;align-items:center;gap:6px;

@@ -28,7 +28,22 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - [x] Mettre en place un registre de templates explicite dans le wizard : Esprit Nature 1:1 + Artisan Moderne + Local Chaleureux, avec instanciation propre, `templateId/templateName` et personnalisation ensuite libre.
 - [x] Validation visuelle dédiée vitrine/template : Chrome 1440 et 390 sur démo canonique + nouvelle instance ; largeur viewport exacte, header 1280 desktop, hero pleine largeur, ordre stable, simulateur avant footer et footer dernier.
 - [x] Bibliothèque nettoyable : sélection multi-projets 34×34, Tout sélectionner sur les cartes visibles, compteur, annulation et suppression groupée persistée ; une bibliothèque volontairement vide reste vide après reload.
-- [ ] Refaire l'audit UI/UX des overlays de l'éditeur après stabilisation template : aucune toolbar/popover ne doit masquer une action ou du contenu utile.
+- [x] Coordonner les overlays de l'éditeur : Texte, Section, Freeform et CTA sont mutuellement exclusifs, leurs couches sont centralisées et la sélection reste intacte (`4.8.0-alpha.36`).
+
+## Audit reçu après `4.8.0-alpha.35`
+
+- [x] Collisions des barres flottantes — livré et vérifié dans `4.8.0-alpha.36`.
+- [ ] XSS du renderer/export et duplication de `escapeHtml` — confirmé encore réel ; prochain lot prioritaire.
+- [ ] PIN client — le fallback `1234`, l’affichage en clair et la portée limitée à la démo interne sont encore présents.
+- [ ] Protection des routes IA — CORS `*` et absence de limitation de débit encore présents.
+- [ ] Labels du wizard — associations `for`/`id` encore incomplètes.
+- [ ] Polices — import Google Fonts dupliqué entre HTML et CSS.
+- [ ] Progression du terminal IA — dernière étape encore cochée avant la résolution réseau.
+- [ ] Bundling/performance — à mesurer avant d’introduire Vite ; ne pas créer une migration globale sans preuve de gain et sans préserver le serveur Node/Vercel.
+- [~] Persistance serveur et audit SEO réel — exclus explicitement par l’utilisateur pour cette mission.
+- [~] Avis Google fictifs / badges associés — conservation explicitement demandée par l’utilisateur.
+
+Prochaine action exacte : centraliser l’échappement HTML et sécuriser les frontières de rendu public/export avec tests d’injection sur Hero, À propos, Services, Avis, FAQ et Footer, sans modifier le contenu des avis demandé.
 
 ## État exact à `4.8.0-alpha.8`
 

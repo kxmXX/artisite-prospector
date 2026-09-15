@@ -52,6 +52,13 @@ Cette section prévaut sur le tableau historique des lots 5–13 ci-dessous sans
 - Restent ouverts après stabilisation template : robustesse texte/image/CTA/groupe, audit factuel des prompts/fallbacks, limites partage/multi-utilisateur et contre-audit sécurité/performance.
 - Dette suivie : concentration de logique dans `app.js` et duplication du runtime de reparenting editor/export. Aucun refactor lourd sans besoin mesuré.
 
+### Lot overlays éditeur — 4.8.0-alpha.36
+
+- Texte, Section, Freeform et CTA passent par un coordinateur d’exclusivité unique ; la sélection métier/freeform n’est pas supprimée lorsque le chrome concurrent est masqué.
+- Les couches des trois outils principaux sont centralisées en variables CSS et restent sous les modales système.
+- Contrôle ciblé et navigateur réussi, puis 234/234 tests complets. Le nouvel audit est intégré à la checklist : prochain lot XSS/échappement, puis PIN, routes IA, wizard, fontes et progression réseau.
+- Hors périmètre explicite : persistance serveur, audit SEO réel et retrait des faux avis Google.
+
 ## État initial vérifié
 
 - Vanilla JS, serveur Node natif, aucune dépendance npm déclarée ; `npm test` : **136/136**.

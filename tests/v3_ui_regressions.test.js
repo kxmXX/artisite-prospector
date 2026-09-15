@@ -20,6 +20,46 @@ const { renderEditor } = await import('../public/js/components/editor.js');
 const { exportStandaloneHTML } = await import('../public/js/engine/exporter.js');
 
 const css = fs.readFileSync(path.resolve(process.cwd(), 'public/css/studio-v3.css'), 'utf8');
+const appCss = fs.readFileSync(path.resolve(process.cwd(), 'public/css/app.css'), 'utf8');
+
+test('floating editor tools are mutually exclusive without clearing selection state', () => {
+  const app = Object.create(App.prototype);
+  const hidden = new Set();
+  const freeformClasses = new Set(['is-visible']);
+  const ctaClasses = new Set(['is-active']);
+  const textToolbar = { style: { display: 'flex' } };
+  const freeform = {
+    classList: { remove: (...names) => names.forEach(name => freeformClasses.delete(name)) },
+    setAttribute(name, value) { this[name] = value; }
+  };
+  const sectionPopover = { classList: { add: name => hidden.add(name) } };
+  const cta = {
+    classList: { remove: name => ctaClasses.delete(name) },
+    setAttribute(name, value) { this[name] = value; }
+  };
+  document.body = { dataset: {} };
+  document.getElementById = id => id === 'floating-text-toolbar' ? textToolbar : id === 'freeform-selection-box' ? freeform : null;
+  document.querySelectorAll = selector => {
+    if (selector.includes('sec-bg-popover')) return [sectionPopover];
+    if (selector.includes('data-cta-popover-wrapper')) return [cta];
+    return [];
+  };
+
+  app.closeAllFloatingToolbars('text');
+
+  assert.equal(document.body.dataset.activeEditorToolbar, 'text');
+  assert.equal(textToolbar.style.display, 'flex');
+  assert.equal(freeformClasses.has('is-visible'), false);
+  assert.equal(freeform['aria-hidden'], 'true');
+  assert.equal(ctaClasses.has('is-active'), false);
+  assert.equal(cta['aria-expanded'], 'false');
+  assert.equal(hidden.has('hidden'), true);
+  assert.match(appCss, /--z-toolbar-section:\s*65/);
+  assert.match(appCss, /--z-toolbar-text:\s*80/);
+  assert.match(css, /z-index:var\(--z-toolbar-freeform\)/);
+  assert.match(appCss, /data-active-editor-toolbar="freeform"[^}]*editor-section-toolbar/s);
+  assert.match(css, /data-active-editor-toolbar="text"[^}]*freeform-selection-box/s);
+});
 
 test('V3 settings rail re-renders the V3 sidebar immediately', () => {
   const app = Object.create(App.prototype);

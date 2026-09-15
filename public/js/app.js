@@ -2110,6 +2110,7 @@ export class App {
       this.hideFloatingTextToolbar();
       return;
     }
+    this.closeAllFloatingToolbars("text");
     this._activeEditableEl = el;
     const toolbar = document.getElementById("floating-text-toolbar");
     if (!toolbar) return;
@@ -2176,6 +2177,36 @@ export class App {
   hideFloatingTextToolbar() {
     const toolbar = document.getElementById("floating-text-toolbar");
     if (toolbar) toolbar.style.display = "none";
+    if (document.body?.dataset.activeEditorToolbar === "text") {
+      delete document.body.dataset.activeEditorToolbar;
+    }
+  }
+
+  closeAllFloatingToolbars(except = "") {
+    const activeKind = ["text", "section", "freeform", "cta"].includes(except) ? except : "";
+    if (document.body) {
+      if (activeKind) document.body.dataset.activeEditorToolbar = activeKind;
+      else delete document.body.dataset.activeEditorToolbar;
+    }
+
+    if (activeKind !== "text") {
+      const textToolbar = document.getElementById("floating-text-toolbar");
+      if (textToolbar) textToolbar.style.display = "none";
+    }
+    if (activeKind !== "section") {
+      document.querySelectorAll(".sec-bg-popover, .sec-motion-popover").forEach(popover => popover.classList.add("hidden"));
+    }
+    if (activeKind !== "freeform") {
+      const freeform = document.getElementById("freeform-selection-box");
+      freeform?.classList.remove("is-visible");
+      freeform?.setAttribute("aria-hidden", "true");
+    }
+    if (activeKind !== "cta") {
+      document.querySelectorAll("[data-cta-popover-wrapper].is-active").forEach(wrapper => {
+        wrapper.classList.remove("is-active");
+        wrapper.setAttribute("aria-expanded", "false");
+      });
+    }
   }
 
   toggleTextColorMenu() {
@@ -4111,7 +4142,7 @@ export class App {
       wrapper.dataset.ctaEditorBound = "true";
       const setOpen = (open) => wrapper.setAttribute("aria-expanded", String(open));
       const togglePopover = () => {
-        this.hideFloatingTextToolbar();
+        this.closeAllFloatingToolbars("cta");
         document.querySelectorAll("[data-cta-popover-wrapper].is-active").forEach(w => {
           if (w !== wrapper) {
             w.classList.remove("is-active");
@@ -4402,6 +4433,7 @@ export class App {
       this.clearFreeformSelection();
       return;
     }
+    this.closeAllFloatingToolbars("freeform");
     this._freeformSelectedKeys = keys;
     this._freeformSelectedKey = primaryKey && keys.includes(primaryKey) ? primaryKey : keys[0];
     this._freeformSelectedElement = canvas.querySelector(`[data-layout-key="${this._freeformSelectedKey}"]`);
@@ -4455,6 +4487,9 @@ export class App {
     if (this._freeformOverlay) {
       this._freeformOverlay.classList.remove("is-visible", "is-multi", "is-group", "is-locked");
       this._freeformOverlay.setAttribute("aria-hidden", "true");
+    }
+    if (document.body?.dataset.activeEditorToolbar === "freeform") {
+      delete document.body.dataset.activeEditorToolbar;
     }
     this.hideFreeformGuides();
     this.hideFreeformSpacingGuides();
@@ -5593,6 +5628,7 @@ export class App {
     document.querySelectorAll(".editor-section-toolbar button").forEach(btn => {
       btn.onclick = (e) => {
         e.stopPropagation();
+        this.closeAllFloatingToolbars("section");
         const action = btn.getAttribute("data-action");
         const secId = btn.getAttribute("data-id");
         if (action === "move-up") this.moveSection(secId, "up");

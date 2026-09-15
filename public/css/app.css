@@ -6,6 +6,9 @@
   --font-jakarta: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-syne: 'Syne', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-outfit: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  --z-toolbar-section: 65;
+  --z-toolbar-text: 80;
+  --z-toolbar-freeform: 9400;
 }
 
 *, *::before, *::after {
@@ -735,7 +738,7 @@ body.dark-theme .faq-item.active .faq-icon-btn {
   position: absolute !important;
   top: 10px !important;
   right: 16px !important;
-  z-index: 65 !important;
+  z-index: var(--z-toolbar-section) !important;
   display: flex !important;
   flex-direction: row !important;
   align-items: center !important;
@@ -1543,7 +1546,7 @@ input, textarea, select, [contenteditable] {
 /* Floating In-Canvas Text Toolbar ("Monter / Agrandir les textes") */
 .floating-text-toolbar {
   position: absolute;
-  z-index: 80;
+  z-index: var(--z-toolbar-text);
   display: flex;
   align-items: center;
   gap: 3px;
@@ -1556,6 +1559,20 @@ input, textarea, select, [contenteditable] {
   font-size: 11px;
   pointer-events: auto;
   white-space: nowrap;
+}
+
+/* Contextual editor chrome is mutually exclusive. The selected content stays
+   selected; only competing controls disappear while another tool is active. */
+body[data-active-editor-toolbar="text"] .editor-section-toolbar,
+body[data-active-editor-toolbar="freeform"] .editor-section-toolbar,
+body[data-active-editor-toolbar="cta"] .editor-section-toolbar {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+body[data-active-editor-toolbar="section"] .floating-text-toolbar,
+body[data-active-editor-toolbar="freeform"] .floating-text-toolbar,
+body[data-active-editor-toolbar="cta"] .floating-text-toolbar {
+  display: none !important;
 }
 
 .ftb-btn {
