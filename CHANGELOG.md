@@ -7,6 +7,25 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.14) — Lot 4a : socle des réglages de section
+
+- **Le manque le plus net de l'audit** : une section n'avait **aucun** réglage de mise en page — ni
+  largeur, ni respiration verticale, ni alignement. `public/js/engine/sectionStyle.js` pose le modèle
+  (largeur pleine / contenu / étroite, espacement compact / normal / aéré, alignement gauche / centre /
+  droite), avec valeurs par défaut complètes et repli sur les valeurs sûres en cas de réglage inconnu.
+- **Aucun risque pour les vitrines existantes** : rien n'est rendu tant que l'auteur n'a pas modifié un
+  réglage. Le CSS partagé ne cible que les sections portant `data-section-layout="custom"`, et un test
+  interdit toute règle non conditionnée sur `.site-section`.
+- **Une seule source de CSS** : la feuille vit dans le module et sera injectée par `renderWebsiteHTML`,
+  comme les styles du hero — donc éditeur, aperçu et **site autonome exporté** partageront le même
+  rendu, sans troisième copie.
+- **QA** : `tests/section_layout.test.js` (6 tests) — pas de réglage, pas de rendu ; variables bornées ;
+  valeurs inconnues neutralisées ; la section source n'est jamais mutée ; CSS conditionné ; validation
+  des identifiants. **330/330 tests**.
+- **Ce qui reste (4b)** : le branchement dans le renderer (les deux chemins éditeur et vitrine) et
+  l'interface dans l'inspecteur. En l'état, **l'auteur ne peut pas encore régler une section** : le
+  modèle est prêt et testé, rien de plus.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.13) — Revenir au style principal
 
 - **Action explicite « Effacer cet état »** dans le menu couleur : elle supprime toutes les

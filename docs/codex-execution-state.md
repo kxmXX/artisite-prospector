@@ -1248,3 +1248,25 @@ Vérifications : 324/324 tests.
 
 Reste (5b, second temps) : aperçu immédiat d'un état sans survol réel, et extension des états aux
 propriétés autres que la couleur (fond, bordure, ombre, opacité), que le modèle autorise déjà.
+
+---
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.14 (lot 4a/9)
+
+Réglages de section : rien n'existait (l'audit relevait qu'une section n'avait que fond, assombrissement
+et animation). Première moitié posée, sans aucun risque pour l'existant.
+
+- public/js/engine/sectionStyle.js : échelles de largeur, d'espacement et d'alignement, valeurs par
+  défaut complètes, setSectionLayout sans mutation, sectionLayoutAttributes qui ne renvoie quelque
+  chose que si l'auteur a réellement modifié un réglage, et SECTION_LAYOUT_CSS (feuille partagée,
+  conditionnée par data-section-layout="custom").
+- Décision structurante : le CSS vit dans le module et sera injecté par renderWebsiteHTML, comme
+  HERO_STYLES, pour éviter la troisième copie de styles que l'audit reprochait au site exporté.
+- Choix de sûreté : aucune règle non conditionnée sur .site-section, pour que les vitrines existantes
+  gardent un rendu strictement identique. Un test le verrouille.
+
+Vérifications : tests/section_layout.test.js (6 tests) ; 330/330 tests complets.
+
+Reste (4b) : brancher sectionLayoutAttributes et SECTION_LAYOUT_CSS dans les DEUX chemins de rendu du
+renderer (éditeur et vitrine), puis l'interface dans l'inspecteur. Aucun réglage de section n'est
+encore possible depuis le produit.
