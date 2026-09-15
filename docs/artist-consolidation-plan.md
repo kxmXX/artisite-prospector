@@ -78,6 +78,12 @@ Cette section prévaut sur le tableau historique des lots 5–13 ci-dessous sans
 - Les trois routes capables de consommer Gemini sont limitées par IP et répondent 429 après le budget configuré ; la limite mémoire et son besoin futur de stockage partagé sont documentés.
 - Prochaine étape bornée : accessibilité du wizard et fonte dupliquée, puis progression IA fidèle au réseau.
 
+### Lot accessibilité/performance légère — 4.8.0-alpha.40
+
+- Les libellés du wizard ciblent explicitement leurs champs, restaurant l’annonce lecteur d’écran et le focus au clic.
+- Les Google Fonts ne sont plus chargées une seconde fois par un `@import` bloquant dans `app.css`.
+- Prochaine étape : terminal de génération fidèle à l’état réseau, puis mesure objective avant d’accepter ou refuser un bundler.
+
 ## État initial vérifié
 
 - Vanilla JS, serveur Node natif, aucune dépendance npm déclarée ; `npm test` : **136/136**.

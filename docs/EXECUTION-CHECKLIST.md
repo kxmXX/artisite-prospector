@@ -36,14 +36,14 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - [x] XSS du renderer/export et duplication de `escapeHtml` — rendu métier neutralisé, URL/CSS/scripts filtrés et utilitaire partagé livré dans `4.8.0-alpha.37`.
 - [x] PIN client — aucun fallback, aucun secret réaffiché, validation 4–6 chiffres et portée « démo interne uniquement » explicite dans `4.8.0-alpha.38`.
 - [x] Protection des routes IA — CORS restreint/configurable et budget par IP sur génération, copilote et image livré dans `4.8.0-alpha.39`.
-- [ ] Labels du wizard — associations `for`/`id` encore incomplètes.
-- [ ] Polices — import Google Fonts dupliqué entre HTML et CSS.
+- [x] Labels du wizard — associations natives `for`/`id` complètes dans `4.8.0-alpha.40`.
+- [x] Polices — import CSS Google Fonts bloquant supprimé ; chargement unique par `<link>` dans `4.8.0-alpha.40`.
 - [ ] Progression du terminal IA — dernière étape encore cochée avant la résolution réseau.
 - [ ] Bundling/performance — à mesurer avant d’introduire Vite ; ne pas créer une migration globale sans preuve de gain et sans préserver le serveur Node/Vercel.
 - [~] Persistance serveur et audit SEO réel — exclus explicitement par l’utilisateur pour cette mission.
 - [~] Avis Google fictifs / badges associés — conservation explicitement demandée par l’utilisateur.
 
-Prochaine action exacte : terminer le lot accessibilité/performance léger — associations `label/for` du wizard et suppression du chargement Google Fonts dupliqué — avec tests ciblés avant toute décision de bundler.
+Prochaine action exacte : rendre la progression du terminal IA fidèle à la requête réelle — aucune dernière étape « terminée » avant résolution réseau, erreur ou fallback explicite.
 
 ## État exact à `4.8.0-alpha.8`
 

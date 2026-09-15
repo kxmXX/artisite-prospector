@@ -1,3 +1,10 @@
+## LOT DE LIVRAISON — wizard accessible et fontes dédupliquées 4.8.0-alpha.40 — 15 septembre 2026
+
+- Wizard : nom, métier, ville, téléphone, région, preset, ambiance, tonalité, couleur et email possèdent tous une association `label[for]` / `id` testée.
+- Polices : le `@import` Google Fonts du CSS est supprimé ; le `<head>` reste l’unique point de chargement réseau des familles Google.
+- Tests : 33/33 ciblés verts sur accessibilité, performance légère et régressions V3 ; 242/242 tests complets verts.
+- Prochaine action exacte : synchroniser les étapes du terminal IA avec la résolution effective de la requête, puis mesurer le poids/requêtes avant toute décision Vite.
+
 ## LOT DE LIVRAISON — garde-fous API IA 4.8.0-alpha.39 — 15 septembre 2026
 
 - CORS : suppression de `Access-Control-Allow-Origin: *`. La production connue, localhost, l’hôte effectivement servi et les origines explicites `ALLOWED_ORIGINS` sont acceptés ; les autres origines reçoivent 403 sans en-tête permissif.

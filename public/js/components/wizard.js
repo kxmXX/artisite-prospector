@@ -59,7 +59,7 @@ export function renderWizardModal() {
 
           <!-- Enterprise Name -->
           <div>
-            <label class="block text-[11px] font-medium text-zinc-600 mb-1">
+            <label for="wiz-name" class="block text-[11px] font-medium text-zinc-600 mb-1">
               Nom de l'entreprise artisanale <span class="text-zinc-400">*</span>
             </label>
             <input type="text" id="wiz-name" required placeholder="Ex: Esprit Nature, Dupont Plomberie..." value="Esprit Nature" class="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-2 text-xs text-zinc-900 font-medium focus:bg-white focus:border-zinc-900 focus:outline-none">
@@ -68,7 +68,7 @@ export function renderWizardModal() {
           <!-- Trade Selection -->
           <div class="grid sm:grid-cols-2 gap-3">
             <div>
-              <label class="block text-[11px] font-medium text-zinc-600 mb-1">
+              <label for="wiz-trade" class="block text-[11px] font-medium text-zinc-600 mb-1">
                 Métier / Activité <span class="text-zinc-400">*</span>
               </label>
               <select id="wiz-trade" class="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-2 text-xs text-zinc-900 font-medium focus:bg-white focus:border-zinc-900 focus:outline-none">
@@ -77,7 +77,7 @@ export function renderWizardModal() {
             </div>
 
             <div>
-              <label class="block text-[11px] font-medium text-zinc-600 mb-1">
+              <label for="wiz-city" class="block text-[11px] font-medium text-zinc-600 mb-1">
                 Ville d'intervention <span class="text-zinc-400">*</span>
               </label>
               <input type="text" id="wiz-city" required placeholder="Ex: Montauban, Albi, Toulouse..." value="Montauban" class="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-2 text-xs text-zinc-900 font-medium focus:bg-white focus:border-zinc-900 focus:outline-none">
@@ -87,14 +87,14 @@ export function renderWizardModal() {
           <!-- Phone & Zone (Always useful for cold calling) -->
           <div class="grid sm:grid-cols-2 gap-3">
             <div>
-              <label class="block text-[11px] font-medium text-zinc-600 mb-1">
+              <label for="wiz-phone" class="block text-[11px] font-medium text-zinc-600 mb-1">
                 Téléphone de contact
               </label>
               <input type="tel" id="wiz-phone" placeholder="07 XX XX XX XX" value="07 82 14 39 50" class="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-2 text-xs text-zinc-900 font-medium focus:bg-white focus:border-zinc-900 focus:outline-none">
             </div>
 
             <div>
-              <label class="block text-[11px] font-medium text-zinc-600 mb-1">
+              <label for="wiz-region" class="block text-[11px] font-medium text-zinc-600 mb-1">
                 Région / Secteur
               </label>
               <input type="text" id="wiz-region" placeholder="Ex: Occitanie, Tarn-et-Garonne..." value="Occitanie" class="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-2 text-xs text-zinc-900 font-medium focus:bg-white focus:border-zinc-900 focus:outline-none">
@@ -105,7 +105,7 @@ export function renderWizardModal() {
           <div id="wiz-advanced-fields" class="space-y-3 pt-2 border-t border-zinc-100" style="display: none;">
             <div class="grid sm:grid-cols-2 gap-3">
               <div>
-                <label class="block text-[11px] font-medium text-zinc-600 mb-1">
+                <label for="wiz-preset" class="block text-[11px] font-medium text-zinc-600 mb-1">
                   Preset de Style Graphique
                 </label>
                 <select id="wiz-preset" class="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-2 text-xs text-zinc-900 font-medium focus:bg-white focus:border-zinc-900 focus:outline-none">
@@ -114,7 +114,7 @@ export function renderWizardModal() {
               </div>
 
               <div>
-                <label class="block text-[11px] font-medium text-zinc-600 mb-1">
+                <label for="wiz-ambiance" class="block text-[11px] font-medium text-zinc-600 mb-1">
                   Ambiance Globale 1-Clic
                 </label>
                 <select id="wiz-ambiance" class="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-2 text-xs text-zinc-900 font-medium focus:bg-white focus:border-zinc-900 focus:outline-none">
@@ -127,7 +127,7 @@ export function renderWizardModal() {
 
             <div class="grid sm:grid-cols-2 gap-3">
               <div>
-                <label class="block text-[11px] font-medium text-zinc-600 mb-1">
+                <label for="wiz-tone" class="block text-[11px] font-medium text-zinc-600 mb-1">
                   Tonalité Rédactionnelle IA
                 </label>
                 <select id="wiz-tone" class="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-2 text-xs text-zinc-900 font-medium focus:bg-white focus:border-zinc-900 focus:outline-none">
@@ -139,7 +139,7 @@ export function renderWizardModal() {
               </div>
 
               <div>
-                <label class="block text-[11px] font-medium text-zinc-600 mb-1">
+                <label for="wiz-color" class="block text-[11px] font-medium text-zinc-600 mb-1">
                   Couleur Primaire (Optionnel)
                 </label>
                 <div class="flex items-center gap-2">
@@ -150,7 +150,7 @@ export function renderWizardModal() {
             </div>
 
             <div>
-              <label class="block text-[11px] font-medium text-zinc-600 mb-1">
+              <label for="wiz-email" class="block text-[11px] font-medium text-zinc-600 mb-1">
                 Email commercial (optionnel)
               </label>
               <input type="email" id="wiz-email" placeholder="contact@artisan.fr" class="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-2 text-xs text-zinc-900 font-medium focus:bg-white focus:border-zinc-900 focus:outline-none">

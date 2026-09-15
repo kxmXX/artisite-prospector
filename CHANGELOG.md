@@ -7,6 +7,12 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 15 septembre 2026 (4.8.0-alpha.40)
+
+- Accessibilité : chaque champ nommé du wizard possède désormais une association native `label[for]` / `id`, y compris les paramètres avancés.
+- Performance : suppression du `@import` Google Fonts bloquant et dupliqué ; les familles restent chargées une seule fois depuis le `<head>`.
+- QA : 33/33 tests ciblés sur le wizard, les fontes et les régressions V3 ; 242/242 tests complets.
+
 ### Consolidation — 15 septembre 2026 (4.8.0-alpha.39)
 
 - API : les origines navigateur sont limitées à la production, au développement local, aux hôtes servis ou à la liste `ALLOWED_ORIGINS` ; le wildcard CORS global est supprimé.
