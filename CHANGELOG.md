@@ -7,6 +7,15 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.52) — Lot 3b : les trois derniers réglages morts reprennent vie
+
+- Suite de l'inventaire : après les listes, restaient trois capacités enfermées dans le gabarit jamais rendu — **l'assombrissement du hero**, les **curseurs de taille** de titre / sous-titre / texte, et les **motifs d'inspiration**.
+- Réimplémentées dans un bloc replié « Réglages avancés : contenu et inspiration » du panneau de propriétés : un curseur d'assombrissement (visible **uniquement** pour le hero), trois curseurs de taille de champ, et six motifs d'inspiration avec leur description en infobulle.
+- Erreur d'insertion commise puis corrigée dans le même tour : j'ai d'abord inséré l'appel dans le **corps** de la fonction au lieu du gabarit, ce que `node --check` a immédiatement signalé. Aucun commit avec du code cassé.
+- Mesuré sur un projet de référence : assombrissement présent pour le hero et absent ailleurs, 3 curseurs, 6 motifs.
+- Tests : 1 nouveau ; 401 → **402/402**.
+- Reste avant suppression des 837 lignes : `toggleGalleryItemType`, `setGalleryAspectRatio`, `restoreButton`.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.51) — Lot 3b : les listes redeviennent éditables
 
 - Inventaire avant suppression : les 837 lignes de `renderSectionAccordionContent` sont bien **inertes** (son gabarit n'est cloné nulle part), mais elles portent **31 capacités**, dont une quinzaine sans aucun autre point d'entrée. Supprimer d'abord aurait retiré des fonctions.

@@ -1732,3 +1732,11 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Mesure : services 6 retraits + 1 ajout, FAQ 1+1, points forts 4 retraits, avis 1 ajout.
 - Tests : 400 → 401, verifie sur la sortie reelle de renderInspector.
 - Reste sur 3b : assombrissement du hero, motifs d'inspiration, curseurs de taille de champ ; puis suppression des 837 lignes. Ensuite lot 7, export 2d, PRODUCT.md/DESIGN.md. Toujours en attente : validation utilisateur du geste de deplacement et du mobile.
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.52 (3 derniers reglages morts reimplementes)
+
+- Reimplemente dans un bloc replie « Reglages avances : contenu et inspiration » : assombrissement du hero (hero uniquement), trois curseurs de taille (titre, sous-titre, texte), six motifs d'inspiration avec infobulle.
+- Erreur d'insertion : appel place dans le corps de la fonction au lieu du gabarit. Detecte par node --check, retire, reinsere au bon endroit. Rien de casse n'a ete committe.
+- Mesure : assombrissement present pour le hero, absent ailleurs ; 3 curseurs ; 6 motifs.
+- Tests : 401 → 402. `node --check` sur l'inspecteur.
+- Reste avant suppression des 837 lignes : toggleGalleryItemType, setGalleryAspectRatio, restoreButton. Puis suppression, lot 7, export 2d, PRODUCT.md/DESIGN.md. Toujours en attente : validation utilisateur du geste de deplacement et du mobile.

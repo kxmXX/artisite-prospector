@@ -219,3 +219,21 @@ test('les listes de la section sont editables depuis l inspecteur', async () => 
   assert.ok(app.includes('state.pushHistory("Suppression dans la liste "'), 'la suppression doit etre annulable');
   state.selectedElementKey = null;
 });
+
+test('assombrissement, tailles et motifs sont accessibles depuis l inspecteur', async () => {
+  const { renderInspector } = await import('../public/js/components/inspector.js');
+  const { generateSite } = await import('../public/js/engine/generator.js');
+  const { state } = await import('../public/js/state.js');
+  const project = generateSite({ name: 'Controle Avance', tradeId: 'plombier' });
+  state.currentProject = project;
+  const hero = project.sections.find((s) => s.type === 'hero');
+  const heroHtml = renderInspector(hero, project, state);
+  assert.ok(heroHtml.includes('window.app.setHeroOverlayDarkening('), 'l assombrissement du hero doit etre reglable');
+  assert.equal((heroHtml.match(/adjustFieldFontSizeSlider/g) || []).length, 3, 'trois curseurs de taille');
+  assert.equal((heroHtml.match(/applyInspirationPattern/g) || []).length, 6, 'six motifs proposes');
+  // Hors du hero, l'assombrissement n'a pas de sens : il ne doit pas apparaitre.
+  const services = project.sections.find((s) => s.type === 'services');
+  assert.ok(!renderInspector(services, project, state).includes('setHeroOverlayDarkening'),
+    'pas d assombrissement hors du hero');
+  state.selectedElementKey = null;
+});

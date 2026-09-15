@@ -15,6 +15,7 @@ import { MOTION_PRESETS, MOTION_SPEEDS, MOTION_DELAYS } from "../data/motionPres
 import { TRANSFORM_FIELDS, getElementTransform, hasElementTransform } from "../engine/elementTransform.js";
 import { collectSectionElements } from "./renderer.js";
 import { numberedLabels } from "../data/elementLabels.js";
+import { INSPIRATION_PATTERNS } from "../data/inspiration.js";
 
 /**
  * Divulgation progressive : l'inspecteur montre d'abord l'essentiel — choisir une
@@ -92,6 +93,48 @@ const LIST_ADDERS = {
  * (`renderSectionAccordionContent`, 837 lignes inertes). Sans eux, on pouvait
  * modifier un avis existant mais ni en ajouter ni en supprimer un.
  */
+const FIELD_SIZE_ROWS = [
+  { field: "title", label: "Titre" },
+  { field: "subtitle", label: "Sous-titre" },
+  { field: "text", label: "Texte" }
+];
+
+/**
+ * Reglages de contenu qui n'existaient que dans le gabarit mort : assombrissement
+ * du hero, taille des champs, et motifs d'inspiration.
+ */
+function sectionContentSettingsHTML(section, sectionId) {
+  const settings = section?.settings || {};
+  const darkening = settings.overlayDarkening !== undefined ? settings.overlayDarkening : 45;
+  const sizeRow = (row) => {
+    const value = Number(settings["fontSize_" + row.field]) || 0;
+    return `
+      <label class="block space-y-1">
+        <span class="text-ui-2xs uppercase tracking-wider text-zinc-500">${row.label}</span>
+        <input type="range" min="-8" max="24" step="1" value="${value}" class="w-full"
+               oninput="window.app.adjustFieldFontSizeSlider('${sectionId}', '${row.field}', this.value)">
+      </label>`;
+  };
+  return disclosure("section-content-settings", "Réglages avancés : contenu et inspiration", `
+    ${section?.type === "hero" ? `
+      <label class="block space-y-1">
+        <span class="text-ui-2xs uppercase tracking-wider text-zinc-500">Assombrissement du hero</span>
+        <input type="range" min="0" max="100" step="5" value="${darkening}" class="w-full"
+               oninput="window.app.setHeroOverlayDarkening('${sectionId}', this.value)">
+      </label>` : ''}
+    ${FIELD_SIZE_ROWS.map(sizeRow).join("")}
+    <div class="space-y-1">
+      <span class="text-ui-2xs uppercase tracking-wider text-zinc-500">Motifs d'inspiration</span>
+      <div class="flex flex-wrap gap-1">
+        ${INSPIRATION_PATTERNS.slice(0, 6).map((pattern) => `
+          <button type="button" class="motion-loop-btn" title="${pattern.description}"
+                  onclick="window.app.applyInspirationPattern('${sectionId}', '${pattern.id}')">${pattern.label}</button>
+        `).join("")}
+      </div>
+    </div>
+  `);
+}
+
 function sectionListsHTML(section, sectionId) {
   const content = section?.content || {};
   const lists = Object.keys(content).filter((key) => Array.isArray(content[key]));
@@ -305,6 +348,7 @@ export function renderInspector(section, project, state) {
       ${state.selectedElementKey ? elementTransformControlsHTML(project, state.selectedElementKey, state.viewport) : ''}
       ${sectionElementsHTML(section, project, state.selectedElementKey)}
       ${sectionListsHTML(section, sectionId)}
+      ${sectionContentSettingsHTML(section, sectionId)}
 
       ${variants.length > 1 ? `
         <div class="p-2.5 bg-zinc-50 border border-zinc-200 rounded-lg space-y-1">
