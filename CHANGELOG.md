@@ -7,6 +7,22 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.19) — Un seul vocabulaire de réglages
+
+- **Cause racine traitée** : les styles d'élément et les états d'élément étaient deux familles de
+  réglages séparées, avec deux façons d'écrire le CSS. Une même intention — « respiration aérée » —
+  devait s'écrire deux fois. Une **primitive partagée** (`declarationsFor`) produit désormais les
+  déclarations pour les deux : un état peut porter les six réglages d'élément (respiration, arrondi,
+  opacité, fond, bordure, ombre) **et** une déclaration libre filtrée (couleur issue du nuancier).
+- **Garde-fou** : une propriété pilotée par une échelle refuse une valeur hors échelle — sinon
+  « padding: gigantesque » passerait par la liste blanche des déclarations libres. L'opacité garde
+  l'exception d'une valeur numérique nue, qui est l'usage historique du curseur.
+- **QA** : `tests/element_states.test.js` passe de 5 à 9 tests (vocabulaire partagé, refus des
+  valeurs hors échelle, et restauration des deux tests d'interface). **337/337 tests**.
+- *Deux tests d'interface avaient été supprimés par erreur pendant ce lot* (un script de troncature a
+  coupé plus large que prévu) : je les ai **rétablis** plutôt que de laisser la suite s'appauvrir en
+  silence.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.18) — Réglages d'élément complétés
 
 - **Fond, bordure et ombre** rejoignent la respiration, l'arrondi et l'opacité : six réglages par

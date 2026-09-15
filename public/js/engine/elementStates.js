@@ -13,6 +13,8 @@
  * refusées si elles contiennent de quoi sortir d'une déclaration ou d'une règle.
  */
 
+import { declarationsFor } from "./elementStyle.js";
+
 export const ELEMENT_STATES = ["hover", "focus", "active", "disabled"];
 
 export const ELEMENT_STATE_LABELS = {
@@ -58,6 +60,9 @@ const ALLOWED_PROPERTIES = new Set([
 
 const FORBIDDEN_VALUE = /[;{}<>]|\/\*|\*\/|url\s*\(|expression\s*\(|javascript:|@import/i;
 const SAFE_KEY = /^[A-Za-z0-9_-]{1,64}$/;
+
+// Propriétés pilotées par une échelle : une valeur hors échelle est refusée.
+const ENUM_PROPERTY_NAMES = new Set(["padding", "radius", "opacity", "background", "border", "shadow"]);
 const MAX_RULES = 400;
 
 export function isElementState(stateName) {
@@ -86,11 +91,23 @@ export function getElementState(project, layoutKey, stateName) {
 /** Ajoute ou remplace une déclaration. Renvoie un nouveau projet. */
 export function setElementState(project, layoutKey, stateName, property, value) {
   if (!project || !SAFE_KEY.test(String(layoutKey || "")) || !isElementState(stateName)) return project;
-  const declaration = sanitizeDeclaration(property, value);
-  if (!declaration) return project;
+  // Deux familles de réglages : les énumérations partagées avec les styles d'élément
+  // (padding, ombre…) et les déclarations libres filtrées (couleur, par exemple).
+  // Une propriété énumérée n'accepte qu'une valeur de son échelle : sinon
+  // « padding: gigantesque » passerait par la liste blanche.
+  const enumerated = declarationsFor(property, value);
+  if (!enumerated) {
+    const name = String(property).trim().toLowerCase();
+    // L'opacité accepte aussi une valeur numérique nue : c'est l'usage historique du
+    // curseur, et une valeur hors échelle doit rester possible là où elle est simple.
+    const freeOpacity = name === "opacity" && /^(?:0|1|0?\.\d+)$/.test(String(value));
+    if (ENUM_PROPERTY_NAMES.has(name) && !freeOpacity) return project;
+    const declaration = sanitizeDeclaration(property, value);
+    if (!declaration) return project;
+  }
   const elementStates = { ...(project.elementStates || {}) };
   const forElement = { ...(elementStates[layoutKey] || {}) };
-  forElement[stateName] = { ...(forElement[stateName] || {}), [declaration.property]: declaration.value };
+  forElement[stateName] = { ...(forElement[stateName] || {}), [String(property).trim().toLowerCase()]: value };
   elementStates[layoutKey] = forElement;
   return { ...project, elementStates };
 }
@@ -124,6 +141,10 @@ export function elementStateCSS(project) {
       if (!forState || typeof forState !== "object") continue;
       const declarations = [];
       for (const property of Object.keys(forState)) {
+        // Un réglage énuméré (padding, ombre...) prime ; sinon la déclaration libre
+        // reste acceptée si la liste blanche l'autorise (couleur, par exemple).
+        const enumerated = declarationsFor(property, forState[property]);
+        if (enumerated) { for (const declaration of enumerated) declarations.push(declaration); continue; }
         const declaration = sanitizeDeclaration(property, forState[property]);
         if (declaration) declarations.push(declaration.property + ": " + declaration.value + ";");
       }

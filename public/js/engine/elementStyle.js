@@ -99,6 +99,37 @@ export function setElementStyle(project, layoutKey, property, value) {
   return { ...project, elementStyles };
 }
 
+/**
+ * Déclarations CSS d'un réglage énuméré. Source unique : les styles d'élément ET
+ * les états d'élément s'en servent, pour qu'une même intention produise exactement
+ * le même CSS dans les deux cas.
+ * Renvoie un tableau de déclarations, ou null si le réglage n'existe pas.
+ */
+export function declarationsFor(property, valueId) {
+  const scales = {
+    padding: ELEMENT_PADDING,
+    radius: ELEMENT_RADIUS,
+    opacity: ELEMENT_OPACITY,
+    background: ELEMENT_BACKGROUND,
+    border: ELEMENT_BORDER,
+    shadow: ELEMENT_SHADOW
+  };
+  const scale = scales[property];
+  if (!scale || !Object.prototype.hasOwnProperty.call(scale, valueId)) return null;
+  if (property === "padding") return ["padding: " + ELEMENT_PADDING[valueId].value + ";"];
+  if (property === "radius") return ["border-radius: " + ELEMENT_RADIUS[valueId].value + ";"];
+  if (property === "opacity") return ["opacity: " + ELEMENT_OPACITY[valueId].value + ";"];
+  if (property === "border") return ["border: " + ELEMENT_BORDER[valueId].value + ";"];
+  if (property === "shadow") return ["box-shadow: " + ELEMENT_SHADOW[valueId].value + ";"];
+  const background = ELEMENT_BACKGROUND[valueId];
+  return ["background-color: " + background.value + ";"].concat(background.contrast ? [background.contrast] : []);
+}
+
+/** Vrai si le réglage énuméré existe pour cette propriété. */
+export function isKnownElementValue(property, valueId) {
+  return declarationsFor(property, valueId) !== null;
+}
+
 /** Retire un réglage. L'entrée disparaît quand il ne reste rien. Renvoie un nouveau projet. */
 export function clearElementStyle(project, layoutKey, property) {
   if (!project || !project.elementStyles || !project.elementStyles[layoutKey]) return project;
@@ -126,17 +157,11 @@ export function elementStyleCSS(project) {
     if (!hasCustomElementStyle(project, layoutKey)) continue;
     const style = getElementStyle(project, layoutKey);
     const declarations = [];
-    if (style.padding !== ELEMENT_STYLE_DEFAULTS.padding) declarations.push("padding: " + ELEMENT_PADDING[style.padding].value + ";");
-    if (style.radius !== ELEMENT_STYLE_DEFAULTS.radius) declarations.push("border-radius: " + ELEMENT_RADIUS[style.radius].value + ";");
-    if (style.opacity !== ELEMENT_STYLE_DEFAULTS.opacity) declarations.push("opacity: " + ELEMENT_OPACITY[style.opacity].value + ";");
-    if (style.background !== ELEMENT_STYLE_DEFAULTS.background) {
-      const background = ELEMENT_BACKGROUND[style.background];
-      declarations.push("background-color: " + background.value + ";");
+    for (const property of Object.keys(ELEMENT_STYLE_DEFAULTS)) {
+      if (style[property] === ELEMENT_STYLE_DEFAULTS[property]) continue;
       // Un fond accentué impose un texte lisible : la paire est indissociable.
-      if (background.contrast) declarations.push(background.contrast);
+      for (const declaration of declarationsFor(property, style[property]) || []) declarations.push(declaration);
     }
-    if (style.border !== ELEMENT_STYLE_DEFAULTS.border) declarations.push("border: " + ELEMENT_BORDER[style.border].value + ";");
-    if (style.shadow !== ELEMENT_STYLE_DEFAULTS.shadow) declarations.push("box-shadow: " + ELEMENT_SHADOW[style.shadow].value + ";");
     if (!declarations.length) continue;
     rules.push('[data-layout-key="' + layoutKey + '"] { ' + declarations.join(" ") + " }");
     if (rules.length >= 400) break;

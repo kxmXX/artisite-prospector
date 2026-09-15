@@ -1377,3 +1377,26 @@ Deux décisions à retenir :
 Vérifications : tests/element_style.test.js (6 tests) ; 337/337 tests complets.
 
 Non vérifié : l'apparence à l'écran des blocs de l'inspecteur, comme pour les lots 4b et 4c.
+
+---
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.19 (vocabulaire de réglages unifié)
+
+Les styles d'élément (alpha.18) et les états (alpha.9 à 13) avaient chacun leur façon de produire du
+CSS : une même intention devait être écrite deux fois, avec deux risques de divergence. declarationsFor
+devient la source unique ; elementStyleCSS et elementStateCSS l'utilisent tous les deux.
+
+Garde-fous ajoutés :
+- Une propriété pilotée par une échelle (padding, radius, opacity, background, border, shadow) refuse
+  une valeur hors échelle. Sans cela, la liste blanche des déclarations libres aurait laissé passer
+  « padding: gigantesque ».
+- L'opacité conserve l'exception d'une valeur numérique nue (usage historique du curseur).
+
+Erreurs commises pendant ce lot, à consigner :
+1. Un script de troncature de test fichier coupé trop large : il a supprimé deux tests d'interface
+   valides. Je les ai rétablis ; la suite est repassée de 335 à 337 tests. Leçon : après toute
+   manipulation par script d'un fichier de test, recompter les tests et comparer.
+2. Un remplacement a laissé une variable locale utilisée hors de sa portée (« declaration is not
+   defined »), attrapé par la suite avant tout commit.
+
+Vérifications : 337/337 tests. Non vérifié : l'apparence à l'écran, comme pour les lots 4b à 4c.

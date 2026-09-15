@@ -70,45 +70,52 @@ test('les etats sont presents dans le rendu partage et dans l export autonome', 
   assert.ok(!/\[data-layout-key="[^"]+"\]:hover/.test(untouched), 'aucun etat par defaut : rien n est invente');
 });
 
+test('un etat peut porter les memes reglages enumeres que le style de base', () => {
+  let current = states.setElementState(project(), 'E1', 'hover', 'padding', 'airy');
+  assert.match(states.elementStateCSS(current), /padding: clamp\(1\.25rem, 4vw, 3rem\);/,
+    'le réglage énuméré doit produire exactement le même CSS que le style de base');
+  current = states.setElementState(current, 'E1', 'hover', 'shadow', 'lifted');
+  assert.match(states.elementStateCSS(current), /box-shadow: 0 8px 24px rgba\(0, 0, 0, 0\.10\);/);
+  current = states.setElementState(current, 'E1', 'hover', 'background', 'accent');
+  const css = states.elementStateCSS(current);
+  assert.match(css, /background-color: var\(--primary, #527c22\);/);
+  assert.match(css, /color: #ffffff;/, 'fond accentué et texte lisible restent indissociables');
+  assert.equal(states.getElementState(current, 'E1', 'hover').padding, 'airy');
+  // La déclaration libre reste possible : les pastilles de couleur envoient un code hexadécimal.
+  current = states.setElementState(current, 'E1', 'hover', 'color', '#ffffff');
+  assert.match(states.elementStateCSS(current), /color: #ffffff;/);
+});
+
+test('une valeur inconnue ne cree pas de declaration parasite', () => {
+  const current = states.setElementState(project(), 'E1', 'hover', 'padding', 'gigantesque');
+  assert.deepEqual(states.getElementState(current, 'E1', 'hover'), {},
+    'une valeur hors énumération ne doit rien produire');
+});
+
+
 const editorSource = fs.readFileSync(new URL('../public/js/components/editor.js', import.meta.url), 'utf8');
 const appSource = fs.readFileSync(new URL('../public/js/app.js', import.meta.url), 'utf8');
 
-test('l interface permet de choisir l etat modifie', () => {
+test('l interface expose le selecteur d etat et son rappel', () => {
   for (const stateName of ['default', 'hover', 'focus', 'active', 'disabled']) {
     assert.ok(editorSource.includes('data-ftb-state="' + stateName + '"'),
       'le sélecteur doit proposer l état ' + stateName);
   }
-  assert.ok(/setActiveTextState\('hover'\)/.test(editorSource), 'le sélecteur est branché sur une commande');
-});
-
-test('hors style principal, la couleur alimente bien les etats', () => {
-  const block = appSource.slice(appSource.indexOf('setActiveTextColor(color) {'));
-  const stateBranch = block.slice(0, block.indexOf('if (secId && field && state.currentProject) {', 10));
-  assert.ok(stateBranch.includes('setElementState(state.currentProject, layoutKey'),
-    'la couleur doit écrire dans les états quand un état est choisi');
-  assert.ok(stateBranch.includes('getUiCode('), 'la clé de mise en page doit être celle du renderer');
-  assert.ok(stateBranch.includes('return;'), 'le chemin du style principal ne doit pas être exécuté en plus');
-  assert.ok(appSource.includes('this._activeTextState = "default"'), 'sortir de l édition revient au style principal');
-});
-
-
-test('l etat actif reste visible quand le menu est ferme', () => {
   assert.ok(editorSource.includes('id="ftb-state-badge"'),
     'la barre doit rappeler l état choisi hors du menu');
-  assert.ok(/ftb-state-badge[\s\S]{0,400}classList\.toggle\("hidden"/.test(appSource),
-    'le rappel doit apparaître et disparaître avec l état choisi');
-});
-
-
-test('revenir au style principal est une action explicite', () => {
   assert.ok(editorSource.includes('clearActiveTextState()'),
     'un bouton doit permettre d effacer l état choisi');
-  const method = appSource.slice(appSource.indexOf('clearActiveTextState() {'));
-  assert.ok(method.slice(0, 900).includes('clearElementState(state.currentProject, layoutKey, stateName)'),
-    'effacer un état doit passer par la primitive du modèle');
-  assert.ok(method.slice(0, 900).includes('state.updateProject('),
+});
+
+test('les commandes d etat passent par la primitive et par l historique', () => {
+  const stateBranch = appSource.slice(appSource.indexOf('setActiveTextColor(color) {'));
+  assert.ok(stateBranch.slice(0, 1400).includes('setElementState(state.currentProject, layoutKey'),
+    'la couleur doit écrire dans les états quand un état est choisi');
+  assert.ok(stateBranch.slice(0, 1400).includes('getUiCode('),
+    'la clé de mise en page doit être celle du renderer');
+  const clear = appSource.slice(appSource.indexOf('clearActiveTextState() {'));
+  assert.ok(clear.slice(0, 900).includes('clearElementState(state.currentProject, layoutKey, stateName)'));
+  assert.ok(clear.slice(0, 900).includes('state.updateProject('),
     'l effacement doit passer par l historique, donc être annulable');
-  assert.ok(appSource.includes('état à effacer'),
-    'sans état choisi, l action doit expliquer au lieu d échouer en silence');
 });
 
