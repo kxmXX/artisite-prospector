@@ -1,3 +1,11 @@
+## LOT DE LIVRAISON — ancres inertes en édition 4.8.0-alpha.50 — 15 septembre 2026
+
+- `decorateLayoutKeys` reçoit `isEditor` et, en mode éditeur uniquement, ajoute `onclick="event.preventDefault()"` à chaque ancre portant `href`. Le canevas n’est pas une page vivante : un clic ne doit jamais naviguer. `href` reste pour la sémantique et la parité d’export.
+- Portée vérifiée par sonde : 24 ancres éditeur traitées (2 appartiennent à la barre collante de niveau supérieur, masquée en édition), **0 injection** dans le HTML public, et `href="#simulateur"` toujours présent côté éditeur.
+- Observation honnête : en automatisation, le panneau de réglages s’ouvre bien, mais l’URL peut encore afficher `#simulateur` après le clic — aucun code applicatif n’écrit ce hash (`location.hash` n’est jamais assigné) ; il s’agit probablement d’un artefact du pilotage synthétique. La garantie posée est celle du renderer : l’action par défaut est annulée en ligne.
+- Tests : 11/11 tests d’intégrité éditeur, 257/257 complets, `node --check` et `git diff --check` propres.
+- Prochaine action exacte : construire la matrice de non-régression des gestes (souris / tactile / clavier) puis simplifier les barres d’outils et leurs libellés.
+
 ## LOT DE LIVRAISON — CTA d’en-tête réparé 4.8.0-alpha.49 — 15 septembre 2026
 
 - Cause : le wrapper du CTA d’en-tête (`renderHeader`, renderer.js) omettait `data-ui-target="true"`, contrairement aux CTA de hero/CTA. La liaison éditeur (`initCanvasInteractivity`) sort tôt quand cet attribut est absent : le bouton principal de l’en-tête n’avait donc aucun gestionnaire de réglages et son clic suivait `href="#simulateur"`.

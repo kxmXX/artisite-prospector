@@ -7,6 +7,12 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 15 septembre 2026 (4.8.0-alpha.50)
+
+- Ancres d’édition : chaque ancre du canevas porte désormais `onclick="event.preventDefault()"` en mode éditeur. `href` reste présent pour la sémantique et la parité d’export, mais un clic ne peut plus déclencher de navigation de fragment ni d’ouverture `tel:`/`sms:` parasite.
+- Portée : le site public et l’export conservent leurs liens natifs, sans aucune injection.
+- QA : test de rendu vérifiant l’ancre d’en-tête inerte en éditeur et l’absence totale d’injection publique ; 11/11 tests d’intégrité éditeur, 257/257 tests complets.
+
 ### Consolidation — 15 septembre 2026 (4.8.0-alpha.49)
 
 - CTA d’en-tête : son conteneur ne portait pas `data-ui-target="true"`, il était donc exclu de la liaison éditeur. Cliquer le bouton principal de l’en-tête ouvrait uniquement son lien `#simulateur` au lieu de ses réglages — le contrôle le plus visible de la page était inutilisable. Le renderer garantit désormais cette liaison pour chaque CTA en mode éditeur, sans modifier le site public.

@@ -189,3 +189,16 @@ test('every editor CTA wrapper can open its contextual controls', async () => {
   assert.ok(!publicHtml.includes('data-ui-target="true"'), 'public CTAs keep native navigation');
   assert.ok(rendererSource.includes('data-ui-target="true">'));
 });
+
+test('editor anchors cannot navigate the canvas', async () => {
+  const { renderWebsiteHTML } = await import('../public/js/components/renderer.js');
+  const project = generateSite({ name: 'Anchor Probe', tradeId: 'paysagiste' });
+  const editorHtml = renderWebsiteHTML(project, { isEditor: true, isStandalone: false });
+  const publicHtml = renderWebsiteHTML(project, { isEditor: false, isStandalone: false });
+  const headerAnchor = (editorHtml.match(/<a\b[^>]*vitrine-header-cta[^>]*>/) || [''])[0];
+  assert.ok(headerAnchor.includes('href="#simulateur"'), 'href stays for semantics and export parity');
+  assert.ok(headerAnchor.includes('onclick="event.preventDefault()"'), 'editor CTA must cancel navigation');
+  const publicAnchors = publicHtml.match(/<a\b[^>]*>/gi) || [];
+  assert.ok(publicAnchors.length > 0);
+  assert.ok(publicAnchors.every(tag => !tag.includes('event.preventDefault()')), 'public anchors keep native navigation');
+});

@@ -101,6 +101,13 @@ function decorateLayoutKeys(markup, project, section, isEditor = false) {
     const code = getButtonLayoutCode(project, section, buttonType);
     return full.replace(/>$/, ` data-layout-key="${code}"${getFreeformPlacementAttributes(project, code, section?.id)}>`);
   });
+  if (isEditor) {
+    // The editor canvas is not a live page: an anchor click must never navigate.
+    // href stays for semantics and export parity; the default action is cancelled
+    // inline so a late or missing listener binding cannot leak a jump.
+    output = output.replace(/<a\b([^>]*\shref=[^>]*)>/gi, (full, attrs) => (/onclick=/i.test(full) ? full : '<a' + attrs + ' onclick="event.preventDefault()">'));
+  }
+
   return output;
 }
 
