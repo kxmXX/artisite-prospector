@@ -71,9 +71,13 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
       cercle générique) ; 92 lignes de CSS mort retirées de `studio-v3.css` (vérifiées au navigateur) ;
       dashboard ≤ 760 px — le rail devient une barre basse (le thème redevient accessible), titres en
       `clamp()`, métadonnées conservées. **285/285**.
-      *Reste du lot 2 (2c, non fait)* : convergence rayons/ombres/espacements (32 rayons et
-      47 ombres distincts dans le chrome), réduction de la cascade de cartes de l'inspecteur,
-      résorption de la liste gelée des 34 classes sans règle.
+      **2c partiel livré en `4.9.0-alpha.8`** : `placeholder-zinc-400` (classe invalide, la couleur
+      du texte indicatif ne s'appliquait jamais) corrigée en `placeholder:text-zinc-400`,
+      `no-scrollbar` reçoit une vraie définition, et cinq marqueurs redondants sont retirés
+      (`app-dashboard-shell`, `dashboard-topbar`, `dashboard-v3-field-name`, `ai-avatar-wrapper`,
+      `cmd-group`). La liste gelée passe de **34 à 26** classes côté application.
+      *Reste de 2c* : convergence rayons/ombres/espacements (32 rayons et 47 ombres distincts dans
+      le chrome), réduction de la cascade de cartes de l'inspecteur, et les 26 classes restantes.
       *Point ouvert 2a mesuré* : dans le canvas de l'éditeur (~640 px à 1280 de fenêtre), la vitrine
       rend sa navigation bureau et déborde (logo replié, FAQ sous le CTA). Cause identifiée : les
       media queries du site répondent à la fenêtre, pas au canvas. Correction prévue au lot

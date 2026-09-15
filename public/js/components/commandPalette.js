@@ -19,7 +19,7 @@ export function renderCommandPalette(project, allProjects = []) {
                  placeholder="Tapez une commande ou une section... (ex: services, mobile, export, devis)" 
                  oninput="window.app.filterCommandPalette(this.value)"
                  onkeydown="window.app.handleCommandPaletteKey(event)"
-                 class="w-full bg-transparent text-sm text-zinc-900 placeholder-zinc-400 focus:outline-none font-medium">
+                 class="w-full bg-transparent text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none font-medium">
           <kbd class="px-2 py-0.5 text-ui-xs font-mono text-zinc-500 bg-zinc-100 border border-zinc-200 rounded">ESC</kbd>
         </div>
 
@@ -28,7 +28,7 @@ export function renderCommandPalette(project, allProjects = []) {
           
           ${sections.length > 0 ? `
           <!-- Sections Group -->
-          <div class="cmd-group" data-group="sections">
+          <div class="" data-group="sections">
             <div class="px-2.5 py-1 text-ui-xs font-bold text-zinc-400 uppercase tracking-wider">Sections du site</div>
             ${sections.map(s => `
               <div class="cmd-item flex items-center justify-between px-3 py-2 rounded-lg text-xs text-zinc-800 hover:bg-zinc-100 cursor-pointer transition-colors"
@@ -45,7 +45,7 @@ export function renderCommandPalette(project, allProjects = []) {
 
           ${allProjects.length > 0 ? `
           <!-- Projects Group -->
-          <div class="cmd-group pt-2 border-t border-zinc-100" data-group="projects">
+          <div class="pt-2 border-t border-zinc-100" data-group="projects">
             <div class="px-2.5 py-1 text-ui-xs font-bold text-zinc-400 uppercase tracking-wider">Mes Projets</div>
             ${allProjects.map(p => `
               <div class="cmd-item flex items-center justify-between px-3 py-2 rounded-lg text-xs text-zinc-800 hover:bg-zinc-100 cursor-pointer transition-colors"
@@ -62,7 +62,7 @@ export function renderCommandPalette(project, allProjects = []) {
           ` : ''}
 
           <!-- Actions Group -->
-          <div class="cmd-group pt-2 border-t border-zinc-100" data-group="actions">
+          <div class="pt-2 border-t border-zinc-100" data-group="actions">
             <div class="px-2.5 py-1 text-ui-xs font-bold text-zinc-400 uppercase tracking-wider">Outils & Actions Vente</div>
             
             <div class="cmd-item flex items-center justify-between px-3 py-2 rounded-lg text-xs text-zinc-800 hover:bg-zinc-100 cursor-pointer transition-colors"
@@ -112,7 +112,7 @@ export function renderCommandPalette(project, allProjects = []) {
           </div>
 
           <!-- Viewports Group -->
-          <div class="cmd-group pt-2 border-t border-zinc-100" data-group="viewports">
+          <div class="pt-2 border-t border-zinc-100" data-group="viewports">
             <div class="px-2.5 py-1 text-ui-xs font-bold text-zinc-400 uppercase tracking-wider">Affichage Responsive</div>
             
             <div class="cmd-item flex items-center justify-between px-3 py-2 rounded-lg text-xs text-zinc-800 hover:bg-zinc-100 cursor-pointer transition-colors"
@@ -144,7 +144,7 @@ export function renderCommandPalette(project, allProjects = []) {
           </div>
 
           <!-- Ambiances Group -->
-          <div class="cmd-group pt-2 border-t border-zinc-100" data-group="themes">
+          <div class="pt-2 border-t border-zinc-100" data-group="themes">
             <div class="px-2.5 py-1 text-ui-xs font-bold text-zinc-400 uppercase tracking-wider">Ambiance Globale</div>
             
             <div class="cmd-item flex items-center justify-between px-3 py-2 rounded-lg text-xs text-zinc-800 hover:bg-zinc-100 cursor-pointer transition-colors"

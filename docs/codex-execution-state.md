@@ -1117,3 +1117,30 @@ navigateur après purge du cache — sélection d'un titre dans le canvas, la ba
 
 Reste du lot 3 : arbre des éléments dans le panneau Structure, sélection hiérarchique par clic droit
 ou ⌘-clic depuis une liste, et suppression des 830 lignes inertes de renderSectionAccordionContent.
+
+---
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.8 (lot 2c partiel)
+
+Objectif : réduire la dette « classes émises sans aucune règle CSS », gelée par test depuis le lot 1,
+et corriger au passage les deux cas où une classe mal écrite cachait un vrai défaut.
+
+1. placeholder-zinc-400 (palette de commandes) n'est pas une classe valide : la couleur du texte
+   indicatif ne s'appliquait pas. Devenue placeholder:text-zinc-400, générée par la couche
+   d'utilitaires et donc réellement active.
+2. no-scrollbar (barre d'onglets de la modale de partage) n'avait aucune règle : la barre de
+   défilement restait visible. Règle réelle ajoutée (scrollbar-width + ::-webkit-scrollbar).
+3. Cinq marqueurs redondants retirés du balisage : app-dashboard-shell, dashboard-topbar,
+   dashboard-v3-field-name, ai-avatar-wrapper, cmd-group. Aucun effet visuel possible, une classe
+   sans règle ne peignant rien ; c'est le balisage qui devient exact.
+
+Liste gelée : 34 -> 26 classes côté application. Les 26 restantes sont soit des crochets
+sémantiques utilisés par du JavaScript (site-theme-icon-dark, site-theme-label, tab-nav-btn,
+btn-sec-*), soit des restes d'anciens gabarits dans le contenu du site (card, header, footer, title,
+sub, pricing, inclusions, price-val, sig-box, sig-img, gallery-card, review-rating-star,
+simulateur-roi-slider, vitrine-about-copy, vitrine-brand-name, cta-direct-gear, studio-system).
+
+Vérifications : 314/314 tests ; générateur d'utilitaires à jour (check:css) ; listes gelées mises à
+jour dans tests/design_system.test.js. Aucun contrôle navigateur n'a été jugé nécessaire ici : les
+classes retirées n'avaient aucune règle, leur suppression ne peut donc rien changer au rendu, et les
+deux classes réparées ont été vérifiées par le générateur (règle émise).

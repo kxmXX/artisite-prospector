@@ -100,7 +100,7 @@ export function renderDashboard(state) {
   }).join('');
 
   return `
-    <div class="dashboard-v3-shell app-dashboard-shell selection:bg-zinc-900 selection:text-white">
+    <div class="dashboard-v3-shell selection:bg-zinc-900 selection:text-white">
       <aside class="dashboard-v3-rail" aria-label="Navigation principale">
         <div class="dashboard-v3-monogram">A</div>
         <button type="button" class="dashboard-v3-rail-item is-active" aria-label="Projets">${getIcon("layers", "w-5 h-5")}<span>Projets</span></button>
@@ -111,7 +111,7 @@ export function renderDashboard(state) {
       </aside>
 
       <div class="dashboard-v3-page">
-        <header class="dashboard-v3-header dashboard-topbar">
+        <header class="dashboard-v3-header">
           <div class="dashboard-v3-brand">
             <span>ARTISITE PROSPECTOR</span>
             <b>v${APP_VERSION}</b>
@@ -136,7 +136,7 @@ export function renderDashboard(state) {
               <p>Passez d’un nom et d’une ville à une direction de site complète. L’outil compose la base ; vous gardez la décision.</p>
 
               <form id="quick-gen-form" onsubmit="event.preventDefault(); window.app.handleQuickGenerate(event);" class="quick-gen-bar dashboard-v3-composer">
-                <label class="dashboard-v3-field dashboard-v3-field-name">
+                <label class="dashboard-v3-field">
                   <span>Entreprise</span>
                   <div>${getIcon("edit", "w-4 h-4")}<input type="text" id="quick-gen-name" required aria-label="Raison sociale" placeholder="Atelier Morel"></div>
                 </label>

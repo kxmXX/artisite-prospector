@@ -7,6 +7,23 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.8) — Lot 2c : dette de classes réduite
+
+- **Défaut réel corrigé** : le champ de recherche de la palette de commandes portait
+  `placeholder-zinc-400`, qui n'est pas une classe valide — la couleur du texte indicatif ne
+  s'appliquait donc jamais. Remplacé par `placeholder:text-zinc-400`, désormais généré et actif.
+- **Barre d'onglets sans barre de défilement** : `no-scrollbar` était utilisée sans aucune règle
+  (la barre restait visible). Elle reçoit une vraie définition (`scrollbar-width: none` et
+  `::-webkit-scrollbar`), donc le contenu reste défilable mais sans barre apparente.
+- **Marqueurs redondants retirés** : `app-dashboard-shell`, `dashboard-topbar`,
+  `dashboard-v3-field-name`, `ai-avatar-wrapper` et `cmd-group` n'avaient aucune règle et
+  doublonnaient une classe déjà stylée. Aucun effet visuel possible (une classe sans règle ne peint
+  rien) ; le balisage et les listes gelées sont simplement plus honnêtes.
+- **Dette suivie** : la liste gelée des classes émises sans règle CSS passe de **34 à 26** côté
+  application. Les 26 restantes sont des crochets sémantiques (`site-theme-*`, `tab-nav-btn`,
+  `btn-sec-*`) ou des restes d'anciens gabarits, à traiter avec l'arbre des éléments.
+- **QA** : **314/314 tests**, générateur d'utilitaires à jour, listes gelées mises à jour.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.7) — Lot 3a : savoir ce qui est sélectionné
 
 - **Défaut corrigé (relevé par l'audit)** : deux modèles de sélection se déclenchaient ensemble sans

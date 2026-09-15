@@ -16,13 +16,11 @@ const read = (relative) => fs.readFileSync(path.join(ROOT, relative), 'utf8');
 // gabarits, composants à styler. Liste gelée volontairement : toute NOUVELLE classe
 // sans règle fait échouer ces tests. Le lot de finition UI doit la faire diminuer.
 const UNSTYLED_APP = [
-  'ai-avatar-wrapper', 'app-dashboard-shell', 'btn-sec-bg', 'btn-sec-down', 'btn-sec-dup',
-  'btn-sec-insert', 'btn-sec-up', 'btn-sec-vis', 'card', 'cmd-group', 'cta-direct-gear',
-  'dashboard-topbar', 'dashboard-v3-field-name', 'footer', 'gallery-card', 'header',
-  'inclusions', 'no-scrollbar', 'placeholder-zinc-400', 'price-val', 'pricing',
-  'review-rating-star', 'sig-box', 'sig-img', 'simulateur-roi-slider', 'site-theme-icon-dark',
-  'site-theme-icon-light', 'site-theme-label', 'studio-system', 'sub', 'tab-nav-btn', 'title',
-  'vitrine-about-copy', 'vitrine-brand-name'
+  'btn-sec-bg', 'btn-sec-down', 'btn-sec-dup', 'btn-sec-insert', 'btn-sec-up', 'btn-sec-vis',
+  'card', 'cta-direct-gear', 'footer', 'gallery-card', 'header', 'inclusions', 'price-val',
+  'pricing', 'review-rating-star', 'sig-box', 'sig-img', 'simulateur-roi-slider',
+  'site-theme-icon-dark', 'site-theme-icon-light', 'site-theme-label', 'studio-system', 'sub',
+  'tab-nav-btn', 'title', 'vitrine-about-copy', 'vitrine-brand-name'
 ];
 const UNSTYLED_EXPORT = [
   'btn-sec-bg', 'btn-sec-down', 'btn-sec-dup', 'btn-sec-insert', 'btn-sec-up', 'btn-sec-vis',

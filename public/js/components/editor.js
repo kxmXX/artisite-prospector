@@ -390,7 +390,7 @@ export function renderEditor(state) {
         </div>
       ` : `
         <button type="button" aria-label="Ouvrir Studio Assistant IA" onclick="window.app.toggleCopilotPanel(true)" class="copilot-launcher ai-launcher-pill">
-          <span class="ai-avatar-wrapper relative">
+          <span class="relative">
             <span class="assistant-avatar">${getIcon("bot", "w-4 h-4 text-amber-300")}</span>
             <span class="ai-status-dot"></span>
           </span>
