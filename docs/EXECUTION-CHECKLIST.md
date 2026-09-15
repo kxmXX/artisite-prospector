@@ -159,8 +159,9 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
 - [ ] **Passe anti-slop (skill Impeccable)** : surfaces du navigateur thématisées en `4.9.0-alpha.30`
       (sélection, curseur de saisie, barres de défilement, chiffres tabulaires, anneau de focus unique),
       portée bornée à `.studio-editor` ; **tous** les glyphes du chrome et du rendu remplacés par des icônes
-      dessinées (`4.9.0-alpha.32` → `.34`). *Reste* : « glass et blur comme décoration » dans les menus
-      flottants, unification du vocabulaire de boutons, PRODUCT.md et DESIGN.md à écrire.
+      dessinées (`4.9.0-alpha.32` → `.34`) ; vocabulaire de boutons unifié par des jetons de contrôle
+      (`4.9.0-alpha.45`), à rendu identique. *Reste* : « glass et blur comme décoration » dans les menus
+      flottants, et PRODUCT.md / DESIGN.md à écrire.
 - [x] **Lot 8 — Undo/Redo exhaustif** (`4.9.0-alpha.4`) : 11 commandes mutaient avant de prendre
       l'instantané (l'annulation ne restaurait rien) et 20 commandes n'avaient aucun historique ;
       toutes prennent désormais leur instantané **avant** la mutation, y compris les six

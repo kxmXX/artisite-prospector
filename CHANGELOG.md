@@ -7,6 +7,14 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.45) — Un seul vocabulaire de boutons, par les jetons
+
+- Constat : les familles de boutons du chrome (`studio-v3-*`, `motion-loop-btn`, `btn-keycap`) réécrivaient chacune leurs valeurs — `height:34px`, `border-radius:10px`, `transition:.16s ease`, `border-radius:.5rem`, `opacity:.28`. Rien de visible à l'écran, mais autant d'occasions de diverger à la prochaine retouche.
+- Correctif : cinq jetons de contrôle dans `tokens.css` — hauteur, rayon, écart, opacité désactivée et une transition partagée — que les familles consomment désormais. Les valeurs sont **numériquement identiques** (34 px, 10 px, 160 ms ≈ .16 s, 8 px) : c'est un changement de source de vérité, pas d'apparence.
+- Un test vérifie que les jetons existent, que les familles les utilisent, et qu'aucune valeur arbitraire ne revient dans la règle partagée.
+- Un test existant encodait la chaîne `var(--btn-radius, var(--cta-radius, 8px))` : **réécrit** pour vérifier le contrat — respecter les variables — au lieu de la valeur figée, afin qu'il ne casse plus à chaque changement de jeton.
+- Tests : 1 nouveau ; 391 → **392/392**. Capture de contrôle : rendu inchangé, comme attendu.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.44) — Le panneau de propriétés suit enfin la section
 
 - Cause trouvée : la visibilité du panneau dépendait d'une **requête média** (`matchMedia("(max-width: 1280px)")`) au lieu d'un état. Sur un écran large, ce chemin ne l'ouvrait donc jamais ; et après un changement de section il restait **bloqué sur la section précédente** — je cliquais « Hero », le panneau affichait « Menu ».

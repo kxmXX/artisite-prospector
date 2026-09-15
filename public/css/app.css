@@ -1285,9 +1285,9 @@ input, textarea, select, [contenteditable] {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--btn-radius, var(--cta-radius, 8px));
-  font-weight: 600;
-  transition: all 0.12s cubic-bezier(0.2, 0.8, 0.4, 1);
+  border-radius: var(--btn-radius, var(--cta-radius, var(--ui-radius-md)));
+  font-weight: var(--ui-weight-semibold);
+  transition: var(--ui-transition-control);
   box-shadow: 0 3px 0 rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.08);
   transform: translateY(0);
   cursor: pointer;
@@ -3659,7 +3659,7 @@ img[data-motion="pulse"],
 /* Loop selector shared by the section, text and image motion menus. */
 .motion-loop-row { display: flex; align-items: center; gap: .3rem; margin-top: .5rem; }
 .motion-loop-label { flex: 0 0 auto; font-size: .6rem; text-transform: uppercase; letter-spacing: .08em; color: #8a928e; }
-.motion-loop-btn { flex: 1 1 0%; min-height: 1.9rem; border: 1px solid #e4e4e7; border-radius: .5rem; background: #fff; color: #52525b; font-size: .64rem; font-weight: 700; cursor: pointer; }
+.motion-loop-btn { flex: 1 1 0%; min-height: 1.9rem; border: 1px solid #e4e4e7; border-radius: var(--ui-radius-md); background: #fff; color: #52525b; font-size: var(--ui-text-xs); font-weight: var(--ui-weight-bold); cursor: pointer; transition: var(--ui-transition-control); }
 .motion-loop-btn:hover { border-color: #a1a1aa; }
 .motion-loop-btn.is-active { background: #18181b; color: #fff; border-color: #18181b; }
 .motion-loop-hint { margin-top: .35rem; font-size: .62rem; line-height: 1.35; color: #8a928e; }

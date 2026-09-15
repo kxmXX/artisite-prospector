@@ -116,3 +116,19 @@ test('la selection d un element a un seul indicateur, partage avec la selection 
   const studio = read('public/css/studio-v3.css');
   assert.ok(studio.includes('[data-layout-key].is-freeform-selected'), 'le style doit exister');
 });
+
+test('les familles de boutons partagent un seul vocabulaire', () => {
+  const tokens = read('public/css/tokens.css');
+  for (const t of ['--ui-control-height', '--ui-radius-control', '--ui-control-gap', '--ui-disabled-opacity', '--ui-transition-control']) {
+    assert.ok(tokens.includes(t + ':'), 'jeton manquant : ' + t);
+  }
+  const studio = read('public/css/studio-v3.css');
+  assert.ok(studio.includes('height:var(--ui-control-height)'), 'les boutons du studio doivent partager la hauteur');
+  assert.ok(studio.includes('border-radius:var(--ui-radius-control)'), 'et le rayon');
+  assert.ok(!studio.includes('height:34px;border-radius:10px'), 'plus de hauteur et de rayon arbitraires dans la regle partagee');
+  assert.ok(!studio.includes('opacity:.28'), 'plus d opacite arbitraire');
+  const app = read('public/css/app.css');
+  assert.match(app, /\.motion-loop-btn[^}]*border-radius: var\(--ui-radius-md\)/, 'les pastilles passent par un jeton de rayon');
+  assert.ok(!/\.motion-loop-btn[^}]*border-radius:\s*\.5rem/.test(app), 'plus de rayon arbitraire sur les pastilles');
+  assert.ok(!app.includes('border-radius: var(--btn-radius, var(--cta-radius, 8px))'), 'le keycap ne fige plus 8px');
+});

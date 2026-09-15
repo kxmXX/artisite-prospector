@@ -55,6 +55,15 @@
   --btn-radius: var(--ui-radius-full);
   --card-radius: var(--ui-radius-xl);
 
+  /* --- Contrôles du chrome : un seul vocabulaire de boutons ---
+     Les boutons du studio, les pastilles d'animation, les touches et les chips
+     partagent ces valeurs au lieu de les réécrire chacune de leur côté. */
+  --ui-control-height: 34px;
+  --ui-radius-control: 10px;
+  --ui-control-gap: 7px;
+  --ui-disabled-opacity: .28;
+  --ui-transition-control: background-color var(--ui-dur-base) var(--ui-ease), color var(--ui-dur-base) var(--ui-ease), border-color var(--ui-dur-base) var(--ui-ease), transform var(--ui-dur-base) var(--ui-ease), box-shadow var(--ui-dur-base) var(--ui-ease);
+
   /* --- Ombres --- */
   --ui-shadow-1: 0 1px 2px rgba(24, 32, 31, .06), 0 1px 1px rgba(24, 32, 31, .04);
   --ui-shadow-2: 0 8px 24px rgba(24, 32, 31, .10);

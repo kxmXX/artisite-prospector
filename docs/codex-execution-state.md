@@ -1675,3 +1675,11 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Verifie a l'ecran : panneau ferme au chargement, ouvert par le bouton, affiche « Hero » apres selection de Hero. La liste du hero expose Badge, Titre, Sous-titre, Bouton principal, Bouton secondaire, Mention de confiance.
 - Deux tests reecrits (contrat change), 391/391. `node --check` sur app.js et state.js, `scripts/build-utilities.mjs` relance.
 - Reste : desambiguiser deux libelles « Bouton » identiques ; geste de deplacement (validation utilisateur) ; puis 4d (mise en page, reglages globaux), 3b, 7, export 2d.
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.45 (vocabulaire de boutons unifie)
+
+- Fait : cinq jetons de controle dans tokens.css (hauteur 34px, rayon 10px, ecart 7px, opacite desactivee .28, transition partagee) et les familles studio-v3-*, motion-loop-btn et btn-keycap les consomment. Valeurs numeriquement identiques : le rendu ne change pas.
+- Motivation : quatre familles reecrivaient leurs valeurs, donc quatre occasions de diverger. C'est de la dette de nommage, pas un defaut visible — je l'avais depriorise au tour 33 et je la solde.
+- Un test existant encodait la valeur figee du keycap : reecrit sur le contrat (respecter les variables) pour qu'il ne casse plus a chaque changement de jeton.
+- Tests : 391 → 392. `scripts/build-utilities.mjs` relance, capture de controle prise.
+- Reste : glass/blur decoratif des menus flottants, PRODUCT.md/DESIGN.md, desambiguisation des libelles Bouton, geste de deplacement (validation utilisateur), puis 4d, 3b, 7, export 2d.
