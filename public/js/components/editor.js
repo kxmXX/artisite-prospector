@@ -1,4 +1,5 @@
 import { getIcon } from "./icons.js";
+import { MOTION_PRESETS, MOTION_SPEEDS, MOTION_DELAYS } from "../data/motionPresets.js";
 import { renderWebsiteHTML, renderStickyCallBar } from "./renderer.js";
 import { renderInspector } from "./inspector.js";
 import { STYLE_PRESETS } from "../data/styles.js";
@@ -328,13 +329,9 @@ export function renderEditor(state) {
               <div id="ftb-anim-menu" class="hidden absolute left-0 top-full mt-2 w-56 bg-zinc-900/95 backdrop-blur-md border border-white/20 rounded-xl p-2.5 shadow-2xl z-50 text-white text-ui-sm">
                 <div class="text-ui-2xs font-bold uppercase tracking-wider text-zinc-400 mb-1.5">Animation de l’élément · texte</div>
                 <div class="grid grid-cols-2 gap-1.5">
-                  <button type="button" data-motion-preview="fade-in" onclick="window.app.setActiveTextMotion('fade-in')" class="motion-chip">Fade ◐</button>
-                  <button type="button" data-motion-preview="slide-up" onclick="window.app.setActiveTextMotion('slide-up')" class="motion-chip">Slide ↑</button>
-                  <button type="button" data-motion-preview="spring" onclick="window.app.setActiveTextMotion('spring')" class="motion-chip">Spring ⤒</button>
-                  <button type="button" data-motion-preview="pulse" onclick="window.app.setActiveTextMotion('pulse')" class="motion-chip">Pulse ◉</button>
-                  <button type="button" data-motion-preview="shimmer" onclick="window.app.setActiveTextMotion('shimmer')" class="motion-chip"><span class="inline-flex items-center justify-center gap-1">Shimmer ${getIcon("sparkles", "w-3 h-3")}</span></button>
-                  <button type="button" data-motion-preview="zoom-in" onclick="window.app.setActiveTextMotion('zoom-in')" class="motion-chip">Zoom ⤢</button>
-                  <button type="button" onclick="window.app.setActiveTextMotion('none')" class="motion-chip col-span-2 text-zinc-400">Aucune</button>
+                  ${MOTION_PRESETS.map((motion) => `
+                    <button type="button" data-motion-preview="${motion.id}" onclick="window.app.setActiveTextMotion('${motion.id}')" class="motion-chip ${motion.id === 'none' ? 'col-span-2 text-zinc-400' : ''}">${motion.label}</button>
+                  `).join('')}
                 </div>
                 <div class="motion-loop-row" data-text-loop-row>
                   <span class="motion-loop-label">Répétition</span>
@@ -342,8 +339,19 @@ export function renderEditor(state) {
                   <button type="button" data-text-loop="twice" class="motion-loop-btn" onclick="window.app.setActiveTextMotionLoop('twice')">×2</button>
                   <button type="button" data-text-loop="infinite" class="motion-loop-btn" onclick="window.app.setActiveTextMotionLoop('infinite')">Boucle</button>
                 </div>
-                <div class="motion-preview-hint">Survolez un style pour le voir jouer.</div>
-                <div class="motion-preview-hint">Survolez un style pour le voir jouer.</div>
+                <div class="motion-loop-row" data-text-timing>
+                  <span class="motion-loop-label">Vitesse</span>
+                  ${MOTION_SPEEDS.map((speed) => `
+                    <button type="button" data-text-speed="${speed.id}" class="motion-loop-btn ${speed.id === 'normal' ? 'is-active' : ''}" title="${speed.description}" onclick="window.app.setActiveTextMotionSpeed('${speed.id}')">${speed.label}</button>
+                  `).join('')}
+                </div>
+                <div class="motion-loop-row" data-text-timing>
+                  <span class="motion-loop-label">Délai</span>
+                  ${MOTION_DELAYS.map((delay) => `
+                    <button type="button" data-text-delay="${delay.id}" class="motion-loop-btn ${delay.id === 'aucun' ? 'is-active' : ''}" title="${delay.description}" onclick="window.app.setActiveTextMotionDelay('${delay.id}')">${delay.label}</button>
+                  `).join('')}
+                </div>
+                <div class="motion-preview-hint">Survolez une animation pour la voir jouer.</div>
               </div>
             </div>
             <div class="h-3.5 w-[1px] bg-zinc-700 mx-1"></div>

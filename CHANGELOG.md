@@ -7,6 +7,15 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.28) — Lot 7c étendu : texte et image, et le menu texte rejoint le catalogue
+
+- Cause : la vitesse et le délai n'existaient que pour la section ; et le menu d'animation du texte, dernier survivant des anciens catalogues locaux, affichait encore « Fade », « Slide », « Spring » — la même animation portait donc deux noms selon l'endroit — avec une ligne d'aide dupliquée.
+- Correctif : `setActiveTextTiming` et `setImageMotionTiming` écrivent la vitesse et le délai des éléments et des images, avec les mêmes trois choix que la section ; le rendu émet `data-motion-speed` et `data-motion-delay` sur les nœuds texte et image, comme sur la section.
+- Menu texte : il lit désormais `MOTION_PRESETS`, expose les 12 entrées du catalogue avec leurs libellés français, et n'affiche plus qu'une seule ligne d'aide. À l'ouverture, les boutons Vitesse et Délai montrent la valeur réellement enregistrée pour le champ sélectionné.
+- Méthode : une erreur d'import (`MOTION_SPEEDS` utilisée dans `renderer.js` sans être importée) a été détectée par la suite complète, diagnostiquée à la trace de pile, puis corrigée avant tout commit. Un test de rendu réel de l'éditeur couvre maintenant cette classe de faute.
+- Tests : 3 nouveaux dans `tests/motion_timing.test.js` ; 357 → **360/360**.
+- Reste : courbe et direction par animation ; le menu texte garde le vocabulaire de répétition `once / twice / infinite` alors que le catalogue dit `once / twice / thrice / loop` — migration à faire avec précaution car ces valeurs sont persistées dans les projets.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.27) — Lot 7c : la durée et le délai viennent du catalogue
 
 - Cause : le catalogue annonçait une durée propre pour chaque animation, mais une règle globale (`--anim-duration-multiplier` sur une base figée à 0,85 s), présente en double dans `app.css` et `exporter.js`, écrasait toutes ces durées. Toutes les animations jouaient au même rythme et l'auteur ne pouvait rien régler.

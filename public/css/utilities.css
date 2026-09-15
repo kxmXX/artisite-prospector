@@ -1,6 +1,6 @@
 /* GÉNÉRÉ PAR scripts/build-utilities.mjs — NE PAS ÉDITER À LA MAIN.
    Couche d'utilitaires de l'application (éditeur, aperçu, dashboard).
-   376 règles. Relancer : npm run build:css */
+   375 règles. Relancer : npm run build:css */
 
 .-bottom-6 { bottom: calc(-1 * 1.5rem); }
 .-left-6 { left: calc(-1 * 1.5rem); }
@@ -90,7 +90,6 @@
 .bottom-5 { bottom: 1.25rem; }
 .bottom-full { bottom: 100%; }
 .break-words { overflow-wrap: break-word; }
-.col-span-2 { grid-column: span 2 / span 2; }
 .component-slider { accent-color: var(--primary, #059669); cursor: pointer; }
 .component-table { border-collapse: separate; border-spacing: 0; min-width: 40rem; }
 .contrast-\[1\.05\] { --ui-contr: 1.05; filter: saturate(var(--ui-sat, 1)) contrast(var(--ui-contr, 1)); }

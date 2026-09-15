@@ -3413,10 +3413,88 @@ export class App {
     this.showToast(`Animation image : ${preset === 'none' ? 'Aucune' : preset}`, "info");
   }
 
+  /** Rythme d'un texte : une seule écriture, un seul instantané d'historique. */
+  setActiveTextMotionSpeed(speedId) {
+    this.setActiveTextTiming("elementMotionSpeeds", "normal", speedId, "Vitesse");
+  }
+
+  setActiveTextMotionDelay(delayId) {
+    this.setActiveTextTiming("elementMotionDelays", "aucun", delayId, "Délai");
+  }
+
+  setActiveTextTiming(key, defaultId, valueId, label) {
+    const el = this._activeEditableEl;
+    if (!el) return;
+    const field = el.getAttribute("data-editable") || "text";
+    const secWrapper = el.closest(".editor-section-wrapper");
+    const secId = secWrapper?.getAttribute("data-section-id");
+    if (secId && state.currentProject) {
+      const updated = JSON.parse(JSON.stringify(state.currentProject));
+      const sec = updated.sections.find(s => s.id === secId);
+      if (sec) {
+        sec.settings = sec.settings || {};
+        sec.settings[key] = sec.settings[key] || {};
+        if (valueId && valueId !== defaultId) sec.settings[key][field] = valueId;
+        else delete sec.settings[key][field];
+        state.updateProject(updated, true);
+      }
+    }
+    const attr = key === "elementMotionSpeeds" ? "data-motion-speed" : "data-motion-delay";
+    const live = document.querySelector(".editor-section-wrapper[data-section-id=\"" + secId + "\"] [data-editable=\"" + field + "\"]") || el;
+    if (live) {
+      if (valueId && valueId !== defaultId) live.setAttribute(attr, valueId);
+      else live.removeAttribute(attr);
+    }
+    this.syncMotionLoopButtons("#ftb-anim-menu", key === "elementMotionSpeeds" ? "data-text-speed" : "data-text-delay", valueId);
+    const motion = state.currentProject?.sections.find(s => s.id === secId)?.settings?.elementMotions?.[field] || "";
+    if (live && motion && motion !== "none") this.previewElementMotion(live, motion);
+    this.showToast(label + " de l'animation mise à jour", "info");
+  }
+
+  /** Rythme d'une image : une seule écriture, un seul instantané d'historique. */
+  setImageMotionSpeed(secId, fieldPath, itemIndex, speedId) {
+    this.setImageMotionTiming(secId, fieldPath, itemIndex, "imageMotionSpeeds", "normal", speedId, "Vitesse");
+  }
+
+  setImageMotionDelay(secId, fieldPath, itemIndex, delayId) {
+    this.setImageMotionTiming(secId, fieldPath, itemIndex, "imageMotionDelays", "aucun", delayId, "Délai");
+  }
+
+  setImageMotionTiming(secId, fieldPath, itemIndex, key, defaultId, valueId, label) {
+    const idx = (itemIndex !== null && itemIndex !== undefined && itemIndex !== "null") ? itemIndex : 0;
+    if (!state.currentProject) return;
+    const updated = JSON.parse(JSON.stringify(state.currentProject));
+    const sec = updated.sections.find(s => s.id === secId);
+    if (!sec) return;
+    sec.settings = sec.settings || {};
+    sec.settings[key] = sec.settings[key] || {};
+    const imgKey = fieldPath + "_" + idx;
+    if (valueId && valueId !== defaultId) sec.settings[key][imgKey] = valueId;
+    else delete sec.settings[key][imgKey];
+    state.updateProject(updated, true);
+    const secEl = document.getElementById("section-" + secId) || document.querySelector(".editor-section-wrapper[data-section-id=\"" + secId + "\"]");
+    const imgEl = secEl?.querySelector("[data-image-field=\"" + fieldPath + "\"][data-image-index=\"" + idx + "\"]") || secEl?.querySelector("img");
+    const attr = key === "imageMotionSpeeds" ? "data-motion-speed" : "data-motion-delay";
+    if (imgEl) {
+      if (valueId && valueId !== defaultId) imgEl.setAttribute(attr, valueId);
+      else imgEl.removeAttribute(attr);
+    }
+    const menu = "#img-motion-menu-" + secId + "-" + String(fieldPath || "").replace(/\./g, "-") + "-" + idx;
+    this.syncMotionLoopButtons(menu, key === "imageMotionSpeeds" ? "data-image-speed" : "data-image-delay", valueId);
+    const motion = sec.settings.imageMotions?.[imgKey];
+    if (imgEl && motion && motion !== "none") this.previewElementMotion(imgEl, motion);
+    this.showToast(label + " de l'animation mise à jour", "info");
+  }
+
   toggleTextMotionMenu() {
     const menu = document.getElementById("ftb-anim-menu");
     const loop = this._activeEditableEl ? this.getFieldMotionLoop(this._activeEditableEl) : "";
     this.syncMotionLoopButtons("#ftb-anim-menu", "data-text-loop", loop);
+    const field = this._activeEditableEl?.getAttribute("data-editable") || "text";
+    const secId = this._activeEditableEl?.closest(".editor-section-wrapper")?.getAttribute("data-section-id");
+    const settings = state.currentProject?.sections.find(s => s.id === secId)?.settings || {};
+    this.syncMotionLoopButtons("#ftb-anim-menu", "data-text-speed", settings.elementMotionSpeeds?.[field] || "normal");
+    this.syncMotionLoopButtons("#ftb-anim-menu", "data-text-delay", settings.elementMotionDelays?.[field] || "aucun");
     if (menu) menu.classList.toggle("hidden");
   }
 

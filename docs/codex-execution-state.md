@@ -1531,3 +1531,11 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - UI : « Vitesse » et « Délai » dans le panneau Animation de la section, avec relance de l'aperçu. Un seul chemin d'écriture (`setSectionMotionTiming`) et un seul instantané d'historique.
 - Tests : 351 → 357. `node --check` sur les quatre fichiers modifiés, `scripts/build-utilities.mjs` relancé, aucune classe utilitaire nouvelle.
 - Reste : courbe et direction par animation, extension de la vitesse et du délai aux animations d'élément et d'image, outil tester/rejouer/arrêter/réinitialiser, motions pendant un transform libre.
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.28 (lot 7c étendu : texte, image, menu texte migré)
+
+- Fait : `setActiveTextTiming` et `setImageMotionTiming` donnent vitesse et délai aux animations d'élément et d'image ; le rendu émet `data-motion-speed` et `data-motion-delay` sur les nœuds texte et image, exactement comme sur la section.
+- Découverte : le menu d'animation du texte (`editor.js`) était le dernier catalogue local, avec des noms anglais (« Fade », « Spring ») et une ligne d'aide en double. Il lit maintenant `MOTION_PRESETS`, affiche les 12 entrées en français, n'a plus qu'une aide, et synchronise ses boutons Vitesse/Délai à l'ouverture.
+- Erreur rencontrée et corrigée : `MOTION_SPEEDS` utilisée dans `renderer.js` sans import → 12 tests rouges. Diagnostiquée par la trace de pile, corrigée, puis couverte par un test de rendu de l'éditeur qui aurait attrapé la faute.
+- Tests : 357 → 360. `node --check` sur les quatre fichiers modifiés, `scripts/build-utilities.mjs` relancé.
+- Reste : courbe et direction par animation ; vocabulaire de répétition du menu texte encore `once / twice / infinite` alors que le catalogue dit `once / twice / thrice / loop` (valeurs persistées, migration à préparer) ; outil tester/rejouer/arrêter/réinitialiser ; motions pendant un transform libre.

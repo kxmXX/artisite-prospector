@@ -1,7 +1,7 @@
 import { getIcon } from "./icons.js";
 import { HERO_STYLES } from "./heroStyles.js";
 import { elementStateCSS } from "../engine/elementStates.js";
-import { MOTION_PRESETS, motionTimingCSS } from "../data/motionPresets.js";
+import { MOTION_PRESETS, MOTION_SPEEDS, MOTION_DELAYS, motionTimingCSS } from "../data/motionPresets.js";
 import { sectionLayoutAttributes, SECTION_LAYOUT_CSS } from "../engine/sectionStyle.js";
 import { elementStyleCSS } from "../engine/elementStyle.js";
 import { getTradeFallbackDataUrl } from "../data/imageFallbacks.js";
@@ -188,9 +188,11 @@ function decorateEditableMarkup(markup, project, section) {
     if (textColor) customStyles.push(`color: ${textColor} !important;`);
 
     const textLoop = ["twice", "infinite"].includes(section?.settings?.elementMotionLoops?.[fieldPath]) ? section.settings.elementMotionLoops[fieldPath] : "";
+    const textSpeed = section?.settings?.elementMotionSpeeds?.[fieldPath] && section.settings.elementMotionSpeeds[fieldPath] !== "normal" ? section.settings.elementMotionSpeeds[fieldPath] : "";
+    const textDelay = section?.settings?.elementMotionDelays?.[fieldPath] && section.settings.elementMotionDelays[fieldPath] !== "aucun" ? section.settings.elementMotionDelays[fieldPath] : "";
     let motionAttrs = "";
     if (textMotion && textMotion !== "none") {
-      motionAttrs = ` data-motion="${textMotion}"${textLoop ? ' data-motion-loop="' + textLoop + '"' : ''}`;
+motionAttrs = ` data-motion="${textMotion}"${textLoop ? ' data-motion-loop="' + textLoop + '"' : ''}${textSpeed ? ' data-motion-speed="' + textSpeed + '"' : ''}${textDelay ? ' data-motion-delay="' + textDelay + '"' : ''}`;
       if (textMotion === "pulse") {
         motionAttrs += ` data-btn-motion="pulse"`;
       }
@@ -270,7 +272,9 @@ export function renderEditableImage(url, { sectionId = "", fieldPath = "", targe
   const imagePlacementAttrs = getFreeformPlacementAttributes(project, imageUiCode, sectionId);
   const imgMotion = sec?.settings?.imageMotions?.[imgKey] || sec?.settings?.[`motion_${fieldPath}`] || sec?.settings?.motion_image || "";
   const imgLoop = ["twice", "infinite"].includes(sec?.settings?.imageMotionLoops?.[imgKey]) ? sec.settings.imageMotionLoops[imgKey] : "";
-  const motionAttr = imgMotion && imgMotion !== "none" ? ` data-motion="${imgMotion}"${imgLoop ? ' data-motion-loop="' + imgLoop + '"' : ''}` : "";
+  const imgSpeed = sec?.settings?.imageMotionSpeeds?.[imgKey] && sec.settings.imageMotionSpeeds[imgKey] !== "normal" ? sec.settings.imageMotionSpeeds[imgKey] : "";
+  const imgDelay = sec?.settings?.imageMotionDelays?.[imgKey] && sec.settings.imageMotionDelays[imgKey] !== "aucun" ? sec.settings.imageMotionDelays[imgKey] : "";
+const motionAttr = imgMotion && imgMotion !== "none" ? ` data-motion="${imgMotion}"${imgLoop ? ' data-motion-loop="' + imgLoop + '"' : ''}${imgSpeed ? ' data-motion-speed="' + imgSpeed + '"' : ''}${imgDelay ? ' data-motion-delay="' + imgDelay + '"' : ''}` : "";
   const motionClass = imgMotion && imgMotion !== "none" ? ` motion-preset-${imgMotion.replace('-in', '')}${imgMotion === 'pulse' ? ' btn-pulse-active' : ''}` : "";
 
   if (!isEditor) {
@@ -322,6 +326,18 @@ export function renderEditableImage(url, { sectionId = "", fieldPath = "", targe
               <button type="button" data-image-loop="once" class="motion-loop-btn" onclick="event.stopPropagation(); window.app.setImageMotionLoop('${sectionId}', '${fieldPath}', ${indexParam}, 'once')">Une fois</button>
               <button type="button" data-image-loop="twice" class="motion-loop-btn" onclick="event.stopPropagation(); window.app.setImageMotionLoop('${sectionId}', '${fieldPath}', ${indexParam}, 'twice')">×2</button>
               <button type="button" data-image-loop="infinite" class="motion-loop-btn" onclick="event.stopPropagation(); window.app.setImageMotionLoop('${sectionId}', '${fieldPath}', ${indexParam}, 'infinite')">Boucle</button>
+            </div>
+            <div class="motion-loop-row" data-image-timing>
+              <span class="motion-loop-label">Vitesse</span>
+              ${MOTION_SPEEDS.map((speed) => `
+                <button type="button" data-image-speed="${speed.id}" class="motion-loop-btn ${speed.id === (sec?.settings?.imageMotionSpeeds?.[imgKey] || 'normal') ? 'is-active' : ''}" title="${speed.description}" onclick="event.stopPropagation(); window.app.setImageMotionSpeed('${sectionId}', '${fieldPath}', ${indexParam}, '${speed.id}')">${speed.label}</button>
+              `).join('')}
+            </div>
+            <div class="motion-loop-row" data-image-timing>
+              <span class="motion-loop-label">Délai</span>
+              ${MOTION_DELAYS.map((delay) => `
+                <button type="button" data-image-delay="${delay.id}" class="motion-loop-btn ${delay.id === (sec?.settings?.imageMotionDelays?.[imgKey] || 'aucun') ? 'is-active' : ''}" title="${delay.description}" onclick="event.stopPropagation(); window.app.setImageMotionDelay('${sectionId}', '${fieldPath}', ${indexParam}, '${delay.id}')">${delay.label}</button>
+              `).join('')}
             </div>
             <div class="motion-preview-hint">Survolez un style pour le voir jouer.</div>
           </div>

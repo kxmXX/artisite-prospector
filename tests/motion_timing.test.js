@@ -86,3 +86,42 @@ test('le rythme choisi apparait vraiment dans le rendu, et jamais quand il est n
   assert.ok(html.includes('[data-motion-delay="leger"] { --motion-delay: 150ms; }'), 'la feuille doit expliquer le delai');
 });
 
+test('le menu texte lit le catalogue au lieu de sa propre liste anglaise', () => {
+  const editor = fs.readFileSync(new URL('../public/js/components/editor.js', import.meta.url), 'utf8');
+  assert.ok(editor.includes('MOTION_PRESETS.map'), 'le menu texte doit lire le catalogue');
+  assert.ok(!editor.includes('Fade '), 'plus de nom anglais brut dans le menu texte');
+  assert.ok(!editor.includes("setActiveTextMotion('fade-in')"), 'plus de bouton code en dur');
+  assert.equal(editor.split('motion-preview-hint').length - 1, 1, 'une seule aide de survol, pas deux lignes identiques');
+});
+
+test('le rythme est disponible pour les elements et les images', () => {
+  const read = (rel) => fs.readFileSync(new URL('../' + rel, import.meta.url), 'utf8');
+  const renderer = read('public/js/components/renderer.js');
+  for (const key of ['elementMotionSpeeds', 'elementMotionDelays', 'imageMotionSpeeds', 'imageMotionDelays']) {
+    assert.ok(renderer.includes(key), 'le rendu doit lire ' + key);
+  }
+  const app = read('public/js/app.js');
+  assert.ok(app.includes('setActiveTextTiming(key, defaultId, valueId, label)'), 'un seul chemin d ecriture pour le texte');
+  assert.ok(app.includes('setImageMotionTiming(secId, fieldPath, itemIndex, key, defaultId, valueId, label)'), 'un seul chemin d ecriture pour l image');
+  const editor = read('public/js/components/editor.js');
+  assert.ok(editor.includes('setActiveTextMotionSpeed') && editor.includes('setActiveTextMotionDelay'), 'le menu texte doit offrir vitesse et delai');
+  assert.ok(renderer.includes('setImageMotionSpeed') && renderer.includes('setImageMotionDelay'), 'le menu image doit offrir vitesse et delai');
+});
+
+test('le menu texte rendu par l editeur lit le catalogue et offre vitesse et delai', async () => {
+  const { generateSite } = await import('../public/js/engine/generator.js');
+  const { renderEditor } = await import('../public/js/components/editor.js');
+  const { state } = await import('../public/js/state.js');
+  state.currentProject = generateSite({ name: 'Controle Rythme', tradeId: 'menuisier' });
+  state.currentView = 'editor';
+  state.editorMode = 'edit';
+  const html = renderEditor(state);
+  assert.ok(html.includes('id="ftb-anim-menu"'), 'le menu texte doit exister');
+  assert.ok(html.includes('Apparition en fondu'), 'le menu texte doit afficher les noms du catalogue');
+  assert.equal(html.split('setActiveTextMotion(').length - 1, 12, 'le menu rendu doit generer les 12 entrees du catalogue, pas une liste locale');
+  assert.ok(html.includes('data-text-speed="normal"') && html.includes('data-text-speed="lente"'), 'la vitesse doit etre offerte');
+  assert.ok(html.includes('data-text-delay="aucun"') && html.includes('data-text-delay="net"'), 'le delai doit etre offert');
+});
+
+
+

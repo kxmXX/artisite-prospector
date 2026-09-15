@@ -119,12 +119,12 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
       X/Y/L/H/rotation, boîte de sélection réduite à un menu `⋯`, bornes clavier = bornes souris.
 - [ ] **Lot 7 — Mouvement unifié** : catalogue unique, déclencheur, durée, délai, courbe, direction,
       répétition explicite, tester/rejouer/arrêter/réinitialiser, runtime partagé à l'export.
-      *Acquis 7a/7b/7c (`4.9.0-alpha.22` → `.27`)* : catalogue unique dans `public/js/data/motionPresets.js`,
-      lu par l'inspecteur, le rendu (image et section) et l'aperçu au survol ; les 12 entrées
-      proposées sont jouables ; durée et délai réglables par section, dérivés du catalogue et
-      injectés par le rendu (une seule feuille pour éditeur, aperçu et export). *Reste* : courbe et
-      direction réglables, étendre vitesse et délai aux animations d'élément et d'image, outil
-      tester/rejouer/arrêter/réinitialiser, et neutralisation des motions pendant un transform libre.
+      *Acquis 7a/7b/7c (`4.9.0-alpha.22` → `.28`)* : catalogue unique dans `public/js/data/motionPresets.js`,
+      lu par l'inspecteur, le rendu (section, texte, image) et l'aperçu au survol ; les 12 entrées
+      proposées sont jouables ; durée et délai réglables sur les trois surfaces, dérivés du catalogue
+      et injectés par le rendu (une seule feuille pour éditeur, aperçu et export). *Reste* : courbe et
+      direction réglables, vocabulaire de répétition du menu texte encore `once / twice / infinite`,
+      outil tester/rejouer/arrêter/réinitialiser, et neutralisation des motions pendant un transform libre.
 - [x] **Lot 8 — Undo/Redo exhaustif** (`4.9.0-alpha.4`) : 11 commandes mutaient avant de prendre
       l'instantané (l'annulation ne restaurait rien) et 20 commandes n'avaient aucun historique ;
       toutes prennent désormais leur instantané **avant** la mutation, y compris les six
