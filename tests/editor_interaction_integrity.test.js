@@ -48,3 +48,24 @@ test('editor chrome stays out of preview and touch targets remain usable', () =>
   assert.match(studioCss, /freeform-layerbar button[^}]+min-width:44px/);
   assert.match(studioCss, /animation-play-state:paused!important/);
 });
+
+test('simulated device preview owns the breakpoints without touching client exports', () => {
+  const viewportCss = fs.readFileSync(new URL('../public/css/editor-canvas-viewport.css', import.meta.url), 'utf8');
+  const indexHtml = fs.readFileSync(new URL('../public/index.html', import.meta.url), 'utf8');
+  const rendererSource = fs.readFileSync(new URL('../public/js/components/renderer.js', import.meta.url), 'utf8');
+  const exporterSource = fs.readFileSync(new URL('../public/js/engine/exporter.js', import.meta.url), 'utf8');
+
+  // The simulated canvas width must neutralise the window breakpoints.
+  assert.ok(viewportCss.includes('#canvas-container[data-viewport="mobile"] .hidden { display: none !important; }'));
+  assert.ok(viewportCss.includes('#canvas-container[data-viewport="mobile"] .sm\\:grid-cols-2'));
+  assert.ok(viewportCss.includes('#canvas-container[data-viewport="tablet"] .lg\\:grid-cols-12'));
+  assert.ok(viewportCss.includes('#canvas-container[data-viewport="tablet"] .md\\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }'));
+
+  // The override ships only with the editor shell; exported sites keep media queries.
+  assert.ok(indexHtml.includes('css/editor-canvas-viewport.css'));
+  assert.ok(!rendererSource.includes('editor-canvas-viewport'));
+  assert.ok(!exporterSource.includes('editor-canvas-viewport'));
+
+  // Device switching no longer animates layout width.
+  assert.ok(!studioCss.includes('transition:width .28s'));
+});

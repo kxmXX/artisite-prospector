@@ -7,6 +7,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 15 septembre 2026 (4.8.0-alpha.44)
+
+- Aperçu appareil : la largeur simulée du canevas gouverne désormais les breakpoints. En modes Mobile et Tablette, les utilitaires desktop (`md:flex`, `lg:grid-cols-*`, `lg:col-span-*`, `lg:order-*`, tailles de texte) reviennent à leur valeur de base ; la navigation desktop ne déborde plus dans le cadre 390 px et le hero se recompose en colonne.
+- Portée sûre : la couche d’aperçu est chargée uniquement par la coque éditeur (`public/index.html`) et n’est référencée ni par le renderer ni par l’export ; les sites clients conservent exactement leurs media queries d’origine.
+- Performance : la bascule Ordinateur/Tablette/Mobile n’anime plus la largeur du canevas, supprimant le layout thrash sur toute la page.
+- QA : 4/4 tests d’intégrité éditeur, 250/250 tests complets, captures 390/768/1280, détecteur Impeccable exécuté.
+
 ### Consolidation — 15 septembre 2026 (4.8.0-alpha.43)
 
 - Historique : l’édition inline du canevas et des cellules, comme la saisie dans l’inspecteur et la barre latérale, capturent désormais la valeur d’avant-édition. Undo annule réellement la modification et Redo la rétablit, au lieu d’enregistrer un instantané déjà modifié.

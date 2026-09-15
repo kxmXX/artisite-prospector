@@ -1,3 +1,14 @@
+## LOT DE LIVRAISON — aperçu mobile/tablette fidèle 4.8.0-alpha.44 — 15 septembre 2026
+
+- Cause racine : les media queries `sm`/`md`/`lg` de `app.css` répondent à la fenêtre, pas à la largeur du cadre simulé. Dans un canevas de 390 px sur un écran 1280, `md:flex` gardait donc la navigation desktop active et celle-ci débordait.
+- Correctif : nouvelle couche `public/css/editor-canvas-viewport.css`, chargée uniquement par `public/index.html`. Elle neutralise les utilitaires de breakpoint définis (base puis sm/md/lg) sous `#canvas-container[data-viewport="mobile"]` et `[data-viewport="tablet"]`, avec une spécificité d’identifiant qui bat les règles média et des valeurs de base copiées à l’identique depuis `app.css`.
+- En tablette, seuls les utilitaires `lg` sont neutralisés puis les utilitaires `sm`/`md` sont ré-affirmés, afin de respecter la vraie progression mobile-first.
+- Frontière sûre : renderer et export ne référencent jamais cette couche ; les sites clients gardent leurs media queries.
+- Performance : `#canvas-container` n’anime plus `width` ; la bascule d’appareil ne déclenche plus un recalcul complet de la page.
+- Vérification navigateur : mobile 390 = navigation desktop masquée et hero empilé ; tablette 768 = navigation desktop conservée ; ordinateur inchangé.
+- Tests : 4/4 tests d’intégrité éditeur, 250/250 complets, `git diff --check` et `node --check` propres ; détecteur Impeccable exécuté (avertissements de palette/shimmer préexistants, déjà couverts par la DA validée).
+- Prochaine action exacte : rotation et redimensionnement d’objets déjà tournés ou scalés (géométrie AABB écran vs coordonnées locales, `transform-origin` unique).
+
 ## LOT DE LIVRAISON — édition visuelle fiable 4.8.0-alpha.43 — 15 septembre 2026
 
 - Cause racine corrigée : `commitFieldUpdate` mutant l’état avant `pushHistory`, chaque modification de texte, de cellule et de champ inspecteur enregistrait un instantané déjà modifié ; Undo était donc un no-op silencieux pour une grande partie de l’édition.

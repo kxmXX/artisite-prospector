@@ -154,7 +154,7 @@
 .studio-v3-stagecontext b { color:#4b5451;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
 #canvas-container {
   margin-top:0!important;flex:0 0 auto;box-shadow:0 22px 70px rgba(26,34,31,.16),0 0 0 1px rgba(24,32,31,.07)!important;
-  border-radius:10px!important;overflow:visible!important;transition:width .28s cubic-bezier(.2,.75,.2,1),border-radius .2s ease!important;
+  border-radius:10px!important;overflow:visible!important;transition:border-radius .2s ease!important;
 }
 #canvas-container[data-viewport="tablet"] { width:768px!important;max-width:none!important;border-radius:18px!important; }
 #canvas-container[data-viewport="mobile"] { width:390px!important;max-width:none!important;border-radius:24px!important; }

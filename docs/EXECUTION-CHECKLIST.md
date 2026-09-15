@@ -56,8 +56,8 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 
 ### Constats ouverts issus de l’audit et du détecteur
 
-- `#canvas-container` anime `width` (`studio-v3.css:157`) : l’aperçu appareil provoque du layout thrash, piste probable des saccades ressenties ; migrer vers `transform: scale` ou une transition non bloquante.
-- Aperçu mobile/tablette simulé : les media queries suivent la fenêtre réelle, pas la largeur du canevas ; la navigation desktop déborde donc dans le cadre 390 px. Envisager des container queries `@container` pour le rendu éditeur.
+- [x] Jank de l’aperçu appareil — la bascule Ordinateur/Tablette/Mobile n’anime plus la largeur du canevas (`4.8.0-alpha.44`).
+- [x] Aperçu mobile/tablette simulé — la largeur du canevas gouverne les breakpoints via une couche éditeur dédiée, sans modifier les media queries du site public (`4.8.0-alpha.44`). Les container queries restent la piste si le rendu doit un jour être isolé dans une iframe.
 - Rotation/redimensionnement d’objets déjà tournés ou scalés : géométrie mesurée en AABB écran mais écrite en coordonnées locales ; à unifier avec un `transform-origin` unique.
 - Dégradé indigo résiduel (`app.js:3605`) signalé par le détecteur comme marqueur de palette IA.
 

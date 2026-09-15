@@ -1,0 +1,76 @@
+/* Editor device preview — the simulated canvas width owns the breakpoints.
+   Loaded only by the app shell (public/index.html), never by exported client sites,
+   so the public media-query behaviour stays exactly as delivered. */
+
+/* ============ MOBILE (390) — every sm/md/lg utility reverts to its base ============ */
+#canvas-container[data-viewport="mobile"] .hidden { display: none !important; }
+#canvas-container[data-viewport="mobile"] .block { display: block !important; }
+#canvas-container[data-viewport="mobile"] .inline { display: inline !important; }
+#canvas-container[data-viewport="mobile"] .flex { display: flex !important; }
+#canvas-container[data-viewport="mobile"] .inline-flex { display: inline-flex !important; }
+#canvas-container[data-viewport="mobile"] .grid { display: grid !important; }
+#canvas-container[data-viewport="mobile"] .flex-row { flex-direction: row !important; }
+#canvas-container[data-viewport="mobile"] .flex-col { flex-direction: column !important; }
+#canvas-container[data-viewport="mobile"] .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)) !important; }
+#canvas-container[data-viewport="mobile"] .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+#canvas-container[data-viewport="mobile"] .grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+#canvas-container[data-viewport="mobile"] .grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
+#canvas-container[data-viewport="mobile"] .text-xs { font-size: .75rem; line-height: 1rem; }
+#canvas-container[data-viewport="mobile"] .text-sm { font-size: .875rem; line-height: 1.25rem; }
+#canvas-container[data-viewport="mobile"] .text-base { font-size: 1rem; line-height: 1.5rem; }
+#canvas-container[data-viewport="mobile"] .text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+#canvas-container[data-viewport="mobile"] .text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+#canvas-container[data-viewport="mobile"] .text-2xl { font-size: 1.5rem; line-height: 2rem; }
+#canvas-container[data-viewport="mobile"] .text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+#canvas-container[data-viewport="mobile"] .text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
+#canvas-container[data-viewport="mobile"] .text-5xl { font-size: 3rem; line-height: 1; }
+#canvas-container[data-viewport="mobile"] .text-6xl { font-size: 3.75rem; line-height: 1; }
+#canvas-container[data-viewport="mobile"] .sm\:flex-row,
+#canvas-container[data-viewport="mobile"] .md\:flex-row { flex-direction: column !important; }
+#canvas-container[data-viewport="mobile"] .sm\:grid-cols-2,
+#canvas-container[data-viewport="mobile"] .sm\:grid-cols-3,
+#canvas-container[data-viewport="mobile"] .md\:grid-cols-2,
+#canvas-container[data-viewport="mobile"] .md\:grid-cols-3,
+#canvas-container[data-viewport="mobile"] .md\:grid-cols-4,
+#canvas-container[data-viewport="mobile"] .lg\:grid-cols-2,
+#canvas-container[data-viewport="mobile"] .lg\:grid-cols-3,
+#canvas-container[data-viewport="mobile"] .lg\:grid-cols-4,
+#canvas-container[data-viewport="mobile"] .lg\:grid-cols-12 { grid-template-columns: repeat(1, minmax(0, 1fr)) !important; }
+#canvas-container[data-viewport="mobile"] .md\:col-span-2,
+#canvas-container[data-viewport="mobile"] .lg\:col-span-4,
+#canvas-container[data-viewport="mobile"] .lg\:col-span-5,
+#canvas-container[data-viewport="mobile"] .lg\:col-span-6,
+#canvas-container[data-viewport="mobile"] .lg\:col-span-7,
+#canvas-container[data-viewport="mobile"] .lg\:col-span-8 { grid-column: auto !important; }
+#canvas-container[data-viewport="mobile"] .lg\:order-1,
+#canvas-container[data-viewport="mobile"] .lg\:order-2 { order: 0 !important; }
+
+/* ============ TABLETTE (768) — only lg is off; sm + md stay active ============ */
+#canvas-container[data-viewport="tablet"] .lg\:grid-cols-2,
+#canvas-container[data-viewport="tablet"] .lg\:grid-cols-3,
+#canvas-container[data-viewport="tablet"] .lg\:grid-cols-4,
+#canvas-container[data-viewport="tablet"] .lg\:grid-cols-12 { grid-template-columns: repeat(1, minmax(0, 1fr)) !important; }
+#canvas-container[data-viewport="tablet"] .lg\:col-span-4,
+#canvas-container[data-viewport="tablet"] .lg\:col-span-5,
+#canvas-container[data-viewport="tablet"] .lg\:col-span-6,
+#canvas-container[data-viewport="tablet"] .lg\:col-span-7,
+#canvas-container[data-viewport="tablet"] .lg\:col-span-8 { grid-column: auto !important; }
+#canvas-container[data-viewport="tablet"] .lg\:order-1,
+#canvas-container[data-viewport="tablet"] .lg\:order-2 { order: 0 !important; }
+#canvas-container[data-viewport="tablet"] .lg\:text-5xl { font-size: 3rem; line-height: 1; }
+#canvas-container[data-viewport="tablet"] .lg\:text-6xl { font-size: 3rem; line-height: 1; }
+/* Re-assert sm/md after the lg reset so tablet follows its real breakpoints. */
+#canvas-container[data-viewport="tablet"] .sm\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+#canvas-container[data-viewport="tablet"] .sm\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+#canvas-container[data-viewport="tablet"] .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+#canvas-container[data-viewport="tablet"] .md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+#canvas-container[data-viewport="tablet"] .md\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
+#canvas-container[data-viewport="tablet"] .sm\:flex-row { flex-direction: row !important; }
+#canvas-container[data-viewport="tablet"] .md\:flex-row { flex-direction: row !important; }
+#canvas-container[data-viewport="tablet"] .md\:flex { display: flex !important; }
+#canvas-container[data-viewport="tablet"] .md\:inline { display: inline !important; }
+#canvas-container[data-viewport="tablet"] .md\:col-span-2 { grid-column: span 2 / span 2 !important; }
+#canvas-container[data-viewport="tablet"] .sm\:block { display: block !important; }
+#canvas-container[data-viewport="tablet"] .sm\:inline-flex { display: inline-flex !important; }
+#canvas-container[data-viewport="tablet"] .sm\:text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
+#canvas-container[data-viewport="tablet"] .sm\:text-5xl { font-size: 3rem; line-height: 1; }
