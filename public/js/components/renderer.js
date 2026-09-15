@@ -787,9 +787,9 @@ function renderHeader(sec, project, options = {}) {
           ${isButtonHidden(sec, 'ctaText') || isButtonHidden(sec, 'primary') ? '' : `
             <div class="cta-button-wrapper group/cta relative" role="group" tabindex="0" aria-expanded="false" aria-controls="cta-popover-${sec.id}-ctaText" data-cta-popover-wrapper data-section-id="${sec.id}" data-button-type="ctaText">
               ${renderButtonActionBadge(sec, 'ctaText', options, project)}
-              <a href="#simulateur" class="btn-cta inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white shadow-sm hover:shadow-md transition-all transform hover:-translate-y-0.5 no-underline ${isPaysagiste ? 'vitrine-header-cta' : ''}" style="background-color: var(--primary);">
+              <a href="#simulateur" class="btn-cta inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white shadow-sm hover:shadow-md transition-all transform hover:-translate-y-0.5 no-underline whitespace-nowrap ${isPaysagiste ? 'vitrine-header-cta' : ''}" style="background-color: var(--primary);">
                 ${getIcon("phone", "w-4 h-4 text-white")}
-                <span data-editable="ctaText">${c.ctaText || "Demander un devis"}</span>
+                <span data-editable="ctaText" class="whitespace-nowrap">${c.ctaText || "Demander un devis"}</span>
               </a>
               ${renderButtonPopover(sec, 'ctaText', options, project)}
             </div>
@@ -985,7 +985,7 @@ function renderHero(sec, project, options = {}) {
         <div class="hero-discover flex justify-center">
           <a href="#about" class="hero-scroll-discover inline-flex flex-col items-center gap-1 text-[11px] font-bold tracking-widest uppercase text-white/80 hover:text-white transition-all transform hover:translate-y-1 no-underline">
             <span>DÉCOUVRIR</span>
-            <span class="text-base animate-bounce">↓</span>
+            <span class="text-base">↓</span>
           </a>
         </div>
       </div>

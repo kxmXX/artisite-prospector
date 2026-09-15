@@ -20,6 +20,47 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - Mouvement : navigation d’ancre douce native, un seul langage de révélation discret, jamais de
   scroll-jacking ; respecter `prefers-reduced-motion`.
 
+## Mission de maturation produit — plan approuvé, 9 lots (à partir de 4.9.0-alpha.1)
+
+Objectif : rendre le produit compréhensible et utilisable par un débutant (personnaliser site,
+section, élément, état, animation), obtenir un rendu professionnel, et retrouver son travail depuis
+un autre appareil. Décisions validées avec l'utilisateur : comptes sur serveur Node + fichier de
+données (zéro dépendance npm) · approfondir la direction studio-v3 et supprimer les couches mortes
+(pas de refonte globale) · flux par défaut et position libre en option · éditeur et design d'abord,
+comptes en dernier lot.
+**Réversion explicite d'une exclusion antérieure** : la persistance serveur, jusqu'ici hors périmètre,
+devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
+
+- [x] **Lot 1 — Socle design system** (`4.9.0-alpha.1`) : 452 classes sans règle → 0. Générateur
+      unique `scripts/build-utilities.mjs` → `public/css/utilities.css` + `public/js/engine/utilitiesCss.js`,
+      jetons déclarés dans `public/css/tokens.css`, focus unique `:focus-visible`, marqueurs « IA »
+      retirés, 8 tests dédiés, **280/280**. *Point ouvert* : l'en-tête de la vitrine rendu dans le
+      canvas étroit de l'éditeur (~640 px) est à l'étroit (liens qui se replient, FAQ proche du CTA) —
+      traité au lot 2 avec la largeur de canvas et l'en-tête responsive.
+- [ ] **Lot 2 — Finition UI/UX** : retirer `product-precision.css` (179/273 règles mortes) et la
+      couche orpheline `studio-v3.css:373-478`, converger tailles/rayons/ombres/espacements vers les
+      jetons, remplacer les 204 glyphes emoji du chrome par `icons.js`, couvrir tous les états
+      hover/focus/active/disabled, remonter les 16 contrastes < 4,5:1, étendre `pointer:coarse` à
+      44 px partout, réduire la cascade de cartes, corriger le responsive du dashboard ≤ 760 px
+      (rail masqué sans remplacement) et réduire la liste gelée des 34 classes sans règle.
+- [ ] **Lot 3 — Sélection et hiérarchie** : un seul état de sélection (site/section/élément/multi),
+      Échap remonte d'un niveau, fil d'Ariane Site ▸ Section ▸ Élément, liste des éléments du canvas,
+      suppression des 830 lignes inertes de `renderSectionAccordionContent` après réimplantation de
+      ses capacités uniques.
+- [ ] **Lot 4 — Inspecteur contextuel** : onglets par portée, divulgation progressive, modèles
+      `section.style` et `elementStyles[layoutKey]`, wording humain (fin du « 60fps », « preset »,
+      « responsive », « HEX/RGB », « WCAG AA »).
+- [ ] **Lot 5 — États des éléments** : `elementStates[layoutKey]` (survol, focus, actif, désactivé)
+      partagés éditeur / aperçu / export via une primitive unique.
+- [ ] **Lot 6 — Positionnement** : flux par défaut, position libre en option, champs numériques
+      X/Y/L/H/rotation, boîte de sélection réduite à un menu `⋯`, bornes clavier = bornes souris.
+- [ ] **Lot 7 — Mouvement unifié** : catalogue unique, déclencheur, durée, délai, courbe, direction,
+      répétition explicite, tester/rejouer/arrêter/réinitialiser, runtime partagé à l'export.
+- [ ] **Lot 8 — Undo/Redo exhaustif** : 11 chemins qui mutaient avant l'instantané et 20+ chemins sans
+      historique routés vers un point d'entrée unique, transactions pour les glissers et curseurs.
+- [ ] **Lot 9 — Comptes et persistance** : `scrypt` + sel, sessions hachées, `ownerId` par projet,
+      migration des projets locaux à la première connexion, échec explicite sur Vercel.
+
 ## Reprise P0 qualité produit — signalement du 15 septembre
 
 - [x] Séparer la vitrine canonique Esprit Nature des données persistées de la bibliothèque : `Voir la vitrine` repart d'une instance fraîche et ne reprend ni freeform ni contenu corrompu localement.

@@ -1,0 +1,127 @@
+/* Artist — couche de jetons du produit (chrome de l'application).
+   Chargée avant app.css / studio-v3.css ; les utilitaires générés arrivent en dernier.
+   Source de vérité unique pour la typographie, l'espacement, les rayons, les ombres,
+   les couleurs de rôle et le mouvement du chrome produit. */
+
+:root {
+  /* --- Familles typographiques --- */
+  --font-inter: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-jakarta: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-syne: 'Syne', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-outfit: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-heading: var(--font-jakarta);
+  --font-body: var(--font-inter);
+
+  /* --- Échelle typographique du chrome --- */
+  --ui-text-2xs: 9px;
+  --ui-text-xs: 10px;
+  --ui-text-sm: 11px;
+  --ui-text-base: 12px;
+  --ui-text-md: 13px;
+  --ui-text-lg: 14px;
+  --ui-text-xl: 16px;
+  --ui-text-2xl: 20px;
+  --ui-text-3xl: 24px;
+
+  --ui-weight-normal: 400;
+  --ui-weight-medium: 500;
+  --ui-weight-semibold: 600;
+  --ui-weight-bold: 700;
+
+  --ui-leading-tight: 1.25;
+  --ui-leading-normal: 1.5;
+  --ui-leading-relaxed: 1.65;
+  --ui-tracking-label: 0.1em;
+
+  /* --- Espacement (base 4 px) --- */
+  --ui-space-1: 4px;
+  --ui-space-2: 8px;
+  --ui-space-3: 12px;
+  --ui-space-4: 16px;
+  --ui-space-5: 20px;
+  --ui-space-6: 24px;
+  --ui-space-8: 32px;
+  --ui-space-10: 40px;
+  --ui-space-12: 48px;
+
+  /* --- Rayons --- */
+  --ui-radius-xs: 4px;
+  --ui-radius-sm: 6px;
+  --ui-radius-md: 8px;
+  --ui-radius-lg: 12px;
+  --ui-radius-xl: 16px;
+  --ui-radius-2xl: 22px;
+  --ui-radius-full: 999px;
+  --btn-radius: var(--ui-radius-full);
+  --card-radius: var(--ui-radius-xl);
+
+  /* --- Ombres --- */
+  --ui-shadow-1: 0 1px 2px rgba(24, 32, 31, .06), 0 1px 1px rgba(24, 32, 31, .04);
+  --ui-shadow-2: 0 8px 24px rgba(24, 32, 31, .10);
+  --ui-shadow-3: 0 18px 55px rgba(26, 34, 31, .12);
+
+  /* --- Couleurs de rôle (alignées sur la direction studio-v3) --- */
+  --ui-ink: #18201f;
+  --ui-ink-2: #26302e;
+  --ui-paper: #f4f2ec;
+  --ui-panel: #fbfaf7;
+  --ui-canvas: #e9ebe7;
+  --ui-line: rgba(24, 32, 31, .11);
+  --ui-line-strong: rgba(24, 32, 31, .18);
+  --ui-muted: #5f6866;
+  --ui-accent: #d76a3b;
+  --ui-accent-soft: #fae9df;
+  --ui-sage: #dce7df;
+
+  /* Alias studio-v3 : les règles existantes continuent de fonctionner. */
+  --v3-ink: var(--ui-ink);
+  --v3-paper: var(--ui-paper);
+  --v3-panel: var(--ui-panel);
+  --v3-canvas: var(--ui-canvas);
+  --v3-line: var(--ui-line);
+  --v3-muted: var(--ui-muted);
+  --v3-accent: var(--ui-accent);
+  --v3-radius: var(--ui-radius-xl);
+  --v3-shadow: var(--ui-shadow-3);
+
+  /* --- Focus : un seul anneau, visible au clavier --- */
+  --ui-ring-width: 2px;
+  --ui-ring-color: #1f6feb;
+  --ui-ring: var(--ui-ring-width) solid var(--ui-ring-color);
+  --ui-ring-offset: 2px;
+
+  /* --- Mouvement du chrome --- */
+  --ui-dur-fast: 120ms;
+  --ui-dur-base: 160ms;
+  --ui-dur-slow: 240ms;
+  --ui-ease: cubic-bezier(.16, .84, .24, 1);
+  --motion-ease: var(--ui-ease);
+  --anim-duration-multiplier: 1.0;
+
+  /* --- Jetons historiquement référencés sans être déclarés --- */
+  --primary: #527c22;
+  --secondary: #3f5f1a;
+  --accent: #f59e0b;
+  --sticky-left: auto;
+  --sticky-top: auto;
+  --sticky-bottom: auto;
+
+  /* --- Couches d'empilement du chrome --- */
+  --z-toolbar-section: 65;
+  --z-toolbar-text: 80;
+  --z-toolbar-freeform: 9400;
+}
+
+/* Anneau de focus unique pour tout le chrome interactif. */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: var(--ui-ring);
+  outline-offset: var(--ui-ring-offset);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --ui-dur-fast: 1ms;
+    --ui-dur-base: 1ms;
+    --ui-dur-slow: 1ms;
+  }
+}

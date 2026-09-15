@@ -877,3 +877,53 @@ vs régression réelle ; terminer et tester ce sous-lot avant tout chantier UI o
 L'échec de titre reste réservé au sous-lot version. Les prochains changements doivent être annoncés brièvement.
 
 Arrêt propre après ce sous-lot : aucun nouveau travail lourd lancé. Le chantier global reste ouvert.
+
+---
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.1 (lot 1/9 de la maturation produit)
+
+Plan complet approuvé en 9 lots (voir docs/EXECUTION-CHECKLIST.md). Décisions utilisateur : comptes
+sur serveur Node + fichier de données sans nouvelle dépendance, approfondissement de la direction
+studio-v3 sans refonte globale, flux par défaut avec position libre en option, éditeur et design
+avant les comptes.
+
+Audit préalable (trois passes indépendantes sur l'éditeur, le design system et la persistance) :
+- **Classes sans règle CSS** : 452 classes / 1 863 occurrences mesurées par recensement du balisage
+  contre les 4 feuilles. \`text-[10px]\` ×204, \`text-[11px]\` ×136, \`hover:bg-zinc-100\` ×39,
+  \`sm:px-6\` ×41, \`dark:text-white\` ×14, etc.
+- **Quatre systèmes de jetons concurrents** et \`--primary\` utilisé 13 fois sans jamais être déclaré ;
+  1 068 \`!important\`.
+- **\`product-precision.css\` morte** : 179/273 règles sans émetteur, écrasée par studio-v3 sur les
+  trois sélecteurs encore vivants ; \`studio-v3.css:373-478\` jamais émise.
+- **États** : 3 règles \`:focus-visible\` pour 50 \`:hover\`.
+- **Éditeur** : aucun état d'élément, aucun modèle de style de section, aucun champ numérique de
+  position, deux modèles de sélection jamais effacés ensemble, et \`renderSectionAccordionContent\`
+  (830 lignes) inerte dans un \`<template>\` jamais cloné.
+- **Undo/Redo** : 11 chemins qui mutent avant l'instantané, 20+ sans historique.
+
+Lot 1 livré :
+- \`public/css/tokens.css\` : échelle typographique, espacements, rayons, ombres, rôles de couleur,
+  durées/courbes, anneau de focus unique, et déclaration des jetons fantômes. Les \`--v3-*\` deviennent
+  des alias.
+- \`scripts/build-utilities.mjs\` : relève les classes émises, déduit les manquantes par surface,
+  **réutilise d'abord les déclarations déjà présentes** puis synthétise le reste, et écrit deux
+  artefacts depuis une source unique (\`public/css/utilities.css\`, \`public/js/engine/utilitiesCss.js\`).
+  Importable par les tests ; \`npm run build:css\` / \`npm run check:css\`.
+- Détection de sélecteur corrigée : exiger un caractère de sélecteur après le nom évite les faux
+  positifs sur du JavaScript (\`toast.style.transform =\` faisait croire que \`.transform\` était définie).
+- \`exportStyles.js\` séparé en \`BASE_UTILITY_CSS\` + couche générée ; \`index.html\` charge jetons puis
+  utilitaires ; \`package.json\` expose \`build:css\` et \`check:css\`.
+- Nettoyage : dégradé indigo→violet du chrome remplacé par la couleur d'accent, \`animate-ping\` et
+  \`animate-bounce\` retirées, CTA d'en-tête rendu insécable (repli de libellé supprimé).
+- \`tests/design_system.test.js\` : 8 tests, dont l'autosuffisance du HTML autonome exporté (chaque
+  classe du fichier exporté possède une règle dans ce même fichier). **280/280 tests complets.**
+
+Vérifications : générateur idempotent (\`--check\`), comparaison visuelle avant/après via un worktree
+sur \`fe06c75\` (dashboard 1280 identique, éditeur vérifié en 1280), aperçu client pleine largeur
+vérifié en 1280 (en-tête sur une ligne, aucun chevauchement), détecteur Impeccable exécuté sur les
+fichiers modifiés (alertes pré-existantes sur \`btnShimmer\`, halo rouge et fond quadrillé ; une alerte
+\`gray-on-color\` est un faux positif d'appariement d'utilitaires).
+
+Reste ouvert après ce lot (à ne pas masquer) : l'en-tête de la vitrine rendu dans le canvas étroit de
+l'éditeur est à l'étroit ; 34 classes d'application n'ont toujours aucune règle (liste gelée par test,
+à résorber au lot 2) ; les lots 2 à 9 restent à livrer.

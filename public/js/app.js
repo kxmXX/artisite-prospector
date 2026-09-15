@@ -3694,7 +3694,7 @@ export class App {
     if (feedback) {
       feedback.innerHTML = `
         <div class="ai-state-indicator flex items-center gap-2 p-2 bg-amber-50 rounded-lg text-amber-900 border border-amber-200">
-          <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-ping"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
           <span class="text-xs font-semibold">Analyse & Raisonnement en cours...</span>
         </div>
       `;
@@ -3714,12 +3714,12 @@ export class App {
             <span class="text-xs font-bold text-zinc-900 flex items-center gap-1.5">
               <span>✨</span> Proposition Studio IA
             </span>
-            <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
+            <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
               Confiance 96%
             </span>
           </div>
           <div class="ai-confidence-bar h-1.5 bg-zinc-100 rounded-full overflow-hidden">
-            <div class="ai-confidence-fill h-full bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full" style="width: 96%;"></div>
+            <div class="ai-confidence-fill h-full rounded-full" style="width: 96%;"></div>
           </div>
           <p class="text-xs text-zinc-600 font-medium">${summary}</p>
           <div class="ai-approval-actions flex gap-2 pt-1">

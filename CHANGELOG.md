@@ -7,6 +7,39 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.1) — Lot 1/9 : socle design system
+
+- **Cause racine corrigée** : le balisage utilise un vocabulaire d'utilitaires (hérité de Tailwind)
+  dont seules quelques familles étaient écrites à la main. Mesure avant lot : **452 classes émises
+  sans aucune règle CSS** (1 863 occurrences) — tailles arbitraires (`text-[10px]` ×204,
+  `text-[11px]` ×136), états `hover:` ×39, `focus:`, variantes `sm:`/`lg:`, mode sombre
+  `dark:`, opacités `/60`, `shrink-0`, `whitespace-nowrap`, `ring-2`… Autrement dit : la
+  micro-typographie, les états d'interaction et le responsive du chrome n'étaient pas appliqués.
+- **Une seule source** : `scripts/build-utilities.mjs` relève les classes réellement émises, déduit
+  celles qui n'ont aucune règle, **réutilise d'abord les déclarations déjà écrites** dans le projet,
+  puis synthétise le reste. Il produit deux artefacts depuis cette source : `public/css/utilities.css`
+  (application, éditeur, aperçu) et `public/js/engine/utilitiesCss.js` (site autonome exporté).
+  Résultat : 386 règles applicatives, 369 pour l'export, **0 classe d'utilitaire sans règle**.
+- **Parité éditeur / export** : la même couche alimente l'application et le HTML autonome, et un test
+  vérifie que **chaque classe du HTML exporté possède une règle dans ce même fichier**.
+- **Jetons du produit** (`public/css/tokens.css`) : échelle typographique, espacements, rayons,
+  ombres, couleurs de rôle, durées et courbes — plus la déclaration des jetons fantômes
+  (`--primary` utilisé 13× sans être déclaré, `--btn-radius`, `--card-radius`, `--motion-ease`,
+  `--font-heading`, `--font-body`, `--sticky-*`). Les `--v3-*` deviennent des alias.
+- **Politique de focus unique** : un seul anneau `:focus-visible` global. Les 63 `focus:outline-none`
+  du balisage ne sont **volontairement pas générés** : ils auraient remis un contour transparent et
+  supprimé la seule indication de focus clavier.
+- **Nettoyage des marqueurs « IA »** : dégradé indigo → violet du chrome remplacé par la couleur
+  d'accent du produit, pastille `animate-ping` et flèche `animate-bounce` retirées (animations
+  gratuites), CTA d'en-tête rendu insécable.
+- **QA** : nouvelle suite `tests/design_system.test.js` (8 tests : fraîcheur du générateur,
+  zéro classe non couverte, définitions réelles des tailles/variantes/états, jetons déclarés,
+  autosuffisance du HTML exporté, non-retour des marqueurs IA) et **280/280 tests complets**.
+- **Mesure de non-régression visuelle** : comparaison avant/après (worktree sur `fe06c75`) du
+  dashboard et de l'éditeur à 1280 ; le dashboard est identique, l'éditeur gagne ses micro-libellés
+  et ses états. Point ouvert consigné : en canvas étroit (~640 px) l'en-tête de la vitrine rendu dans
+  l'éditeur est à l'étroit — à traiter au lot 2.
+
 ### Consolidation — 15 septembre 2026 (4.8.0-alpha.54)
 
 - Aperçu des presets : survoler un preset joue son mouvement **directement sur le bouton**, dans le panneau de section, le menu du texte, celui de l’image et la grille des Réglages. L’auteur voit le mouvement avant de l’appliquer, sans quitter le menu.
