@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 
+globalThis.requestAnimationFrame = callback => callback();
+
 globalThis.document = {
   addEventListener() {},
   querySelector() { return null; },
@@ -382,4 +384,19 @@ test('Freeform single-element ratio lock and section resize constraints stay exp
   assert.ok(appSource.includes('adjustedDx = Math.min(adjustedDx, boundary.right - entry.rect.right)'));
   assert.ok(appSource.includes('const fit = Math.min(1, maxW / width, maxH / height)'));
   assert.ok(stateSource.includes('nextLayout.aspectLocked === true'));
+});
+
+test('Freeform responsive tools adapt selected layouts across breakpoints without coupling them', () => {
+  const appSource = fs.readFileSync(path.resolve(process.cwd(), 'public/js/app.js'), 'utf8');
+  assert.ok(appSource.includes('data-freeform-copy="tablet"'));
+  assert.ok(appSource.includes('data-freeform-copy="mobile"'));
+  assert.ok(appSource.includes('data-freeform-inherit-desktop'));
+  assert.ok(appSource.includes('copyFreeformSelectionToViewport(targetViewport, sourceViewport = state.viewport)'));
+  assert.ok(appSource.includes('adaptFreeformLayoutToViewport(sourceLayout, sourceViewport, targetViewport)'));
+  assert.ok(appSource.includes('state.setFreeformLayouts(updates, targetViewport'));
+  assert.ok(appSource.includes('this._freeformViewportSyncTimer = setTimeout(() => this.updateFreeformOverlay(), 340)'));
+  assert.ok(appSource.includes('const responsiveBar = overlay.querySelector(".freeform-responsivebar")'));
+  assert.ok(appSource.includes('responsiveBar.style.left = `${desiredLeft - left}px`'));
+  assert.ok(!appSource.match(/copyShareUrl[\s\S]{0,900}responsiveBar\.style\.left/));
+  assert.ok(css.includes('.freeform-responsivebar'));
 });

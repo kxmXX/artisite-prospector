@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { FREEFORM_SNAP_THRESHOLD, rectAxisLines, resolveEqualSpacingSnap, resolveFreeformSnap } from "../public/js/engine/freeform.js";
+import { adaptFreeformLayoutToViewport, FREEFORM_SNAP_THRESHOLD, FREEFORM_VIEWPORT_WIDTHS, rectAxisLines, resolveEqualSpacingSnap, resolveFreeformSnap } from "../public/js/engine/freeform.js";
 
 test("freeform snap chooses the nearest edge or center inside the threshold", () => {
   const snap = resolveFreeformSnap(96, 40, [{ position: 120, source: "peer" }]);
@@ -58,4 +58,12 @@ test("equal spacing snap ignores neighbors on another cross-axis lane", () => {
     "x"
   );
   assert.equal(snap, null);
+});
+
+test("responsive freeform adaptation scales geometry but preserves layer semantics", () => {
+  assert.deepEqual(FREEFORM_VIEWPORT_WIDTHS, { desktop: 1200, tablet: 768, mobile: 390 });
+  const source = { x: 120, y: -60, width: 600, height: 300, z: 4, rotation: 15, scaleX: 1.2, aspectLocked: true };
+  assert.deepEqual(adaptFreeformLayoutToViewport(source, "desktop", "mobile"), {
+    x: 39, y: -19.5, width: 195, height: 97.5, z: 4, rotation: 15, scaleX: 1.2, aspectLocked: true
+  });
 });

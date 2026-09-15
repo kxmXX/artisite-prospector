@@ -1,3 +1,11 @@
+## LOT DE LIVRAISON — responsive assisté 4.8.0-alpha.27
+
+- Adaptation : `adaptFreeformLayoutToViewport` applique un ratio de largeur de référence (desktop 1200, tablette 768, mobile 390) aux coordonnées/dimensions d’un layout sélectionné sans coupler les breakpoints.
+- UI : barre Responsive sur le cadre avec copie vers chaque breakpoint, `Hériter D` pour réadapter Desktop vers le breakpoint actif et `Reset ici` pour effacer uniquement le breakpoint courant.
+- Stabilité : `updateViewportUI()` resynchronise le cadre immédiatement puis après la transition de 300 ms ; la barre est repositionnée dans `updateFreeformOverlay()` et reste bornée au viewport.
+- QA Chrome : Desktop 12/8 → Mobile 3,9/2,6 ; Mobile modifié à 10,9 sans mutation Desktop ; héritage remet 3,9/2,6 ; reset Mobile laisse Desktop 12/8 ; zéro erreur console. Validation : 44/44 ciblés, 219/219 complets et `git diff --check`.
+- Prochaine action : groupes imbriqués ou tactile/auto-scroll du marquee, en gardant un chunk borné.
+
 # État de reprise Codex — 15 septembre 2026
 
 ## LOT DE LIVRAISON — ratio et bornes de resize 4.8.0-alpha.26

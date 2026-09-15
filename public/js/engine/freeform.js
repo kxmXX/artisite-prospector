@@ -106,3 +106,17 @@ export function resolveEqualSpacingSnap(rect, neighbors = [], axis = "x", thresh
   const { distance, span, ...result } = best;
   return result;
 }
+
+export const FREEFORM_VIEWPORT_WIDTHS = Object.freeze({ desktop: 1200, tablet: 768, mobile: 390 });
+
+export function adaptFreeformLayoutToViewport(layout = {}, sourceViewport = "desktop", targetViewport = "mobile") {
+  const sourceWidth = FREEFORM_VIEWPORT_WIDTHS[sourceViewport] || FREEFORM_VIEWPORT_WIDTHS.desktop;
+  const targetWidth = FREEFORM_VIEWPORT_WIDTHS[targetViewport] || sourceWidth;
+  const ratio = targetWidth / sourceWidth;
+  const next = { ...layout };
+  for (const key of ["x", "y", "width", "height"]) {
+    const value = Number(layout?.[key]);
+    if (Number.isFinite(value)) next[key] = Math.round(value * ratio * 100) / 100;
+  }
+  return next;
+}

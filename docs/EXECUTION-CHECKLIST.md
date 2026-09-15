@@ -94,7 +94,7 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - [x] Alignement phase 2a — guides intelligents visibles et snapping à 6 px pendant le déplacement, y compris bords/centres de section et éléments voisins.
 - [x] Alignement phase 2b — snapping pendant le resize, équidistance entre voisins et guides de spacing avec mesure en px ; Alt désactive toujours les accroches.
 - [x] Responsive phase 1 — positions/dimensions isolées par desktop/tablette/mobile ; le viewport simulé gagne sur la taille réelle du navigateur.
-- [ ] Responsive phase 2 — héritage/adaptation assistée et commandes de copie/reset entre breakpoints.
+- [x] Responsive phase 2 — héritage/adaptation assistée et commandes de copie/reset entre breakpoints, avec adaptation proportionnelle 1200/768/390 et resynchronisation du cadre après transition.
 - [x] Persistance phase 1 — transformations enregistrées dans l’état projet, sauvegarde locale, Undo/Redo, preview et export standalone.
 - [x] Calques phase 1 — verrouillage persistant avec Undo ; un calque verrouillé reste sélectionnable mais refuse drag, resize, clavier, alignement, groupage et changement de plan.
 - [ ] Robustesse — tests unitaires + navigateur pour texte/image/CTA/groupe, souris/tactile/clavier, sans collision avec inline editing, popovers ou modales.
@@ -117,6 +117,8 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 7. Noter ici : commit, tests réellement exécutés, anomalies connues et prochaine action unique.
 
 ## Dernière livraison validée
+
+- Lot `4.8.0-alpha.27` : adaptation responsive explicite Desktop/Tablette/Mobile, héritage Desktop et Reset local. QA Chrome : 12/8 → 3,9/2,6, édition Mobile indépendante à 10,9, héritage/restauration et toolbar bornée, zéro erreur console. 44/44 ciblés, 219/219 complets et `git diff --check`.
 
 - Lot `4.8.0-alpha.26` : ratio individuel verrouillable + Shift temporaire, resize borné à la section et priorité du layout libre sur les anciens min/max CSS. QA Chrome : ratio 0,7999907→0,7999748, taille état/rendu concordante, +2000 px reste borné. 42/42 ciblés, 217/217 complets et `git diff --check`.
 

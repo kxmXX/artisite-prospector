@@ -7,6 +7,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 15 septembre 2026 (4.8.0-alpha.27)
+
+- Responsive assisté : adaptation explicite d’une sélection entre Desktop / Tablette / Mobile avec échelle de référence 1200 / 768 / 390 ; x/y/width/height sont proportionnels, rotation/z/scale/ratio restent cohérents.
+- Outils : barre Responsive avec `→ D / → T / → M`, `Hériter D` et `Reset ici`, mutations indépendantes par breakpoint et Undo-compatible via le moteur d’état existant.
+- UX : le cadre et ses toolbars sont resynchronisés au début et à la fin de la transition de viewport afin de ne plus sortir de l’écran après un switch d’appareil.
+- QA Chrome : Desktop x=12/y=8 → Mobile x=3,9/y=2,6 ; édition Mobile x=10,9 sans toucher Desktop ; héritage restaure 3,9/2,6 ; Reset supprime uniquement Mobile ; toolbars bornées au viewport, zéro erreur console. Validation : 44/44 ciblés, 219/219 complets et `git diff --check`.
+
 ### Consolidation — 15 septembre 2026 (4.8.0-alpha.26)
 
 - Ratio : bouton `Ratio libre / Ratio verrouillé` pour une sélection unique, persisté par breakpoint ; Shift conserve temporairement le ratio sur une poignée diagonale.

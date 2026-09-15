@@ -11,7 +11,7 @@ import { renderInspector } from "./components/inspector.js";
 import { renderWebsiteHTML, generateLocalBusinessSchema } from "./components/renderer.js";
 import { generateSite, createSectionData } from "./engine/generator.js";
 import { processCopilotPrompt, applyCopilotOperations, resolveProjectUiTarget } from "./engine/copilot.js";
-import { FREEFORM_SNAP_THRESHOLD, marqueeContainsRectCenter, marqueeRectFromPoints, rectAxisLines, resolveEqualSpacingSnap, resolveFreeformSnap } from "./engine/freeform.js";
+import { adaptFreeformLayoutToViewport, FREEFORM_SNAP_THRESHOLD, marqueeContainsRectCenter, marqueeRectFromPoints, rectAxisLines, resolveEqualSpacingSnap, resolveFreeformSnap } from "./engine/freeform.js";
 import { downloadHTML, downloadJSON, generateProductionPackage, downloadProductionPackage } from "./engine/exporter.js";
 import { getStylePresetById } from "./data/styles.js";
 import { getTradeById } from "./data/trades.js";
@@ -661,6 +661,9 @@ export class App {
     document.querySelectorAll(".studio-v3-device-switch [data-viewport]").forEach(button => {
       button.classList.toggle("is-active", button.dataset.viewport === vp);
     });
+    requestAnimationFrame(() => this.updateFreeformOverlay());
+    clearTimeout(this._freeformViewportSyncTimer);
+    this._freeformViewportSyncTimer = setTimeout(() => this.updateFreeformOverlay(), 340);
   }
 
   setSidebarTab(tab) {
@@ -4088,6 +4091,14 @@ export class App {
           <button type="button" data-freeform-ratio title="Verrouiller le ratio largeur/hauteur" aria-label="Verrouiller le ratio largeur/hauteur">Ratio libre</button>
           <button type="button" data-freeform-lock title="Verrouiller la sélection" aria-label="Verrouiller la sélection">Verrouiller</button>
         </div>
+        <div class="freeform-responsivebar" role="toolbar" aria-label="Adapter la sélection aux breakpoints">
+          <span data-freeform-responsive-label>Responsive</span>
+          <button type="button" data-freeform-copy="desktop" title="Adapter vers ordinateur">→ D</button>
+          <button type="button" data-freeform-copy="tablet" title="Adapter vers tablette">→ T</button>
+          <button type="button" data-freeform-copy="mobile" title="Adapter vers mobile">→ M</button>
+          <button type="button" data-freeform-inherit-desktop title="Adapter Desktop vers le breakpoint actuel">Hériter D</button>
+          <button type="button" data-freeform-breakpoint-reset title="Réinitialiser la sélection sur ce breakpoint">Reset ici</button>
+        </div>
         <div class="freeform-alignbar" role="toolbar" aria-label="Aligner et distribuer la sélection">
           <button type="button" data-freeform-align="left" title="Aligner à gauche" aria-label="Aligner à gauche">L</button>
           <button type="button" data-freeform-align="center" title="Centrer horizontalement" aria-label="Centrer horizontalement">C</button>
@@ -4120,6 +4131,23 @@ export class App {
         event.preventDefault();
         event.stopPropagation();
         this.ungroupFreeformSelection();
+      });
+      overlay.querySelectorAll("[data-freeform-copy]").forEach(button => {
+        button.addEventListener("click", event => {
+          event.preventDefault();
+          event.stopPropagation();
+          this.copyFreeformSelectionToViewport(button.dataset.freeformCopy);
+        });
+      });
+      overlay.querySelector("[data-freeform-inherit-desktop]")?.addEventListener("click", event => {
+        event.preventDefault();
+        event.stopPropagation();
+        this.copyFreeformSelectionToViewport(state.viewport, "desktop");
+      });
+      overlay.querySelector("[data-freeform-breakpoint-reset]")?.addEventListener("click", event => {
+        event.preventDefault();
+        event.stopPropagation();
+        this.resetFreeformSelection();
       });
       overlay.querySelectorAll("[data-freeform-align]").forEach(button => {
         button.addEventListener("click", event => {
@@ -4280,6 +4308,7 @@ export class App {
     const rotateHandle = overlay.querySelector(".freeform-rotate-handle");
     const alignBar = overlay.querySelector(".freeform-alignbar");
     const layerBar = overlay.querySelector(".freeform-layerbar");
+    const responsiveBar = overlay.querySelector(".freeform-responsivebar");
     const controlsInside = top < 36;
     const controlsTop = controlsInside ? Math.max(8 - top, 4) : -31;
     if (labelBar) labelBar.style.top = `${controlsTop}px`;
@@ -4304,6 +4333,21 @@ export class App {
       layerBar.style.left = `${desiredLeft - left}px`;
       layerBar.style.top = `${desiredTop - top}px`;
       layerBar.style.translate = "0 0";
+    }
+    if (responsiveBar) {
+      const toolbarWidth = responsiveBar.offsetWidth || 320;
+      const desiredLeft = Math.max(8, Math.min(window.innerWidth - toolbarWidth - 8, (left + right - toolbarWidth) / 2));
+      const extra = keys.length > 1 && !selectionLocked ? 90 : 50;
+      const desiredTop = Math.max(8, Math.min(window.innerHeight - 38, bottom + extra));
+      responsiveBar.style.left = `${desiredLeft - left}px`;
+      responsiveBar.style.top = `${desiredTop - top}px`;
+      responsiveBar.style.translate = "0 0";
+      responsiveBar.classList.toggle("is-disabled", selectionLocked);
+      responsiveBar.querySelectorAll("[data-freeform-copy]").forEach(button => { button.hidden = button.dataset.freeformCopy === state.viewport; });
+      const inheritButton = responsiveBar.querySelector("[data-freeform-inherit-desktop]");
+      if (inheritButton) inheritButton.hidden = state.viewport === "desktop";
+      const viewportLabel = responsiveBar.querySelector("[data-freeform-responsive-label]");
+      if (viewportLabel) viewportLabel.textContent = state.viewport === "desktop" ? "Desktop" : state.viewport === "tablet" ? "Tablette" : "Mobile";
     }
     if (label) {
       const primaryLabel = this._freeformSelectedElement?.dataset?.layoutLabel || `#${keys[0]}`;
@@ -4837,6 +4881,26 @@ export class App {
       cursor += (horizontal ? entry.rect.width : entry.rect.height) + gap;
     });
     state.setFreeformLayouts(updates, state.viewport, horizontal ? "Distribution horizontale" : "Distribution verticale");
+  }
+
+  copyFreeformSelectionToViewport(targetViewport, sourceViewport = state.viewport) {
+    const keys = this.getFreeformSelectedKeys();
+    const valid = ["desktop", "tablet", "mobile"];
+    if (!keys.length || this.isFreeformSelectionLocked(keys) || !valid.includes(targetViewport) || !valid.includes(sourceViewport) || targetViewport === sourceViewport) return;
+    const sourceLayouts = state.currentProject?.freeformLayout?.[sourceViewport] || {};
+    const updates = {};
+    keys.forEach(key => {
+      const sourceLayout = sourceLayouts[key];
+      if (!sourceLayout) return;
+      updates[key] = adaptFreeformLayoutToViewport(sourceLayout, sourceViewport, targetViewport);
+    });
+    if (!Object.keys(updates).length) {
+      this.showToast(`Aucune transformation ${sourceViewport} à adapter pour la sélection`, "info");
+      return;
+    }
+    state.setFreeformLayouts(updates, targetViewport, `Adapter ${sourceViewport} vers ${targetViewport}`);
+    const targetLabel = targetViewport === "desktop" ? "Desktop" : targetViewport === "tablet" ? "Tablette" : "Mobile";
+    this.showToast(`Sélection adaptée vers ${targetLabel}`, "success");
   }
 
   changeFreeformLayerOrder(mode = "forward") {
