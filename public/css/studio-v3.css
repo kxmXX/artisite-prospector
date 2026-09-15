@@ -624,6 +624,7 @@
 .freeform-selection-label span{overflow:hidden;text-overflow:ellipsis}
 .freeform-selection-label button{pointer-events:auto;border:0;border-radius:4px;background:rgba(255,255,255,.17);color:#fff;padding:3px 5px;font:700 9px/1 sans-serif;cursor:pointer}
 .freeform-selection-label button[hidden]{display:none!important}
+.freeform-selection-label [data-freeform-additive].is-active{background:#fff;color:#1d4ed8}
 .freeform-selection-box.is-multi:not(.is-group) .freeform-resize-handle{display:none}
 .freeform-selection-box.is-group{border-style:solid;box-shadow:0 0 0 1px rgba(255,255,255,.9),0 0 0 4px rgba(37,99,235,.14)}
 .freeform-selection-box.is-locked{border-color:#d97706;box-shadow:0 0 0 1px rgba(255,255,255,.9),0 0 0 4px rgba(217,119,6,.14)}
@@ -679,3 +680,5 @@ body.freeform-transforming #canvas-container [data-layout-key].is-freeform-selec
 .freeform-marquee-box.is-visible{display:block}
 #canvas-container [data-layout-key].is-freeform-marquee-hit{outline:2px solid rgba(37,99,235,.72)!important;outline-offset:2px}
 body.freeform-marqueeing,body.freeform-marqueeing *{cursor:crosshair!important;user-select:none!important;-webkit-user-select:none!important}
+
+@media(pointer:coarse){.freeform-selection-label button{min-height:34px;padding:6px 9px;font-size:10px}.freeform-selection-label{gap:5px}}

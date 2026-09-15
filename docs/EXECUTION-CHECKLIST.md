@@ -85,7 +85,7 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 - [x] Redimensionnement phase 2b — ratio individuel verrouillable par breakpoint, Shift temporaire, bornes de section et neutralisation des anciennes contraintes min/max lors d’une taille libre explicite.
 - [x] Multi-sélection phase 1 — Shift-clic ajoute/retire des cibles, cadre englobant unique, déplacement souris/clavier et Reset collectifs en une mutation Undo.
 - [x] Multi-sélection phase 2a — marquee par glisser dans le vide, aperçu des cibles touchées, Shift additif et respect des groupes.
-- [ ] Multi-sélection phase 2b — ajout/retrait tactile accessible et auto-scroll de bord pendant le marquee.
+- [x] Multi-sélection phase 2b — ajout/retrait tactile via `Multi +`, cibles coarse accessibles et auto-scroll progressif de bord pendant le marquee.
 - [x] Groupes phase 1 — Grouper/Dégrouper persistant, clic sur un membre resélectionne le groupe, déplacement collectif sans perdre les géométries individuelles.
 - [x] Groupes phase 2a — redimensionnement collectif persistant par scale autour du cadre, ratio uniforme avec Shift et Undo batch unique.
 - [x] Groupes phase 2b-1 — ordre/z-index contrôlable : avancer/reculer, premier plan/arrière-plan, persistance par breakpoint et Undo.
@@ -117,6 +117,8 @@ que chaque changement de produit.** Il complète le journal détaillé dans
 7. Noter ici : commit, tests réellement exécutés, anomalies connues et prochaine action unique.
 
 ## Dernière livraison validée
+
+- Lot `4.8.0-alpha.29` : multi-sélection tactile sans Shift + auto-scroll de bord du marquee. QA Chrome : Multi 50×34 px, 1→2→1 éléments au tap, +102 px de scroll pendant le marquee, zéro erreur console. 48/48 ciblés, 223/223 complets et `git diff --check`.
 
 - Lot `4.8.0-alpha.28` : groupes imbriqués, ungroup un niveau et Shift-clic par unité ; barre Responsive repliée par défaut pour supprimer un chevauchement. QA Chrome : groupe parent 3 calques, Move +10 collectif, sous-groupe 2 calques intact après ungroup. 37/37 ciblés, 221/221 complets et `git diff --check`.
 

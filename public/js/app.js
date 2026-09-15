@@ -11,7 +11,7 @@ import { renderInspector } from "./components/inspector.js";
 import { renderWebsiteHTML, generateLocalBusinessSchema } from "./components/renderer.js";
 import { generateSite, createSectionData } from "./engine/generator.js";
 import { processCopilotPrompt, applyCopilotOperations, resolveProjectUiTarget } from "./engine/copilot.js";
-import { adaptFreeformLayoutToViewport, FREEFORM_SNAP_THRESHOLD, marqueeContainsRectCenter, marqueeRectFromPoints, rectAxisLines, resolveEqualSpacingSnap, resolveFreeformSnap } from "./engine/freeform.js";
+import { adaptFreeformLayoutToViewport, FREEFORM_SNAP_THRESHOLD, marqueeContainsRectCenter, marqueeRectFromPoints, rectAxisLines, resolveEdgeAutoScroll, resolveEqualSpacingSnap, resolveFreeformSnap } from "./engine/freeform.js";
 import { downloadHTML, downloadJSON, generateProductionPackage, downloadProductionPackage } from "./engine/exporter.js";
 import { getStylePresetById } from "./data/styles.js";
 import { getTradeById } from "./data/trades.js";
@@ -4075,6 +4075,7 @@ export class App {
       overlay.innerHTML = `
         <div class="freeform-selection-label">
           <span data-freeform-label>Élément</span>
+          <button type="button" data-freeform-additive title="Ajouter/retirer des éléments à la sélection" aria-label="Mode multi-sélection" aria-pressed="false">Multi +</button>
           <button type="button" data-freeform-group title="Grouper la sélection">Grouper</button>
           <button type="button" data-freeform-ungroup title="Dégrouper la sélection">Dégrouper</button>
           <button type="button" data-freeform-reset title="Réinitialiser position et taille">Reset</button>
@@ -4118,6 +4119,12 @@ export class App {
         handle.addEventListener("pointerdown", event => this.startFreeformInteraction(event, handle.dataset.freeformAction, handle.dataset.freeformHandle || ""));
       });
       overlay.querySelector("[data-freeform-rotate]")?.addEventListener("pointerdown", event => this.startFreeformRotation(event));
+      overlay.querySelector("[data-freeform-additive]")?.addEventListener("click", event => {
+        event.preventDefault();
+        event.stopPropagation();
+        this._freeformAdditiveMode = !this._freeformAdditiveMode;
+        this.updateFreeformOverlay();
+      });
       overlay.querySelector("[data-freeform-reset]")?.addEventListener("click", event => {
         event.preventDefault();
         event.stopPropagation();
@@ -4283,6 +4290,7 @@ export class App {
     this._freeformSelectedKeys = [];
     this._freeformSelectedElement = null;
     this._freeformSelectedKey = null;
+    this._freeformAdditiveMode = false;
     if (this._freeformOverlay) {
       this._freeformOverlay.classList.remove("is-visible", "is-multi", "is-group", "is-locked");
       this._freeformOverlay.setAttribute("aria-hidden", "true");
@@ -4334,11 +4342,15 @@ export class App {
     const responsiveBar = overlay.querySelector(".freeform-responsivebar");
     const controlsInside = top < 36;
     const controlsTop = controlsInside ? Math.max(8 - top, 4) : -31;
+    const coarsePointer = Boolean(window.matchMedia?.("(pointer: coarse)")?.matches);
     if (labelBar) labelBar.style.top = `${controlsTop}px`;
-    if (moveHandle) moveHandle.style.top = controlsInside ? `${controlsTop + 42}px` : "-15px";
+    if (moveHandle) {
+      moveHandle.style.left = coarsePointer ? "18px" : "50%";
+      moveHandle.style.top = coarsePointer ? "18px" : (controlsInside ? `${controlsTop + 42}px` : "-15px");
+    }
     if (rotateHandle) {
-      rotateHandle.style.top = controlsInside ? `${controlsTop + 42}px` : "-15px";
-      rotateHandle.style.right = right > window.innerWidth - 48 ? "4px" : "-38px";
+      rotateHandle.style.top = coarsePointer ? "2px" : (controlsInside ? `${controlsTop + 42}px` : "-15px");
+      rotateHandle.style.right = coarsePointer ? "2px" : (right > window.innerWidth - 48 ? "4px" : "-38px");
     }
     if (alignBar && keys.length > 1 && !selectionLocked) {
       const toolbarWidth = alignBar.offsetWidth || 276;
@@ -4379,6 +4391,13 @@ export class App {
       label.textContent = keys.length > 1
         ? `${keys.length} éléments · ${Math.round(right - left)}×${Math.round(bottom - top)}${rotationText}`
         : `${primaryLabel} · ${Math.round(right - left)}×${Math.round(bottom - top)}${rotationText}`;
+    }
+    const additiveButton = overlay.querySelector("[data-freeform-additive]");
+    if (additiveButton) {
+      const active = Boolean(this._freeformAdditiveMode);
+      additiveButton.classList.toggle("is-active", active);
+      additiveButton.setAttribute("aria-pressed", active ? "true" : "false");
+      additiveButton.textContent = active ? "Multi ✓" : "Multi +";
     }
     const groupButton = overlay.querySelector("[data-freeform-group]");
     const ungroupButton = overlay.querySelector("[data-freeform-ungroup]");
@@ -5052,9 +5071,16 @@ export class App {
     const additiveKeys = [...new Set(baseKeys.filter(Boolean))];
     const box = this.ensureFreeformMarquee();
     const candidates = this.getFreeformMarqueeCandidates(canvas);
+    const scrollHost = document.getElementById("editor-main-canvas");
     let started = false;
     let hitKeys = [];
+    let lastPointer = { clientX: event.clientX, clientY: event.clientY };
+    let autoScrollFrame = 0;
 
+    const stopAutoScroll = () => {
+      if (autoScrollFrame) cancelAnimationFrame(autoScrollFrame);
+      autoScrollFrame = 0;
+    };
     const cleanupListeners = () => {
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
@@ -5078,6 +5104,21 @@ export class App {
       hitKeys.forEach(key => canvas.querySelector(`[data-layout-key="${key}"]`)?.classList.add("is-freeform-marquee-hit"));
       this._freeformMarqueeHitKeys = hitKeys;
     };
+    const tickAutoScroll = () => {
+      autoScrollFrame = 0;
+      if (!started || !scrollHost || !lastPointer) return;
+      const speed = resolveEdgeAutoScroll(lastPointer.clientY, scrollHost.getBoundingClientRect());
+      if (!speed) return;
+      const before = scrollHost.scrollTop;
+      scrollHost.scrollTop = Math.max(0, Math.min(scrollHost.scrollHeight - scrollHost.clientHeight, before + speed));
+      if (scrollHost.scrollTop !== before) updateHits(lastPointer);
+      autoScrollFrame = requestAnimationFrame(tickAutoScroll);
+    };
+    const ensureAutoScroll = () => {
+      if (!autoScrollFrame && scrollHost && resolveEdgeAutoScroll(lastPointer.clientY, scrollHost.getBoundingClientRect())) {
+        autoScrollFrame = requestAnimationFrame(tickAutoScroll);
+      }
+    };
     const onMove = moveEvent => {
       if (pointerId != null && moveEvent.pointerId != null && moveEvent.pointerId !== pointerId) return;
       if (!started && Math.hypot(moveEvent.clientX - startPoint.x, moveEvent.clientY - startPoint.y) < 5) return;
@@ -5086,10 +5127,13 @@ export class App {
         document.body.classList.add("freeform-marqueeing");
       }
       moveEvent.preventDefault();
-      updateHits(moveEvent);
+      lastPointer = { clientX: moveEvent.clientX, clientY: moveEvent.clientY };
+      updateHits(lastPointer);
+      ensureAutoScroll();
     };
     const finish = commit => {
       cleanupListeners();
+      stopAutoScroll();
       const finalKeys = commit ? this.expandFreeformGroupKeys([...additiveKeys, ...hitKeys]) : additiveKeys;
       this.clearFreeformMarqueePreview();
       if (commit) {
@@ -5167,13 +5211,14 @@ export class App {
         if (target) {
           const previousKeys = this.getFreeformSelectedKeys();
           const wasSelected = previousKeys.includes(target.dataset.layoutKey);
+          const additive = Boolean(event.shiftKey || this._freeformAdditiveMode);
           let collapseOnClick = null;
-          if (!event.shiftKey && wasSelected && previousKeys.length > 1) {
+          if (!additive && wasSelected && previousKeys.length > 1) {
             const activeGroup = this.getExactFreeformGroup(previousKeys);
             this.selectFreeformKeys(previousKeys, target.dataset.layoutKey);
             if (!activeGroup) collapseOnClick = () => this.selectFreeformTarget(target);
           } else {
-            this.selectFreeformTarget(target, { additive: event.shiftKey, ignoreGroup: event.shiftKey });
+            this.selectFreeformTarget(target, { additive });
           }
           this.armFreeformDirectDrag(event, target, { wasSelected, onClick: collapseOnClick });
         } else if (!event.target.closest("#freeform-selection-box")) {

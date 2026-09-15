@@ -240,7 +240,7 @@ test('Freeform multi-selection batches transforms into one Undo snapshot and per
 
 test('Freeform multi-select exposes Shift selection, group controls and collective movement', () => {
   const appSource = fs.readFileSync(path.resolve(process.cwd(), 'public/js/app.js'), 'utf8');
-  assert.ok(appSource.includes('additive: event.shiftKey'));
+  assert.ok(appSource.includes('const additive = Boolean(event.shiftKey || this._freeformAdditiveMode)'));
   assert.ok(appSource.includes('state.createFreeformGroup(keys'));
   assert.ok(appSource.includes('state.deleteFreeformGroup(group.id'));
   assert.ok(appSource.includes('state.setFreeformLayouts(liveUpdates'));
@@ -415,4 +415,19 @@ test('Freeform nested groups keep top-level selection semantics and additive gro
   assert.ok(stateSource.includes('const childGroups = intersecting.filter(group => group.members.every(key => keys.includes(key)))'));
   assert.ok(stateSource.includes('project.freeformGroups[id] = { id, members: keys, directMembers, childGroups: childGroupIds }'));
   assert.ok(stateSource.includes('if (project.freeformGroups[childId]) delete project.freeformGroups[childId].parentId'));
+});
+
+test('Freeform touch multi-select and marquee edge auto-scroll stay explicit', () => {
+  const appSource = fs.readFileSync(path.resolve(process.cwd(), 'public/js/app.js'), 'utf8');
+  assert.ok(appSource.includes('data-freeform-additive'));
+  assert.ok(appSource.includes('this._freeformAdditiveMode = !this._freeformAdditiveMode'));
+  assert.ok(appSource.includes('const additive = Boolean(event.shiftKey || this._freeformAdditiveMode)'));
+  assert.ok(appSource.includes('this.selectFreeformTarget(target, { additive })'));
+  assert.ok(appSource.includes('resolveEdgeAutoScroll(lastPointer.clientY, scrollHost.getBoundingClientRect())'));
+  assert.ok(appSource.includes('scrollHost.scrollTop = Math.max(0, Math.min(scrollHost.scrollHeight - scrollHost.clientHeight, before + speed))'));
+  assert.ok(appSource.includes('autoScrollFrame = requestAnimationFrame(tickAutoScroll)'));
+  assert.ok(css.includes('@media(pointer:coarse)'));
+  assert.ok(appSource.includes('const coarsePointer = Boolean(window.matchMedia?.("(pointer: coarse)")?.matches)'));
+  assert.ok(appSource.includes('moveHandle.style.left = coarsePointer ? "18px" : "50%"'));
+  assert.ok(css.includes('[data-freeform-additive].is-active'));
 });

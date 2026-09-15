@@ -7,6 +7,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Consolidation — 15 septembre 2026 (4.8.0-alpha.29)
+
+- Tactile : bouton `Multi +` accessible au doigt pour ajouter/retirer des éléments sans Shift ; groupes conservés comme unités et état `aria-pressed` explicite.
+- Ergonomie coarse pointer : cibles du label portées à 34 px minimum et poignées Move/Rotation repositionnées dans les coins du cadre afin de ne plus recouvrir les commandes tactiles.
+- Marquee : auto-scroll progressif du vrai `#editor-main-canvas` à l’approche des bords supérieur/inférieur, avec recalcul des hits pendant le scroll et arrêt garanti au pointerup/cancel.
+- QA Chrome : tap titre → 1, `Multi ✓`, tap rôle → 2, retap titre → rôle seul ; marquee au bord inférieur fait défiler +102 px pendant le geste ; zéro erreur console. Validation : 48/48 ciblés, 223/223 complets et `git diff --check`.
+
 ### Consolidation — 15 septembre 2026 (4.8.0-alpha.28)
 
 - Groupes imbriqués : un groupe parent conserve ses sous-groupes via `childGroups/parentId` tout en gardant `members` aplati pour les transformations existantes.

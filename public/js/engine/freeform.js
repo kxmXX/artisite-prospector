@@ -120,3 +120,22 @@ export function adaptFreeformLayoutToViewport(layout = {}, sourceViewport = "des
   }
   return next;
 }
+
+export function resolveEdgeAutoScroll(pointerY, rect, margin = 56, maxSpeed = 22) {
+  const y = Number(pointerY);
+  const top = Number(rect?.top);
+  const bottom = Number(rect?.bottom);
+  const safeMargin = Math.max(1, Number(margin) || 56);
+  const safeMax = Math.max(1, Number(maxSpeed) || 22);
+  if (![y, top, bottom].every(Number.isFinite) || bottom <= top) return 0;
+  if (y < top || y > bottom) return 0;
+  if (y < top + safeMargin) {
+    const strength = Math.min(1, (top + safeMargin - y) / safeMargin);
+    return -Math.max(1, Math.round(safeMax * strength));
+  }
+  if (y > bottom - safeMargin) {
+    const strength = Math.min(1, (y - (bottom - safeMargin)) / safeMargin);
+    return Math.max(1, Math.round(safeMax * strength));
+  }
+  return 0;
+}

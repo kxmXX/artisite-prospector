@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { adaptFreeformLayoutToViewport, FREEFORM_SNAP_THRESHOLD, FREEFORM_VIEWPORT_WIDTHS, rectAxisLines, resolveEqualSpacingSnap, resolveFreeformSnap } from "../public/js/engine/freeform.js";
+import { adaptFreeformLayoutToViewport, FREEFORM_SNAP_THRESHOLD, FREEFORM_VIEWPORT_WIDTHS, rectAxisLines, resolveEdgeAutoScroll, resolveEqualSpacingSnap, resolveFreeformSnap } from "../public/js/engine/freeform.js";
 
 test("freeform snap chooses the nearest edge or center inside the threshold", () => {
   const snap = resolveFreeformSnap(96, 40, [{ position: 120, source: "peer" }]);
@@ -66,4 +66,14 @@ test("responsive freeform adaptation scales geometry but preserves layer semanti
   assert.deepEqual(adaptFreeformLayoutToViewport(source, "desktop", "mobile"), {
     x: 39, y: -19.5, width: 195, height: 97.5, z: 4, rotation: 15, scaleX: 1.2, aspectLocked: true
   });
+});
+
+test("edge auto-scroll accelerates toward the vertical viewport edges", () => {
+  const rect = { top: 100, bottom: 700 };
+  assert.equal(resolveEdgeAutoScroll(400, rect), 0);
+  assert.ok(resolveEdgeAutoScroll(110, rect) < 0);
+  assert.ok(resolveEdgeAutoScroll(690, rect) > 0);
+  assert.ok(Math.abs(resolveEdgeAutoScroll(102, rect)) > Math.abs(resolveEdgeAutoScroll(140, rect)));
+  assert.equal(resolveEdgeAutoScroll(50, rect), 0);
+  assert.equal(resolveEdgeAutoScroll(750, rect), 0);
 });

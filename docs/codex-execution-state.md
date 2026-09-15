@@ -1,3 +1,11 @@
+## LOT DE LIVRAISON — tactile multi-sélection et auto-scroll 4.8.0-alpha.29
+
+- Multi tactile : `Multi +` bascule un mode additif persistant tant que la sélection existe ; les taps ajoutent/retirent les unités de groupe sans dépendre de Shift.
+- Cibles tactiles : boutons du label à 34 px minimum en pointeur coarse ; Move et Rotation passent dans les coins internes du cadre pour éliminer leur collision avec `Multi +`.
+- Auto-scroll : `resolveEdgeAutoScroll` calcule une vitesse progressive dans une zone de 56 px au bord ; le marquee anime `scrollTop`, recalcule ses hits et annule son RAF à la fin du geste.
+- QA Chrome tactile : titre seul → Multi actif → titre+rôle → rôle seul ; cible Multi 50×34 px. QA marquee : +102 px de scroll au bord inférieur, box visible pendant le geste puis proprement retirée, zéro erreur console. Validation : 48/48 ciblés, 223/223 complets et `git diff --check`.
+- Prochaine action : débordement contrôlé entre sections et reparenting explicite.
+
 ## LOT DE LIVRAISON — groupes imbriqués 4.8.0-alpha.28
 
 - Modèle : les groupes peuvent référencer des `childGroups` avec `parentId` ; leurs `members` restent aplatis pour préserver déplacement, resize, rotation, z-index et export sans nouveau moteur de transform.
