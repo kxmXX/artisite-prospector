@@ -197,3 +197,12 @@ test('le chrome déclare une alternative de mouvement et des cibles tactiles de 
   assert.ok(/@media \(pointer:coarse\)[\s\S]*?min-width:44px/.test(css), 'cibles tactiles portées à 44 px');
   assert.ok(/@media \(prefers-reduced-motion:reduce\)[\s\S]*?\.dashboard-v3-project[\s\S]*?transition:none/.test(css), 'alternative de mouvement sur le dashboard');
 });
+
+test('le chrome n a plus qu une seule valeur de rayon pilule', () => {
+  const chrome = read('public/css/studio-v3.css');
+  assert.ok(!/999px/.test(chrome), 'le chrome doit utiliser le jeton --ui-radius-full, pas une valeur littérale');
+  assert.ok(!/9999px/.test(chrome), 'une seule famille de rayons pilule dans le chrome');
+  const tokens = read('public/css/tokens.css');
+  assert.ok(tokens.includes('--ui-radius-full: 999px'), 'le jeton de rayon pilule est déclaré une seule fois');
+});
+

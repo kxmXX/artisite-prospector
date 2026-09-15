@@ -1175,3 +1175,21 @@ défini.
 Reste (5b) : le sélecteur d'état dans l'inspecteur, l'application des réglages à l'état choisi, le
 retour au style principal et l'intégration à l'historique. Aucun état n'est encore définissable
 depuis l'interface, et je ne présente donc pas ce chantier comme livré.
+
+---
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.10 (finitions de cohérence)
+
+Increment volontairement petit, livré pour ne pas laisser une session s'arrêter sur du travail
+non poussé.
+
+- Les cinq dernières valeurs border-radius:999px de studio-v3.css passent par le jeton
+  --ui-radius-full. Un premier essai a écrit var(--ui-radius-full, 999px), dont le repli littéral
+  faisait échouer le test censé garantir l'absence de valeur littérale : le repli a été retiré,
+  tokens.css étant toujours chargé.
+- Nouveau test dans tests/design_system.test.js : le chrome ne doit contenir ni 999px ni 9999px
+  littéral, et le jeton doit être déclaré une seule fois.
+- app.css conserve 24 valeurs de rayon (contenu du site) : à traiter avec le lot de densité, pas à
+  l'aveugle.
+
+Vérifications : 320/320 tests.

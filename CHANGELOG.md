@@ -7,6 +7,16 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.10) — Finitions de cohérence
+
+- **Un seul rayon « pilule » dans le chrome** : les cinq dernières valeurs littérales `999px` de
+  `studio-v3.css` passent par le jeton `--ui-radius-full`. La valeur est identique, mais le chrome
+  n'a plus deux familles parallèles (`999px` et `9999px`) pour la même intention. Un test interdit
+  désormais toute valeur littérale de rayon pilule dans la feuille du chrome.
+  *Portée volontairement limitée* : les 24 valeurs de `app.css` concernent surtout le contenu du site
+  et seront traitées avec le lot de densité, pas à l'aveugle.
+- **QA** : **320/320 tests**.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.9) — Lot 5a : socle des états d'élément
 
 - **Modèle de données** (`public/js/engine/elementStates.js`) : chaque élément peut porter des écarts
