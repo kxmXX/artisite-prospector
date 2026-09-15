@@ -1,6 +1,7 @@
 import { getIcon } from "./icons.js";
 import { HERO_STYLES } from "./heroStyles.js";
 import { elementStateCSS } from "../engine/elementStates.js";
+import { MOTION_PRESETS } from "../data/motionPresets.js";
 import { sectionLayoutAttributes, SECTION_LAYOUT_CSS } from "../engine/sectionStyle.js";
 import { elementStyleCSS } from "../engine/elementStyle.js";
 import { getTradeFallbackDataUrl } from "../data/imageFallbacks.js";
@@ -309,14 +310,7 @@ export function renderEditableImage(url, { sectionId = "", fieldPath = "", targe
               <span class="text-amber-400 font-mono">${imgMotion || 'aucune'}</span>
             </div>
             <div class="grid grid-cols-2 gap-1.5">
-              ${[
-                ['pulse', 'Pulse ✨'],
-                ['zoom-in', 'Zoom'],
-                ['fade-in', 'Fondu'],
-                ['spring', 'Spring 🍏'],
-                ['shimmer', 'Shimmer'],
-                ['none', 'Aucune']
-              ].map(([mPreset, mLabel]) => `
+              ${MOTION_PRESETS.map((motion) => [motion.id, motion.label]).map(([mPreset, mLabel]) => `
                 <button type="button" data-motion-preview="${mPreset}" onclick="event.stopPropagation(); window.app.setImageMotion('${sectionId}', '${fieldPath}', ${indexParam}, '${mPreset}')"
                         class="motion-chip ${((imgMotion || 'none') === mPreset) ? 'is-active' : ''} ${mPreset === 'none' ? 'col-span-2 text-zinc-400' : ''}">
                   ${mLabel}${((imgMotion || 'none') === mPreset && mPreset !== 'none') ? ' ✓' : ''}
@@ -685,15 +679,7 @@ function renderSection(sec, project, options) {
               <span class="text-amber-400 font-mono font-bold">${sec.settings?.motionPreset || sec.motionPreset || 'défaut'}</span>
             </div>
             <div class="grid grid-cols-2 gap-1.5">
-              ${[
-                ['reveal', 'Reveal'],
-                ['stagger', 'Stagger'],
-                ['spring', 'Spring 🍏'],
-                ['magnetic', 'Magnetic'],
-                ['shimmer', 'Shimmer'],
-                ['pulse', 'Pulse ✨'],
-                ['none', 'Aucun']
-              ].map(([mPreset, mLabel]) => `
+              ${MOTION_PRESETS.map((motion) => [motion.id, motion.label]).map(([mPreset, mLabel]) => `
                 <button type="button" 
                         onmouseenter="window.app.previewSectionMotion('${sec.id}', '${mPreset}')"
                         onclick="event.stopPropagation(); window.app.setSectionMotion('${sec.id}', '${mPreset}')"

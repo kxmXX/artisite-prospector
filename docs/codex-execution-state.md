@@ -1514,3 +1514,11 @@ Vérifications : 9 tests sur le catalogue, 349/349 au total.
 Reste : lot 7b sur les cinq autres surfaces (canevas, image, texte, bouton, réglages globaux) — la
 tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n'a rien modifié, l'arbre
 étant resté propre.
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.26 (lot 7b, fin du catalogue unifié des animations)
+
+- Objectif : le rendu doit lire le catalogue unique, comme l'inspecteur le fait depuis `4.9.0-alpha.22`.
+- Fait : les deux dernières listes locales du rendu (menu image, panneau de section) sont remplacées par `MOTION_PRESETS`. Le bug d'échappement du tour précédent est diagnostiqué précisément : mon remplacement laissait un `]` orphelin après `])}`, d'où « Unexpected identifier 'type' » ; `node --check` l'a montré et la correction est passée avant tout commit. L'édition procède désormais par un script Node, pas par l'éditeur de texte.
+- Aperçu : `slide-in`, `magnetic` et `progress-fill` reçoivent leur règle `:hover` manquante, donc toute animation du catalogue se prévisualise.
+- Tests : 349 → 351 (deux garde-fous). `scripts/build-utilities.mjs` relancé, aucune classe utilitaire nouvelle.
+- Reste sur le lot 7 : durée, délai, courbe et direction réglables par animation, outil tester/rejouer/arrêter/réinitialiser, neutralisation pendant un transform libre, runtime partagé à l'export.

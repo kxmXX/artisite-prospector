@@ -7,6 +7,14 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.26) — Lot 7b : le rendu lit enfin le catalogue d'animations
+
+- Cause : le catalogue unique existait depuis `4.9.0-alpha.22` et l'inspecteur le lisait, mais deux surfaces du rendu déclaraient encore leur propre liste — le menu d'animation d'image (6 entrées) et le panneau d'animation de section (7 entrées). La même animation y portait un autre nom, et six animations disponibles n'étaient proposées nulle part.
+- Correctif : `renderEditableImage` et `renderSection` construisent désormais leurs pastilles depuis `MOTION_PRESETS`. Chaque menu propose les 12 entrées du catalogue — 11 animations réellement jouables plus « Aucune » — donc ce qui est affiché se joue.
+- Aperçu au survol : les pastilles `slide-in`, `magnetic` et `progress-fill` n'avaient aucune règle `:hover` et ne se prévisualisaient pas ; les 11 animations jouables se prévisualisent maintenant, avec les keyframes du rendu final.
+- Tests : 2 garde-fous ajoutés (`tests/motion_presets.test.js`) — interdiction de toute liste locale inline dans le rendu, et aperçu au survol obligatoire pour chaque animation du catalogue ; 349 → **351/351**.
+- Vérification : `node --check` sur le renderer, `scripts/build-utilities.mjs` (aucune classe utilitaire nouvelle), suite complète 351/351. Contrôle visuel non réalisé (capture indisponible).
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.25) — L'accessibilité du mouvement devient vérifiée
 
 - **Contrôle mené sur les douze animations du catalogue** : chacune est bien neutralisée quand le

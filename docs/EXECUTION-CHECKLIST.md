@@ -119,6 +119,11 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
       X/Y/L/H/rotation, boîte de sélection réduite à un menu `⋯`, bornes clavier = bornes souris.
 - [ ] **Lot 7 — Mouvement unifié** : catalogue unique, déclencheur, durée, délai, courbe, direction,
       répétition explicite, tester/rejouer/arrêter/réinitialiser, runtime partagé à l'export.
+      *Acquis 7a/7b (`4.9.0-alpha.22` → `.26`)* : catalogue unique dans `public/js/data/motionPresets.js`,
+      lu par l'inspecteur, par le rendu (image et section) et par l'aperçu au survol ; deux listes
+      locales supprimées du rendu, les 12 entrées proposées sont jouables. *Reste* : durée, délai,
+      courbe et direction réglables par animation, outil tester/rejouer/arrêter/réinitialiser, et
+      neutralisation des motions pendant un transform libre.
 - [x] **Lot 8 — Undo/Redo exhaustif** (`4.9.0-alpha.4`) : 11 commandes mutaient avant de prendre
       l'instantané (l'annulation ne restaurait rien) et 20 commandes n'avaient aucun historique ;
       toutes prennent désormais leur instantané **avant** la mutation, y compris les six

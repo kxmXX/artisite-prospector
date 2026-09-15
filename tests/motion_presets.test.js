@@ -93,3 +93,21 @@ test('chaque animation du catalogue est neutralisee si le systeme demande de red
   });
   assert.deepEqual(uncovered, [], 'animations jouées malgré la demande de réduction : ' + uncovered.join(', '));
 });
+
+test('les surfaces de rendu lisent le catalogue au lieu d une liste locale', () => {
+  // Le rendu portait encore deux listes inline (menu d image, panneau de section) :
+  // la meme animation y portait un autre nom. Ce test interdit leur retour.
+  const renderer = fs.readFileSync(new URL('../public/js/components/renderer.js', import.meta.url), 'utf8');
+  assert.ok(renderer.includes('MOTION_PRESETS.map'), 'le rendu doit lire le catalogue unique');
+  assert.ok(!/\}\s*\]\.map\(\(\[mPreset/.test(renderer), 'plus aucune liste locale inline dans le rendu');
+  assert.ok(!renderer.includes("['pulse', 'Pulse']"), 'les noms anglais bruts ont disparu du rendu');
+});
+
+test('chaque animation proposee se previsualise au survol de son bouton', () => {
+  // Une entree du catalogue sans apercu laisse l auteur choisir a l aveugle.
+  const css = fs.readFileSync(new URL('../public/css/app.css', import.meta.url), 'utf8');
+  const missing = motion.motionPresetIds()
+    .filter((id) => id !== 'none')
+    .filter((id) => !css.includes('[data-motion-preview="' + id + '"]:hover'));
+  assert.deepEqual(missing, [], 'animations sans apercu au survol : ' + missing.join(', '));
+});
