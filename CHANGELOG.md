@@ -7,6 +7,14 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.37) — Le panneau de propriétés devient accessible, et enfin vérifié
+
+- Cause : à 1280 px, `.studio-v3-inspector-panel` est une **surtoile** masquée (`transform: translateX(calc(100% + 24px))`, `opacity: 0`, `pointer-events: none`) qui n'apparaît qu'avec la classe `is-responsive-open`. Cette classe n'était posée que par un chemin indirect, jamais déclenché par la flèche « Inspecter ». Le panneau était donc **inatteignable** à cette largeur, et rien dans l'interface ne permettait de l'ouvrir.
+- Correctif : bouton « Propriétés de la section » dans la barre du haut, avec `aria-controls` et `aria-expanded`, plus une méthode `toggleInspectorPanel()` qui ouvre ou ferme la surtoile et rafraîchit son contenu.
+- **Vérifié à l'écran, pour la première fois de la mission** : le panneau s'ouvre et affiche « Réglages de la section », les contrôles de mise en page (pleine largeur / contenu / étroit, densité, alignement), les 12 animations du catalogue, la divulgation « Réglages avancés : vitesse et délai » **repliée avec son indicateur**, et le bouton « Tester l'animation en direct ». Les lots 4a, 4b, 4d (premier bloc), 7a, 7b et 7c sont donc désormais confirmés visuellement, et pas seulement par test.
+- Toujours non vérifié, et je le redis : les propriétés d'**élément** (styles, états, position). Cliquer un texte n'ouvre pas la barre d'édition et ne renseigne pas la sélection d'élément ; ce chemin dépend d'un geste que mes outils de navigateur ne produisent pas.
+- Tests : 1 nouveau ; 383 → **384/384**.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.36) — Le panneau de propriétés suivait la mauvaise section
 
 - Bug certain, trouvé en lisant le code après une capture : `selectSection` ne rafraîchissait le panneau de propriétés que si la section était **déjà** sélectionnée (`if (alreadySelected) this.updateSelectedSectionUI()`). Changer de section laissait donc le panneau afficher les propriétés de la section précédente ; il fallait cliquer deux fois pour voir les bonnes.

@@ -1607,3 +1607,11 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Conséquence assumée : les réglages de section (lots 4a/4b), les états (5a/5b), les styles d'élément (4c) et les champs de position (6) sont **test-verifiés mais pas vérifiés à l'écran**, et possiblement inatteignables à 1280 px.
 - Tests : 382 → 383. `node --check` sur app.js, `scripts/build-utilities.mjs` relancé.
 - Reste, par ordre d'importance : rendre le panneau réellement accessible (`handleSectionNavigation` ou un bouton explicite), puis lot 3b (sélection unique), 4d, 7, export. 2 tours de budget.
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.37 (panneau de propriétés accessible et vérifié à l'écran)
+
+- Résolu : le panneau de propriétés était une surtoile masquée à 1280 px, sans aucun contrôle pour l'ouvrir. Bouton « Propriétés de la section » ajouté dans la barre du haut (`aria-controls`, `aria-expanded`) et méthode `toggleInspectorPanel()`.
+- Première vérification visuelle de l'inspecteur de toute la mission : réglages de section (pleine largeur / contenu / étroit, densité, alignement), les 12 animations du catalogue, la divulgation « Réglages avancés : vitesse et délai » repliée avec son indicateur, et le bouton « Tester l'animation en direct ». Les lots 4a, 4b, 4d (1er bloc), 7a, 7b, 7c sont donc confirmés à l'écran.
+- Toujours non vérifié : les propriétés d'élément (styles du lot 4c, états 5a/5b, position du lot 6). Cliquer un texte n'ouvre pas la barre d'édition ; la sélection d'élément n'est renseignée qu'en sélection libre, qui exige un geste de glisser que l'outillage navigateur ne fournit pas.
+- Tests : 383 → 384. `node --check` sur les deux fichiers, `scripts/build-utilities.mjs` relancé.
+- Reste, 2 tours : propriétés d'élément (accès), lot 3b, 4d complet, 7, export 2d. Aucun de ces lots ne sera terminé ; l'objectif reste actif.

@@ -120,11 +120,11 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
       du tableau de bord supprimés ; tous les glyphes du chrome et du rendu remplacés par le système
       d'icônes (statuts, sélection freeform, bouton de lecture, étapes de l'assistant). *Reste* :
       unification du vocabulaire de boutons, vérification mobile.
-- [ ] **Panneau de propriétés inatteignable à 1280 px** (relevé en `4.9.0-alpha.36`) : à cette largeur il
-      devient une surtoile masquée jusqu'à la classe `is-responsive-open`, et je n'ai pas réussi à le faire
-      apparaître via la flèche « Inspecter ». Le rafraîchissement au changement de section est corrigé, mais
-      **l'accessibilité du panneau elle-même reste à prouver**. Conséquence : réglages de section, d'élément
-      et champs de position non vérifiés à l'écran.
+- [x] **Panneau de propriétés rendu accessible** (`4.9.0-alpha.37`) : à 1280 px c'était une surtoile masquée
+      qu'aucun contrôle n'ouvrait. Bouton « Propriétés de la section » ajouté dans la barre du haut, avec
+      `aria-controls`/`aria-expanded`. **Vérifié à l'écran** : réglages de section, 12 animations du catalogue,
+      divulgation avancée repliée, bouton de test. *Reste non vérifié* : les propriétés d'élément (styles,
+      états, position), dont l'accès dépend d'un geste de glisser indisponible dans mon outillage.
 - [ ] **Lot 6 — Positionnement, entamé** (`4.9.0-alpha.35`) : champs numériques X / Y / Largeur / Hauteur /
       Rotation branchés sur l'inspecteur, avec bornes, « flux par défaut » tenu (aucune règle CSS sans
       valeur saisie) et retour au flux. *Reste* : position libre en option explicite, boîtes de sélection

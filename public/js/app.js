@@ -1579,6 +1579,20 @@ export class App {
   }
 
   // Actions on Sections
+  /**
+   * Panneau de proprietes : a 1280 px et moins c'est une surtoile masquee
+   * (`@media (max-width:1280px)` dans studio-v3.css) qui n'apparait qu'avec la classe
+   * `is-responsive-open`. Sans geste ni bouton dedie, il etait inatteignable.
+   */
+  toggleInspectorPanel() {
+    const panel = document.getElementById("right-inspector-panel");
+    if (!panel) return;
+    const open = panel.classList.toggle("is-responsive-open");
+    panel.setAttribute("aria-hidden", open ? "false" : "true");
+    document.querySelectorAll('[aria-controls="right-inspector-panel"]').forEach(btn => btn.setAttribute("aria-expanded", open ? "true" : "false"));
+    if (open) this.updateSelectedSectionUI();
+  }
+
   selectSection(sectionId, options = {}) {
     state.setSelectedSection(sectionId);
     // Le panneau de proprietes doit suivre la section choisie, qu'elle ait change ou

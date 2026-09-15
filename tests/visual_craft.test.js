@@ -75,3 +75,12 @@ test('changer de section rafraichit le panneau de proprietes', () => {
   assert.ok(body.includes('this.updateSelectedSectionUI();'), 'le panneau doit suivre la section choisie');
   assert.ok(!body.includes('if (alreadySelected)'), 'l ancienne condition ne doit pas revenir');
 });
+
+test('le panneau de proprietes a un controle explicite', () => {
+  const editor = read('public/js/components/editor.js');
+  const app = read('public/js/app.js');
+  assert.ok(editor.includes('window.app.toggleInspectorPanel()'), 'l editeur doit offrir un bouton');
+  assert.ok(editor.includes('aria-controls="right-inspector-panel"'), 'le bouton doit cibler le panneau');
+  assert.ok(app.includes('toggleInspectorPanel() {'), 'la methode doit exister');
+  assert.ok(app.includes('classList.toggle("is-responsive-open")'), 'elle doit ouvrir la surtoile');
+});
