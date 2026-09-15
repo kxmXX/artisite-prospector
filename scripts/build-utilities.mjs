@@ -185,7 +185,12 @@ function collectUsedClasses(files) {
     attribute.lastIndex = 0;
     while ((match = attribute.exec(source)) !== null) {
       const raw = match[1] !== undefined ? match[1] : match[2];
-      for (const token of stripTemplateExpressions(raw).split(/[\s'"+,]+/)) {
+      // Après retrait des expressions ${...}, une valeur qui contient encore un
+      // guillemet ou un + est une concaténation JavaScript coupée par le balisage :
+      // aucun jeton fiable. Les attributs normaux, eux, restent analysés.
+      const stripped = stripTemplateExpressions(raw);
+      if (stripped.includes("'") || stripped.includes('"') || stripped.includes("+")) continue;
+      for (const token of stripped.split(/[\s'"+,]+/)) {
         if (!token) continue;
         if (token.endsWith('-')) continue;
         if (token.includes('[') !== token.includes(']')) continue;

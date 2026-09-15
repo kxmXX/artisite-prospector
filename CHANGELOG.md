@@ -7,6 +7,27 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.15) — Lot 4b : réglages de section branchés
+
+- **Renderer** : les deux réglages sont posés sur l'élément `<section>` (variables CSS et attribut
+  `data-section-layout="custom"`) et la feuille partagée `SECTION_LAYOUT_CSS` est injectée à côté des
+  styles du hero — donc éditeur, aperçu et site autonome exporté partagent la même source.
+- **Inspecteur** : trois rangées de choix (largeur, respiration, alignement) avec l'état actif visible,
+  et la mention que ces réglages ne concernent que la section sélectionnée.
+- **Application** : `setSectionLayoutValue` passe par l'historique d'annulation.
+- **Outil d'analyse corrigé** : le releveur de classes lisait les attributs `class` coupés par une
+  concaténation JavaScript et en tirait des jetons fantômes (par exemple « id »). Il ignore désormais
+  ces fragments, après retrait des expressions de gabarit — les attributs normaux restent analysés.
+- **QA** : **330/330 tests**. `tests/section_layout.test.js` couvre le modèle (6 tests).
+- **Avertissement honnête, à lever impérativement au prochain lot** : le branchement n'a **pas** pu
+  être validé visuellement. L'inspecteur n'est pas visible à 1280 px avec mes outils, et le test
+  d'intégration que j'avais écrit (« le rendu partagé applique la mise en page ») **échouait sans que
+  je puisse diagnostiquer pourquoi** dans la marge restante : je l'ai retiré plutôt que de le laisser
+  en échec ou de l'assouplir jusqu'à ce qu'il ne prouve plus rien. Il est possible qu'un champ
+  `style` déjà présent dans les projets de démonstration déclenche le marquage, ou que la section
+  modifiée ne soit pas rendue comme le test le supposait. **À vérifier avant de considérer le lot 4
+  comme livré.**
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.14) — Lot 4a : socle des réglages de section
 
 - **Le manque le plus net de l'audit** : une section n'avait **aucun** réglage de mise en page — ni

@@ -8,6 +8,27 @@ import {
   detectAntiPatterns
 } from "../engine/componentIntelligence.js";
 import { escapeHtml } from "../utils/html.js";
+import { SECTION_WIDTHS, SECTION_SPACING, SECTION_ALIGN, getSectionLayout } from "../engine/sectionStyle.js";
+
+/**
+ * Réglages de mise en page de la section : largeur, respiration, alignement.
+ * Construit par concaténation pour rester lisible dans un gabarit déjà long.
+ */
+function sectionLayoutControlsHTML(section, sectionId) {
+  const layout = getSectionLayout(section);
+  const row = (key, scale) => '<div class="flex flex-wrap gap-1">' + Object.keys(scale).map(function (id) {
+    return '<button type="button" class="motion-loop-btn' + (layout[key] === id ? ' is-active' : '') +
+      '" onclick="window.app.setSectionLayoutValue(\'' + sectionId + '\', \'' + key + '\', \'' + id + '\')">' +
+      scale[id].label + '</button>';
+  }).join('') + '</div>';
+  return '<div class="p-2.5 bg-zinc-50 border border-zinc-200 rounded-lg space-y-2">' +
+    '<label class="block text-ui-xs font-medium text-zinc-500 uppercase tracking-wider">Mise en page</label>' +
+    row('width', SECTION_WIDTHS) +
+    row('spacing', SECTION_SPACING) +
+    row('align', SECTION_ALIGN) +
+    '<p class="text-ui-xs text-zinc-400">Ces trois réglages ne concernent que cette section.</p>' +
+  '</div>';
+}
 
 /**
  * Sendpage / Linear Minimalist Inspector Panel.
@@ -59,6 +80,8 @@ export function renderInspector(section, project, state) {
       </div>
 
       <!-- Section Variant Switcher -->
+      ${sectionLayoutControlsHTML(section, sectionId)}
+
       ${variants.length > 1 ? `
         <div class="p-2.5 bg-zinc-50 border border-zinc-200 rounded-lg space-y-1">
           <label class="block text-ui-xs font-medium text-zinc-500 uppercase tracking-wider">Variante d'Affichage</label>

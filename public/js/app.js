@@ -21,6 +21,7 @@ import { getTradeFallbackDataUrl } from "./data/imageFallbacks.js";
 import { ensureFontCatalog } from "./data/fonts.js";
 import { getUiCode } from "./data/uiIds.js";
 import { ELEMENT_STATES, ELEMENT_STATE_LABELS, setElementState, clearElementState } from "./engine/elementStates.js";
+import { setSectionLayout, isValidSectionId } from "./engine/sectionStyle.js";
 import { getIcon } from "./components/icons.js";
 import { parseClientDemoPin, verifyClientDemoPin } from "./utils/clientDemoPin.js";
 import { createEspritNatureDemoProject } from "./data/sampleProjects.js";
@@ -1245,6 +1246,17 @@ export class App {
       return;
     }
     this.render();
+  }
+
+  /** Applique un réglage de mise en page à une section (annulable). */
+  setSectionLayoutValue(sectionId, key, value) {
+    if (!state.currentProject || !isValidSectionId(sectionId)) return;
+    const updated = JSON.parse(JSON.stringify(state.currentProject));
+    const section = updated.sections.find(s => s.id === sectionId);
+    if (!section) return;
+    const next = setSectionLayout(section, { [key]: value });
+    updated.sections[updated.sections.indexOf(section)] = next;
+    state.updateProject(updated, true, "Mise en page de la section");
   }
 
   setNavigationMode(mode) {

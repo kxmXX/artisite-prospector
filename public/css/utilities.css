@@ -1,6 +1,6 @@
 /* GÉNÉRÉ PAR scripts/build-utilities.mjs — NE PAS ÉDITER À LA MAIN.
    Couche d'utilitaires de l'application (éditeur, aperçu, dashboard).
-   389 règles. Relancer : npm run build:css */
+   376 règles. Relancer : npm run build:css */
 
 .-bottom-6 { bottom: calc(-1 * 1.5rem); }
 .-left-6 { left: calc(-1 * 1.5rem); }
@@ -264,16 +264,6 @@
 .whitespace-nowrap { white-space: nowrap; }
 .z-\[9999\] { z-index: 9999; }
 .active\:scale-95:active { scale: 23.75rem; }
-.after\:absolute::after { position: absolute; }
-.after\:bg-white::after { background-color: #ffffff; }
-.after\:border::after { border-width: 1px; border-style: solid; border-color: #e2e8f0; }
-.after\:border-zinc-300::after { border-color: #d4d4d8; }
-.after\:h-3::after { height: 0.75rem; }
-.after\:left-\[2px\]::after { left: 2px; }
-.after\:rounded-full::after { border-radius: 9999px; }
-.after\:top-\[2px\]::after { top: 2px; }
-.after\:transition-all::after { transition-property: all; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
-.after\:w-3\.5::after { width: 0.875rem; }
 .focus\:border-emerald-500:focus { border-color: #10b981; }
 .focus\:border-zinc-600:focus { border-color: #52525b; }
 .focus\:border-zinc-900:focus { border-color: #18181b; }
@@ -329,9 +319,6 @@
 .group\/img:hover .group-hover\/img\:opacity-100 { opacity: 1; }
 .group\/step:hover .group-hover\/step\:opacity-100 { opacity: 1; }
 .group\/thumb:hover .group-hover\/thumb\:opacity-100 { opacity: 1; }
-.peer:checked ~ .peer-checked\:after\:border-white::after { border-color: #ffffff; }
-.peer:checked ~ .peer-checked\:after\:translate-x-full::after { --ui-tx: 100%; translate: var(--ui-tx, 0) var(--ui-ty, 0); }
-.peer:checked ~ .peer-checked\:bg-zinc-900 { background-color: #18181b; }
 body.dark-theme .dark\:bg-zinc-900 { background-color: #18181b; }
 body.dark-theme .dark\:bg-zinc-950 { background-color: #09090b; }
 body.dark-theme .dark\:border-zinc-800 { border-color: #27272a; }

@@ -1,6 +1,7 @@
 import { getIcon } from "./icons.js";
 import { HERO_STYLES } from "./heroStyles.js";
 import { elementStateCSS } from "../engine/elementStates.js";
+import { sectionLayoutAttributes, SECTION_LAYOUT_CSS } from "../engine/sectionStyle.js";
 import { getTradeFallbackDataUrl } from "../data/imageFallbacks.js";
 import { getUiId, getSectionUiId, getUiCode } from "../data/uiIds.js";
 import { escapeHtml, sanitizeUrl, safeCssColor, safeCssLength, safeFontFamily } from "../utils/html.js";
@@ -453,6 +454,7 @@ export function renderWebsiteHTML(project, options = { isEditor: false, isStanda
     ">
       <div class="site-scroll-progress" aria-hidden="true"></div>
       <style>${HERO_STYLES}</style>
+      <style data-section-layout>${SECTION_LAYOUT_CSS}</style>
       <style data-freeform-layout>${buildFreeformLayoutCSS(project)}</style>
       <style data-element-states>${elementStateCSS(project)}</style>
       ${sectionsHTML}
@@ -576,8 +578,9 @@ function renderSection(sec, project, options) {
     ? `background-color: ${sec.settings.customBackground} !important;`
     : "";
 
+  const sectionLayout = sectionLayoutAttributes(sec);
   if (!isEditor) {
-    return `<section id="${sec.type}" class="site-section ${bgTheme} ${isHidden ? 'hidden' : ''}" style="--section-bg: ${themeColor}; ${customBackground}" data-section-id="${sec.id}" data-section-type="${sec.type}" data-section-bg="${sectionTheme}" data-has-custom-bg="${customBackground ? 'true' : 'false'}" data-scroll-fx="zoom"${motionLoop ? ' data-motion-loop="' + motionLoop + '"' : ''} data-ui-id="${getSectionUiId(sec)}" data-ui-type="section"${motionPreset ? ` data-motion="${motionPreset}"` : ''}>${innerHTML}</section>`;
+    return `<section id="${sec.type}" class="site-section ${bgTheme} ${isHidden ? 'hidden' : ''}" style="--section-bg: ${themeColor}; ${customBackground}${sectionLayout.style}" data-section-id="${sec.id}" data-section-type="${sec.type}" data-section-bg="${sectionTheme}" data-has-custom-bg="${customBackground ? 'true' : 'false'}" data-scroll-fx="zoom"${motionLoop ? ' data-motion-loop="' + motionLoop + '"' : ''} data-ui-id="${getSectionUiId(sec)}" data-ui-type="section"${sectionLayout.attributes}${motionPreset ? ` data-motion="${motionPreset}"` : ''}>${innerHTML}</section>`;
   }
 
   // Editor Wrapper with Controls

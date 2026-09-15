@@ -1270,3 +1270,32 @@ Vérifications : tests/section_layout.test.js (6 tests) ; 330/330 tests complets
 Reste (4b) : brancher sectionLayoutAttributes et SECTION_LAYOUT_CSS dans les DEUX chemins de rendu du
 renderer (éditeur et vitrine), puis l'interface dans l'inspecteur. Aucun réglage de section n'est
 encore possible depuis le produit.
+
+---
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.15 (lot 4b/9, NON VALIDÉ VISUELLEMENT)
+
+Branché : sectionLayoutAttributes et SECTION_LAYOUT_CSS dans renderer.js (attribut + variables sur
+l'élément section, feuille injectée à côté de HERO_STYLES), trois rangées de contrôles dans
+l'inspecteur (sectionLayoutControlsHTML), et setSectionLayoutValue dans app.js via state.updateProject
+(donc annulable).
+
+Outil corrigé : le releveur de classes du générateur lisait les attributs class coupés par une
+concaténation JavaScript et produisait des jetons fantômes (dont « id »), ce qui faisait échouer le
+test de couverture. Il ignore désormais ces fragments APRÈS retrait des expressions de gabarit — un
+premier correctif trop large, appliqué avant le retrait, avait fait perdre 21 règles légitimes.
+
+Ce qui n'est PAS fait, et qu'il faut lever avant de considérer le lot 4 livré :
+- Aucune validation visuelle. À 1280 px l'inspecteur n'est pas dans le champ de la capture, et je n'ai
+  pas d'outil de redimensionnement ni d'accès aux styles calculés.
+- Un test d'intégration a été écrit puis RETIRÉ : « le rendu partagé applique la mise en page sans
+  toucher aux sections par défaut » échouait sur sa première assertion (le rendu de la démo contenait
+  déjà data-section-layout="custom"), et je n'ai pas pu déterminer pourquoi dans la marge restante.
+  Hypothèses à vérifier : un champ style déjà présent dans les projets de démonstration, ou une
+  section modifiée qui n'est pas rendue comme le test le supposait. Le retirer plutôt que l'assouplir
+  évite de figer une assertion qui ne prouve rien.
+- Les 6 tests du modèle restent verts ; 330/330 au total.
+
+Prochaine action recommandée : ouvrir l'éditeur dans un navigateur réel, sélectionner une section,
+vérifier que les trois rangées apparaissent dans l'inspecteur et qu'un changement de largeur modifie
+réellement le rendu et l'export ; puis rétablir le test d'intégration une fois la cause identifiée.
