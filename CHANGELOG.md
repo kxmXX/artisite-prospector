@@ -17,6 +17,14 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 - Tests : 3 nouveaux (`tests/store_blob.test.js`, `tests/store_redis.test.js` sur faux serveurs, y compris l'écrasement et la panne) ; 405 → **408/408**.
 - Passation : la base Upstash éphémère essayée d'abord est instable (endpoint injoignable après quelques minutes, en local comme depuis Vercel) — écartée au profit de Vercel Blob.
 
+#### IA — le repli était en cause, pas la clé
+
+- **Cause exacte trouvée dans les logs d'exécution** : Google renvoyait `503 — This model is currently experiencing high demand` sur les **trois** modèles 3.x. Comme la chaîne de repli ne contenait **que** des modèles 3.x et qu'aucun réessai n'existait, tout échouait en silence sur le moteur local. La clé et les noms de modèles étaient bons.
+- **Correctif** : ajout d'une génération antérieure dans la chaîne (`gemini-2.5-flash`, `gemini-2.5-flash-lite`) et **réessais avec backoff** sur `429/500/502/503/504`. Un pic de charge sur les modèles récents ne fait plus tomber l'assistant.
+- **Génération d'image** : `/api/ai/image` appelait un modèle **texte** en lui demandant une image — aucun modèle texte ne peut en produire. Il utilise désormais un vrai modèle image (`gemini-3.1-flash-image`, `gemini-2.5-flash-image`, `gemini-3-pro-image`), renvoie une data URL, et expose `aiAvailable` avec la cause exacte quand il retombe sur le visuel du catalogue.
+- Tests : 1 nouveau (`getImageModels`) ; 408 → **409/409**.
+- **Pas encore en ligne** : le quota Vercel (100 déploiements/jour, compteur journalier que supprimer d'anciens déploiements ne libère pas) a bloqué le déploiement. Le code est sur `main` (`fe0f000`).
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.59) — Lot 7 : la courbe d'animation devient réglable
 
 - Le catalogue portait une courbe par animation, mais l'auteur ne pouvait pas la changer. Trois courbes sont désormais proposées — **Douce** (départ vif, arrivée posée), **Rebond** (léger dépassement), **Régulière** — dans le repli « Réglages avancés » du panneau, à côté de la vitesse et du délai.

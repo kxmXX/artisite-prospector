@@ -1822,3 +1822,13 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Tests : 3 nouveaux (faux Blob et faux Redis, dont l'ecrasement et la panne) ; 408/408.
 - Version : 4.9.0-alpha.59 -> 4.9.1 (package.json, version.js, index.html alignes).
 - Reste : les autres blocs de la 4.9.1 (IA, chrome bleu, animations, vue client = editeur, contenu, slider avant/apres, medias, editeur d'element, navigation, carte/horaires).
+
+## Journal — 17 septembre 2026 · 4.9.1 : IA (code livre, deploiement bloque par le quota)
+
+- Cause exacte via les logs Vercel : 503 "high demand" sur les trois modeles 3.x ; la chaine de repli ne contenait qu'eux et aucun reessai n'existait -> tout tombait en silence sur le moteur local. La cle et les modeles etaient bons.
+- Correctif : repli etendu a gemini-2.5-flash et gemini-2.5-flash-lite + reessais avec backoff sur 429/500/502/503/504.
+- Image : /api/ai/image utilisait un modele TEXTE pour produire une image (impossible). Il utilise desormais gemini-3.1-flash-image / gemini-2.5-flash-image / gemini-3-pro-image, renvoie une data URL et expose aiAvailable + la cause exacte.
+- Tests : 1 nouveau ; 409/409. Commit fe0f000 pousse sur main.
+- DEPLOIEMENT BLOQUE : quota Vercel 100/jour. C'est un compteur par jour ; supprimer 44 deploiements preview ne l'a pas libere. La prod tourne donc encore le commit des sessions (bd12e82), sans les correctifs IA. Prochain deploiement des que la fenetre se rouvre.
+- A noter : /api/ai/copilot a repondu success:true en prod pendant ce tour, mais uniquement parce que la capacite Google s'etait retablie — ce n'est pas encore le correctif qui est en ligne.
+- Reste : chrome bleu, animations, vue client = editeur + export 2d, contenu (6 avis, photos galerie), slider avant/apres, medias, editeur d'element, navigation, carte/horaires.
