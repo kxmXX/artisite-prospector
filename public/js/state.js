@@ -11,6 +11,8 @@ class AppStateManager {
     this.editorMode = "conception"; // "conception", "preview"
     this.themeMode = "light"; // "light", "dark"
     this.selectedSectionId = null;
+    // Clé de mise en page de l'élément sélectionné dans le canevas, ou null.
+    this.selectedElementKey = null;
     this.activeInspectorTab = "content"; // "content", "style", "visibility"
     this.activeSidebarTab = "sections"; // "sections", "settings"
     this.activeDrawer = null; // null, "closer", "new_project", "add_section"

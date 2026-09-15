@@ -9,6 +9,29 @@ import {
 } from "../engine/componentIntelligence.js";
 import { escapeHtml } from "../utils/html.js";
 import { SECTION_WIDTHS, SECTION_SPACING, SECTION_ALIGN, getSectionLayout } from "../engine/sectionStyle.js";
+import { ELEMENT_PADDING, ELEMENT_RADIUS, ELEMENT_OPACITY, getElementStyle } from "../engine/elementStyle.js";
+
+/**
+ * Réglages de l'élément sélectionné (clé de mise en page stable).
+ * Construit par concaténation, sans valeur libre : tout vient d'énumérations.
+ */
+function elementStyleControlsHTML(project, layoutKey) {
+  const style = getElementStyle(project, layoutKey);
+  const row = (property, scale) => '<div class="flex flex-wrap gap-1">' + Object.keys(scale).map(function (id) {
+    const cls = 'motion-loop-btn' + (style[property] === id ? ' is-active' : '');
+    return '<button type="button" class="' + cls +
+      '" onclick="window.app.setSelectedElementStyle(\'' + property + '\', \'' + id + '\')">' +
+      scale[id].label + '</button>';
+  }).join('') + '</div>';
+  return '<div class="p-2.5 bg-zinc-50 border border-zinc-200 rounded-lg space-y-2">' +
+    '<label class="block text-ui-xs font-medium text-zinc-500 uppercase tracking-wider">Élément sélectionné</label>' +
+    '<div class="text-ui-2xs font-mono text-zinc-400">' + escapeHtml(layoutKey) + '</div>' +
+    row('padding', ELEMENT_PADDING) +
+    row('radius', ELEMENT_RADIUS) +
+    row('opacity', ELEMENT_OPACITY) +
+    '<button type="button" onclick="window.app.clearSelectedElementStyle()" class="w-full py-1.5 rounded-md border border-zinc-200 bg-white text-ui-2xs font-semibold text-zinc-600">Revenir au style du thème</button>' +
+  '</div>';
+}
 
 /**
  * Réglages de mise en page de la section : largeur, respiration, alignement.
@@ -81,6 +104,8 @@ export function renderInspector(section, project, state) {
 
       <!-- Section Variant Switcher -->
       ${sectionLayoutControlsHTML(section, sectionId)}
+
+      ${state.selectedElementKey ? elementStyleControlsHTML(project, state.selectedElementKey) : ''}
 
       ${variants.length > 1 ? `
         <div class="p-2.5 bg-zinc-50 border border-zinc-200 rounded-lg space-y-1">

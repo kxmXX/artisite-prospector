@@ -1329,3 +1329,32 @@ L'entrée « Lot 4 » de la checklist annonçait « non commencé » alors que 4
 corrigée, avec la distinction explicite entre ce qui est prouvé par test (marquage, variables, parité
 aperçu/export, absence d'émission par défaut, annulation) et ce qui ne l'est pas (l'apparence à
 l'écran des trois rangées de contrôles).
+
+---
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.17 (lot 4c/9)
+
+Premiers réglages d'élément du produit. La mission demandait taille, position, alignement, padding,
+margin, gap, typographie, couleur, fond, bordure, radius, ombre, opacité ; trois sont livrés
+(respiration interne, arrondi, opacité) et les autres restent à faire, mais l'architecture est
+désormais posée et réutilisable.
+
+Choix d'architecture, identique aux sections et aux états : primitive CSS unique injectée par
+renderWebsiteHTML, ciblage par data-layout-key (déjà posé par le renderer), aucune règle émise par
+défaut, valeurs issues d'énumérations. Conséquence : aucune modification de balisage, parité
+éditeur/aperçu/export par construction, et zéro risque pour les vitrines existantes.
+
+Ajouté :
+- public/js/engine/elementStyle.js (ELEMENT_PADDING, ELEMENT_RADIUS, ELEMENT_OPACITY,
+  ELEMENT_STYLE_DEFAULTS, get/hasCustom/set/clear, elementStyleCSS).
+- renderer.js : feuille <style data-element-style> injectée à côté des états et des sections.
+- inspector.js : bloc « Élément sélectionné » avec la clé affichée, trois rangées de choix et le
+  retour au style du thème.
+- app.js : state.selectedElementKey (posé à la sélection, effacé à la désélection),
+  setSelectedElementStyle, clearSelectedElementStyle, tous deux via l'historique.
+- state.js : selectedElementKey.
+
+Vérifications : tests/element_style.test.js (5 tests) ; 336/336 tests complets.
+
+Non vérifié : l'apparence à l'écran du nouveau bloc, l'inspecteur restant hors du champ des captures
+à 1280 px. À lever comme pour le lot 4b.

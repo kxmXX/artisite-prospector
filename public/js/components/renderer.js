@@ -2,6 +2,7 @@ import { getIcon } from "./icons.js";
 import { HERO_STYLES } from "./heroStyles.js";
 import { elementStateCSS } from "../engine/elementStates.js";
 import { sectionLayoutAttributes, SECTION_LAYOUT_CSS } from "../engine/sectionStyle.js";
+import { elementStyleCSS } from "../engine/elementStyle.js";
 import { getTradeFallbackDataUrl } from "../data/imageFallbacks.js";
 import { getUiId, getSectionUiId, getUiCode } from "../data/uiIds.js";
 import { escapeHtml, sanitizeUrl, safeCssColor, safeCssLength, safeFontFamily } from "../utils/html.js";
@@ -457,6 +458,7 @@ export function renderWebsiteHTML(project, options = { isEditor: false, isStanda
       <style data-section-layout>${SECTION_LAYOUT_CSS}</style>
       <style data-freeform-layout>${buildFreeformLayoutCSS(project)}</style>
       <style data-element-states>${elementStateCSS(project)}</style>
+      <style data-element-style>${elementStyleCSS(project)}</style>
       ${sectionsHTML}
       ${stickyBarHTML}
       ${lightboxHTML}

@@ -22,6 +22,7 @@ import { ensureFontCatalog } from "./data/fonts.js";
 import { getUiCode } from "./data/uiIds.js";
 import { ELEMENT_STATES, ELEMENT_STATE_LABELS, setElementState, clearElementState } from "./engine/elementStates.js";
 import { setSectionLayout, isValidSectionId } from "./engine/sectionStyle.js";
+import { setElementStyle, clearElementStyle } from "./engine/elementStyle.js";
 import { getIcon } from "./components/icons.js";
 import { parseClientDemoPin, verifyClientDemoPin } from "./utils/clientDemoPin.js";
 import { createEspritNatureDemoProject } from "./data/sampleProjects.js";
@@ -2433,7 +2434,26 @@ export class App {
     this._freeformSelectedKeys = [];
     this._freeformAdditiveMode = false;
     this._freeformActiveGroup = null;
+    state.selectedElementKey = null;
     this.updateStageContext();
+  }
+
+  /** Applique un réglage de style à l'élément sélectionné (annulable). */
+  setSelectedElementStyle(property, value) {
+    const layoutKey = state.selectedElementKey;
+    if (!state.currentProject || !layoutKey) return;
+    const next = setElementStyle(state.currentProject, layoutKey, property, value);
+    if (next === state.currentProject) return;
+    state.updateProject(next, true, "Style de l'élément");
+  }
+
+  /** Retire tous les réglages de l'élément sélectionné. */
+  clearSelectedElementStyle() {
+    const layoutKey = state.selectedElementKey;
+    if (!state.currentProject || !layoutKey) return;
+    const next = clearElementStyle(state.currentProject, layoutKey);
+    if (next === state.currentProject) return;
+    state.updateProject(next, true, "Retour au style du thème");
   }
 
   /** Libellé humain de la sélection courante, ou chaîne vide. */
@@ -4875,7 +4895,10 @@ export class App {
     this.closeAllFloatingToolbars("freeform");
     this._freeformSelectedKeys = keys;
     this._freeformSelectedKey = primaryKey && keys.includes(primaryKey) ? primaryKey : keys[0];
+    // L'inspecteur a besoin de la clé de l'élément pour proposer ses réglages.
+    state.selectedElementKey = this._freeformSelectedKey;
     this.updateStageContext();
+    this.updateSelectedSectionUI();
     this._freeformSelectedElement = canvas.querySelector(`[data-layout-key="${this._freeformSelectedKey}"]`);
     const responsiveBar = this._freeformOverlay?.querySelector?.(".freeform-responsivebar");
     responsiveBar?.classList.remove("is-open");

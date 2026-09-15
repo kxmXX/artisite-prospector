@@ -7,6 +7,28 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.17) — Lot 4c : réglages d'élément
+
+- **Répond à la demande « LES BLOCS / ÉLÉMENTS »** de la mission, qui n'avait rien : un élément
+  sélectionné dans le canevas peut recevoir une **respiration interne** (aucune, compacte, normale,
+  aérée), un **arrondi** (angles vifs, adouci, arrondi, pilule) et une **opacité** (100, 85, 60 %),
+  plus un bouton **« Revenir au style du thème »**.
+- **Même architecture que les sections et les états** : le CSS est produit par une primitive unique
+  (`elementStyleCSS`) injectée par `renderWebsiteHTML`, et il cible la clé de mise en page stable que le
+  renderer pose déjà sur chaque élément — **aucun balisage à modifier**. Éditeur, aperçu et site
+  autonome exporté reçoivent donc exactement la même feuille.
+- **Rien par défaut** : un élément non réglé n'émet aucune règle. Les 16 sections de la vitrine de
+  référence ne bougent pas d'un pixel.
+- **Aucune valeur libre dans le CSS** : tout vient d'énumérations, une propriété ou une valeur inconnue
+  est ignorée et la source n'est jamais mutée.
+- **Application annulable** : `setSelectedElementStyle` et `clearSelectedElementStyle` passent par
+  l'historique.
+- **QA** : `tests/element_style.test.js` (5 tests) — absence de règle par défaut, déclaration ciblée,
+  entrées invalides ignorées, source intacte, suppression propre, présence à l'identique dans l'aperçu
+  **et** dans l'export. **336/336 tests**.
+- *Non vérifié* : l'apparence à l'écran du nouveau bloc « Élément sélectionné » dans l'inspecteur,
+  pour la même raison que le lot 4b (inspecteur hors du champ des captures à 1280 px).
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.16) — Lot 4b vérifié
 
 - **Le doute du lot précédent est levé, et l'erreur était dans mon test, pas dans le code.** L'assertion
