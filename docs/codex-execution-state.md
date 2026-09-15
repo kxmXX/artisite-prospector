@@ -1811,3 +1811,14 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Decision a prendre : (a) heberger le serveur Node sur un hote a disque persistant (Railway/Render/Fly/VPS) — aucun changement de code ; (b) ajouter un stockage externe pour Vercel (Upstash Redis / Vercel KV ou Postgres) — ecrire un adaptateur REST sans dependance npm, apres provisionnement et fourniture des variables ; (c) rester local.
 - Perimetre corrige par l'utilisateur : l'editeur ne sera jamais utilise sur mobile. Les gestes mobile sortent du perimetre ; reste desktop/tablette.
 - Reste (inchange) : lot 7 direction, export 2d, PRODUCT.md/DESIGN.md, updateListField, geste de deplacement desktop.
+
+## Journal — 17 septembre 2026 · 4.9.1 : sessions de bout en bout en production
+
+- Cause racine confirmee : le site public repondait 503 car aucun stockage durable n'existait sur Vercel. Ce n'etait pas l'absence de code, mais un refus honnete.
+- Backend retenu : Vercel Blob, en instantanes immuables sous artisite/db/<horodatage>.json. L'ecrasement d'un blob n'est pas fiable (le CDN met en cache par nom : x-vercel-cache HIT servait encore l'ancien contenu). La lecture liste donc les instantanes et prend le plus recent ; les cinq derniers sont conserves.
+- Une panne de lecture LEVE (jamais de base vide, qui effacerait les donnees a l'ecriture suivante). Le 503 porte la cause exacte et la journalise.
+- Upstash ephémère essaye d'abord : endpoint injoignable apres quelques minutes, en local comme depuis Vercel ; ecarte. Le backend Redis est conserve en repli (teste), le fichier local reste le mode de developpement.
+- Verifie en production : inscription -> cookie HttpOnly -> /api/auth/session -> import de projet -> relecture -> deconnexion. Donnees de test retirees.
+- Tests : 3 nouveaux (faux Blob et faux Redis, dont l'ecrasement et la panne) ; 408/408.
+- Version : 4.9.0-alpha.59 -> 4.9.1 (package.json, version.js, index.html alignes).
+- Reste : les autres blocs de la 4.9.1 (IA, chrome bleu, animations, vue client = editeur, contenu, slider avant/apres, medias, editeur d'element, navigation, carte/horaires).

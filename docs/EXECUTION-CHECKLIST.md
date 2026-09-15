@@ -177,7 +177,7 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
       *Reste* : le regroupement n'est branché que sur les deux curseurs de taille de texte et
       l'assombrissement du hero ; les glissers freeform et le glisser du bandeau collant ne sont pas
       encore transactionnels.
-- [~] **Lot 9 — Comptes et persistance** (9a serveur livré en `4.9.0-alpha.5`) :
+- [x] **Lot 9 — Comptes et persistance** (9a serveur livré en `4.9.0-alpha.5`) :
       `server/store.js` (fichier JSON atomique, `DATA_DIR`) et `server/accounts.js` (scrypt + sel,
       jetons de session stockés hachés, cookie `HttpOnly`/`SameSite=Lax`/`Secure`, `ownerId` par
       projet, 404 uniforme hors propriétaire, freinage 20 tentatives/5 min, refus 503 explicite sans
@@ -189,6 +189,12 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
       version la plus récente par projet, et bandeau de migration des créations locales avec copie de
       secours avant import. 7 tests client supplémentaires, **310/310**, et connexion réelle vérifiée
       au navigateur sur un serveur local.
+      **Production résolue en `4.9.1`** : `server/store.js` sait écrire dans **Vercel Blob** en
+      instantanés immuables (`artisite/db/<horodatage>.json`, lecture par liste du plus récent,
+      cinq conservés), avec repli Redis REST et fichier local. Le site public ne répond plus 503 ;
+      inscription, session, import de projet et déconnexion vérifiés en production. Une panne de
+      lecture lève au lieu de renvoyer une base vide (`REMOTE_STORE_TIMEOUT@hôte`). 3 tests de
+      backend supplémentaires, **408/408**.
       *Reste à faire sur ce chantier* : la synchronisation ne pousse que le projet courant (pas une
       suppression côté serveur quand un projet est effacé localement), et aucun test n'a été fait sur
       deux navigateurs simultanés.

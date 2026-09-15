@@ -133,8 +133,28 @@ export async function handleAccountsRoute(req, res, normalizedPath, deps) {
   }
 
   const method = req.method;
-  const db = readDb();
+  let db;
+  try {
+    db = await readDb();
+  } catch (error) {
+    console.error("[accounts] lecture du stockage impossible:", error && error.message);
+    sendJSON(res, 503, { error: UNPERSISTED_MESSAGE, storage: "error", reason: (error && error.message) || "unknown" });
+    return true;
+  }
   purgeExpiredSessions(db);
+
+  // Écriture distante : une panne de stockage doit répondre 503, jamais laisser
+  // croire à un enregistrement réussi.
+  const persist = async () => {
+    try {
+      await writeDb(db);
+      return true;
+    } catch (error) {
+      console.error("[accounts] ecriture du stockage impossible:", error && error.message);
+      sendJSON(res, 503, { error: UNPERSISTED_MESSAGE, storage: "error", reason: (error && error.message) || "unknown" });
+      return false;
+    }
+  };
 
   if (method === "POST" && (normalizedPath === "/api/auth/login" || normalizedPath === "/api/auth/register")) {
     if (rateLimited(clientIp(req))) {
@@ -168,7 +188,7 @@ export async function handleAccountsRoute(req, res, normalizedPath, deps) {
     db.users.push(user);
     const token = crypto.randomBytes(32).toString("base64url");
     db.sessions.push({ tokenHash: hashToken(token), userId: user.id, createdAt: Date.now(), expiresAt: Date.now() + SESSION_TTL_MS });
-    writeDb(db);
+    if (!(await persist())) return true;
     sendCookie(res, sessionCookie(token));
     sendJSON(res, 201, { user: publicUser(user) });
     return true;
@@ -185,7 +205,7 @@ export async function handleAccountsRoute(req, res, normalizedPath, deps) {
     }
     const token = crypto.randomBytes(32).toString("base64url");
     db.sessions.push({ tokenHash: hashToken(token), userId: user.id, createdAt: Date.now(), expiresAt: Date.now() + SESSION_TTL_MS });
-    writeDb(db);
+    if (!(await persist())) return true;
     sendCookie(res, sessionCookie(token));
     sendJSON(res, 200, { user: publicUser(user) });
     return true;
@@ -195,7 +215,7 @@ export async function handleAccountsRoute(req, res, normalizedPath, deps) {
     const active = currentUser(db, req);
     if (active) {
       db.sessions = db.sessions.filter((entry) => entry.tokenHash !== active.session.tokenHash);
-      writeDb(db);
+      if (!(await persist())) return true;
     }
     sendCookie(res, clearedCookie());
     if (typeof res.status === "function") { res.status(204).end(); return true; }
@@ -228,7 +248,7 @@ export async function handleAccountsRoute(req, res, normalizedPath, deps) {
       else db.projects.push({ id: project.id, ownerId: active.user.id, project, updatedAt: Date.now() });
       imported += 1;
     }
-    writeDb(db);
+    if (!(await persist())) return true;
     sendJSON(res, 200, { imported });
     return true;
   }
@@ -244,7 +264,7 @@ export async function handleAccountsRoute(req, res, normalizedPath, deps) {
     }
     if (method === "DELETE") {
       db.projects = db.projects.filter((item) => !(item.id === id && item.ownerId === active.user.id));
-      writeDb(db);
+      if (!(await persist())) return true;
       if (typeof res.status === "function") { res.status(204).end(); return true; }
       res.writeHead(204, { "Content-Type": "application/json; charset=utf-8" });
       res.end();
@@ -258,7 +278,7 @@ export async function handleAccountsRoute(req, res, normalizedPath, deps) {
     }
     entry.project = project;
     entry.updatedAt = Date.now();
-    writeDb(db);
+    if (!(await persist())) return true;
     sendJSON(res, 200, { project });
     return true;
   }

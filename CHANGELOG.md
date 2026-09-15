@@ -7,6 +7,16 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### 4.9.1 — 17 septembre 2026 — Les sessions fonctionnent enfin sur le site public (stockage Vercel Blob)
+
+- **Cause du « Connexion indisponible »** : le compte était branché sur un stockage inexistant sur Vercel (disque éphémère). Toutes les routes `/api/auth/*` et `/api/projects/*` répondaient 503 — à raison : rien n'aurait été conservé. Ce n'était donc pas une absence de sessions, mais un refus honnête faute de stockage durable.
+- **Backend Vercel Blob** (`server/store.js`) : la base est rangée en **instantanés immuables** sous `artisite/db/<horodatage>.json`. On n'écrase **jamais** un blob : le CDN met en cache par nom de fichier et un écrasement ne se voit pas tout de suite (vérifié : `x-vercel-cache: HIT` servait encore l'ancien contenu). La lecture liste les instantanés et prend le plus récent. Les cinq derniers sont conservés, le nettoyage ne fait jamais échouer une écriture. `BLOB_READ_WRITE_TOKEN` posé sur production, preview et développement.
+- **Une panne de lecture lève**, elle ne renvoie jamais une base vide : sinon la première écriture suivante effacerait les données réelles. Le 503 porte désormais la cause exacte (`REMOTE_STORE_TIMEOUT@hôte`, `BLOB_STORE_HTTP_<code>`…) et la journalise.
+- Backends conservés et testés : **Redis REST** (Upstash / Vercel KV) et **fichier JSON atomique** (`DATA_DIR`) pour le local.
+- **Vérifié en production** : inscription → cookie `HttpOnly` → `/api/auth/session` → import de projet → relecture → déconnexion. Plus aucun 503 ; les données de test ont été retirées.
+- Tests : 3 nouveaux (`tests/store_blob.test.js`, `tests/store_redis.test.js` sur faux serveurs, y compris l'écrasement et la panne) ; 405 → **408/408**.
+- Passation : la base Upstash éphémère essayée d'abord est instable (endpoint injoignable après quelques minutes, en local comme depuis Vercel) — écartée au profit de Vercel Blob.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.59) — Lot 7 : la courbe d'animation devient réglable
 
 - Le catalogue portait une courbe par animation, mais l'auteur ne pouvait pas la changer. Trois courbes sont désormais proposées — **Douce** (départ vif, arrivée posée), **Rebond** (léger dépassement), **Régulière** — dans le repli « Réglages avancés » du panneau, à côté de la vitesse et du délai.
