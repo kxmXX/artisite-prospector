@@ -7,6 +7,16 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.38) — Les réglages d'élément deviennent accessibles, et vérifiés
+
+- Cause : la sélection d'élément n'avait qu'un seul point d'entrée, la **sélection libre**, c'est-à-dire un geste de glisser que rien n'annonçait. Les réglages d'élément — styles du lot 4c, états des lots 5a/5b, position du lot 6 — étaient donc **inatteignables** par un clic, ce qui explique aussi pourquoi je n'avais jamais pu les voir.
+- Correctif : liste « Éléments de la section » dans le panneau de propriétés — chaque champ textuel de la section y apparaît sous un libellé lisible, calculé sur la même référence stable que le rendu (`getUiCode`). Cliquer un élément le sélectionne.
+- Correction annexe : la sélection d'élément posait `elementStyleState = "base"`, une valeur qui n'existe pas ; l'état neutre est `"default"`. L'inspecteur recevait donc un état inconnu.
+- Détail d'implémentation : le re-rendu passe par `renderInspector` appelé directement, et non par `updateSelectedSectionUI`, qui repartait de la section et faisait perdre la sélection d'élément.
+- **Vérifié à l'écran** : le panneau affiche « ÉLÉMENT SÉLECTIONNÉ » avec la référence stable, les cinq états (Principal, Survol, Focus clavier, Actif, Désactivé), les réglages de remplissage, angles, opacité, fond, bordure et ombre, et « Revenir au style du thème ». **Les lots 4c et 5a/5b sont confirmés visuellement pour la première fois.**
+- Tests : 2 nouveaux ; 384 → **386/386**.
+- Reste : le bloc « Position et taille » du lot 6 est plus bas dans le panneau défilant et n'a pas encore été vu à l'écran ; lot 3b (arbre complet, 830 lignes inertes), lot 4d (3 blocs), lot 7 (courbe, direction, tester), export 2d.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.37) — Le panneau de propriétés devient accessible, et enfin vérifié
 
 - Cause : à 1280 px, `.studio-v3-inspector-panel` est une **surtoile** masquée (`transform: translateX(calc(100% + 24px))`, `opacity: 0`, `pointer-events: none`) qui n'apparaît qu'avec la classe `is-responsive-open`. Cette classe n'était posée que par un chemin indirect, jamais déclenché par la flèche « Inspecter ». Le panneau était donc **inatteignable** à cette largeur, et rien dans l'interface ne permettait de l'ouvrir.

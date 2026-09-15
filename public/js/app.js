@@ -1593,6 +1593,23 @@ export class App {
     if (open) this.updateSelectedSectionUI();
   }
 
+  /**
+   * Selection d'un element depuis la liste de la section : meme etat que la
+   * selection libre, pour n'avoir qu'une seule source de selection d'element.
+   */
+  selectElementForEditing(layoutKey) {
+    if (!layoutKey) return;
+    state.selectedElementKey = layoutKey;
+    state.elementStyleState = "default";
+    // Rendu direct du panneau : updateSelectedSectionUI() repart de la section et
+    // ne laissait pas les reglages d'element a l'ecran. Ici on re-rend exactement le
+    // meme contenu que lui, avec la selection d'element posee.
+    const panel = document.getElementById("right-inspector-panel");
+    const shell = panel?.querySelector(".studio-v3-inspector-shell");
+    const section = state.currentProject?.sections.find(s => s.id === state.selectedSectionId) || state.currentProject?.sections[0];
+    if (shell && section) shell.innerHTML = renderInspector(section, state.currentProject, state);
+  }
+
   selectSection(sectionId, options = {}) {
     state.setSelectedSection(sectionId);
     // Le panneau de proprietes doit suivre la section choisie, qu'elle ait change ou
@@ -2374,7 +2391,7 @@ export class App {
     if (layoutKey) {
       if (secId && state.selectedSectionId !== secId) state.setSelectedSection(secId);
       state.selectedElementKey = layoutKey;
-      state.elementStyleState = "base";
+      state.elementStyleState = "default";
       this.updateSelectedSectionUI();
     }
     const toolbar = document.getElementById("floating-text-toolbar");

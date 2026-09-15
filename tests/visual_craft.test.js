@@ -84,3 +84,26 @@ test('le panneau de proprietes a un controle explicite', () => {
   assert.ok(app.includes('toggleInspectorPanel() {'), 'la methode doit exister');
   assert.ok(app.includes('classList.toggle("is-responsive-open")'), 'elle doit ouvrir la surtoile');
 });
+
+test('la liste des elements est le chemin vers les reglages d element', () => {
+  const inspector = read('public/js/components/inspector.js');
+  const app = read('public/js/app.js');
+  assert.ok(inspector.includes('sectionElementsHTML'), 'la liste doit exister');
+  assert.ok(inspector.includes('window.app.selectElementForEditing('), 'chaque element doit etre selectionnable');
+  assert.ok(app.includes('selectElementForEditing(layoutKey) {'), 'le chemin de selection doit exister');
+  assert.ok(app.includes('state.elementStyleState = "default";'), 'l etat neutre est default, pas base');
+});
+
+test('l inspecteur liste les elements de la section', async () => {
+  const { generateSite } = await import('../public/js/engine/generator.js');
+  const { renderEditor } = await import('../public/js/components/editor.js');
+  const { state } = await import('../public/js/state.js');
+  const project = generateSite({ name: 'Controle Elements', tradeId: 'menuisier' });
+  state.currentProject = project;
+  state.currentView = 'editor';
+  state.editorMode = 'edit';
+  state.selectedElementKey = null;
+  const html = renderEditor(state);
+  assert.ok(html.includes('Elements de la section'), 'la liste doit etre rendue');
+  assert.ok(html.includes('selectElementForEditing('), 'les elements doivent etre selectionnables');
+});

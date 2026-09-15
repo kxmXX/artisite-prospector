@@ -1615,3 +1615,13 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Toujours non vérifié : les propriétés d'élément (styles du lot 4c, états 5a/5b, position du lot 6). Cliquer un texte n'ouvre pas la barre d'édition ; la sélection d'élément n'est renseignée qu'en sélection libre, qui exige un geste de glisser que l'outillage navigateur ne fournit pas.
 - Tests : 383 → 384. `node --check` sur les deux fichiers, `scripts/build-utilities.mjs` relancé.
 - Reste, 2 tours : propriétés d'élément (accès), lot 3b, 4d complet, 7, export 2d. Aucun de ces lots ne sera terminé ; l'objectif reste actif.
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.38 (réglages d'élément accessibles et vérifiés)
+
+- Cause racine de plusieurs tours d'échec : la sélection d'élément n'avait qu'un point d'entrée, la sélection libre (geste de glisser). Les réglages d'élément étaient donc inatteignables par un clic.
+- Fait : liste « Éléments de la section » dans le panneau de propriétés, cliquable, libellés lisibles, référence stable identique à celle du rendu. Re-rendu direct par `renderInspector` (et non `updateSelectedSectionUI`, qui repartait de la section).
+- Correction : `elementStyleState` était posé à `"base"`, valeur inexistante — l'état neutre est `"default"`. Corrigé.
+- Vérifié à l'écran : « ÉLÉMENT SÉLECTIONNÉ », les cinq états, remplissage, angles, opacité, fond, bordure, ombre, « Revenir au style du thème ». Lots 4c et 5a/5b confirmés visuellement pour la première fois.
+- Leçon de méthode : deux fois de suite j'ai conclu qu'une fonctionnalité avait disparu parce que mes chaînes de recherche ne correspondaient pas aux libellés réels (casse, accents, « 100 % » au lieu d'« opacité »). Lire la capture, pas seulement l'arbre.
+- Tests : 384 → 386. `node --check`, `scripts/build-utilities.mjs` relancé.
+- Reste, 2 tours : voir le bloc position à l'écran ; 3b, 4d complet, 7, export 2d ne seront pas terminés.

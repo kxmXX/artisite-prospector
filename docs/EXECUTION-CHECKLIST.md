@@ -125,6 +125,11 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
       `aria-controls`/`aria-expanded`. **Vérifié à l'écran** : réglages de section, 12 animations du catalogue,
       divulgation avancée repliée, bouton de test. *Reste non vérifié* : les propriétés d'élément (styles,
       états, position), dont l'accès dépend d'un geste de glisser indisponible dans mon outillage.
+- [x] **Chemin vers les réglages d'élément** (`4.9.0-alpha.38`) : la sélection d'élément n'existait qu'en
+      sélection libre (geste de glisser non annoncé). Liste « Éléments de la section » ajoutée dans le
+      panneau, cliquable, calculée sur la même référence que le rendu. **Vérifié à l'écran** : les cinq états
+      d'élément, le remplissage, les angles, l'opacité, le fond, la bordure et l'ombre (lots 4c et 5a/5b
+      confirmés). *Reste* : voir à l'écran le bloc « Position et taille » (lot 6), plus bas dans le panneau.
 - [ ] **Lot 6 — Positionnement, entamé** (`4.9.0-alpha.35`) : champs numériques X / Y / Largeur / Hauteur /
       Rotation branchés sur l'inspecteur, avec bornes, « flux par défaut » tenu (aucune règle CSS sans
       valeur saisie) et retour au flux. *Reste* : position libre en option explicite, boîtes de sélection

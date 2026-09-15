@@ -13,6 +13,7 @@ import { ELEMENT_PADDING, ELEMENT_RADIUS, ELEMENT_OPACITY, ELEMENT_BACKGROUND, E
 import { ELEMENT_STATES, ELEMENT_STATE_LABELS, getElementState } from "../engine/elementStates.js";
 import { MOTION_PRESETS, MOTION_SPEEDS, MOTION_DELAYS } from "../data/motionPresets.js";
 import { TRANSFORM_FIELDS, getElementTransform, hasElementTransform } from "../engine/elementTransform.js";
+import { getUiCode } from "../data/uiIds.js";
 
 /**
  * Divulgation progressive : l'inspecteur montre d'abord l'essentiel — choisir une
@@ -60,6 +61,46 @@ const ELEMENT_SCALE_ROWS = [
  * Les champs restent vides tant que l'auteur n'a rien saisi : un element sans
  * valeur reste dans le flux normal. C'est la position libre « en option ».
  */
+const ELEMENT_LABELS = {
+  title: "Titre", subtitle: "Sous-titre", description: "Description", text: "Texte",
+  badge: "Badge", cta: "Bouton", ctaLabel: "Libelle du bouton", image: "Image",
+  image2: "Image secondaire", price: "Prix", label: "Libelle", name: "Nom", role: "Role"
+};
+
+function elementLabelFor(fieldPath) {
+  const last = String(fieldPath || "").split(".").pop() || "";
+  return ELEMENT_LABELS[last] || last.replace(/[_-]+/g, " ");
+}
+
+/**
+ * Liste des elements de la section.
+ *
+ * C'est le seul chemin decouvrable vers les reglages d'element : sans elle, la
+ * selection d'element n'existait qu'en selection libre, c'est-a-dire derriere un
+ * geste de glisser que rien dans l'interface n'annoncait.
+ */
+function sectionElementsHTML(section, project, selectedKey) {
+  const fields = Object.keys(section?.content || {}).filter((key) => {
+    const value = section.content[key];
+    return typeof value === "string" || typeof value === "number";
+  });
+  if (!fields.length) return "";
+  return `
+    <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-xl space-y-2">
+      <label class="text-ui-xs font-bold uppercase tracking-wider text-zinc-700">Elements de la section</label>
+      <div class="space-y-1">
+        ${fields.map((fieldPath) => {
+          const layoutKey = getUiCode(project?.id, section?.id, fieldPath);
+          const active = layoutKey === selectedKey;
+          return `<button type="button"
+                          class="w-full text-left px-2 py-1 rounded-md text-ui-xs border transition-colors ${active ? 'border-zinc-900 bg-zinc-900 text-white font-semibold' : 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-400'}"
+                          onclick="window.app.selectElementForEditing('${layoutKey}')">${elementLabelFor(fieldPath)}</button>`;
+        }).join("")}
+      </div>
+    </div>
+  `;
+}
+
 function elementTransformControlsHTML(project, layoutKey, viewport) {
   const values = getElementTransform(project, layoutKey, viewport);
   const positioned = hasElementTransform(project, layoutKey, viewport);
@@ -204,6 +245,7 @@ export function renderInspector(section, project, state) {
 
       ${state.selectedElementKey ? elementStyleControlsHTML(project, state.selectedElementKey, state.elementStyleState) : ''}
       ${state.selectedElementKey ? elementTransformControlsHTML(project, state.selectedElementKey, state.viewport) : ''}
+      ${sectionElementsHTML(section, project, state.selectedElementKey)}
 
       ${variants.length > 1 ? `
         <div class="p-2.5 bg-zinc-50 border border-zinc-200 rounded-lg space-y-1">
