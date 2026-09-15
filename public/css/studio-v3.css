@@ -150,7 +150,7 @@
 .studio-v3-mode-switch button { padding:0 9px; }
 .studio-v3-device-switch button { width:32px; }
 .studio-v3-mode-switch button.is-active,.studio-v3-device-switch button.is-active { color:var(--v3-ink);background:#fff;box-shadow:0 1px 5px rgba(24,32,31,.10); }
-.studio-v3-stagecontext { max-width:170px;height:28px;padding:0 10px;border-left:1px solid var(--v3-line);border-right:1px solid var(--v3-line);display:flex;align-items:center;gap:6px;color:var(--ui-muted);font-size:9.5px; }
+.studio-v3-stagecontext { max-width:340px;height:28px;padding:0 10px;border-left:1px solid var(--v3-line);border-right:1px solid var(--v3-line);display:flex;align-items:center;gap:6px;color:var(--ui-muted);font-size:9.5px; }
 .studio-v3-stagecontext b { color:#4b5451;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
 #canvas-container {
   margin-top:0!important;flex:0 0 auto;box-shadow:0 22px 70px rgba(26,34,31,.16),0 0 0 1px rgba(24,32,31,.07)!important;

@@ -7,6 +7,25 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.7) — Lot 3a : savoir ce qui est sélectionné
+
+- **Défaut corrigé (relevé par l'audit)** : deux modèles de sélection se déclenchaient ensemble sans
+  jamais s'effacer. Masquer une barre laissait la sélection active en mémoire, si bien que les
+  **flèches déplaçaient un élément invisible**. Un garde de visibilité empêche désormais toute
+  manipulation d'une sélection dont la boîte n'est plus à l'écran, sans effacer la sélection — le fil
+  de contexte continue de l'afficher.
+- **Échap suit un escalier unique et prévisible** : édition en ligne, puis modale, puis élément
+  sélectionné, puis barres flottantes. Auparavant, Échap faisait tout à la fois et ne remontait jamais
+  la hiérarchie.
+- **Fil de contexte visible** : la barre d'étape de l'éditeur affiche `Section ▸ Élément` (par
+  exemple « Hero ▸ #EWC7TW ») au lieu du seul nom de section, avec le libellé humain du nœud
+  (`data-layout-label`) et l'infobulle portant toujours le texte complet. Le libellé est calculé par
+  une méthode unique, utilisée à la fois par le rendu initial et par chaque changement de sélection.
+- **QA** : `tests/selection_hierarchy.test.js` (4 tests) — libellé humain et repli sur la référence
+  stable, sélection multiple, remise à zéro, ordre de l'escalier Échap, et garde de visibilité des
+  flèches. **314/314 tests**. Vérifié au navigateur : sélection d'un titre dans le canvas, la barre
+  affiche « Hero ▸ #EWC7TW ».
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.6) — Lot 9b : comptes dans l'interface
 
 - **Appel HTTP unique** (`public/js/api.js`) : `apiFetch` avec `credentials: "same-origin"`, délai

@@ -1091,3 +1091,29 @@ Vérifications :
 
 Reste ouvert : la synchronisation ne pousse que le projet courant et ne propage pas les suppressions ;
 aucun test multi-navigateurs simultanés n'a été fait.
+
+---
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.7 (lot 3a/9)
+
+Trois défauts de l'audit traités, tous liés à « l'utilisateur doit toujours savoir ce qu'il
+sélectionne et ce qu'il modifie ».
+
+1. Flèches sur une sélection invisible : closeAllFloatingToolbars masquait la boîte sans oublier la
+   sélection. Premier correctif essayé (effacer la sélection) trop agressif : il effaçait aussi la
+   sélection quand la barre texte s'ouvrait sur l'élément même qu'on venait de sélectionner, et le fil
+   de contexte perdait son libellé. Correctif retenu : garde de visibilité dans le gestionnaire
+   clavier, la sélection reste en mémoire.
+2. Échap : un seul escalier, édition en ligne, puis modale, puis élément, puis barres. Test de source
+   qui vérifie l'ordre des quatre étapes.
+3. Fil de contexte : updateStageContext() unique, appelé au rendu initial, au changement de section et
+   à chaque changement de sélection d'élément. Le libellé de section utilise getSectionFriendlyTitle
+   (le même que le panneau Structure) au lieu du titre complet, qui était tronqué à 170 px ; la largeur
+   passe à 340 px et l'infobulle porte le texte complet.
+
+Vérifications : tests/selection_hierarchy.test.js (4 tests) ; suite complète 314/314 ; contrôle
+navigateur après purge du cache — sélection d'un titre dans le canvas, la barre d'étape affiche
+« Hero ▸ #EWC7TW ».
+
+Reste du lot 3 : arbre des éléments dans le panneau Structure, sélection hiérarchique par clic droit
+ou ⌘-clic depuis une liste, et suppression des 830 lignes inertes de renderSectionAccordionContent.

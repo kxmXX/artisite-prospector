@@ -1,6 +1,6 @@
 import { state, getDeepValue, setDeepValue } from "./state.js";
 import { renderDashboard } from "./components/dashboard.js";
-import { renderEditor } from "./components/editor.js";
+import { renderEditor, getSectionFriendlyTitle } from "./components/editor.js";
 import { renderWizardModal } from "./components/wizard.js";
 import { renderCloserModal } from "./components/closerModal.js";
 import { renderShareModal } from "./components/shareModal.js";
@@ -133,10 +133,13 @@ export class App {
         e.preventDefault();
         this.openCommandPalette();
       } else if (e.key === "Escape") {
-        if (document.activeElement?.isContentEditable) this.exitInlineEditing();
-        this.closeModals();
+        // Un seul escalier : édition en ligne, puis modale, puis élément, puis barres.
+        if (document.activeElement?.isContentEditable) { this.exitInlineEditing(); return; }
+        if (state.activeDrawer) { this.closeModals(); return; }
+        if ((this._freeformSelectedKeys || []).length) { this.clearFreeformSelection(); return; }
         this.toggleExportMenu(false);
         this.closeAllButtonPopovers();
+        this.closeAllFloatingToolbars();
       }
     });
 
@@ -1609,9 +1612,8 @@ export class App {
       row.classList.toggle("is-selected", row.getAttribute("data-sec-id") === sectionId);
     });
 
-    const selectedSec = state.currentProject.sections.find(s => s.id === sectionId) || state.currentProject.sections[0];
-    const stageTitle = document.querySelector(".studio-v3-stagecontext b");
-    if (stageTitle && selectedSec) stageTitle.textContent = selectedSec.content?.title || selectedSec.type || "Section";
+    // Le fil de contexte est la source unique du libellé Site > Section > Élément.
+    this.updateStageContext();
 
     // 4. Update inspector content without destroying its responsive shell/header.
     const rightInspector = document.getElementById("right-inspector-panel");
@@ -2406,6 +2408,38 @@ export class App {
     }
     this._activeEditableEl = null;
     this.hideFloatingTextToolbar();
+  }
+
+  /** Oublie la sélection d'élément sans toucher au reste de l'éditeur. */
+  clearElementSelection() {
+    this._freeformSelectedKey = null;
+    this._freeformSelectedKeys = [];
+    this._freeformAdditiveMode = false;
+    this._freeformActiveGroup = null;
+    this.updateStageContext();
+  }
+
+  /** Libellé humain de la sélection courante, ou chaîne vide. */
+  getFreeformSelectionLabel() {
+    const keys = this._freeformSelectedKeys || [];
+    if (!keys.length) return "";
+    if (keys.length > 1) return keys.length + " éléments";
+    const element = document.querySelector('[data-layout-key="' + keys[0] + '"]');
+    return (element && element.getAttribute("data-layout-label")) || ("#" + keys[0]);
+  }
+
+  /** Fil de contexte : Site > Section > Élément, toujours visible dans l'éditeur. */
+  updateStageContext() {
+    if (!state.currentProject) return;
+    const selectedSec = state.currentProject.sections.find(s => s.id === state.selectedSectionId) || state.currentProject.sections[0];
+    const stageTitle = document.querySelector(".studio-v3-stagecontext b");
+    if (!stageTitle || !selectedSec) return;
+    const sectionLabel = getSectionFriendlyTitle(selectedSec);
+    const elementLabel = this.getFreeformSelectionLabel();
+    const full = elementLabel ? sectionLabel + " ▸ " + elementLabel : sectionLabel;
+    stageTitle.textContent = full;
+    // Le fil est tronqué visuellement : l'infobulle porte toujours le texte complet.
+    stageTitle.setAttribute("title", full);
   }
 
   closeAllFloatingToolbars(except = "") {
@@ -4765,6 +4799,7 @@ export class App {
     this.closeAllFloatingToolbars("freeform");
     this._freeformSelectedKeys = keys;
     this._freeformSelectedKey = primaryKey && keys.includes(primaryKey) ? primaryKey : keys[0];
+    this.updateStageContext();
     this._freeformSelectedElement = canvas.querySelector(`[data-layout-key="${this._freeformSelectedKey}"]`);
     const responsiveBar = this._freeformOverlay?.querySelector?.(".freeform-responsivebar");
     responsiveBar?.classList.remove("is-open");
@@ -5951,6 +5986,10 @@ export class App {
         if (!keys.length) return;
         const editable = event.target?.matches?.("input, textarea, select, [contenteditable='true']");
         if (editable) return;
+        // Une barre masquée ne doit plus répondre aux flèches : la sélection reste
+        // en mémoire pour le fil de contexte, mais elle n'est plus manipulable.
+        const selectionBox = document.getElementById("freeform-selection-box");
+        if (!selectionBox || !selectionBox.classList.contains("is-visible")) return;
         if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "g") {
           event.preventDefault();
           if (event.shiftKey) this.ungroupFreeformSelection();
