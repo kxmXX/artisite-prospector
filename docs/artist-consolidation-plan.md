@@ -38,6 +38,16 @@ V4.3 PRO sur l'accueil et v4.7 dans les tests : cette divergence sera supprimée
 - Ensuite seulement : reprendre les contrôles d’édition encore prioritaires (typo, fonds,
   rayon, animations) sans modifier les données personnalisées des vitrines.
 
+## État de consolidation courant — après 4.8.0-alpha.31
+
+Cette section prévaut sur le tableau historique des lots 5–13 ci-dessous sans le supprimer.
+
+- Vitrine/hero/FAQ/personnalisation/export/responsive : les sous-lots correspondants ont été livrés et régressés jusqu'à alpha.31 ; le tableau historique conserve leur état initial pour traçabilité.
+- Éditeur libre : sélection universelle, drag/resize/rotation, groupes imbriqués, snapping, tactile, responsive par breakpoint et reparenting inter-sections sont livrés.
+- Production : Vercel sert alpha.31 ; contrôle navigateur 390 px tactile validé, sans overflow horizontal sur le scénario CTA.
+- Restent réellement ouverts : robustesse consolidée texte/image/CTA/groupe, audit factuel des prompts/fallbacks, limites partage/multi-utilisateur et contre-audit sécurité/performance.
+- Dette suivie : concentration de logique dans `app.js` et duplication du runtime de reparenting editor/export. Aucun refactor lourd n'est engagé sans besoin mesuré.
+
 ## État initial vérifié
 
 - Vanilla JS, serveur Node natif, aucune dépendance npm déclarée ; `npm test` : **136/136**.

@@ -1,3 +1,12 @@
+## AUDIT RENFORCÉ — post-alpha.31 — 15 septembre 2026
+
+- Régression : suite complète 226/226 et `git diff --check` propres sur `6d70267`; `main` et `refactor/artist-consolidation` synchronisés.
+- Diff cumulé `alpha.29 → alpha.31` relu : reparenting + CTA responsive cohérents avec le cap freeform, aucun changement de données projet destructif observé.
+- Dette : `public/js/app.js` atteint 5 637 lignes (~240 méthodes) ; le runtime de reparenting reste dupliqué entre l'éditeur et le script standalone de l'exporter. Parité actuelle validée, extraction future recommandée mais non faite dans ce lot d'audit.
+- Risque factuel confirmé : plusieurs chemins secondaires contiennent encore des mentions codées en dur de garantie/certification/24/7/avis vérifiés (`renderer`, `generator`, `trades`, `copilot`, `server/gemini`). La checklist d'audit factuel reste ouverte et prioritaire ; aucune de ces mentions n'est déclarée vérifiée par cet audit.
+- Cohérence plan : le tableau historique des lots 5–13 est antérieur aux livraisons alpha.7–31 ; un état courant est ajouté au plan sans supprimer l'historique.
+- Prochaine action : lot R&D/backlog exploratoire obligatoire, puis reprise des tâches exploitables en privilégiant robustesse et factualité avant toute nouvelle parité Figma lourde.
+
 ## LOT DE VÉRIFICATION — production Vercel après 4.8.0-alpha.31
 
 - Git : `main` et `refactor/artist-consolidation` convergent sur `3e08275`, version produit `4.8.0-alpha.31`.
