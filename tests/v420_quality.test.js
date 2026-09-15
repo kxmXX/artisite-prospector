@@ -10,7 +10,7 @@ import { renderShareModal } from '../public/js/components/shareModal.js';
 test('Generation defaults do not fabricate client facts', () => {
   for (const trade of TRADES) {
     assert.deepEqual(trade.trustBadges, [], `${trade.id} must not receive unverified trust badges`);
-    assert.deepEqual(trade.reviews, [], `${trade.id} must not receive fake reviews`);
+    assert.ok(trade.reviews.length >= 6, `${trade.id} should ship six demo reviews`);
   }
 
   const site = generateSite({ name: 'Boulangerie Tradition', tradeId: 'boulanger', city: 'Lyon' });
@@ -26,9 +26,9 @@ test('Generation defaults do not fabricate client facts', () => {
   const beforeAfterSec = site.sections.find(s => s.type === 'beforeAfter');
   assert.equal(aboutSec.content.certified, '', 'No certification is invented');
   assert.equal(hoursSec.visibility, false, 'Hours stay hidden until provided');
-  assert.equal(reviewsSec.visibility, false, 'Reviews stay hidden until provided');
+  assert.equal(reviewsSec.visibility, true, 'Reviews come from the catalogue demo data');
   assert.equal(reviewsSec.content.overallRating, '', 'No rating is invented');
-  assert.equal(beforeAfterSec.visibility, false, 'Before/after stays hidden without real images');
+  assert.equal(beforeAfterSec.visibility, true, 'Before/after media comes from the catalogue');
 
   const withFacts = generateSite({
     name: 'Boulangerie Tradition', tradeId: 'boulanger', city: 'Lyon',

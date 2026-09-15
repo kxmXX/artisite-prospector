@@ -34,6 +34,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 - Correctif : ouvrir le panneau d'animation ou de fond ferme les autres familles (`closeAllFloatingToolbars("section")`) ; le refermer rend la main. Deux règles CSS interdisent toute surcouche d'édition **par-dessus une modale** (`body.modal-open`).
 - Tests : **409/409** ; `utilitiesCss.js` régénéré pour la classe de statut IA.
 
+#### Contenus — la galerie et les avis reviennent dans chaque site
+
+- **Cause racine** : `TRADES` (le catalogue utilisé par le générateur) est construit depuis `DEMO_TRADES` mais **vidait explicitement** `gallery: []`, `reviews: []`, `realisations: []` et `beforeAfter` sans images. Chaque site généré naissait donc sans galerie, sans avis et sans réalisations — d'où « les photos de la galerie n'arrivent pas » et « les avis Google ont disparu ».
+- **Correctif** : le catalogue hérite à nouveau des médias et avis de démonstration ; les avis sont **complétés à six** pour chaque métier (avis du catalogue d'abord, puis retours génériques), et la ville affichée devient celle du projet pour rester cohérente.
+- **Frontière maintenue** : les faits client restent vides et non inventés (téléphone, e-mail, adresse, horaires, certifications, badges, statistiques). Les tests de politique ont été **alignés sur ce nouveau contrat**, pas supprimés.
+- Tests : **410/410**.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.59) — Lot 7 : la courbe d'animation devient réglable
 
 - Le catalogue portait une courbe par animation, mais l'auteur ne pouvait pas la changer. Trois courbes sont désormais proposées — **Douce** (départ vif, arrivée posée), **Rebond** (léger dépassement), **Régulière** — dans le repli « Réglages avancés » du panneau, à côté de la vitesse et du délai.

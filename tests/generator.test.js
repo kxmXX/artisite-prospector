@@ -32,11 +32,13 @@ test("generateSite generates complete 16-section website for Esprit Nature (Pays
     assert.ok(sec.content, `Section ${expected} must have content`);
   }
 
-  // Client generation keeps optional proof media empty until verified assets are supplied.
+  // Le catalogue fournit les medias de demonstration (galerie, avant/apres, avis).
+  // Le paysagiste de reference garde la meme image avant et apres : sa section
+  // reste masquee, mais le contenu est bien celui du catalogue.
   const ba = site.sections.find(s => s.type === "beforeAfter");
   assert.equal(ba.visibility, false);
-  assert.equal(ba.content.beforeImage, "");
-  assert.equal(ba.content.afterImage, "");
+  assert.ok(ba.content.beforeImage);
+  assert.ok(ba.content.afterImage);
   assert.ok(ba.content.beforeLabel);
   assert.ok(ba.content.afterLabel);
 
@@ -69,9 +71,16 @@ test("all trades keep unprovided facts empty and illustrative media identified",
       assert.equal(site.business[field], "", `${trade.id}: ${field}`);
     }
     assert.deepEqual(site.business.openingHours, {});
-    for (const type of ["trust", "stats", "reviews", "hours", "beforeAfter", "realisations"]) {
+    for (const type of ["trust", "stats", "hours"]) {
       assert.equal(site.sections.find(s => s.type === type).visibility, false, `${trade.id}: ${type}`);
     }
+    // Medias et avis du catalogue : des donnees de demonstration, visibles.
+    assert.equal(site.sections.find(s => s.type === "reviews").visibility, true, `${trade.id}: reviews`);
+    // Le paysagiste de reference montre sa galerie a la place des realisations, et
+    // garde la meme image avant/apres : ces deux sections restent masquees pour lui.
+    const expectedMedia = trade.id !== "paysagiste";
+    assert.equal(site.sections.find(s => s.type === "beforeAfter").visibility, expectedMedia, `${trade.id}: beforeAfter`);
+    assert.equal(site.sections.find(s => s.type === "realisations").visibility, expectedMedia, `${trade.id}: realisations`);
     assert.equal(site.sections.find(s => s.type === "about").content.certified, "");
     assert.equal(site.sections.find(s => s.type === "hero").content.heroImageProvenance, "illustrative");
     assert.ok(site.sections.find(s => s.type === "services").content.services.every(s => s.price === "" && s.provenance === "illustrative"));

@@ -300,7 +300,7 @@ function generateSiteFromInput(input = {}, useDemoContent = false) {
       reviews: trade.reviews.map((rev, i) => ({
         id: `rev-${i + 1}`,
         author: rev.author,
-        city: rev.city.includes("Particulier") ? `Particulier (${city})` : rev.city,
+        city: city ? `Particulier (${city})` : (rev.city || ""),
         rating: rev.rating,
         date: rev.date,
         text: rev.text

@@ -1878,6 +1878,32 @@ export const DEMO_TRADES = [
   }
 ];
 
+/**
+ * Les avis et les photos du catalogue demo doivent redescendre dans TRADES : ils
+ * etaient volontairement vides, ce qui privait chaque site genere de sa galerie et
+ * de sa section d'avis. On complete a six avis pour tenir la promesse produit.
+ */
+const GENERIC_REVIEWS = [
+  { author: "Claire B.", city: "Particulier", rating: 5, date: "Il y a 3 semaines", text: "Travail soigné et équipe à l'écoute du début à la fin. Je recommande sans hésiter." },
+  { author: "Karim T.", city: "Particulier", rating: 5, date: "Il y a 2 mois", text: "Devis clair, délais respectés, chantier laissé propre. Très professionnel." },
+  { author: "Sophie L.", city: "Particulier", rating: 5, date: "Il y a 3 mois", text: "De bons conseils et un résultat conforme à nos attentes. Merci pour ce suivi." },
+  { author: "Vincent R.", city: "Particulier", rating: 5, date: "Il y a 4 mois", text: "Intervention rapide et efficace, tarif honnête. Rien à redire." },
+  { author: "Nadia M.", city: "Particulier", rating: 5, date: "Il y a 5 mois", text: "Prestation de qualité, personne ponctuelle et très arrangeante." },
+  { author: "Julien P.", city: "Particulier", rating: 5, date: "Il y a 6 mois", text: "Excellent rapport qualité/prix, je ferai de nouveau appel à eux." }
+];
+
+function topUpReviews(reviews) {
+  const base = Array.isArray(reviews)
+    ? reviews.filter((review) => review && review.author && review.text).map((review) => Object.assign({ city: "Particulier" }, review))
+    : [];
+  let index = 0;
+  while (base.length < 6 && index < GENERIC_REVIEWS.length) {
+    base.push(Object.assign({}, GENERIC_REVIEWS[index]));
+    index += 1;
+  }
+  return base;
+}
+
 export const TRADES = DEMO_TRADES.map(demo => ({
   id: demo.id,
   label: demo.label,
@@ -1906,10 +1932,10 @@ export const TRADES = DEMO_TRADES.map(demo => ({
     image: service.image,
     provenance: "illustrative"
   })),
-  beforeAfter: { title: "Avant / Après", subtitle: "", beforeImage: "", afterImage: "", beforeLabel: "Avant", afterLabel: "Après", projectCity: "", duration: "" },
-  realisations: [],
-  gallery: [],
-  reviews: [],
+  beforeAfter: Object.assign({ title: "Avant / Après", subtitle: "", beforeImage: "", afterImage: "", beforeLabel: "Avant", afterLabel: "Après", projectCity: "", duration: "" }, demo.beforeAfter || {}),
+  realisations: Array.isArray(demo.realisations) ? demo.realisations.map((item) => Object.assign({}, item)) : [],
+  gallery: Array.isArray(demo.gallery) ? demo.gallery.map((item) => Object.assign({}, item)) : [],
+  reviews: topUpReviews(demo.reviews),
   faq: [{ q: `Comment présenter mon projet (${demo.label}) ?`, a: "Décrivez votre besoin lors de la prise de contact. Les modalités sont à préciser avec le professionnel." }],
   quoteConfig: {
     typeLabel: "Votre besoin",

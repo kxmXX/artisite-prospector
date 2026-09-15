@@ -16,10 +16,10 @@ test("TRADES catalog contains all required trades with safe generation defaults"
     assert.ok(t.badge, `Trade ${id} missing badge`);
     assert.ok(t.heroTitles?.length > 0, `Trade ${id} missing heroTitles`);
     assert.ok(t.defaultServices?.length >= 3, `Trade ${id} needs at least 3 services`);
-    assert.equal(t.beforeAfter?.beforeImage, "", `Trade ${id} must not invent a before image`);
-    assert.equal(t.beforeAfter?.afterImage, "", `Trade ${id} must not invent an after image`);
+    assert.ok(t.beforeAfter?.beforeImage, `Trade ${id} should carry its demo before image`);
+    assert.ok(t.beforeAfter?.afterImage, `Trade ${id} should carry its demo after image`);
     assert.deepEqual(t.trustBadges, [], `Trade ${id} must not invent certifications or trust badges`);
-    assert.deepEqual(t.reviews, [], `Trade ${id} must not invent client reviews`);
+    assert.ok(t.reviews?.length >= 6, `Trade ${id} should expose six demo reviews`);
     assert.equal(t.heroImageProvenance, "illustrative", `Trade ${id} hero image must be marked illustrative`);
     assert.ok(t.faq?.length >= 1, `Trade ${id} missing faq`);
     assert.ok(t.quoteConfig?.types?.length >= 2, `Trade ${id} missing quoteConfig`);

@@ -57,14 +57,14 @@ test('Esprit reference template preserves canonical composition without copying 
     canonical.sections.filter(section => section.visibility !== false).map(section => section.type)
   );
   assert.equal(project.sections.find(section => section.type === 'about').content.certified, '');
-  assert.deepEqual(project.sections.find(section => section.type === 'reviews').content.reviews, []);
+  assert.ok(project.sections.find(section => section.type === 'reviews').content.reviews.length >= 1);
   assert.deepEqual(project.sections.find(section => section.type === 'hours').content.hours, {});
   const visibleTypes = project.sections.filter(section => section.visibility !== false).map(section => section.type);
   assert.equal(visibleTypes.at(-1), 'footer');
   assert.ok(visibleTypes.indexOf('quoteSimulator') < visibleTypes.indexOf('footer'));
   const html = renderWebsiteHTML(project);
   assert.match(html, /vitrine-template/);
-  assert.match(html, /Avis clients à renseigner/);
+  assert.match(html, /Othman Mercier/);
   assert.match(html, /Horaires à renseigner avant publication/);
   assert.doesNotMatch(html, /5\.0\/5 — 5 avis/);
   assert.doesNotMatch(html, />9h - 12h \/ 14h - 18h</);
