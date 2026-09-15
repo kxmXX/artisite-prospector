@@ -7,6 +7,14 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 ---
 
+### Maturation produit — 17 septembre 2026 (4.9.0-alpha.56) — Deux tests cessent de protéger du code mort
+
+- **Cause profonde du lot 3b** : deux tests assertaient des chaînes qui ne vivaient que dans le gabarit jamais rendu (`renderSectionAccordionContent`). L'un cherchait les **titres de groupes** du panneau mort ; l'autre lisait le HTML **rendu**, où un `<template>` apparaît même s'il n'est jamais affiché. Voilà pourquoi 837 lignes inertes ont survécu : **la suite de tests les protégeait**.
+- Réécrits pour viser les **emplacements vivants** : le panneau de propriétés (choix de l'image de carte, format de galerie, nature d'une entrée, ajout d'avis et de services, retrait d'entrée), l'arbre des éléments, et les méthodes réelles de l'application. Le second rend désormais l'éditeur **avec la section concernée sélectionnée** — la seule façon honnête d'obtenir ces contrôles, puisqu'ils dépendent de la section.
+- Conséquence directe : la suppression des 843 lignes ne fera plus tomber ces tests **pour la bonne raison** — ils ne valident plus du code mort.
+- Dette signalée sans la masquer : `updateListField` (éditer le champ d'une entrée de liste) reste sans interface vivante.
+- Tests : **403/403**, aucune assertion supprimée.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.55) — Les contrôles de carte redeviennent accessibles
 
 - Réimplanté : le **mode d'affichage de la carte** du bloc horaires (carte interactive / image personnalisée) et le **choix de l'image de carte**. Ces deux réglages n'existaient que dans le gabarit jamais rendu — c'est précisément ce que décrivait le test tombé au tour précédent, et donc une capacité que ma suppression ratée aurait emportée.

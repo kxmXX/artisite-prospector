@@ -144,13 +144,20 @@ test("v4.7.0 Consolidation: Editor sidebar retains accordion open state and prov
   state.activeSidebarTab = "sections";
   editorHtml = renderEditor(state);
 
-  // Test hero overlay slider
-  assert.ok(editorHtml.includes("setHeroOverlayDarkening"), "Editor must bind setHeroOverlayDarkening handler");
+  // Les controles vivent dans le panneau de proprietes et dependent de la section
+  // selectionnee : on rend donc une fois pour le hero, une fois pour la galerie. Avant,
+  // ces chaines n'apparaissaient que parce que le gabarit mort etait serialise.
+  const heroSection = project.sections.find((s) => s.type === "hero");
+  const gallerySection = project.sections.find((s) => s.type === "gallery");
+  state.selectedSectionId = heroSection.id;
+  let controlsHtml = renderEditor(state);
+  assert.ok(controlsHtml.includes("setHeroOverlayDarkening"), "Editor must bind setHeroOverlayDarkening handler");
 
-  // Test gallery aspect ratio selector
-  assert.ok(editorHtml.includes("setGalleryAspectRatio"), "Editor must bind setGalleryAspectRatio handler");
-  assert.ok(editorHtml.includes("addGalleryItem"), "Editor must bind addGalleryItem handler");
-  assert.ok(editorHtml.includes("toggleGalleryItemType"), "Editor must bind toggleGalleryItemType handler");
+  state.selectedSectionId = gallerySection.id;
+  controlsHtml = renderEditor(state);
+  assert.ok(controlsHtml.includes("setGalleryAspectRatio"), "Editor must bind setGalleryAspectRatio handler");
+  assert.ok(controlsHtml.includes("addGalleryItem"), "Editor must bind addGalleryItem handler");
+  assert.ok(controlsHtml.includes("toggleGalleryItemType"), "Editor must bind toggleGalleryItemType handler");
 });
 
 test("v4.7.0 Consolidation: 100% Sendpage Benchmark Fidelity for Esprit Nature Paysagiste", () => {

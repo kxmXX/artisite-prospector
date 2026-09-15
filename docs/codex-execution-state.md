@@ -1765,3 +1765,11 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Reste avant suppression : les controles de contenu de la vitrine (test 401), puis reprise de la suppression avec un inventaire complet (appels + libelles).
 - Tests : 403/403.
 - Contexte : fenetre de contexte presque saturee ; tours suivants plus courts, priorite aux lots restants (3b, 7, export 2d, PRODUCT.md/DESIGN.md).
+
+## Journal — 17 septembre 2026 · 4.9.0-alpha.56 (tests debloques du code mort)
+
+- Decouverte : deux tests validaient des chaines du gabarit mort — l'un les titres de groupes du panneau mort, l'autre le HTML rendu (ou un template apparait meme s'il n'est jamais affiche). C'est la raison de fond de la survie des 837 lignes.
+- Reecrits vers les emplacements vivants (inspecteur, arbre, methodes app), et le second selectionne desormais la section concernee avant de rendre.
+- Effet : la suppression du gabarit ne cassera plus ces tests pour la bonne raison. Dette signalee : updateListField reste sans interface vivante.
+- Tests : 403/403, aucune assertion supprimee.
+- Reste : suppression des 843 lignes (prochain tour, cette fois sure), updateListField, puis lot 7, export 2d, PRODUCT.md/DESIGN.md.

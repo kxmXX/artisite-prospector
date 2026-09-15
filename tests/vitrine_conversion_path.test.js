@@ -203,19 +203,21 @@ test("editor exposes the vitrine template content controls", async () => {
   const editorSource = await readFile(new URL("../public/js/components/editor.js", import.meta.url), "utf8");
   const appSource = await readFile(new URL("../public/js/app.js", import.meta.url), "utf8");
 
+  // Ces controles vivaient dans un gabarit jamais rendu (`renderSectionAccordionContent`).
+  // Le test les cherchait la — ce qui protegeait du code mort. Il vise maintenant les
+  // emplacements reels : le panneau de proprietes, et les methodes de l'application.
+  const inspectorSource = await readFile(new URL("../public/js/components/inspector.js", import.meta.url), "utf8");
   for (const marker of [
-    "Identité & Navigation Vitrine",
-    "À propos — contenu du template",
-    "Avis clients (",
-    "Horaires & carte",
-    "Simulateur de devis",
-    "Pied de page",
-    "updateListField('${sectionId}', 'types'",
-    "services.${sIdx}.image",
-    "Choisir l'image de carte"
-  ]) assert.ok(editorSource.includes(marker), `missing vitrine editor control: ${marker}`);
-  assert.match(appSource, /addReviewItem\(sectionId\)/);
-  assert.match(appSource, /removeReviewItem\(sectionId, idx\)/);
+    "Choisir l'image de carte",
+    "setGalleryAspectRatio",
+    "toggleGalleryItemType",
+    "openImagePicker",
+    "addReviewItem",
+    "addServiceItem",
+    "removeListEntry"
+  ]) assert.ok(inspectorSource.includes(marker), `missing vitrine editor control: ${marker}`);
+  assert.ok(editorSource.includes("collectSectionElements") || editorSource.includes("numberedLabels"), 'l arbre des elements doit nommer les controles');
+  assert.match(appSource, /removeListEntry\(sectionId, listKey, index\)/);
   assert.match(appSource, /updateListField\(sectionId, field, rawValue\)/);
 });
 
