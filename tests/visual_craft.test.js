@@ -143,5 +143,7 @@ test('le chrome de l editeur n a plus de verre decoratif', () => {
   assert.ok(!/\.sticky-dock-glass\s*\{[^}]*backdrop-filter/.test(app), 'le dock collant doit etre opaque');
   const studio = read('public/css/studio-v3.css');
   assert.ok(!studio.includes('backdrop-filter:blur(14px)'), 'le panneau de structure doit etre opaque');
-  assert.ok(!studio.includes('backdrop-filter:blur(18px)'), 'la barre du haut doit etre opaque');
+  assert.ok(!studio.includes('blur(18px) saturate(1.2)'), 'la barre du haut doit etre opaque');
+  // Le voile de modale garde son flou : c'est un effet au service d'une intention.
+  assert.ok(studio.includes('backdrop-filter:blur(18px) saturate(.9)'), 'le voile de modale reste floute');
 });
