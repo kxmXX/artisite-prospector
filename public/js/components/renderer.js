@@ -790,11 +790,13 @@ function renderHeader(sec, project, options = {}) {
         </nav>
 
         <div class="flex items-center gap-3">
-          ${isPaysagiste ? '' : `
-            <a href="tel:${c.phone || project.business?.phone || ''}" class="hidden sm:inline-flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-gray-900 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors no-underline">
+          ${(c.phone || project.business?.phone) ? `
+            <a href="tel:${c.phone || project.business?.phone}" class="hidden sm:inline-flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-gray-900 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors no-underline">
               ${getIcon("phone", "w-4 h-4 text-emerald-600")}
-              <span data-editable="phone">${c.phone || project.business?.phone || ''}</span>
+              <span data-editable="phone">${c.phone || project.business?.phone}</span>
             </a>
+          ` : ''}
+          ${isPaysagiste ? '' : `
             <button type="button" onclick="event.stopPropagation(); window.app ? window.app.toggleSiteTheme() : null;" class="site-theme-toggle inline-flex items-center gap-2 px-3.5 py-2.5 rounded-full text-sm font-semibold text-gray-800 border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all" data-site-theme-toggle aria-label="Activer le mode sombre du site">
               <span class="site-theme-icon site-theme-icon-light">${getIcon("moon", "w-4 h-4")}</span>
               <span class="site-theme-icon site-theme-icon-dark hidden">${getIcon("sun", "w-4 h-4")}</span>
