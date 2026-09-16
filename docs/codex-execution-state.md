@@ -1911,3 +1911,11 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Verification navigateur (styles calcules, animation figee a t=0) : up -> translateY(+22), down -> translateY(-22), left -> translateX(-24), right -> translateX(+24).
 - Tests : 430/430 (tests/motion_direction.test.js, 5 cas).
 - Reste : bug destructif du centrage (jamais reproduit ; contrat verrouille par test) ; vocabulaire de repetition du menu texte encore once/twice/infinite ; outil tester/rejouer/arreter/reinitialiser ; motions pendant un transform libre ; PRODUCT.md/DESIGN.md.
+
+## Journal — 17 septembre 2026 · 4.9.1 (suite 9) : vocabulaire de repetition unifie
+
+- Cause : les trois menus de repetition (section, element, image) ne parlaient pas la meme langue — l'inspecteur disait once/twice/infinite, le catalogue once/twice/thrice/loop ; « trois fois » n'existait que dans le CSS et un reglage ecrit par un menu n'etait pas relu par l'autre.
+- motionRepeatRowHTML (catalogue) construit les quatre choix pour les trois surfaces ; les libelles viennent du catalogue.
+- normalizeMotionRepeatId traduit l'ancien infinite en loop a la lecture : un projet existant boucle toujours et le bon bouton s'allume, sans migration de donnees. Le CSS garde la regle infinite pour les pages deja enregistrees.
+- Tests : tests/motion_loop.test.js etendu (6 cas) ; 431/431.
+- Reste : bug destructif du centrage (jamais reproduit) ; outil tester/rejouer/arreter/reinitialiser ; motions pendant un transform libre ; PRODUCT.md/DESIGN.md.

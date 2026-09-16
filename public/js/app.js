@@ -23,7 +23,7 @@ import { getUiCode } from "./data/uiIds.js";
 import { ELEMENT_STATES, ELEMENT_STATE_LABELS, setElementState, clearElementState } from "./engine/elementStates.js";
 import { setSectionLayout, isValidSectionId } from "./engine/sectionStyle.js";
 import { setElementStyle, clearElementStyle, getElementStyle } from "./engine/elementStyle.js";
-import { motionDirectionsFor } from "./data/motionPresets.js";
+import { motionDirectionsFor, motionLoopAttribute } from "./data/motionPresets.js";
 import { getIcon } from "./components/icons.js";
 import { setElementTransform, clearElementTransform, enableElementTransform } from "./engine/elementTransform.js";
 import { parseClientDemoPin, verifyClientDemoPin } from "./utils/clientDemoPin.js";
@@ -3527,24 +3527,27 @@ export class App {
     const field = el?.getAttribute?.("data-editable");
     const secId = el?.closest?.(".editor-section-wrapper")?.getAttribute("data-section-id");
     const sec = state.currentProject?.sections.find(s => s.id === secId);
-    return sec?.settings?.elementMotionLoops?.[field] || "";
+    return motionLoopAttribute(sec?.settings?.elementMotionLoops?.[field]);
   }
 
   getImageMotionLoop(secId, fieldPath, itemIndex) {
     const idx = (itemIndex !== null && itemIndex !== undefined && itemIndex !== "null") ? itemIndex : 0;
     const key = fieldPath + "_" + idx;
-    return state.currentProject?.sections.find(s => s.id === secId)?.settings?.imageMotionLoops?.[key] || "";
+    return motionLoopAttribute(state.currentProject?.sections.find(s => s.id === secId)?.settings?.imageMotionLoops?.[key]);
   }
 
   syncMotionLoopButtons(scopeSelector, dataAttr, mode) {
+    // Le catalogue dit "loop" là où l'ancien menu disait "infinite" : on normalise
+    // pour que le bon bouton s'allume, y compris sur un projet existant.
+    const wanted = motionLoopAttribute(mode) || "once";
     document.querySelectorAll(scopeSelector).forEach(node => {
-      node.querySelectorAll("[" + dataAttr + "]").forEach(btn => btn.classList.toggle("is-active", btn.getAttribute(dataAttr) === (mode || "once")));
+      node.querySelectorAll("[" + dataAttr + "]").forEach(btn => btn.classList.toggle("is-active", btn.getAttribute(dataAttr) === wanted));
     });
   }
 
   setSectionMotionLoop(sectionId, mode) {
     if (!state.currentProject) return;
-    const nextMode = ["twice", "infinite"].includes(mode) ? mode : "";
+    const nextMode = motionLoopAttribute(mode);
     const updated = JSON.parse(JSON.stringify(state.currentProject));
     const sec = updated.sections.find(s => s.id === sectionId);
     if (!sec) return;
@@ -3558,7 +3561,8 @@ export class App {
       else secEl.removeAttribute("data-motion-loop");
     }
     this.syncMotionLoopButtons("#sec-motion-popover-" + sectionId, "data-section-loop", nextMode);
-    this.showToast(nextMode === "infinite" ? "Animation de section en boucle continue" : (nextMode === "twice" ? "Animation de section répétée deux fois" : "Animation de section jouée une fois"), "info");
+    const repeatLabel = { twice: "répétée deux fois", thrice: "répétée trois fois", loop: "en boucle continue" }[nextMode];
+    this.showToast(repeatLabel ? "Animation de section " + repeatLabel : "Animation de section jouée une fois", "info");
   }
 
   /** Position libre : ecriture unique, instantane pris AVANT la mutation. */
@@ -3612,7 +3616,7 @@ export class App {
   setActiveTextMotionLoop(mode) {
     const el = this._activeEditableEl;
     if (!el) return;
-    const nextMode = ["twice", "infinite"].includes(mode) ? mode : "";
+    const nextMode = motionLoopAttribute(mode);
     const field = el.getAttribute("data-editable") || "text";
     const secWrapper = el.closest(".editor-section-wrapper");
     const secId = secWrapper?.getAttribute("data-section-id");
@@ -3635,7 +3639,7 @@ export class App {
 
   setImageMotionLoop(secId, fieldPath, itemIndex, mode) {
     const idx = (itemIndex !== null && itemIndex !== undefined && itemIndex !== "null") ? itemIndex : 0;
-    const nextMode = ["twice", "infinite"].includes(mode) ? mode : "";
+    const nextMode = motionLoopAttribute(mode);
     if (!state.currentProject) return;
     const updated = JSON.parse(JSON.stringify(state.currentProject));
     const sec = updated.sections.find(s => s.id === secId);

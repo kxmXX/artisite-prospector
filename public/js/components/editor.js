@@ -1,5 +1,5 @@
 import { getIcon } from "./icons.js";
-import { MOTION_PRESETS, MOTION_SPEEDS, MOTION_DELAYS } from "../data/motionPresets.js";
+import { MOTION_PRESETS, MOTION_SPEEDS, MOTION_DELAYS, motionRepeatRowHTML } from "../data/motionPresets.js";
 import { renderWebsiteHTML, renderStickyCallBar, collectSectionElements } from "./renderer.js";
 import { numberedLabels } from "../data/elementLabels.js";
 import { renderInspector } from "./inspector.js";
@@ -343,9 +343,7 @@ export function renderEditor(state) {
                 </div>
                 <div class="motion-loop-row" data-text-loop-row>
                   <span class="motion-loop-label">Répétition</span>
-                  <button type="button" data-text-loop="once" class="motion-loop-btn is-active" onclick="window.app.setActiveTextMotionLoop('once')">Une fois</button>
-                  <button type="button" data-text-loop="twice" class="motion-loop-btn" onclick="window.app.setActiveTextMotionLoop('twice')">×2</button>
-                  <button type="button" data-text-loop="infinite" class="motion-loop-btn" onclick="window.app.setActiveTextMotionLoop('infinite')">Boucle</button>
+                  ${motionRepeatRowHTML("once", "data-text-loop", (id) => "window.app.setActiveTextMotionLoop('" + id + "')")}
                 </div>
                 <div class="motion-loop-row" data-text-timing>
                   <span class="motion-loop-label">Vitesse</span>

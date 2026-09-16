@@ -79,6 +79,39 @@ export function motionIterations(id) {
   return getMotionRepeat(id).iterations;
 }
 
+/**
+ * Normalise une répétition enregistrée par une version antérieure.
+ *
+ * L'ancien menu texte/image disait `once / twice / infinite`, alors que le
+ * catalogue dit `loop`. On traduit à la lecture : un projet existant continue de
+ * boucler sans migration de données.
+ */
+export function normalizeMotionRepeatId(id) {
+  const value = String(id || "");
+  if (value === "infinite") return "loop";
+  return REPEAT_BY_ID.has(value) ? value : "";
+}
+
+/** Valeur de `data-motion-loop` : vide pour « une fois », sinon l'identifiant du catalogue. */
+export function motionLoopAttribute(value) {
+  const id = normalizeMotionRepeatId(value);
+  return id && id !== "once" ? id : "";
+}
+
+/**
+ * Rangée de répétition partagée par les trois surfaces d'animation — section,
+ * élément, image — pour qu'elles proposent exactement les mêmes choix.
+ * `onclickFor(id)` renvoie l'action propre à chaque surface.
+ */
+export function motionRepeatRowHTML(currentId, dataAttr, onclickFor) {
+  const current = normalizeMotionRepeatId(currentId) || "once";
+  return MOTION_REPEAT.map((repeat) => {
+    const active = repeat.id === current ? " is-active" : "";
+    return '<button type="button" ' + dataAttr + '="' + repeat.id + '" class="motion-loop-btn' + active +
+      '" title="' + repeat.description + '" onclick="' + onclickFor(repeat.id) + '">' + repeat.label + "</button>";
+  }).join("");
+}
+
 /** Vitesse relative : multiplie la durée propre à chaque animation. */
 export const MOTION_SPEEDS = Object.freeze([
   { id: "normal", label: "Normale", factor: 1, description: "La durée prévue pour cette animation." },

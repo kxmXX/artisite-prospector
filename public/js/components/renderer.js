@@ -1,7 +1,7 @@
 import { getIcon } from "./icons.js";
 import { HERO_STYLES } from "./heroStyles.js";
 import { elementStateCSS } from "../engine/elementStates.js";
-import { MOTION_PRESETS, MOTION_SPEEDS, MOTION_DELAYS, motionTimingCSS, motionDirectionsFor, motionDirectionCSS } from "../data/motionPresets.js";
+import { MOTION_PRESETS, MOTION_SPEEDS, MOTION_DELAYS, motionTimingCSS, motionDirectionsFor, motionDirectionCSS, motionLoopAttribute, motionRepeatRowHTML } from "../data/motionPresets.js";
 import { sectionLayoutAttributes, SECTION_LAYOUT_CSS } from "../engine/sectionStyle.js";
 import { elementStyleCSS } from "../engine/elementStyle.js";
 import { getTradeFallbackDataUrl } from "../data/imageFallbacks.js";
@@ -192,7 +192,7 @@ function decorateEditableMarkup(markup, project, section) {
     if (isUnderline === false) customStyles.push(`text-decoration: none !important;`);
     if (textColor) customStyles.push(`color: ${textColor} !important;`);
 
-    const textLoop = ["twice", "infinite"].includes(section?.settings?.elementMotionLoops?.[fieldPath]) ? section.settings.elementMotionLoops[fieldPath] : "";
+    const textLoop = motionLoopAttribute(section?.settings?.elementMotionLoops?.[fieldPath]);
     const textSpeed = section?.settings?.elementMotionSpeeds?.[fieldPath] && section.settings.elementMotionSpeeds[fieldPath] !== "normal" ? section.settings.elementMotionSpeeds[fieldPath] : "";
     const textDelay = section?.settings?.elementMotionDelays?.[fieldPath] && section.settings.elementMotionDelays[fieldPath] !== "aucun" ? section.settings.elementMotionDelays[fieldPath] : "";
     let motionAttrs = "";
@@ -276,7 +276,7 @@ export function renderEditableImage(url, { sectionId = "", fieldPath = "", targe
   const imageUiCode = project && sec ? getUiCode(project?.id, sec.id, uiFieldPath) : "";
   const imagePlacementAttrs = getFreeformPlacementAttributes(project, imageUiCode, sectionId);
   const imgMotion = sec?.settings?.imageMotions?.[imgKey] || sec?.settings?.[`motion_${fieldPath}`] || sec?.settings?.motion_image || "";
-  const imgLoop = ["twice", "infinite"].includes(sec?.settings?.imageMotionLoops?.[imgKey]) ? sec.settings.imageMotionLoops[imgKey] : "";
+  const imgLoop = motionLoopAttribute(sec?.settings?.imageMotionLoops?.[imgKey]);
   const imgSpeed = sec?.settings?.imageMotionSpeeds?.[imgKey] && sec.settings.imageMotionSpeeds[imgKey] !== "normal" ? sec.settings.imageMotionSpeeds[imgKey] : "";
   const imgDelay = sec?.settings?.imageMotionDelays?.[imgKey] && sec.settings.imageMotionDelays[imgKey] !== "aucun" ? sec.settings.imageMotionDelays[imgKey] : "";
 const motionAttr = imgMotion && imgMotion !== "none" ? ` data-motion="${imgMotion}"${imgLoop ? ' data-motion-loop="' + imgLoop + '"' : ''}${imgSpeed ? ' data-motion-speed="' + imgSpeed + '"' : ''}${imgDelay ? ' data-motion-delay="' + imgDelay + '"' : ''}` : "";
@@ -328,9 +328,7 @@ const motionAttr = imgMotion && imgMotion !== "none" ? ` data-motion="${imgMotio
             </div>
             <div class="motion-loop-row" data-image-loop-row>
               <span class="motion-loop-label">Répétition</span>
-              <button type="button" data-image-loop="once" class="motion-loop-btn" onclick="event.stopPropagation(); window.app.setImageMotionLoop('${sectionId}', '${fieldPath}', ${indexParam}, 'once')">Une fois</button>
-              <button type="button" data-image-loop="twice" class="motion-loop-btn" onclick="event.stopPropagation(); window.app.setImageMotionLoop('${sectionId}', '${fieldPath}', ${indexParam}, 'twice')">×2</button>
-              <button type="button" data-image-loop="infinite" class="motion-loop-btn" onclick="event.stopPropagation(); window.app.setImageMotionLoop('${sectionId}', '${fieldPath}', ${indexParam}, 'infinite')">Boucle</button>
+              ${motionRepeatRowHTML(imgLoop || "once", "data-image-loop", (id) => "event.stopPropagation(); window.app.setImageMotionLoop('" + sectionId + "', '" + fieldPath + "', " + indexParam + ", '" + id + "')")}
             </div>
             <div class="motion-loop-row" data-image-timing>
               <span class="motion-loop-label">Vitesse</span>
@@ -404,7 +402,7 @@ export function renderWebsiteHTML(project, options = { isEditor: false, isStanda
   sectionsHTML = sectionsHTML.replace(/<[a-z][^>]*data-section-id="([^"]+)"[^>]*>/gi, (tag, id) => {
     if (/data-motion-loop=/.test(tag)) return tag;
     const sec = project.sections.find(s => s.id === id);
-    const loop = ["twice", "infinite"].includes(sec?.settings?.motionLoop) ? sec.settings.motionLoop : "";
+    const loop = motionLoopAttribute(sec?.settings?.motionLoop);
     return loop ? tag.replace(/>$/, ' data-motion-loop="' + loop + '">') : tag;
   });
 
@@ -592,7 +590,7 @@ function renderSection(sec, project, options) {
   const bgTheme = `bg-sec-${sectionTheme}`;
   const themeColor = sectionTheme === "dark" ? "#09090b" : sectionTheme === "navy" ? "#0c1527" : sectionTheme === "warm" ? "#faf8f5" : sectionTheme === "mineral" ? "#f8fafc" : sectionTheme === "primary" ? (project.branding?.primaryColor || "#059669") : "#ffffff";
   const motionPreset = sec.settings?.motionPreset || sec.motionPreset || (project.branding?.motionPreset && project.branding.motionPreset !== "none" ? project.branding.motionPreset : "");
-  const motionLoop = ["twice", "infinite"].includes(sec.settings?.motionLoop) ? sec.settings.motionLoop : "";
+  const motionLoop = motionLoopAttribute(sec.settings?.motionLoop);
   const motionSpeed = sec.settings?.motionSpeed && sec.settings.motionSpeed !== "normal" ? sec.settings.motionSpeed : "";
   const motionDelay = sec.settings?.motionDelay && sec.settings.motionDelay !== "aucun" ? sec.settings.motionDelay : "";
   const motionEasing = sec.settings?.motionEasing && sec.settings.motionEasing !== "douce" ? sec.settings.motionEasing : "";

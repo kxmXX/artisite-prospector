@@ -11,7 +11,7 @@ import { escapeHtml } from "../utils/html.js";
 import { SECTION_WIDTHS, SECTION_SPACING, SECTION_ALIGN, getSectionLayout } from "../engine/sectionStyle.js";
 import { ELEMENT_PADDING, ELEMENT_RADIUS, ELEMENT_FONT, ELEMENT_OPACITY, ELEMENT_BACKGROUND, ELEMENT_BORDER, ELEMENT_SHADOW, getElementStyle } from "../engine/elementStyle.js";
 import { ELEMENT_STATES, ELEMENT_STATE_LABELS, ELEMENT_STATE_DESCRIPTIONS, getElementState } from "../engine/elementStates.js";
-import { MOTION_PRESETS, MOTION_SPEEDS, MOTION_DELAYS, MOTION_EASINGS, motionDirectionsFor } from "../data/motionPresets.js";
+import { MOTION_PRESETS, MOTION_SPEEDS, MOTION_DELAYS, MOTION_EASINGS, motionDirectionsFor, motionRepeatRowHTML } from "../data/motionPresets.js";
 import { TRANSFORM_FIELDS, getElementTransform, hasElementTransform } from "../engine/elementTransform.js";
 import { collectSectionElements } from "./renderer.js";
 import { numberedLabels } from "../data/elementLabels.js";
@@ -495,9 +495,7 @@ export function renderInspector(section, project, state) {
         ${disclosure("section-motion-timing", "Réglages avancés : vitesse et délai", `
         <div class="motion-loop-row" data-section-loop-row>
           <span class="motion-loop-label">Répétition</span>
-          <button type="button" data-section-loop="once" class="motion-loop-btn ${(section.settings?.motionLoop || 'once') === 'once' ? 'is-active' : ''}" onclick="window.app.setSectionMotionLoop('${sectionId}', 'once')">Une fois</button>
-          <button type="button" data-section-loop="twice" class="motion-loop-btn ${section.settings?.motionLoop === 'twice' ? 'is-active' : ''}" onclick="window.app.setSectionMotionLoop('${sectionId}', 'twice')">×2</button>
-          <button type="button" data-section-loop="infinite" class="motion-loop-btn ${section.settings?.motionLoop === 'infinite' ? 'is-active' : ''}" onclick="window.app.setSectionMotionLoop('${sectionId}', 'infinite')">Boucle</button>
+          ${motionRepeatRowHTML(section.settings?.motionLoop || "once", "data-section-loop", (id) => "window.app.setSectionMotionLoop('" + sectionId + "', '" + id + "')")}
         </div>
         <div class="motion-loop-row" data-section-timing>
           <span class="motion-loop-label">Vitesse</span>

@@ -147,9 +147,10 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
       et injectés par le rendu (une seule feuille pour éditeur, aperçu et export). La **courbe**
       (`4.9.0-alpha.59`) et la **direction** (`4.9.1`) sont désormais réglables ; la direction n'apparaît
       que pour les animations qui en ont une (montée douce, entrée latérale), afin de ne pas promettre un
-      effet que le rendu ne joue pas. *Reste* : vocabulaire de répétition du menu texte encore
-      `once / twice / infinite`, outil tester/rejouer/arrêter/réinitialiser, et neutralisation des motions
-      pendant un transform libre.
+      effet que le rendu ne joue pas. La **répétition** parle désormais un seul vocabulaire (`4.9.1`) :
+      une rangée partagée par les trois surfaces, alimentée par le catalogue, et l'ancien `infinite`
+      traduit en `loop` à la lecture. *Reste* : outil tester/rejouer/arrêter/réinitialiser, et
+      neutralisation des motions pendant un transform libre.
 - [x] **Lot 4d — Divulgation progressive de l'inspecteur** (clos en `4.9.0-alpha.48`) : primitive partagée
       (`disclosure`, `<details>/<summary>` natifs, focus clavier, état retenu au nouveau rendu) appliquée au
       rythme de l'animation de section (`4.9.0-alpha.29`) puis aux réglages d'élément — espacement et angles

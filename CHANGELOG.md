@@ -114,6 +114,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 - **Vérifié dans le navigateur** (styles calculés, animation figée à t=0) : `slide-up`+`up` → `translateY(+22px)`, `+down` → `translateY(-22px)`, `slide-in`+`left` → `translateX(-24px)`, `+right` → `translateX(+24px)` ; la bonne animation est nommée dans chaque cas.
 - Tests : 5 nouveaux (`tests/motion_direction.test.js`) ; **430/430**.
 
+#### Animations — une seule façon de dire « répète »
+
+- **Constat** : trois menus (section, élément, image) proposaient la répétition, mais avec **deux vocabulaires** — l'inspecteur disait `once / twice / infinite`, le catalogue disait `once / twice / thrice / loop` — et l'option « trois fois » n'existait que dans le CSS. Un réglage enregistré par un menu n'était donc pas relu par l'autre.
+- **Rangée partagée** : `motionRepeatRowHTML` (catalogue `motionPresets.js`) construit les quatre choix — Une fois, Deux fois, Trois fois, En continu — pour les trois surfaces ; les libellés viennent du catalogue, plus du balisage local.
+- **Migration à la lecture** : `normalizeMotionRepeatId` traduit l'ancien `infinite` en `loop` ; un projet déjà enregistré continue de boucler et le bon bouton s'allume, sans réécriture de données.
+- Tests : `tests/motion_loop.test.js` étendu (6 cas) ; **431/431**.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.59) — Lot 7 : la courbe d'animation devient réglable
 
 - Le catalogue portait une courbe par animation, mais l'auteur ne pouvait pas la changer. Trois courbes sont désormais proposées — **Douce** (départ vif, arrivée posée), **Rebond** (léger dépassement), **Régulière** — dans le repli « Réglages avancés » du panneau, à côté de la vitesse et du délai.

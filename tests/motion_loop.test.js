@@ -4,6 +4,7 @@ import fs from 'node:fs';
 
 import { generateSite } from '../public/js/engine/generator.js';
 import { renderWebsiteHTML } from '../public/js/components/renderer.js';
+import { MOTION_REPEAT, normalizeMotionRepeatId, motionLoopAttribute } from '../public/js/data/motionPresets.js';
 
 const appSource = fs.readFileSync(new URL('../public/js/app.js', import.meta.url), 'utf8');
 const appCss = fs.readFileSync(new URL('../public/css/app.css', import.meta.url), 'utf8');
@@ -30,11 +31,13 @@ test('loops render on the section, the element and the image', () => {
   const html = renderWebsiteHTML(project, { isEditor: true });
   const sectionTag = (html.match(new RegExp('data-section-id="' + hero.id + '"[^>]*>')) || [''])[0];
   assert.ok(sectionTag.includes('data-motion="fade-in"'), 'section keeps its preset');
-  assert.ok(sectionTag.includes('data-motion-loop="infinite"'), 'section loop attribute must render');
+  // L'ancien nom "infinite" est traduit en "loop" à la lecture : un projet
+  // existant continue de boucler sans migration de données.
+  assert.ok(sectionTag.includes('data-motion-loop="loop"'), 'section loop attribute must render');
   const titleTag = (html.match(/<[^>]*data-editable="title"[^>]*>/) || [''])[0];
   assert.ok(titleTag.includes('data-motion-loop="twice"'), 'element loop attribute must render');
   const firstImage = html.slice(html.indexOf('<img'));
-  assert.ok(firstImage.includes('data-motion-loop="infinite"'), 'image loop attribute must render');
+  assert.ok(firstImage.includes('data-motion-loop="loop"'), 'image loop attribute must render');
 });
 
 test('a loop only applies when asked, and reduced motion neutralises it', () => {
@@ -46,6 +49,9 @@ test('a loop only applies when asked, and reduced motion neutralises it', () => 
   assert.ok(sectionTag.includes('data-motion="fade-in"'));
   assert.ok(!sectionTag.includes('data-motion-loop'), 'no loop is emitted unless the author asks');
   assert.ok(appCss.includes('[data-motion-loop="twice"] { animation-iteration-count: 2 !important; }'));
+  assert.ok(appCss.includes('[data-motion-loop="thrice"] { animation-iteration-count: 3 !important; }'));
+  assert.ok(appCss.includes('[data-motion-loop="loop"] { animation-iteration-count: infinite !important; }'));
+  // Conservé pour les pages déjà enregistrées avec l'ancien nom.
   assert.ok(appCss.includes('[data-motion-loop="infinite"] { animation-iteration-count: infinite !important; }'));
   assert.ok(appCss.includes('@media (prefers-reduced-motion: reduce) {'), 'reduced motion block exists');
   assert.ok(appCss.includes('[data-motion-loop] { animation-iteration-count: 1 !important; }'), 'loops are neutralised for reduced motion');
@@ -82,3 +88,25 @@ test('every preset previews its own motion on hover', () => {
   assert.ok(editorSource.includes('Survolez une animation pour la voir jouer'), 'the editor explains the hover preview in plain words');
   assert.ok(rendererSource.includes('motion-preview-hint'), 'the image menu explains the hover preview');
 });
+test("la répétition parle un seul vocabulaire et traduit l'ancien", () => {
+  assert.deepEqual(MOTION_REPEAT.map((repeat) => repeat.id), ['once', 'twice', 'thrice', 'loop']);
+  assert.equal(normalizeMotionRepeatId('infinite'), 'loop');
+  assert.equal(normalizeMotionRepeatId('thrice'), 'thrice');
+  assert.equal(normalizeMotionRepeatId('inconnu'), '');
+  assert.equal(motionLoopAttribute('once'), '');
+  assert.equal(motionLoopAttribute('infinite'), 'loop');
+  // Les trois surfaces partagent la même rangée, alimentée par le catalogue.
+  assert.ok(inspectorSource.includes('motionRepeatRowHTML'));
+  assert.ok(editorSource.includes('motionRepeatRowHTML'));
+  assert.ok(rendererSource.includes('motionRepeatRowHTML'));
+  // Plus aucun identifiant hérité écrit en dur dans les menus.
+  assert.ok(!editorSource.includes('data-text-loop="infinite"'));
+  assert.ok(!rendererSource.includes('data-image-loop="infinite"'));
+  assert.ok(!inspectorSource.includes('data-section-loop="infinite"'));
+  // Le rendu final ne contient plus l'ancien nom.
+  const { project } = projectWithLoops();
+  const html = renderWebsiteHTML(project, { isEditor: true });
+  assert.ok(html.includes('data-motion-loop="loop"'));
+  assert.ok(!html.includes('data-motion-loop="infinite"'));
+});
+
