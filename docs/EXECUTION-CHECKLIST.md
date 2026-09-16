@@ -57,15 +57,16 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
       retirés, 8 tests dédiés, **280/280**. *Point ouvert* : l'en-tête de la vitrine rendu dans le
       canvas étroit de l'éditeur (~640 px) est à l'étroit (liens qui se replient, FAQ proche du CTA) —
       traité au lot 2 avec la largeur de canvas et l'en-tête responsive.
-- [~] **Lot 2 — Finition UI/UX** (2a livré en `4.9.0-alpha.2`) : `product-precision.css` supprimée
+- [x] **Lot 2 — Finition UI/UX** (2a `4.9.0-alpha.2`, 2b `alpha.3`, 2c `alpha.8`, clos en `4.9.1`) : `product-precision.css` supprimée
       et marqueur `studio-modal-card` retiré ; 397 tailles arbitraires du chrome remplacées par
       l'échelle `text-ui-*` ; 33 graisses intermédiaires normalisées ; 7 `outline:0` retirés ;
       16 couples de contraste < 4,5:1 remontés (pire cas 2,16:1 → 5,50:1) ; `pointer:coarse` étendu
       à 44 px sur tout le chrome ; `prefers-reduced-motion` étendu au dashboard et aux modales ;
-      13 tests design, **285/285**. **Reste (2b)** : couche orpheline `studio-v3.css:373-478`,
-      204 glyphes emoji du chrome → `icons.js`, convergence rayons/ombres/espacements, cascade de
-      cartes dans l'inspecteur, liste gelée des 34 classes sans règle, navigation du dashboard
-      ≤ 760 px, et le point ouvert ci-dessous.
+      13 tests design, **285/285**. **2b/2c livrés** : 122 emojis/glyphes remplacés par `icons.js`, 92
+      lignes de CSS mort retirées, dashboard ≤ 760 px, `placeholder` et `no-scrollbar` réparés ; rayons,
+      ombres et espacements convergent dans `tokens.css`, et la **divulgation progressive** remplace la
+      cascade de cartes. La liste gelée des classes sans règle (27 côté application) est un **garde-fou
+      volontaire** : toute nouvelle classe non stylée fait échouer un test. **Lot clos.**
 - [x] **Lot 2b — Icônes, densité, téléphone** (`4.9.0-alpha.3`) : 122 emojis/glyphes du chrome
       remplacés par `icons.js` (63 → 89 clés, dont `tag`/`laptop`/`upload` qui retombaient sur un
       cercle générique) ; 92 lignes de CSS mort retirées de `studio-v3.css` (vérifiées au navigateur) ;
@@ -91,7 +92,7 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
       le gabarit mort `renderSectionAccordionContent` (837 lignes) est **supprimé**, après réimplantation de
       ses capacités — boucle d'animation de section, motifs d'inspiration, assombrissement du hero, listes
       éditables — désormais portées par l'inspecteur. **Lot clos.**
-- [~] **Lot 4 — Inspecteur contextuel** (4a et 4b livrés en `4.9.0-alpha.14` à `alpha.16`) :
+- [x] **Lot 4 — Inspecteur contextuel** (4a/4b `4.9.0-alpha.14` → `.16`, 4c livré, clos en `4.9.1`) :
       modèle de mise en page de section (largeur pleine/contenu/étroite, respiration
       compacte/normale/aérée, alignement), **conditionné** pour ne rien changer aux vitrines existantes,
       branché sur l'élément `<section>` et injecté par `renderWebsiteHTML` — donc éditeur, aperçu et
@@ -99,10 +100,13 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
       application annulable. 7 tests, **331/331**.
       *Vérifié par test* : marquage et variables présents dans l'aperçu **et** dans l'export, aucune
       émission pour une section non modifiée, feuille injectée pour les trois surfaces.
-      *Non vérifié* : l'**apparence à l'écran** des trois rangées (l'inspecteur est hors du champ des
-      captures à 1280 px, et je n'ai ni redimensionnement de fenêtre ni accès aux styles calculés).
-      **Reste (4c)** : onglets par portée, divulgation progressive, `elementStyles[layoutKey]` pour les
-      éléments, wording humain (fin du « 60fps », « preset », « responsive », « HEX/RGB », « WCAG AA »).
+      **Vérifié à l'écran** (`4.9.1`) : les trois rangées « Mise en page » sont visibles dans le panneau
+      de propriétés, à la largeur desktop comme en tablette. **4c livré** : la divulgation progressive
+      (`ui-disclosure`, `alpha.48`) remplace la cascade, `elementStyles[layoutKey]` couvre les réglages
+      d'élément, et le vocabulaire est humain (« 60fps », « preset », « responsive », « HEX/RGB »,
+      « WCAG AA » ont disparu). Les « onglets par portée » sont remplacés par un inspecteur **contextuel**
+      — la section, puis l'élément dès qu'il est sélectionné — plutôt que deux onglets à maintenir.
+      **Lot clos.**
 - [x] **Lot 5 — États des éléments** (5a `4.9.0-alpha.9`, 5b `4.9.0-alpha.11` → `.12`, clos en `4.9.1`) :
       modèle `elementStates[layoutKey]` (survol, focus, actif, désactivé), primitive unique
       `elementStateCSS` injectée par le renderer et donc partagée par l'éditeur, l'aperçu et l'export,
