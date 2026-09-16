@@ -79,6 +79,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 - **Export autonome vérifié** : généré puis **affiché au navigateur** (en-tête, héros, services, galerie garnie, avis, simulateur). Les manques constatés venaient des contenus vides, désormais restaurés.
 - Tests : 4 nouveaux ; **420/420**.
 
+#### Aimants — l'image glissée s'attache à l'emplacement, elle ne flotte plus
+
+- En glissant un élément, l'**emplacement image survolé s'illumine** (contour bleu) : l'auteur voit où l'image va s'attacher, comme le demandait le retour d'usage.
+- Au relâchement, l'image **est déposée dans l'emplacement** (copie de la source vers le champ cible) au lieu de rester en position libre et de laisser un trou dans la section.
+- L'écriture d'image accepte désormais un **chemin pointé de liste** (`services.0.image`, `photos.2.url`, `photos.1.beforeImage`) : c'est ce qui permet d'écrire au bon endroit, et cela couvre aussi les deux photos du comparatif.
+- Tests : 1 nouveau ; **421/421**.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.59) — Lot 7 : la courbe d'animation devient réglable
 
 - Le catalogue portait une courbe par animation, mais l'auteur ne pouvait pas la changer. Trois courbes sont désormais proposées — **Douce** (départ vif, arrivée posée), **Rebond** (léger dépassement), **Régulière** — dans le repli « Réglages avancés » du panneau, à côté de la vitesse et du délai.

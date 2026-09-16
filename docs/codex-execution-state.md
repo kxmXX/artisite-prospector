@@ -1872,3 +1872,11 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Export autonome VERIFIE au navigateur : en-tete, heros, services, galerie garnie, avis, simulateur rendent correctement. Les manques venaient des contenus vides, restaures plus tot.
 - Tests : 420/420.
 - Reste : drag-and-drop a aimants, vue client = editeur (form factor), bug destructif du centrage (non reproduit), slider styles graphiques multiples, mediathèque alignee.
+
+## Journal — 17 septembre 2026 · 4.9.1 (suite 4) : aimants
+
+- Aimants livres : pendant un glisser, l'emplacement image survole s'illumine (classe is-freeform-drop-slot, contour bleu) ; au relachement, l'image est copiee dans le champ cible au lieu de rester en position libre (fini le trou dans la section).
+- buildFreeformSlotIndex construit la correspondance cle de mise en page -> {sectionId, field, kind} via collectSectionElements ; findFreeformDropSlot cherche l'emplacement survole ou le plus proche (< 48px).
+- applyImageUpdate gere desormais les chemins pointes generiques (services.0.image, photos.2.url, photos.1.beforeImage) : c'est la brique qui rend l'attachement possible, et elle couvre aussi les deux photos du comparatif.
+- Tests : 421/421.
+- Reste : vue client = editeur (form factor : le canevas de l'editeur est plus etroit a cause des panneaux), bug destructif du centrage (non reproduit), styles graphiques multiples du slider, mediathèque alignee sur l'editeur.
