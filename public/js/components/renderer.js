@@ -1,7 +1,7 @@
 import { getIcon } from "./icons.js";
 import { HERO_STYLES } from "./heroStyles.js";
 import { elementStateCSS } from "../engine/elementStates.js";
-import { MOTION_PRESETS, MOTION_SPEEDS, MOTION_DELAYS, motionTimingCSS } from "../data/motionPresets.js";
+import { MOTION_PRESETS, MOTION_SPEEDS, MOTION_DELAYS, motionTimingCSS, motionDirectionsFor, motionDirectionCSS } from "../data/motionPresets.js";
 import { sectionLayoutAttributes, SECTION_LAYOUT_CSS } from "../engine/sectionStyle.js";
 import { elementStyleCSS } from "../engine/elementStyle.js";
 import { getTradeFallbackDataUrl } from "../data/imageFallbacks.js";
@@ -475,6 +475,7 @@ export function renderWebsiteHTML(project, options = { isEditor: false, isStanda
       <style data-element-states>${elementStateCSS(project)}</style>
       <style data-element-style>${elementStyleCSS(project)}</style>
       <style data-motion-timing>${motionTimingCSS()}</style>
+      <style data-motion-direction>${motionDirectionCSS()}</style>
       ${sectionsHTML}
       ${stickyBarHTML}
       ${lightboxHTML}
@@ -595,13 +596,16 @@ function renderSection(sec, project, options) {
   const motionSpeed = sec.settings?.motionSpeed && sec.settings.motionSpeed !== "normal" ? sec.settings.motionSpeed : "";
   const motionDelay = sec.settings?.motionDelay && sec.settings.motionDelay !== "aucun" ? sec.settings.motionDelay : "";
   const motionEasing = sec.settings?.motionEasing && sec.settings.motionEasing !== "douce" ? sec.settings.motionEasing : "";
+  const motionDirection = motionDirectionsFor(motionPreset).some((direction) => direction.id === sec.settings?.motionDirection)
+    ? sec.settings.motionDirection
+    : "";
   const customBackground = /^#[0-9a-f]{3,8}$/i.test(sec.settings?.customBackground || "")
     ? `background-color: ${sec.settings.customBackground} !important;`
     : "";
 
   const sectionLayout = sectionLayoutAttributes(sec);
   if (!isEditor) {
-    return `<section id="${sec.type}" class="site-section ${bgTheme} ${isHidden ? 'hidden' : ''}" style="--section-bg: ${themeColor}; ${customBackground}${sectionLayout.style}" data-section-id="${sec.id}" data-section-type="${sec.type}" data-section-bg="${sectionTheme}" data-has-custom-bg="${customBackground ? 'true' : 'false'}" data-scroll-fx="zoom"${motionLoop ? ' data-motion-loop="' + motionLoop + '"' : ''} data-ui-id="${getSectionUiId(sec)}" data-ui-type="section"${sectionLayout.attributes}${motionPreset ? ` data-motion="${motionPreset}"` : ''}>${innerHTML}</section>`;
+    return `<section id="${sec.type}" class="site-section ${bgTheme} ${isHidden ? 'hidden' : ''}" style="--section-bg: ${themeColor}; ${customBackground}${sectionLayout.style}" data-section-id="${sec.id}" data-section-type="${sec.type}" data-section-bg="${sectionTheme}" data-has-custom-bg="${customBackground ? 'true' : 'false'}" data-scroll-fx="zoom"${motionLoop ? ' data-motion-loop="' + motionLoop + '"' : ''} data-ui-id="${getSectionUiId(sec)}" data-ui-type="section"${sectionLayout.attributes}${motionPreset ? ` data-motion="${motionPreset}"` : ''}${motionPreset && motionDirection ? ` data-motion-direction="${motionDirection}"` : ''}>${innerHTML}</section>`;
   }
 
   // Editor Wrapper with Controls
@@ -652,6 +656,7 @@ function renderSection(sec, project, options) {
          data-section-bg="${sectionTheme}"
          data-has-custom-bg="${hasCustomBg ? 'true' : 'false'}"
           ${motionPreset ? `data-motion="${motionPreset}"` : ''}
+          ${motionPreset && motionDirection ? `data-motion-direction="${motionDirection}"` : ''}
           ${motionPreset && motionSpeed ? `data-motion-speed="${motionSpeed}"` : ''}
           ${motionPreset && motionDelay ? `data-motion-delay="${motionDelay}"` : ''}
           ${motionPreset && motionEasing ? `data-motion-easing="${motionEasing}"` : ''}

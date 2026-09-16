@@ -23,6 +23,7 @@ import { getUiCode } from "./data/uiIds.js";
 import { ELEMENT_STATES, ELEMENT_STATE_LABELS, setElementState, clearElementState } from "./engine/elementStates.js";
 import { setSectionLayout, isValidSectionId } from "./engine/sectionStyle.js";
 import { setElementStyle, clearElementStyle, getElementStyle } from "./engine/elementStyle.js";
+import { motionDirectionsFor } from "./data/motionPresets.js";
 import { getIcon } from "./components/icons.js";
 import { setElementTransform, clearElementTransform, enableElementTransform } from "./engine/elementTransform.js";
 import { parseClientDemoPin, verifyClientDemoPin } from "./utils/clientDemoPin.js";
@@ -3448,6 +3449,7 @@ export class App {
     delete sec.settings.motionLoop;
     delete sec.settings.motionSpeed;
     delete sec.settings.motionDelay;
+    delete sec.settings.motionDirection;
     state.updateProject(updated, true);
     this.stopSectionMotion(sectionId);
     this.refreshInspectorPanel();
@@ -3482,6 +3484,9 @@ export class App {
     sec.motionPreset = preset;
     sec.settings = sec.settings || {};
     sec.settings.motionPreset = preset === "none" ? "" : preset;
+    // Changer pour une animation sans direction ne doit pas laisser derrière un
+    // ancien réglage de direction que le rendu ne jouerait plus.
+    if (!motionDirectionsFor(preset).length) delete sec.settings.motionDirection;
     state.updateProject(updated, true, `Animation section (${preset})`);
 
     const pop = document.getElementById(`sec-motion-popover-${secId}`);
@@ -3492,6 +3497,30 @@ export class App {
       this.previewSectionMotion(secId, preset);
     }, 30);
     this.showToast(`Animation : ${preset === 'none' ? 'Aucune' : preset}`, "info");
+  }
+
+  setSectionMotionDirection(sectionId, directionId) {
+    if (!state.currentProject) return;
+    const updated = JSON.parse(JSON.stringify(state.currentProject));
+    const sec = updated.sections.find(s => s.id === sectionId);
+    if (!sec) return;
+    sec.settings = sec.settings || {};
+    const preset = sec.settings.motionPreset || sec.motionPreset || "";
+    const directions = motionDirectionsFor(preset);
+    if (!directions.length) return;
+    const fallback = directions[0].id;
+    const chosen = directions.some(d => d.id === directionId) ? directionId : fallback;
+    if (chosen !== fallback) sec.settings.motionDirection = chosen;
+    else delete sec.settings.motionDirection;
+    state.updateProject(updated, true, "Direction de l'animation");
+
+    const secEl = document.getElementById("section-" + sectionId) || document.querySelector(".editor-section-wrapper[data-section-id=\"" + sectionId + "\"]");
+    if (secEl) {
+      if (sec.settings.motionDirection) secEl.setAttribute("data-motion-direction", sec.settings.motionDirection);
+      else secEl.removeAttribute("data-motion-direction");
+    }
+    if (preset && preset !== "none") this.previewSectionMotion(sectionId, preset);
+    this.showToast("Direction de l'animation enregistrée", "info");
   }
 
   getFieldMotionLoop(el) {

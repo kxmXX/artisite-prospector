@@ -1901,3 +1901,13 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Correctif : regle reecrite (champs/bordures/fonds alignes sur les jetons studio) et classe appliquee aux sept modales (mediatheque, closer, auth, palette de commandes, partage, wizard, ajout de section). Le contour de focus est conserve.
 - Tests : 425/425.
 - Reste : bug destructif du centrage (jamais reproduit ; contrat verrouille par test).
+
+## Journal — 17 septembre 2026 · 4.9.1 (suite 8) : direction des animations
+
+- Cause : « Montee douce » montait toujours du bas et « Entree laterale » entrait toujours par la gauche — la direction etait ecrite en dur dans le CSS, sans reglage.
+- Catalogue : MOTION_DIRECTIONS (haut/bas pour slide-up, gauche/droite pour slide-in) + motionDirectionCSS(), qui engendre les keyframes manquantes et reecrit animation-name. Aucune direction n'est proposee pour les animations qui n'en ont pas (un fondu ou un zoom n'a pas de direction).
+- Rendu : data-motion-direction sur la section, editeur ET vue client ; une direction inconnue ou incompatible avec l'animation est ignoree plutot que jouee.
+- Inspecteur : ligne « Direction » dans « Reglages avances », uniquement si l'animation en a une ; changer d'animation efface la direction orpheline.
+- Verification navigateur (styles calcules, animation figee a t=0) : up -> translateY(+22), down -> translateY(-22), left -> translateX(-24), right -> translateX(+24).
+- Tests : 430/430 (tests/motion_direction.test.js, 5 cas).
+- Reste : bug destructif du centrage (jamais reproduit ; contrat verrouille par test) ; vocabulaire de repetition du menu texte encore once/twice/infinite ; outil tester/rejouer/arreter/reinitialiser ; motions pendant un transform libre ; PRODUCT.md/DESIGN.md.

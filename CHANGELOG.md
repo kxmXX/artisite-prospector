@@ -105,13 +105,22 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 - Le contour de focus est conservé (pas de `outline: none`), conformément au contrat d'accessibilité.
 - Tests : 1 nouveau ; **425/425**.
 
+#### Animations — la direction devient réglable
+
+- **Constat** : deux animations seulement ont un sens directionnel — « Montée douce » et « Entrée latérale » — mais leur direction était **écrite en dur** dans le CSS : la montée venait toujours du bas, l'entrée toujours de la gauche. Impossible de faire entrer un bloc par la droite.
+- **Catalogue unique** (`public/js/data/motionPresets.js`) : `MOTION_DIRECTIONS` ne déclare des directions que pour ces deux animations (haut/bas, gauche/droite) et `motionDirectionCSS()` engendre les keyframes manquantes + la règle qui réécrit `animation-name`. Les animations sans direction n'exposent **rien** : afficher un réglage inopérant promettrait un effet que le rendu ne joue pas.
+- **Rendu** : la direction choisie voyage dans `data-motion-direction` sur la section, en éditeur **et** en vue client ; une direction inconnue ou incompatible avec l'animation est ignorée au lieu d'être jouée.
+- **Inspecteur** : une ligne « Direction » n'apparaît dans « Réglages avancés » que lorsque l'animation en a une, à côté de la vitesse, du délai et de la courbe. Changer d'animation efface un ancien réglage de direction resté orphelin.
+- **Vérifié dans le navigateur** (styles calculés, animation figée à t=0) : `slide-up`+`up` → `translateY(+22px)`, `+down` → `translateY(-22px)`, `slide-in`+`left` → `translateX(-24px)`, `+right` → `translateX(+24px)` ; la bonne animation est nommée dans chaque cas.
+- Tests : 5 nouveaux (`tests/motion_direction.test.js`) ; **430/430**.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.59) — Lot 7 : la courbe d'animation devient réglable
 
 - Le catalogue portait une courbe par animation, mais l'auteur ne pouvait pas la changer. Trois courbes sont désormais proposées — **Douce** (départ vif, arrivée posée), **Rebond** (léger dépassement), **Régulière** — dans le repli « Réglages avancés » du panneau, à côté de la vitesse et du délai.
 - Implémentation : la courbe choisie prime sur celle du preset par une règle unique (`animation-timing-function` sur `[data-motion-easing]`), alimentée par une variable par courbe — donc aucune règle d'animation dupliquée.
 - **Le réglage survit au rechargement** : le rendu émet `data-motion-easing`, vérifié sur le HTML produit. C'est le contrôle que j'avais oublié au premier passage de ce tour, et que la sonde a rattrapé.
 - Tests : 1 nouveau ; **404/404**. Vérifié : 3 courbes au catalogue, règle d'override présente, ligne dans l'inspecteur, attribut dans le rendu.
-- Reste sur le lot 7 : la **direction** par animation.
+- Reste sur le lot 7 : la **direction** par animation — **livrée** dans la section 4.9.1 ci-dessus (réglage par animation, `data-motion-direction`).
 
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.58) — Lot 7 : arrêter et réinitialiser une animation
 

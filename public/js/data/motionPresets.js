@@ -173,3 +173,55 @@ export function getMotionEasing(id) {
 export function motionEasingIds() {
   return MOTION_EASINGS.map((easing) => easing.id);
 }
+
+/**
+ * Direction : d'où part le mouvement, pour les animations qui en ont un.
+ *
+ * Seules les animations directionnelles exposent ce réglage — un fondu ou un
+ * zoom n'a pas de direction, l'afficher promettrait un effet que le rendu ne
+ * joue pas. Chaque direction est une animation nommée ; le rendu génère le
+ * sélecteur qui réécrit `animation-name`.
+ */
+export const MOTION_DIRECTIONS = Object.freeze({
+  "slide-up": Object.freeze([
+    { id: "up", label: "Depuis le bas", animation: "motion-slide-up", description: "L'élément monte depuis le bas." },
+    { id: "down", label: "Depuis le haut", animation: "motion-slide-down", description: "L'élément descend depuis le haut." }
+  ]),
+  "slide-in": Object.freeze([
+    { id: "left", label: "Depuis la gauche", animation: "motion-slide-in", description: "L'élément entre par la gauche." },
+    { id: "right", label: "Depuis la droite", animation: "motion-slide-from-right", description: "L'élément entre par la droite." }
+  ])
+});
+
+/** Directions d'une animation, ou liste vide si l'animation n'est pas directionnelle. */
+export function motionDirectionsFor(presetId) {
+  return MOTION_DIRECTIONS[String(presetId || "")] || [];
+}
+
+/** Direction retenue : celle demandée si elle existe, sinon la première. */
+export function getMotionDirection(presetId, directionId) {
+  const list = motionDirectionsFor(presetId);
+  if (!list.length) return null;
+  return list.find((direction) => direction.id === directionId) || list[0];
+}
+
+/**
+ * CSS de la direction : les keyframes manquantes, puis la réécriture du nom.
+ *
+ * `motion-slide-up` et `motion-slide-in` existent déjà dans app.css et servent
+ * de référence ; seules les directions alternatives ajoutent une keyframe. Le
+ * sélecteur d'attribut est plus spécifique que le raccourci `animation` de
+ * app.css, donc la direction choisie l'emporte à coup sûr.
+ */
+export function motionDirectionCSS() {
+  const lines = ["/* Direction de l'animation : le catalogue en est la source. */"];
+  lines.push("@keyframes motion-slide-down { from { opacity: 0; transform: translateY(-22px); } to { opacity: 1; transform: translateY(0); } }");
+  lines.push("@keyframes motion-slide-from-right { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: translateX(0); } }");
+  for (const [presetId, directions] of Object.entries(MOTION_DIRECTIONS)) {
+    for (const direction of directions) {
+      lines.push('[data-motion="' + presetId + '"][data-motion-direction="' + direction.id + '"].is-revealed,');
+      lines.push('.motion-preview[data-motion="' + presetId + '"][data-motion-direction="' + direction.id + '"] { animation-name: ' + direction.animation + " !important; }");
+    }
+  }
+  return lines.join("\n");
+}

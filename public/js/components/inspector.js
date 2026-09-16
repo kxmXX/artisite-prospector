@@ -11,7 +11,7 @@ import { escapeHtml } from "../utils/html.js";
 import { SECTION_WIDTHS, SECTION_SPACING, SECTION_ALIGN, getSectionLayout } from "../engine/sectionStyle.js";
 import { ELEMENT_PADDING, ELEMENT_RADIUS, ELEMENT_FONT, ELEMENT_OPACITY, ELEMENT_BACKGROUND, ELEMENT_BORDER, ELEMENT_SHADOW, getElementStyle } from "../engine/elementStyle.js";
 import { ELEMENT_STATES, ELEMENT_STATE_LABELS, ELEMENT_STATE_DESCRIPTIONS, getElementState } from "../engine/elementStates.js";
-import { MOTION_PRESETS, MOTION_SPEEDS, MOTION_DELAYS, MOTION_EASINGS } from "../data/motionPresets.js";
+import { MOTION_PRESETS, MOTION_SPEEDS, MOTION_DELAYS, MOTION_EASINGS, motionDirectionsFor } from "../data/motionPresets.js";
 import { TRANSFORM_FIELDS, getElementTransform, hasElementTransform } from "../engine/elementTransform.js";
 import { collectSectionElements } from "./renderer.js";
 import { numberedLabels } from "../data/elementLabels.js";
@@ -526,6 +526,21 @@ export function renderInspector(section, project, state) {
                     onclick="window.app.setSectionMotionEasing('${sectionId}', '${easing.id}')">${easing.label}</button>
           `).join('')}
         </div>
+        ${(() => {
+          const directions = motionDirectionsFor(section.settings?.motionPreset || section.motionPreset || '');
+          if (!directions.length) return '';
+          const current = section.settings?.motionDirection || directions[0].id;
+          return `
+            <div class="motion-loop-row" data-section-timing>
+              <span class="motion-loop-label">Direction</span>
+              ${directions.map((direction) => `
+                <button type="button"
+                        class="motion-loop-btn ${current === direction.id ? 'is-active' : ''}"
+                        title="${direction.description}"
+                        onclick="window.app.setSectionMotionDirection('${sectionId}', '${direction.id}')">${direction.label}</button>
+              `).join('')}
+            </div>`;
+        })()}
         `)}
 
         <button type="button"
