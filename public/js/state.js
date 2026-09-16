@@ -18,6 +18,7 @@ class AppStateManager {
     this.elementStyleState = "default";
     this.activeInspectorTab = "content"; // "content", "style", "visibility"
     this.activeSidebarTab = "sections"; // "sections", "settings"
+    this.structurePanelCollapsed = false; // volet Structure/Réglages refermé sur desktop
     this.activeDrawer = null; // null, "closer", "new_project", "add_section"
     this.copilotOpen = false;
     this.hasStoredLibrary = false;

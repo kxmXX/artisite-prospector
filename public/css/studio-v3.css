@@ -95,7 +95,12 @@
 .studio-v3-panelhead { min-height:76px;padding:16px 17px 12px;display:flex;align-items:flex-end;justify-content:space-between;border-bottom:1px solid var(--v3-line); }
 .studio-v3-eyebrow { display:block;margin-bottom:5px;color:var(--ui-muted);font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:.15em; }
 .studio-v3-panelhead h2 { margin:0;color:var(--v3-ink);font-size:17px;line-height:1;font-weight:700;letter-spacing:-.035em; }
-.studio-v3-mobile-close { display:none;width:32px;height:32px;border:0;border-radius:9px;background:#eeede8;color:#68716d; }
+.studio-v3-mobile-close { display:none;width:32px;height:32px;border:0;border-radius:9px;background:#eeede8;color:#68716d;cursor:pointer; }
+/* Desktop : le volet Structure/Reglages se referme vraiment, et le rail le rouvre. */
+@media (min-width: 981px) {
+  .studio-v3-mobile-close { display:grid;place-items:center; }
+  .studio-v3-structure-panel.is-collapsed { display:none; }
+}
 .studio-v3-structure-summary { height:44px;padding:0 13px 0 17px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--v3-line);color:#8b918e;font-size:9.5px; }
 .studio-v3-structure-summary span+span::before { content:"·";margin-right:8px; }
 .studio-v3-structure-summary button { margin-left:auto;min-height:32px;padding:0 6px;border:0;background:transparent;color:#4b5b54;display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700; }

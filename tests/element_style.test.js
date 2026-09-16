@@ -13,7 +13,7 @@ const markupOnly = (html) => html.replace(/<style[\s\S]*?<\/style>/g, '');
 test('un element sans reglage ne produit aucune regle', () => {
   assert.equal(style.elementStyleCSS(project()), '', 'aucun réglage, aucune feuille');
   assert.deepEqual(style.getElementStyle(project(), 'E1'),
-    { padding: 'normal', radius: 'soft', opacity: 'full', background: 'none', border: 'none', shadow: 'none' },
+    { padding: 'normal', radius: 'soft', opacity: 'full', background: 'none', border: 'none', shadow: 'none', font: 'theme' },
     'les valeurs par défaut sont complètes');
   assert.equal(style.hasCustomElementStyle(project(), 'E1'), false);
 });

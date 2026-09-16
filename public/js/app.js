@@ -1970,6 +1970,13 @@ export class App {
     this.commitFieldUpdate(sectionId, field, value);
   }
 
+  /** Referme/rouvre le volet Structure-Réglages ; l'état survit aux re-rendus. */
+  setStructurePanelCollapsed(collapsed) {
+    state.structurePanelCollapsed = Boolean(collapsed);
+    const panel = document.querySelector(".studio-v3-structure-panel");
+    if (panel) panel.classList.toggle("is-collapsed", state.structurePanelCollapsed);
+  }
+
   toggleSettingsItem(itemId) {
     const body = document.getElementById(`settings-body-${itemId}`);
     if (!body) return;

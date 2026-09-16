@@ -9,7 +9,7 @@ import {
 } from "../engine/componentIntelligence.js";
 import { escapeHtml } from "../utils/html.js";
 import { SECTION_WIDTHS, SECTION_SPACING, SECTION_ALIGN, getSectionLayout } from "../engine/sectionStyle.js";
-import { ELEMENT_PADDING, ELEMENT_RADIUS, ELEMENT_OPACITY, ELEMENT_BACKGROUND, ELEMENT_BORDER, ELEMENT_SHADOW, getElementStyle } from "../engine/elementStyle.js";
+import { ELEMENT_PADDING, ELEMENT_RADIUS, ELEMENT_FONT, ELEMENT_OPACITY, ELEMENT_BACKGROUND, ELEMENT_BORDER, ELEMENT_SHADOW, getElementStyle } from "../engine/elementStyle.js";
 import { ELEMENT_STATES, ELEMENT_STATE_LABELS, getElementState } from "../engine/elementStates.js";
 import { MOTION_PRESETS, MOTION_SPEEDS, MOTION_DELAYS, MOTION_EASINGS } from "../data/motionPresets.js";
 import { TRANSFORM_FIELDS, getElementTransform, hasElementTransform } from "../engine/elementTransform.js";
@@ -48,6 +48,7 @@ function disclosure(key, summary, body) {
 const ELEMENT_SCALE_ROWS = [
   ["padding", ELEMENT_PADDING],
   ["radius", ELEMENT_RADIUS],
+  ["font", ELEMENT_FONT],
   ["opacity", ELEMENT_OPACITY],
   ["background", ELEMENT_BACKGROUND],
   ["border", ELEMENT_BORDER],
@@ -328,7 +329,7 @@ function elementStyleControlsHTML(project, layoutKey, activeState) {
 
   // Divulgation progressive : l'auteur regle d'abord l'espacement et la forme, qui font
   // l'essentiel du travail ; le reste s'ouvre a la demande (mode Operate de la skill).
-  const ESSENTIAL_STYLE_ROWS = ["padding", "radius"];
+  const ESSENTIAL_STYLE_ROWS = ["padding", "radius", "font"];
   const essentialRows = ELEMENT_SCALE_ROWS.filter(function (entry) { return ESSENTIAL_STYLE_ROWS.indexOf(entry[0]) >= 0; })
     .map(function (entry) { return row(entry[0], entry[1]); }).join('');
   const advancedRows = ELEMENT_SCALE_ROWS.filter(function (entry) { return ESSENTIAL_STYLE_ROWS.indexOf(entry[0]) < 0; })

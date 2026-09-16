@@ -48,13 +48,26 @@ export const ELEMENT_SHADOW = {
   lifted: { label: "Portée", value: "0 8px 24px rgba(0, 0, 0, 0.10)" }
 };
 
+// Polices proposées par élément : uniquement des familles déjà chargées par le site
+// et par l'export (Fontshare) plus des replis système, jamais une valeur libre.
+export const ELEMENT_FONT = {
+  theme: { label: "Police du thème", value: "inherit" },
+  satoshi: { label: "Satoshi", value: "'Satoshi', system-ui, sans-serif" },
+  general: { label: "General Sans", value: "'General Sans', system-ui, sans-serif" },
+  clash: { label: "Clash Display", value: "'Clash Display', system-ui, sans-serif" },
+  cabinet: { label: "Cabinet Grotesk", value: "'Cabinet Grotesk', system-ui, sans-serif" },
+  serif: { label: "Serif classique", value: "Georgia, 'Times New Roman', serif" },
+  mono: { label: "Monospace", value: "ui-monospace, SFMono-Regular, Menlo, monospace" }
+};
+
 export const ELEMENT_STYLE_DEFAULTS = Object.freeze({
   padding: "normal",
   radius: "soft",
   opacity: "full",
   background: "none",
   border: "none",
-  shadow: "none"
+  shadow: "none",
+  font: "theme"
 });
 
 const SAFE_KEY = /^[A-Za-z0-9_-]{1,64}$/;
@@ -72,7 +85,8 @@ export function getElementStyle(project, layoutKey) {
     opacity: pick(ELEMENT_OPACITY, raw.opacity, ELEMENT_STYLE_DEFAULTS.opacity),
     background: pick(ELEMENT_BACKGROUND, raw.background, ELEMENT_STYLE_DEFAULTS.background),
     border: pick(ELEMENT_BORDER, raw.border, ELEMENT_STYLE_DEFAULTS.border),
-    shadow: pick(ELEMENT_SHADOW, raw.shadow, ELEMENT_STYLE_DEFAULTS.shadow)
+    shadow: pick(ELEMENT_SHADOW, raw.shadow, ELEMENT_STYLE_DEFAULTS.shadow),
+    font: pick(ELEMENT_FONT, raw.font, ELEMENT_STYLE_DEFAULTS.font)
   };
 }
 
@@ -90,7 +104,8 @@ export function setElementStyle(project, layoutKey, property, value) {
     opacity: ELEMENT_OPACITY,
     background: ELEMENT_BACKGROUND,
     border: ELEMENT_BORDER,
-    shadow: ELEMENT_SHADOW
+    shadow: ELEMENT_SHADOW,
+    font: ELEMENT_FONT
   };
   const scale = scales[property];
   if (!scale || !Object.prototype.hasOwnProperty.call(scale, value)) return project;
@@ -112,7 +127,8 @@ export function declarationsFor(property, valueId) {
     opacity: ELEMENT_OPACITY,
     background: ELEMENT_BACKGROUND,
     border: ELEMENT_BORDER,
-    shadow: ELEMENT_SHADOW
+    shadow: ELEMENT_SHADOW,
+    font: ELEMENT_FONT
   };
   const scale = scales[property];
   if (!scale || !Object.prototype.hasOwnProperty.call(scale, valueId)) return null;
@@ -121,6 +137,7 @@ export function declarationsFor(property, valueId) {
   if (property === "opacity") return ["opacity: " + ELEMENT_OPACITY[valueId].value + ";"];
   if (property === "border") return ["border: " + ELEMENT_BORDER[valueId].value + ";"];
   if (property === "shadow") return ["box-shadow: " + ELEMENT_SHADOW[valueId].value + ";"];
+  if (property === "font") return ["font-family: " + ELEMENT_FONT[valueId].value + ";"];
   const background = ELEMENT_BACKGROUND[valueId];
   return ["background-color: " + background.value + ";"].concat(background.contrast ? [background.contrast] : []);
 }

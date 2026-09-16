@@ -152,10 +152,10 @@ export function renderEditor(state) {
       <div class="studio-v3-workspace editor-workspace-layout">
         ${!isLivePreview ? `
         <nav class="studio-v3-rail" aria-label="Outils du studio">
-          <button type="button" class="studio-v3-railbtn ${state.activeSidebarTab !== 'settings' ? 'is-active' : ''}" onclick="window.app.setSidebarTab('sections'); requestAnimationFrame(() => document.querySelector('.studio-v3-structure-panel')?.classList.add('is-mobile-open'))" title="Structure">
+          <button type="button" class="studio-v3-railbtn ${state.activeSidebarTab !== 'settings' ? 'is-active' : ''}" onclick="window.app.setStructurePanelCollapsed(false); window.app.setSidebarTab('sections'); requestAnimationFrame(() => document.querySelector('.studio-v3-structure-panel')?.classList.add('is-mobile-open'))" title="Structure">
             ${getIcon("layers", "w-5 h-5")}<span>Structure</span>
           </button>
-          <button type="button" class="studio-v3-railbtn ${state.activeSidebarTab === 'settings' ? 'is-active' : ''}" onclick="window.app.setSidebarTab('settings'); requestAnimationFrame(() => document.querySelector('.studio-v3-structure-panel')?.classList.add('is-mobile-open'))" title="Réglages globaux">
+          <button type="button" class="studio-v3-railbtn ${state.activeSidebarTab === 'settings' ? 'is-active' : ''}" onclick="window.app.setStructurePanelCollapsed(false); window.app.setSidebarTab('settings'); requestAnimationFrame(() => document.querySelector('.studio-v3-structure-panel')?.classList.add('is-mobile-open'))" title="Réglages globaux">
             ${getIcon("sliders", "w-5 h-5")}<span>Réglages</span>
           </button>
           <button type="button" class="studio-v3-railbtn" onclick="window.app.openAddSectionModal('sections')" title="Ajouter une section">
@@ -167,13 +167,13 @@ export function renderEditor(state) {
           </button>
         </nav>
 
-        <aside class="studio-v3-structure-panel">
+        <aside class="studio-v3-structure-panel${state.structurePanelCollapsed ? ' is-collapsed' : ''}">
           <div class="studio-v3-panelhead">
             <div>
               <span class="studio-v3-eyebrow">${state.activeSidebarTab === 'settings' ? 'Projet' : 'Architecture'}</span>
               <h2>${state.activeSidebarTab === 'settings' ? 'Réglages du site' : 'Structure du site'}</h2>
             </div>
-            <button type="button" class="studio-v3-mobile-close" onclick="this.closest('.studio-v3-structure-panel')?.classList.remove('is-mobile-open')" aria-label="Fermer">${getIcon("x", "w-4 h-4")}</button>
+            <button type="button" class="studio-v3-mobile-close" onclick="window.app.setStructurePanelCollapsed(true)" aria-label="Fermer le volet">${getIcon("x", "w-4 h-4")}</button>
           </div>
 
           ${state.activeSidebarTab === 'settings' ? `
