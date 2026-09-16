@@ -190,6 +190,11 @@ class AppStateManager {
   }
 
   setDrawer(drawerName) {
+    // Une surcouche pose une entree d'historique : le bouton Retour la ferme au
+    // lieu de quitter la page ou de changer d'onglet.
+    if (!this.activeDrawer && drawerName && typeof window !== "undefined" && window.history && typeof window.history.pushState === "function") {
+      window.history.pushState({ artisite: true, modal: drawerName }, "", window.location.href);
+    }
     this.activeDrawer = drawerName;
     this.notify("drawer_change");
   }

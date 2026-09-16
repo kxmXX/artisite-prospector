@@ -303,6 +303,8 @@ export class App {
   installNavigationHistory() {
     if (this._navigationHistoryBound || typeof window === "undefined") return;
     window.addEventListener("popstate", () => {
+      // Le bouton Retour ferme d'abord la surcouche ouverte : il ne change pas de page.
+      if (state.activeDrawer) { state.closeDrawer(); this.renderModals(); return; }
       this.applyNavigationRoute(this.readNavigationRoute());
     });
     this._navigationHistoryBound = true;
@@ -339,8 +341,13 @@ export class App {
 
   writeNavigationHistory(route, replace = false) {
     if (typeof window === "undefined" || !window.history) return;
+    const url = this.navigationUrl(route);
+    const currentUrl = window.location.pathname + window.location.search + window.location.hash;
+    // Ne jamais empiler deux fois la même destination : sinon le bouton Retour du
+    // navigateur fait défiler des doublons au lieu de revenir vraiment en arrière.
+    if (!replace && url === currentUrl) return;
     const payload = { artisite: true, view: route.view || "dashboard", projectId: route.projectId || null, canonicalDemo: Boolean(route.canonicalDemo) };
-    window.history[replace ? "replaceState" : "pushState"](payload, "", this.navigationUrl(route));
+    window.history[replace ? "replaceState" : "pushState"](payload, "", url);
   }
 
   resolveRouteProject(projectId) {
@@ -650,12 +657,12 @@ export class App {
     state.authTab = tab === "register" ? "register" : "login";
     state.authError = "";
     state.authNotice = "";
-    state.activeDrawer = "auth";
+    state.setDrawer("auth");
     this.renderModals();
   }
 
   closeAuthModal() {
-    state.activeDrawer = null;
+    state.closeDrawer();
     this.renderModals();
   }
 
@@ -681,7 +688,7 @@ export class App {
       state.setSession(session.user, session.status);
       await this.pullCloudLibrary();
       state.authBusy = false;
-      state.activeDrawer = null;
+      state.closeDrawer();
       const plan = planMigration(readLocalProjects(), state.projects);
       state._migrationPlan = plan.toImport.length ? plan : null;
       this.render();
