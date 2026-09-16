@@ -2309,8 +2309,9 @@ function renderHours(sec, project, options = {}) {
                   loading="lazy"
                   allowfullscreen
                   referrerpolicy="no-referrer-when-downgrade"
-                  src="https://maps.google.com/maps?q=${encodeURIComponent(mapQuery)}&t=&z=12&ie=UTF8&iwloc=&output=embed">
+                  data-src="https://maps.google.com/maps?q=${encodeURIComponent(mapQuery)}&t=&z=12&ie=UTF8&iwloc=&output=embed">
                 </iframe>
+                <button type="button" onclick="var f=this.parentNode.querySelector('iframe');f.src=f.getAttribute('data-src');this.remove();" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#eef2f7,#dbe3ec);border:0;cursor:pointer;font:600 13px/1.2 system-ui,sans-serif;color:#334155;z-index:2">Afficher la carte interactive</button>
               ` : renderEditableImage(mapImage, {
                 sectionId: sec.id,
                 fieldPath: "mapImage",
@@ -2405,8 +2406,9 @@ function renderLocation(sec, project) {
                   class="w-full h-full border-0 filter saturate-[1.1] contrast-[1.05]"
                   loading="lazy"
                   allowfullscreen
-                  src="https://maps.google.com/maps?q=${encodeURIComponent(c.address || (c.city ? c.city + ', France' : 'France'))}&t=&z=12&ie=UTF8&iwloc=&output=embed">
+                  data-src="https://maps.google.com/maps?q=${encodeURIComponent(c.address || (c.city ? c.city + ', France' : 'France'))}&t=&z=12&ie=UTF8&iwloc=&output=embed">
                 </iframe>
+                <button type="button" onclick="var f=this.parentNode.querySelector('iframe');f.src=f.getAttribute('data-src');this.remove();" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#eef2f7,#dbe3ec);border:0;cursor:pointer;font:600 13px/1.2 system-ui,sans-serif;color:#334155;z-index:2">Afficher la carte interactive</button>
 
                 <!-- Clean Route Badge (High Clarity, No heavy frosted blur) -->
                 <div class="absolute bottom-3 left-3 z-10 map-clean-overlay p-3 text-white space-y-1.5 pointer-events-auto">
