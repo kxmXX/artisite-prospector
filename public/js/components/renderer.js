@@ -2248,6 +2248,8 @@ function renderHours(sec, project, options = {}) {
       samedi: "Samedi",
       dimanche: "Dimanche"
     };
+    // Le jour courant est mis en avant : l'auteur demandait des horaires "lies au jour".
+    const todayKey = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"][new Date().getDay()];
 
     return `
       <div id="horaires" class="py-20 lg:py-28 bg-white dark:bg-zinc-950 border-t border-black/5">
@@ -2275,13 +2277,14 @@ function renderHours(sec, project, options = {}) {
                   const time = hours[day] || "À renseigner";
                   const isClosed = time.toLowerCase().includes("fermé");
                   const isPending = !hours[day];
+                  const isToday = day === todayKey;
                   return `
-                    <div class="flex items-center justify-between vitrine-hours-row">
+                    <div class="flex items-center justify-between vitrine-hours-row"${isToday ? ' style="background:color-mix(in srgb, var(--primary, #527c22) 7%, transparent)" aria-current="date"' : ''}>
                       <div class="flex items-center gap-3">
                         <svg class="w-4 h-4 ${isClosed ? 'text-zinc-400' : 'text-[#527c22]'}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        <span class="font-semibold text-gray-900 dark:text-white">${dayLabels[day] || day}</span>
+                        <span class="font-semibold text-gray-900 dark:text-white">${dayLabels[day] || day}${isToday ? ' <span style="display:inline-block;margin-left:6px;padding:1px 6px;border-radius:999px;background:var(--primary,#527c22);color:#fff;font-size:9px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;vertical-align:middle">Aujourd\'hui</span>' : ''}</span>
                       </div>
                       <span class="${isPending || isClosed ? 'text-zinc-400 dark:text-zinc-500 italic' : 'text-gray-700 dark:text-zinc-300 font-medium'}" data-editable="hours.${day}">${time}</span>
                     </div>
