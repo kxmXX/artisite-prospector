@@ -1988,3 +1988,12 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Le catalogue deterministe (six avis, badges) reste en place : choix explicite de l'auteur, entierement modifiable.
 - Tests : tests/ai_prompt_provenance.test.js (1 cas) ; 451/451.
 - Reste : bug destructif du centrage (jamais reproduit) ; Lot 6 — glisser a la souris (test local de l'auteur) ; items de fond (bundling/performance, robustesse navigateur, contre-audit securite).
+
+## Journal — 17 septembre 2026 · 4.9.1 (suite 19) : contre-audit securite, perf et bundling
+
+- Securite : serveur relu (server.js, apiHandler.js, accounts.js, store.js). Aucune faille critique trouvee. Les invariants sont desormais verrouilles par tests/server_security_audit.test.js : scrypt + timingSafeEqual, sessions referencees par le hash du jeton (jamais le jeton en clair), cookie HttpOnly/SameSite=Lax/Secure en production, corps borne a 2 Mo, origine verifiee avant toute route API (403 sinon, deja teste), budget par IP sur les routes IA, refus de la traversee de dossier et des separateurs encodes, isolation des projets par proprietaire.
+- Limites de partage : le partage existe mais aucune revendication multi-utilisateur n'est faite ; test dedie.
+- Performance/bundling : mesure — 43 fichiers JS + 5 CSS, 292 Ko de JS gzippe et 43 Ko de CSS gzippe. Aucun gain demontre ne justifie Vite ; decision de ne pas migrer, zero dependance npm et serveur Node/Vercel preserves.
+- Robustesse : couverte par les 12 cas de gestes + les tests d'exclusivite des surcouches, d'edition en ligne annulable, d'echelle Echap, de CTA et de tableaux defilants. Item clos.
+- Tests : 453/453. Trois items de fond clos (bundling, robustesse, contre-audit).
+- Reste : bug destructif du centrage (jamais reproduit) ; Lot 6 — glisser a la souris (test local de l'auteur).

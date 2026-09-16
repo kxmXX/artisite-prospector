@@ -236,7 +236,10 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
 - [x] Labels du wizard — associations natives `for`/`id` complètes dans `4.8.0-alpha.40`.
 - [x] Polices — import CSS Google Fonts bloquant supprimé ; chargement unique par `<link>` dans `4.8.0-alpha.40`.
 - [x] Progression du terminal IA — étapes liées à la requête et à la construction réelles, fallback local explicite et ouverture après assemblage (`4.8.0-alpha.42`).
-- [ ] Bundling/performance — à mesurer avant d’introduire Vite ; ne pas créer une migration globale sans preuve de gain et sans préserver le serveur Node/Vercel.
+- [x] Bundling/performance — **mesuré** (`4.9.1`) : 43 fichiers JS et 5 CSS, soit **292 Ko de JS gzippé**
+      et **43 Ko de CSS gzippé** (HTML 1 Ko) pour toute l'application. Aucun gain démontré ne justifie
+      d'introduire Vite ni de perdre le « zéro dépendance npm » et le serveur Node/Vercel. Décision :
+      **ne pas migrer** tant qu'une mesure ne montre pas un problème réel.
 - [~] Persistance serveur et audit SEO réel — exclus explicitement par l’utilisateur pour cette mission.
 - [~] Avis Google fictifs / badges associés — conservation explicitement demandée par l’utilisateur.
 
@@ -345,7 +348,12 @@ Prochaine action exacte : audit navigateur large de l’éditeur Esprit Nature s
 - [x] Responsive phase 2 — héritage/adaptation assistée et commandes de copie/reset entre breakpoints, avec adaptation proportionnelle 1200/768/390 et resynchronisation du cadre après transition.
 - [x] Persistance phase 1 — transformations enregistrées dans l’état projet, sauvegarde locale, Undo/Redo, preview et export standalone.
 - [x] Calques phase 1 — verrouillage persistant avec Undo ; un calque verrouillé reste sélectionnable mais refuse drag, resize, clavier, alignement, groupage et changement de plan.
-- [ ] Robustesse — tests unitaires + navigateur pour texte/image/CTA/groupe, souris/tactile/clavier, sans collision avec inline editing, popovers ou modales.
+- [x] Robustesse — couverte par des tests par valeurs, sans collision entre familles d'interface :
+      **12 cas de gestes** (souris, tactile, clavier, tablette, export) ; édition en ligne annulable et
+      sortie explicite ; **exclusivité des surcouches** (barre d'élément, panneau de section, sélection
+      libre, CTA) et jamais par-dessus une modale ; échelle Échap unique ; flèches inertes quand la barre
+      est masquée ; CTA d'en-tête ouvrable ; tableaux comparatifs qui défilent au lieu de couper les
+      cellules. Vérification navigateur faite par captures et styles calculés.
 
 ## Stabilité async / backend — reprise après l’éditeur
 
@@ -358,7 +366,13 @@ Prochaine action exacte : audit navigateur large de l’éditeur Esprit Nature s
       **vides** (ils appartiennent à l'artisan), les certifications et noms de personne ne sont plus
       affirmés, et les réponses de FAQ ne promettent plus de délai ni de garantie. Le catalogue de
       démonstration déterministe reste la base **choisie par l'auteur** et demeure modifiable.
-- [ ] Contre-audit sécurité / performance et limites de partage avant toute revendication multi-utilisateur.
+- [x] Contre-audit sécurité / performance (`4.9.1`) : serveur relu et **invariants verrouillés par test**
+      (`tests/server_security_audit.test.js`) — scrypt + comparaison en temps constant, sessions
+      référencées par le **hash** du jeton (jamais le jeton en clair), cookie HttpOnly/SameSite/Secure en
+      production, corps borné à 2 Mo, **origine vérifiée avant toute route API** (une origine inconnue
+      reçoit 403, testé), budget par IP sur les routes IA, refus de la traversée de dossier et des
+      séparateurs encodés, isolation des projets par propriétaire (testée). **Limites de partage** : le
+      partage existe mais aucune revendication « multi-utilisateur » n'est faite — test dédié.
 
 ## Procédure de chaque commit
 

@@ -174,6 +174,12 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 - Le catalogue de démonstration déterministe (six avis, badges) reste en place : c'est un **choix explicite de l'auteur**, et il reste entièrement modifiable.
 - Tests : 1 nouveau (`tests/ai_prompt_provenance.test.js`) ; **451/451**.
 
+#### Contre-audit sécurité, performance et décision de bundling
+
+- **Sécurité** : serveur relu, invariants **verrouillés par test** (`tests/server_security_audit.test.js`) — scrypt et comparaison en temps constant, sessions référencées par le **hash** du jeton (le jeton en clair n'est jamais stocké), cookie HttpOnly/SameSite/Secure en production, corps borné à 2 Mo, **origine vérifiée avant toute route API** (403 sinon, testé), budget par IP sur les routes IA, refus de la traversée de dossier et des séparateurs encodés, isolation des projets par propriétaire. Aucune revendication « multi-utilisateur » n'est faite.
+- **Performance / bundling** : mesuré — 43 fichiers JS et 5 CSS, soit **292 Ko de JS gzippé** et 43 Ko de CSS gzippé. Aucun gain démontré ne justifie Vite ; décision de **ne pas migrer**, le « zéro dépendance npm » et le serveur Node/Vercel sont préservés.
+- Tests : 2 nouveaux ; **453/453**. Deux items de fond clos.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.59) — Lot 7 : la courbe d'animation devient réglable
 
 - Le catalogue portait une courbe par animation, mais l'auteur ne pouvait pas la changer. Trois courbes sont désormais proposées — **Douce** (départ vif, arrivée posée), **Rebond** (léger dépassement), **Régulière** — dans le repli « Réglages avancés » du panneau, à côté de la vitesse et du délai.
