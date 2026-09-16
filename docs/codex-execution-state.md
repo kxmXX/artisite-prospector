@@ -1927,3 +1927,10 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Helper _findImageElement : les trois actions image visent la meme image (remplace quatre selecteurs dupliques).
 - Tests : tests/motion_actions.test.js (4 cas) ; 435/435.
 - Reste : bug destructif du centrage (jamais reproduit) ; motions pendant un transform libre ; PRODUCT.md/DESIGN.md.
+
+## Journal — 17 septembre 2026 · 4.9.1 (suite 11) : motions figees pendant un transform libre
+
+- Cause : la pause existait (freeform-transforming) mais ne visait que les elements .is-freeform-selected ; pendant un glisser direct d'un element non selectionne, et pendant l'aimantation, les animations d'entree des autres elements continuaient et decalaient les rectangles mesures.
+- Correctif CSS (studio-v3.css) : pendant freeform-transforming OU freeform-rotating, toutes les animations du canevas sont figees (animation-play-state: paused) ; elles reprennent au relachement. La pause reste bornee au geste.
+- Tests : tests/freeform_motion_suspension.test.js (1 cas) ; 436/436.
+- Reste : exposer le declencheur (MOTION_TRIGGERS : apparition / chargement / survol / clic ; seul « a l'apparition » est branche) ; bug destructif du centrage (jamais reproduit) ; PRODUCT.md/DESIGN.md.

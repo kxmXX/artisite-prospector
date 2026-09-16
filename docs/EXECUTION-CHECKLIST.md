@@ -150,8 +150,10 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
       effet que le rendu ne joue pas. La **répétition** parle désormais un seul vocabulaire (`4.9.1`) :
       une rangée partagée par les trois surfaces, alimentée par le catalogue, et l'ancien `infinite`
       traduit en `loop` à la lecture. L'outil **tester / arrêter / réinitialiser** couvre désormais les
-      trois surfaces (`4.9.1`) : la section, le texte et l'image. *Reste* : neutralisation des motions
-      pendant un transform libre.
+      trois surfaces (`4.9.1`) : la section, le texte et l'image. Les animations sont **figées pendant un
+      transform libre** (`4.9.1`) — tout le canevas, pas seulement la sélection — pour que les repères
+      d'aimantation mesurent des positions stables. *Reste* : exposer le **déclencheur** (`MOTION_TRIGGERS`
+      déclare apparition / chargement / survol / clic, mais seul « à l'apparition » est branché).
 - [x] **Lot 4d — Divulgation progressive de l'inspecteur** (clos en `4.9.0-alpha.48`) : primitive partagée
       (`disclosure`, `<details>/<summary>` natifs, focus clavier, état retenu au nouveau rendu) appliquée au
       rythme de l'animation de section (`4.9.0-alpha.29`) puis aux réglages d'élément — espacement et angles

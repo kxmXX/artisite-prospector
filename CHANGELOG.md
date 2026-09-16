@@ -128,6 +128,12 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 - Un helper `_findImageElement` remplace les quatre sélecteurs d'image dupliqués, pour que les trois actions visent bien la même image.
 - Tests : 4 nouveaux (`tests/motion_actions.test.js`) ; **435/435**.
 
+#### Animations — plus aucune animation pendant un transform libre
+
+- **Constat** : la pause existait (`freeform-transforming`) mais ne visait que les éléments **sélectionnés**. Pendant un glisser direct d'un élément non sélectionné, et surtout pendant l'aimantation, les animations d'entrée des autres éléments continuaient — ce qui **décalait les rectangles mesurés** pour l'aimantation.
+- **Correctif** : pendant `freeform-transforming` ou `freeform-rotating`, **toutes** les animations du canevas sont figées (`animation-play-state: paused`), pas seulement la sélection ; elles repartent au relâchement. La pause reste bornée au geste : aucune règle ne l'applique en dehors.
+- Tests : 1 nouveau (`tests/freeform_motion_suspension.test.js`) ; **436/436**.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.59) — Lot 7 : la courbe d'animation devient réglable
 
 - Le catalogue portait une courbe par animation, mais l'auteur ne pouvait pas la changer. Trois courbes sont désormais proposées — **Douce** (départ vif, arrivée posée), **Rebond** (léger dépassement), **Régulière** — dans le repli « Réglages avancés » du panneau, à côté de la vitesse et du délai.

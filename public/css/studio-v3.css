@@ -624,8 +624,15 @@ body.freeform-marqueeing,body.freeform-marqueeing *{cursor:crosshair!important;u
 
 .studio-editor:not(.client-preview-mode) > .sticky-call-bar{display:none!important}
 .freeform-alignbar,.freeform-layerbar,.freeform-responsivebar{max-width:calc(100vw - 16px);overflow-x:auto;overscroll-behavior:contain;scrollbar-width:thin}
-body.freeform-transforming #canvas-container [data-layout-key].is-freeform-selected,
-body.freeform-transforming #canvas-container [data-layout-key].is-freeform-selected *{animation-play-state:paused!important}
+/* Pendant un deplacement ou un redimensionnement libre, toutes les animations
+   du canevas sont figees : l'element deplace ne doit pas lutter avec son
+   animation d'entree, et les reperes d'aimantation mesurent des positions
+   stables (une animation en cours decale le rectangle mesure). Les animations
+   reprennent au relachement. */
+body.freeform-transforming #canvas-container [data-layout-key],
+body.freeform-transforming #canvas-container [data-layout-key] *,
+body.freeform-rotating #canvas-container [data-layout-key],
+body.freeform-rotating #canvas-container [data-layout-key] *{animation-play-state:paused!important}
 .client-preview-mode .freeform-selection-box,
 .client-preview-mode .freeform-snap-guide,
 .client-preview-mode .freeform-spacing-guide,
