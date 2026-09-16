@@ -26,6 +26,18 @@ const MIME_TYPES = {
   ".woff2": "font/woff2"
 };
 
+/**
+ * Local : tout doit se revalider. Sinon le navigateur sert un JS/CSS vieux d'une
+ * heure (max-age=3600) et l'auteur jure qu'on n'a rien change. En production,
+ * Vercel sert lui-meme les fichiers statiques ; ce serveur ne fait que l'API.
+ */
+function cacheControlHeader(ext) {
+  if (process.env.VERCEL) {
+    return ext === ".html" ? "no-cache" : "public, max-age=3600, stale-while-revalidate=86400";
+  }
+  return "no-cache";
+}
+
 const server = http.createServer(async (req, res) => {
   const [rawUrl] = req.url.split("?");
 
@@ -72,7 +84,7 @@ const server = http.createServer(async (req, res) => {
     if (req.headers["if-none-match"] === etag) {
       res.writeHead(304, {
         "ETag": etag,
-        "Cache-Control": ext === ".html" ? "no-cache" : "public, max-age=3600, stale-while-revalidate=86400"
+        "Cache-Control": cacheControlHeader(ext)
       });
       res.end();
       return;
@@ -88,7 +100,7 @@ const server = http.createServer(async (req, res) => {
       res.writeHead(200, {
         "Content-Type": contentType,
         "ETag": etag,
-        "Cache-Control": ext === ".html" ? "no-cache" : "public, max-age=3600, stale-while-revalidate=86400"
+        "Cache-Control": cacheControlHeader(ext)
       });
       res.end(content);
     });

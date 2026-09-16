@@ -2745,7 +2745,7 @@ export class App {
   }
 
   closeAllFloatingToolbars(except = "") {
-    const activeKind = ["text", "section", "freeform", "cta"].includes(except) ? except : "";
+    const activeKind = ["text", "section", "freeform", "cta", "image"].includes(except) ? except : "";
     if (document.body) {
       if (activeKind) document.body.dataset.activeEditorToolbar = activeKind;
       else delete document.body.dataset.activeEditorToolbar;
@@ -2768,6 +2768,11 @@ export class App {
         wrapper.classList.remove("is-active");
         wrapper.setAttribute("aria-expanded", "false");
       });
+    }
+    // Le menu d'animation d'image est une famille de contrôles comme les autres :
+    // ouvert, il doit être seul à l'écran (sinon il recouvre la barre de sélection).
+    if (activeKind !== "image") {
+      document.querySelectorAll("[id^='img-motion-menu-']:not(.hidden)").forEach(menu => menu.classList.add("hidden"));
     }
   }
 
@@ -3804,7 +3809,15 @@ export class App {
     if (!menu) return;
     const isClosed = menu.classList.contains("hidden");
     document.querySelectorAll("[id^='img-motion-menu-']:not(.hidden)").forEach(m => m.classList.add("hidden"));
-    if (isClosed) menu.classList.remove("hidden");
+    if (isClosed) {
+      // Une seule famille de contrôles à l'écran : le menu prend la main et la
+      // boîte de sélection s'efface, au lieu de s'empiler dessous.
+      this.closeAllFloatingToolbars("image");
+      menu.classList.remove("hidden");
+    } else {
+      this.closeAllFloatingToolbars();
+      this.updateFreeformOverlay();
+    }
   }
 
   setImageMotion(secId, fieldPath, itemIndex, preset) {

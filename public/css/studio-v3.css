@@ -549,7 +549,8 @@
 .freeform-selection-box.is-visible{display:block}
 body[data-active-editor-toolbar="text"] .freeform-selection-box,
 body[data-active-editor-toolbar="section"] .freeform-selection-box,
-body[data-active-editor-toolbar="cta"] .freeform-selection-box{display:none!important}
+body[data-active-editor-toolbar="cta"] .freeform-selection-box,
+body[data-active-editor-toolbar="image"] .freeform-selection-box{display:none!important}
 .freeform-selection-box.is-transforming{box-shadow:0 0 0 1px rgba(255,255,255,.9),0 0 0 4px rgba(37,99,235,.16)}
 .freeform-selection-label{
   position:absolute;left:-1px;top:-34px;min-height:30px;max-width:min(440px,82vw);display:flex;align-items:center;gap:7px;

@@ -15,6 +15,7 @@ import { MOTION_PRESETS, MOTION_SPEEDS, MOTION_DELAYS, MOTION_EASINGS, motionDir
 import { TRANSFORM_FIELDS, getElementTransform, hasElementTransform } from "../engine/elementTransform.js";
 import { collectSectionElements } from "./renderer.js";
 import { numberedLabels } from "../data/elementLabels.js";
+import { getUiCode } from "../data/uiIds.js";
 import { INSPIRATION_PATTERNS } from "../data/inspiration.js";
 
 /**
@@ -290,6 +291,34 @@ function sectionElementsHTML(section, project, selectedKey) {
   `;
 }
 
+/**
+ * Bascule image simple / comparateur avant-apres pour une photo de service.
+ *
+ * Le bouton pose sur l'image ne s'affiche qu'au survol : l'auteur le cherchait
+ * sans le voir. Ce panneau le rend permanent des que la photo est selectionnee.
+ */
+function serviceComparisonControlsHTML(section, project, selectedKey) {
+  if (!section || !selectedKey) return "";
+  // La cle de mise en page d une image est un hachage stable de son champ :
+  // on retrouve l index du service en recalculant la cle attendue.
+  const services = Array.isArray(section.content && section.content.services) ? section.content.services : [];
+  if (!services.length) return "";
+  const index = services.findIndex((_, i) => getUiCode(project && project.id, section.id, "services." + i + ".image") === selectedKey);
+  if (index < 0) return "";
+  const service = services[index];
+  const active = Boolean(service.beforeImage && service.afterImage);
+  return `
+    <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-xl space-y-2">
+      <label class="text-ui-xs font-bold uppercase tracking-wider text-zinc-700">Comparateur avant/après</label>
+      <p class="text-ui-2xs text-zinc-500">${active ? "Cette photo est un comparateur : elle sert de « Après »." : "Transformez cette photo en comparateur : elle devient « Après », puis vous choisissez « Avant »."}</p>
+      <button type="button"
+              class="w-full py-2 rounded-md text-ui-xs font-semibold ${active ? 'border border-zinc-300 bg-white text-zinc-700' : 'bg-zinc-900 text-white'}"
+              onclick="window.app.enableServiceComparison('${section.id}', ${index})">
+        ${active ? "Revenir à l'image simple" : "Transformer en avant/après"}
+      </button>
+    </div>`;
+}
+
 function elementTransformControlsHTML(project, layoutKey, viewport) {
   const values = getElementTransform(project, layoutKey, viewport);
   const positioned = hasElementTransform(project, layoutKey, viewport);
@@ -456,6 +485,7 @@ export function renderInspector(section, project, state) {
 
       ${state.selectedElementKey ? elementStyleControlsHTML(project, state.selectedElementKey, state.elementStyleState, sectionId) : ''}
       ${state.selectedElementKey ? elementTransformControlsHTML(project, state.selectedElementKey, state.viewport) : ''}
+      ${serviceComparisonControlsHTML(section, project, state.selectedElementKey)}
       ${sectionElementsHTML(section, project, state.selectedElementKey)}
       ${sectionListsHTML(section, sectionId)}
       ${sectionContentSettingsHTML(section, sectionId)}
