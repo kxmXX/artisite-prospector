@@ -161,6 +161,12 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 - **DESIGN.md** : documente le système **existant** au format DESIGN.md (frontmatter de jetons normatifs + huit sections). Il sépare explicitement les deux mondes — le **chrome studio** (fond papier, encre #18201f, accent #d76a3b, contrôles à hauteur et rayon uniques) et le **site publié** (palettes de métier, polices par style, boutons à touche) — et fixe les règles à ne pas enfreindre (pas de verre, pas d'animation de mise en page, pas de valeur inventée).
 - Tests : 2 nouveaux (`tests/design_docs.test.js`) — ils vérifient la présence des documents, leur structure et que les jetons cités existent réellement dans `tokens.css`. **447/447**. La **passe anti-slop est close**.
 
+#### Gestes — la matrice couvre tablette, rotation + échelle et export
+
+- **Constat** : la matrice de non-régression couvrait souris, tactile, clavier et desktop→mobile. Restaient la **tablette (768)**, la **rotation combinée à l'échelle**, la **multi-sélection tactile** et la **parité export**.
+- **Ajout** : trois cas de plus — adaptation desktop→tablette (768) avec la rotation conservée et un aller-retour exact ; câblage du mode additif tactile (`Multi +`, `aria-pressed`, partage de la logique avec Shift) ; et la preuve que la position libre est **publiée à l'identique** dans le HTML public (`translate`, `width`, `height`, `rotate`). La matrice passe de 9 à **12** cas.
+- Tests : **450/450**. L'audit des gestes réels est clos.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.59) — Lot 7 : la courbe d'animation devient réglable
 
 - Le catalogue portait une courbe par animation, mais l'auteur ne pouvait pas la changer. Trois courbes sont désormais proposées — **Douce** (départ vif, arrivée posée), **Rebond** (léger dépassement), **Régulière** — dans le repli « Réglages avancés » du panneau, à côté de la vitesse et du délai.

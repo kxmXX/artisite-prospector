@@ -1973,3 +1973,10 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - DESIGN.md ecrit en scan du code : frontmatter de jetons normatifs (couleurs, typographie, rayons, espacements, composants) + les huit sections du format. Separe le chrome studio (fond papier, encre #18201f, accent #d76a3b, controles a hauteur/rayon uniques) et le site publie (palettes de metier, polices par style, boutons a touche). Documente les regles : pas de verre, pas d'animation de mise en page, catalogues comme seule source.
 - Tests : tests/design_docs.test.js (2 cas) ; 447/447. La passe anti-slop est close.
 - Reste : bug destructif du centrage (jamais reproduit) ; Lot 6 — glisser a la souris (l'auteur veut le tester en local ; le serveur tourne sur http://127.0.0.1:5173).
+
+## Journal — 17 septembre 2026 · 4.9.1 (suite 17) : matrice de gestes etendue, audit des gestes clos
+
+- Constat : la matrice couvrait souris, tactile, clavier et desktop->mobile ; restaient tablette (768), rotation + scale, multi-selection tactile et parite export.
+- Trois cas ajoutes : (1) adaptation desktop->tablette avec rotation conservee et aller-retour exact (x 76.8, width 384 pour 120/600 a l'echelle 0.64) ; (2) cablage du mode additif tactile (data-freeform-additive, aria-pressed, partage avec Shift, cibles coarse) ; (3) parite export verifiee par valeur : la regle .artisite-root.public-mode porte translate/width/height/rotate identiques au layout enregistre.
+- La matrice passe de 9 a 12 cas. Tests : 450/450. L'audit des gestes reels est clos dans la checklist.
+- Reste : bug destructif du centrage (jamais reproduit) ; Lot 6 — glisser a la souris (l'auteur veut le tester en local ; le serveur tourne sur http://127.0.0.1:5173) ; items de fond (bundling, prompts de generation, contre-audit securite/performance).

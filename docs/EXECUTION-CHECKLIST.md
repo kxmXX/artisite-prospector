@@ -242,12 +242,20 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
 
 ## P0 — reprise qualité de l’éditeur visuel Canva / Figma
 
-- [~] Auditer largement les gestes réels : premier passage desktop 1280 et mobile simulé 390 effectué (`4.8.0-alpha.43`). Restent tablette, rotation et rotation+scale, multi-sélection tactile et parité export.
+- [x] Auditer largement les gestes réels : desktop 1280 et mobile simulé 390 (`4.8.0-alpha.43`), puis
+      **tablette (768), rotation et rotation+scale, multi-sélection tactile et parité export** (`4.9.1`).
+      12 tests de matrice couvrent souris, tactile, clavier, tablette, responsive et publication.
+      **Lot clos.**
 - [x] Éliminer les superpositions de chrome et les layouts cassés : dock de contact client masqué en édition, pile Freeform mesurée anti-collision, repères libres exclus de l’aperçu (`4.8.0-alpha.43`).
 - [~] Repenser l’édition des cellules autour d’un modèle spatial cohérent : historique d’édition réparé (`4.8.0-alpha.43`) et tableau comparatif rendu défilable pour ne plus couper les cellules sur canevas étroit (`4.8.0-alpha.48`) ; sortie de mode explicite livrée (`4.8.0-alpha.52` : Échap et validation partagent `exitInlineEditing`) ; restent les limites spatiales.
 - [x] Rendre chaque outil réellement opérant et lisible : l’édition inline et l’inspecteur enregistrent à nouveau une transaction annulable (`4.8.0-alpha.43`).
-- [x] Fiabiliser les animations : origine unique (`4.8.0-alpha.45`), aperçu de section réellement visible et vitesse appliquée à chaque preset (`4.8.0-alpha.46`), boucles une/deux/infinie et distinction explicite section / élément / image (`4.8.0-alpha.53`). Reste à neutraliser les motions pendant un transform libre, au-delà de la suspension déjà posée.
-- [x] Matrice de non-régression des gestes : 9 tests comportementaux sur le moteur libre (souris, tactile, clavier, responsive) et vérification du câblage des trois modalités (`4.8.0-alpha.51`). La géométrie est désormais testée par valeurs, pas par présence de chaînes. Reste à étendre la matrice à un vrai navigateur si un jour Playwright rejoint les dépendances.
+- [x] Fiabiliser les animations : origine unique (`4.8.0-alpha.45`), aperçu de section réellement visible et vitesse appliquée à chaque preset (`4.8.0-alpha.46`), boucles une/deux/infinie et distinction explicite section / élément / image (`4.8.0-alpha.53`). Les motions sont **figées pendant un transform libre** (`4.9.1`), tout le canevas et pas seulement la sélection — les repères d'aimantation mesurent des positions stables.
+- [x] Matrice de non-régression des gestes : **12 tests** comportementaux sur le moteur libre (souris,
+      tactile, clavier, responsive, **tablette 768, rotation + scale, multi-sélection tactile, parité
+      export**) et vérification du câblage des trois modalités (`4.8.0-alpha.51`, étendue en `4.9.1`). La
+      géométrie est testée par valeurs, pas par présence de chaînes ; la position libre est vérifiée
+      **publiée à l'identique** dans le HTML du site. Reste à étendre la matrice à un vrai navigateur si un
+      jour Playwright rejoint les dépendances.
 - [~] Réduire la complexité d’usage : libellés Freeform clarifiés (`Resp.` → `Responsive`, `Page` → `Entre sections`, `→ D` → `Vers desktop`, `Reset ici` → `Réinitialiser ici`), distinction explicite section / élément / image et sélecteur de boucle unique (`4.8.0-alpha.51` à `4.8.0-alpha.54`). Une refonte plus profonde de l’architecture d’information des barres d’outils reste possible mais n’est pas bloquante.
 
 ### Constats ouverts issus de l’audit et du détecteur

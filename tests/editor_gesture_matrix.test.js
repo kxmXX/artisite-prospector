@@ -13,6 +13,9 @@ import {
   resolveEdgeAutoScroll
 } from '../public/js/engine/freeform.js';
 
+import { generateSite } from '../public/js/engine/generator.js';
+import { renderWebsiteHTML } from '../public/js/components/renderer.js';
+
 const appSource = fs.readFileSync(new URL('../public/js/app.js', import.meta.url), 'utf8');
 const studioCss = fs.readFileSync(new URL('../public/css/studio-v3.css', import.meta.url), 'utf8');
 
@@ -105,3 +108,41 @@ test('matrix / keyboard: nudge, escape, group and snapping are wired', () => {
   assert.ok(appSource.includes('Math.round(delta / 15) * 15'), 'Shift rotates on a 15 degree step');
   assert.ok(appSource.includes('moveEvent.shiftKey || entry.base.aspectLocked === true'));
 });
+test('matrix / tablet: une mise en page passe au gabarit tablette en gardant la rotation', () => {
+  const layout = { x: 120, y: 60, width: 600, height: 300, rotation: 30, z: 4 };
+  const tablet = adaptFreeformLayoutToViewport(layout, 'desktop', 'tablet');
+  assert.equal(tablet.x, 76.8);
+  assert.equal(tablet.y, 38.4);
+  assert.equal(tablet.width, 384);
+  assert.equal(tablet.height, 192);
+  assert.equal(tablet.rotation, 30, 'la rotation ne depend pas du breakpoint');
+  assert.equal(tablet.z, 4);
+  // Aller-retour tablette -> desktop : on retrouve la géométrie d'origine.
+  const back = adaptFreeformLayoutToViewport(tablet, 'tablet', 'desktop');
+  assert.equal(back.width, 600);
+  assert.equal(back.height, 300);
+  assert.equal(back.rotation, 30);
+});
+
+test('matrix / touch: la multi-selection additive est cablee pour le doigt', () => {
+  assert.ok(appSource.includes('data-freeform-additive'), 'le bouton Multi + doit exister');
+  assert.ok(appSource.includes('_freeformAdditiveMode'), 'le mode additif doit etre suivi');
+  assert.ok(appSource.includes('aria-pressed'), 'le bouton doit annoncer son etat');
+  assert.ok(appSource.includes('event.shiftKey || this._freeformAdditiveMode'),
+    'le doigt et le clavier doivent partager la meme addition de selection');
+  assert.ok(studioCss.includes('@media(pointer:coarse)'), 'les cibles tactiles doivent etre agrandies');
+});
+
+test('matrix / export: la geometrie libre est publiee a l identique', () => {
+  const project = generateSite({ name: 'Parite Export', tradeId: 'menuisier', city: 'Lyon' });
+  project.freeformLayout = { desktop: { abc123: { x: 10, y: 20, width: 300, height: 100, rotation: 15 } } };
+  const published = renderWebsiteHTML(project, { isEditor: false });
+  const rule = published.match(/\.artisite-root\.public-mode \[data-layout-key="abc123"\]\{([^}]*)\}/);
+  assert.ok(rule, 'le site publie doit porter la regle de position libre');
+  const body = rule[1];
+  assert.ok(body.includes('translate:10px 20px'), 'la position doit etre conservee');
+  assert.ok(body.includes('width:300px'), 'la largeur doit etre conservee');
+  assert.ok(body.includes('height:100px'), 'la hauteur doit etre conservee');
+  assert.ok(body.includes('rotate:15deg'), 'la rotation doit etre conservee');
+});
+
