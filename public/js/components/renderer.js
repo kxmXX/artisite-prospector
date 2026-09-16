@@ -3541,7 +3541,7 @@ export function renderStickyCallBar(project, options = {}) {
         ` : ''}
 
         <!-- Direct Call -->
-        <a href="tel:${cleanPhone || phone}" class="sticky-call-btn flex-1 flex items-center justify-center gap-2 py-2 px-3.5 rounded-full font-bold bg-white text-zinc-950 hover:bg-zinc-100 transition-all shadow-md active:scale-95" aria-label="Appeler ${phone || 'l’entreprise'}">
+        <a href="${(cleanPhone || phone) ? 'tel:' + (cleanPhone || phone) : '#simulateur'}" class="sticky-call-btn flex-1 flex items-center justify-center gap-2 py-2 px-3.5 rounded-full font-bold bg-white text-zinc-950 hover:bg-zinc-100 transition-all shadow-md active:scale-95" aria-label="Appeler ${phone || 'l’entreprise'}">
           ${getIcon("phone", "w-3.5 h-3.5 text-zinc-900")}
           <span class="truncate tracking-tight">${phone || "Appeler"}</span>
         </a>
