@@ -1997,3 +1997,12 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Robustesse : couverte par les 12 cas de gestes + les tests d'exclusivite des surcouches, d'edition en ligne annulable, d'echelle Echap, de CTA et de tableaux defilants. Item clos.
 - Tests : 453/453. Trois items de fond clos (bundling, robustesse, contre-audit).
 - Reste : bug destructif du centrage (jamais reproduit) ; Lot 6 — glisser a la souris (test local de l'auteur).
+
+## Journal — 17 septembre 2026 · 4.9.1 (suite 20) : en-tete tablette
+
+- Verification visuelle au viewport tablette (768) : l'en-tete du gabarit vitrine debordait — le numero de telephone passait sur deux lignes et le bouton de devis consommait toute la marge droite.
+- Correctif : numero en hidden lg:inline-flex + whitespace-nowrap (il reste dans le heros, la barre collante et le pied de page) ; sur 768-1023 px, ecart de navigation vitrine resserre a 1.15rem et marge interne a 16 px.
+- Capture tablette avant/apres : l'en-tete tient sur une ligne, marque + 5 liens + bouton de devis.
+- Tests : tests/header_tablet_layout.test.js (2 cas) ; 456/456.
+- Production a jour : 27e87aa deploye (le quota Vercel s'est libere).
+- Reste : Lot 6 — glisser a la souris (test local de l'auteur) ; bug destructif du centrage (jamais reproduit, contrat verrouille par test).

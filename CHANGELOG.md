@@ -180,6 +180,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 - **Performance / bundling** : mesuré — 43 fichiers JS et 5 CSS, soit **292 Ko de JS gzippé** et 43 Ko de CSS gzippé. Aucun gain démontré ne justifie Vite ; décision de **ne pas migrer**, le « zéro dépendance npm » et le serveur Node/Vercel sont préservés.
 - Tests : 2 nouveaux ; **453/453**. Deux items de fond clos.
 
+#### Tablette — l'en-tête ne déborde plus
+
+- **Constat, vu à l'écran** : à 768 px, le numéro de téléphone de l'en-tête passait sur **deux lignes** et le bouton de devis consommait toute la marge droite ; la marque, les cinq liens et le bouton ne tenaient pas ensemble.
+- **Correctif** : le numéro n'apparaît plus qu'à partir de `lg` — il reste dans le héros, la barre d'appel collante et le pied de page — et ne se coupe plus (`whitespace-nowrap`) ; sur la plage 768–1023 px, l'écart de navigation du gabarit vitrine est resserré (`1.15rem`) et la marge interne ramenée à 16 px.
+- **Vérifié à l'écran** : capture tablette avant/après ; l'en-tête tient sur une ligne.
+- Tests : 2 nouveaux (`tests/header_tablet_layout.test.js`) ; **456/456**.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.59) — Lot 7 : la courbe d'animation devient réglable
 
 - Le catalogue portait une courbe par animation, mais l'auteur ne pouvait pas la changer. Trois courbes sont désormais proposées — **Douce** (départ vif, arrivée posée), **Rebond** (léger dépassement), **Régulière** — dans le repli « Réglages avancés » du panneau, à côté de la vitesse et du délai.

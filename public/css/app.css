@@ -38,6 +38,12 @@ html {
 }
 .vitrine-site-header-inner { min-height: 5rem; max-width: 80rem !important; }
 .vitrine-site-nav { gap: 2.35rem; font-size: .875rem; font-weight: 500; }
+/* Tablette : la navigation, la marque et le bouton de devis cohabitent sur 768 px.
+   Sans ce resserrement, le bouton consommait toute la marge droite de l'en-tête. */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .vitrine-site-header-inner .vitrine-site-nav { gap: 1.15rem; }
+  .vitrine-site-header-inner { padding-left: 1rem; padding-right: 1rem; }
+}
 .vitrine-site-nav a { color: #262626; text-decoration: none; }
 .vitrine-site-nav a:hover,
 .vitrine-site-nav a:focus-visible { color: var(--primary, #527c22); }

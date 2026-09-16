@@ -815,7 +815,7 @@ function renderHeader(sec, project, options = {}) {
 
         <div class="flex items-center gap-3">
           ${(c.phone || project.business?.phone) ? `
-            <a href="tel:${c.phone || project.business?.phone}" class="hidden sm:inline-flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-gray-900 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors no-underline">
+            <a href="tel:${c.phone || project.business?.phone}" class="hidden lg:inline-flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-gray-900 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors no-underline whitespace-nowrap">
               ${getIcon("phone", "w-4 h-4 text-emerald-600")}
               <span data-editable="phone">${c.phone || project.business?.phone}</span>
             </a>
