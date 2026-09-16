@@ -201,6 +201,12 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 - **Découvrabilité avant/après** : l'option existait dans la liste des services de l'inspecteur, mais l'auteur la cherchait **sur l'image**. Un bouton **« Avant/après »** apparaît maintenant sur la photo d'une carte service : un clic garde la photo actuelle comme « Après » et ouvre le choix de l'« Avant » ; un second clic rend la carte à son image simple.
 - Tests : 5 nouveaux (`tests/element_font_size.test.js`, `tests/service_before_after.test.js` étendu) ; **468/468**.
 
+#### Panneau de propriétés — il garde sa position
+
+- **Constat** : le canevas conservait sa position après un réglage, mais le **panneau de propriétés revenait tout en haut** à chaque modification. Dès que le réglage est bas dans la liste (services, listes), il fallait redescendre pour continuer.
+- **Correctif** : la position du panneau est capturée puis restaurée, sur le **re-rendu complet** comme sur le **rafraîchissement du seul panneau**.
+- Tests : 1 nouveau (`tests/inspector_scroll.test.js`) ; **469/469**.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.59) — Lot 7 : la courbe d'animation devient réglable
 
 - Le catalogue portait une courbe par animation, mais l'auteur ne pouvait pas la changer. Trois courbes sont désormais proposées — **Douce** (départ vif, arrivée posée), **Rebond** (léger dépassement), **Régulière** — dans le repli « Réglages avancés » du panneau, à côté de la vitesse et du délai.

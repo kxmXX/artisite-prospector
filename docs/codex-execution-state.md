@@ -2031,3 +2031,10 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Verifie : le rendu editeur contient le bouton et le libelle ; les tests couvrent l'aller-retour.
 - Tests : service_before_after etendu (5 cas) ; 468/468.
 - Reste : Lot 6 — glisser a la souris (verdict de l'auteur) ; centrage (jamais reproduit) ; captures UX a venir.
+
+## Journal — 17 septembre 2026 · 4.9.1 (suite 24) : panneau de proprietes qui garde sa position
+
+- Defaut d'usage trouve en lisant le rendu : le canevas conservait sa position apres un reglage, mais le panneau de proprietes revenait tout en haut a chaque modification (le panneau est reconstruit a chaque updateProject). Penible des que le reglage est bas dans la liste (services, listes).
+- Correctif : capture de panel.scrollTop avant le re-rendu complet et restauration dans la rAF ; meme chose dans refreshInspectorPanel pour le rafraichissement du seul panneau.
+- Tests : tests/inspector_scroll.test.js (1 cas) ; 469/469.
+- Reste : Lot 6 — glisser a la souris (verdict de l'auteur) ; centrage (jamais reproduit) ; captures UX a venir.

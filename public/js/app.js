@@ -202,6 +202,11 @@ export class App {
           return host ? { top: host.scrollTop, left: host.scrollLeft } : null;
         })()
       : null;
+    // Le panneau de proprietes est reconstruit a chaque reglage : sans cela il
+    // revenait tout en haut et il fallait redescendre pour poursuivre au meme endroit.
+    const previousInspectorScroll = state.currentView === "editor"
+      ? (document.getElementById("right-inspector-panel")?.scrollTop || 0)
+      : 0;
 
     if (state.currentView === "dashboard") {
       this.rootEl.innerHTML = renderDashboard(state);
@@ -218,10 +223,16 @@ export class App {
     this.syncSiteThemeToggle();
     this.hydrateImageFallbacks();
     this.initScrollObserver();
-    if (previousScrollPosition) {
+    if (previousScrollPosition || previousInspectorScroll) {
       requestAnimationFrame(() => {
-        const host = document.getElementById("editor-main-canvas") || document.querySelector("main");
-        host?.scrollTo?.({ top: previousScrollPosition.top, left: previousScrollPosition.left, behavior: "instant" });
+        if (previousScrollPosition) {
+          const host = document.getElementById("editor-main-canvas") || document.querySelector("main");
+          host?.scrollTo?.({ top: previousScrollPosition.top, left: previousScrollPosition.left, behavior: "instant" });
+        }
+        if (previousInspectorScroll) {
+          const panel = document.getElementById("right-inspector-panel");
+          if (panel) panel.scrollTop = previousInspectorScroll;
+        }
       });
     }
   }
@@ -1622,7 +1633,12 @@ export class App {
     const section = state.currentProject?.sections.find(s => s.id === state.selectedSectionId) || state.currentProject?.sections[0];
     if (!panel || !section) return;
     const shell = panel.querySelector(".studio-v3-inspector-shell") || panel;
+    const previousScrollTop = panel.scrollTop || 0;
     shell.innerHTML = renderInspector(section, state.currentProject, state);
+    if (previousScrollTop) {
+      // Le contenu est remplace : sans cette remise en place, le panneau saute en haut.
+      requestAnimationFrame(() => { if (panel.isConnected) panel.scrollTop = previousScrollTop; });
+    }
     // La visibilite vient d'un etat, pas d'une requete media : le panneau ne se
     // referme plus tout seul et ne recouvre plus le canevas sans qu'on le demande.
     const open = state.inspectorPanelOpen === true;
