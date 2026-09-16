@@ -167,6 +167,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 - **Ajout** : trois cas de plus — adaptation desktop→tablette (768) avec la rotation conservée et un aller-retour exact ; câblage du mode additif tactile (`Multi +`, `aria-pressed`, partage de la logique avec Shift) ; et la preuve que la position libre est **publiée à l'identique** dans le HTML public (`translate`, `width`, `height`, `rotate`). La matrice passe de 9 à **12** cas.
 - Tests : **450/450**. L'audit des gestes réels est clos.
 
+#### Prompts IA — plus d'avis ni de certifications inventés
+
+- **Constat** : le prompt d'enrichissement **se contredisait**. Une règle interdisait « de fausses certifications ni de faux chiffres », et le schéma demandé juste en dessous **faisait inventer au modèle trois avis nominatifs 5 étoiles** (« Sophie M. », « Jean-Pierre D. », « Marc L. »), un badge « Garantie Décennale & Assurance », un nom de dirigeant, et des réponses de FAQ affirmant un délai de 24-48 h et une garantie décennale.
+- **Correctif** : `reviews` reste **vide** — les avis appartiennent à l'artisan —, les certifications et noms de personne ne sont plus affirmés, les badges deviennent des engagements non chiffrés (« Devis gratuit », « Artisan local », « Travail soigné », « Conseil personnalisé »), et les réponses de FAQ ne promettent plus ni délai ni garantie.
+- Le catalogue de démonstration déterministe (six avis, badges) reste en place : c'est un **choix explicite de l'auteur**, et il reste entièrement modifiable.
+- Tests : 1 nouveau (`tests/ai_prompt_provenance.test.js`) ; **451/451**.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.59) — Lot 7 : la courbe d'animation devient réglable
 
 - Le catalogue portait une courbe par animation, mais l'auteur ne pouvait pas la changer. Trois courbes sont désormais proposées — **Douce** (départ vif, arrivée posée), **Rebond** (léger dépassement), **Régulière** — dans le repli « Réglages avancés » du panneau, à côté de la vitesse et du délai.

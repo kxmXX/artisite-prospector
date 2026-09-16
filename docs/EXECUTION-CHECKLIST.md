@@ -351,7 +351,13 @@ Prochaine action exacte : audit navigateur large de l’éditeur Esprit Nature s
 
 - [x] Protéger la génération photo IA : résultat lié à projet/section/champ/index, réponse tardive ignorée après changement de cible ou de projet, application revérifiée avant mutation.
 - [x] Dédupliquer les requêtes de génération IA simultanées qui portent la même clé de contexte : une seule promesse `in-flight` par clé exacte, contextes différents isolés, puis promotion dans le cache TTL.
-- [ ] Revoir les prompts de génération restants pour ne pas transformer des exemples en faits client non vérifiés.
+- [x] Revoir les prompts de génération restants pour ne pas transformer des exemples en faits client non
+      vérifiés (`4.9.1`) : le prompt IA se contredisait — il interdisait les faux chiffres tout en
+      **demandant au modèle d'inventer des avis nominatifs 5 étoiles** (« Sophie M. », « Jean-Pierre D. »,
+      « Marc L. ») et des certifications (« Garantie Décennale & Assurance »). Les avis restent désormais
+      **vides** (ils appartiennent à l'artisan), les certifications et noms de personne ne sont plus
+      affirmés, et les réponses de FAQ ne promettent plus de délai ni de garantie. Le catalogue de
+      démonstration déterministe reste la base **choisie par l'auteur** et demeure modifiable.
 - [ ] Contre-audit sécurité / performance et limites de partage avant toute revendication multi-utilisateur.
 
 ## Procédure de chaque commit

@@ -172,8 +172,9 @@ Génère les contenus ultra-personnalisés et percutants pour l'entreprise suiva
 
 RÈGLES STRICTES :
 1. Pas de charabia IA générique comme "nous sommes une entreprise dynamique". Sois authentique, ancré localement à ${city}.
-2. Ne JAMAIS inventer de fausses certifications ni de faux chiffres factuels présentés comme réels. Utilise des réassurances valables (devis gratuit 24h, garantie décennale, réactivité, écoute).
-3. Renvoie UNIQUEMENT un objet JSON valide avec cette structure exacte :
+2. Ne JAMAIS inventer de certification, de nom de personne, d'avis client, de chiffre ni de prix présenté comme un fait. N'affirme que ce que l'artisan a fourni ; le reste s'écrit sans engagement ("sur devis", "dans les règles de l'art").
+3. Le tableau "reviews" doit rester VIDE : les avis appartiennent à l'artisan, l'IA n'en invente jamais.
+4. Renvoie UNIQUEMENT un objet JSON valide avec cette structure exacte :
 {
   "heroTitle": "Titre fort valorisant le métier et la commune",
   "heroSubtitle": "Sous-titre commercial percutant avec appel à l'action",
@@ -181,7 +182,7 @@ RÈGLES STRICTES :
   "ctaSecondary": "Appeler l'artisan",
   "aboutTitle": "Titre authentique sur le savoir-faire",
   "aboutStory": "Histoire d'artisan passionné ancré à ${city} (2-3 phrases chaleureuses)",
-  "aboutOwner": "Prénom du dirigeant & équipe",
+  "aboutOwner": "",
   "aboutRole": "Artisan passionné",
   "services": [
     { "title": "Service 1 précis", "desc": "Courte description concrète", "tag": "Spécialité", "price": "Sur devis gratuit" },
@@ -192,20 +193,16 @@ RÈGLES STRICTES :
     { "title": "Service 6 précis", "desc": "Courte description concrète", "tag": "Conseil", "price": "Sur devis gratuit" }
   ],
   "trustBadges": [
-    { "title": "Devis Gratuit sous 24h", "desc": "Déplacement et étude personnalisée offerts" },
-    { "title": "Garantie Décennale & Assurance", "desc": "Travaux couverts et réalisés dans les règles de l'art" },
-    { "title": "Artisan Local de Proximité", "desc": "Intervention soignée à ${city} et ses alentours" },
-    { "title": "Matériel Professionnel", "desc": "Équipements récents et finitions impeccables" }
+    { "title": "Devis gratuit", "desc": "Étude personnalisée sans engagement" },
+    { "title": "Artisan local", "desc": "Intervention soignée à ${city} et ses alentours" },
+    { "title": "Travail soigné", "desc": "Finitions vérifiées avant réception" },
+    { "title": "Conseil personnalisé", "desc": "Un interlocuteur unique du devis à la réception" }
   ],
-  "reviews": [
-    { "author": "Sophie M.", "city": "${city}", "rating": 5, "text": "Très satisfait des travaux réalisés. Ponctuel, soigné et de bon conseil !" },
-    { "author": "Jean-Pierre D.", "city": "${city}", "rating": 5, "text": "Artisan sérieux, devis clair et respecté au centime près. Je recommande." },
-    { "author": "Marc L.", "city": "Alentours de ${city}", "rating": 5, "text": "Réactivité exemplaire et chantier laissé parfaitement propre." }
-  ],
+  "reviews": [],
   "faq": [
-    { "q": "Quels sont vos délais pour établir un devis à ${city} ?", "a": "Nous nous déplaçons rapidement et vous remettons un devis détaillé et gratuit sous 24 à 48 heures." },
-    { "q": "Vos déplacements sont-ils gratuits ?", "a": "Oui, tous les déplacements pour l'évaluation de vos chantiers sur le secteur de ${city} sont entièrement gratuits." },
-    { "q": "Vos travaux sont-ils garantis ?", "a": "Absolument, toutes nos interventions sont couvertes par notre garantie décennale et notre responsabilité civile professionnelle." }
+    { "q": "Quels sont vos délais pour établir un devis à ${city} ?", "a": "Nous échangeons sur votre besoin puis vous remettons un devis détaillé et gratuit, sans engagement." },
+    { "q": "Vos déplacements sont-ils gratuits ?", "a": "Le déplacement pour l'évaluation de votre chantier sur le secteur de ${city} est offert." },
+    { "q": "Vos travaux sont-ils garantis ?", "a": "Nos interventions sont réalisées dans les règles de l'art ; les garanties applicables sont précisées dans votre devis." }
   ],
   "closerTips": {
     "hook": "Bonjour, j'ai remarqué la qualité de votre travail sur ${city} et j'ai préparé une proposition concrète de votre futur site pour attirer plus de chantiers rentables.",

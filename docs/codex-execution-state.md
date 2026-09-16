@@ -1980,3 +1980,11 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Trois cas ajoutes : (1) adaptation desktop->tablette avec rotation conservee et aller-retour exact (x 76.8, width 384 pour 120/600 a l'echelle 0.64) ; (2) cablage du mode additif tactile (data-freeform-additive, aria-pressed, partage avec Shift, cibles coarse) ; (3) parite export verifiee par valeur : la regle .artisite-root.public-mode porte translate/width/height/rotate identiques au layout enregistre.
 - La matrice passe de 9 a 12 cas. Tests : 450/450. L'audit des gestes reels est clos dans la checklist.
 - Reste : bug destructif du centrage (jamais reproduit) ; Lot 6 — glisser a la souris (l'auteur veut le tester en local ; le serveur tourne sur http://127.0.0.1:5173) ; items de fond (bundling, prompts de generation, contre-audit securite/performance).
+
+## Journal — 17 septembre 2026 · 4.9.1 (suite 18) : prompt IA sans faits inventes
+
+- Constat : le prompt d'enrichissement se contredisait. Une regle interdisait les faux chiffres et certifications, mais le schema demande juste en dessous faisait inventer au modele trois avis nominatifs 5 etoiles (Sophie M., Jean-Pierre D., Marc L.), un badge « Garantie Decennale & Assurance », un prenom de dirigeant, et des reponses de FAQ affirmant un delai 24-48h et une garantie decennale.
+- Correctif : reviews reste vide (les avis appartiennent a l'artisan), plus de certification ni de nom de personne affirme, badges non chiffres (Devis gratuit / Artisan local / Travail soigne / Conseil personnalise), FAQ sans promesse de delai ni de garantie.
+- Le catalogue deterministe (six avis, badges) reste en place : choix explicite de l'auteur, entierement modifiable.
+- Tests : tests/ai_prompt_provenance.test.js (1 cas) ; 451/451.
+- Reste : bug destructif du centrage (jamais reproduit) ; Lot 6 — glisser a la souris (test local de l'auteur) ; items de fond (bundling/performance, robustesse navigateur, contre-audit securite).
