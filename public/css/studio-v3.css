@@ -433,6 +433,16 @@
   body.client-preview-mode .studio-v3-canvas { padding-bottom:12px!important; }
 }
 
+/* Parité éditeur / vue client : en aperçu, le canevas conserve EXACTEMENT la largeur
+   qu'il a dans l'éditeur (rail 66 + volet Structure 286 + propriétés 318 retirés),
+   centré. Le rendu ne se réorganise donc plus entre les deux modes. */
+@media (min-width: 1281px) {
+  body.client-preview-mode #canvas-container[data-viewport="desktop"] { max-width: calc(100vw - 726px); margin-inline: auto; }
+}
+@media (min-width: 901px) and (max-width: 1280px) {
+  body.client-preview-mode #canvas-container[data-viewport="desktop"] { max-width: calc(100vw - 388px); margin-inline: auto; }
+}
+
 /* ---------- system surfaces V3 ---------- */
 .studio-system-modal{background:rgba(20,27,25,.32)!important;backdrop-filter:blur(18px) saturate(.9)!important}
 .studio-v3-modal{background:#f6f4ee!important;color:#1e2725!important;border:1px solid rgba(24,32,31,.10)!important;border-radius:24px!important;box-shadow:0 30px 90px rgba(18,25,23,.24)!important;max-height:calc(100vh - 32px)!important;min-height:0!important;overflow:hidden!important}
