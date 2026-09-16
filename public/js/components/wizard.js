@@ -20,7 +20,7 @@ export function renderWizardModal() {
 
   return `
     <div id="wizard-modal" class="studio-system-modal fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
-      <div class="studio-v3-modal studio-v3-wizard max-w-lg w-full overflow-hidden relative">
+      <div class="studio-v3-modal studio-v3-modal-frame studio-v3-wizard max-w-lg w-full overflow-hidden relative">
         
         <!-- Header -->
         <div class="px-6 py-4 flex items-center justify-between border-b border-zinc-200">

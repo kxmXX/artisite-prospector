@@ -13,7 +13,7 @@ export function renderAuthModal(state = {}) {
   const unavailable = state.authStatus === "unavailable";
 
   return '<div class="studio-system-modal fixed inset-0 z-50 flex items-center justify-center p-4" id="auth-modal" onclick="if(event.target === this) window.app.closeAuthModal()">' +
-    '<div class="studio-v3-modal w-full max-w-md overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title" onclick="event.stopPropagation()">' +
+    '<div class="studio-v3-modal studio-v3-modal-frame w-full max-w-md overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title" onclick="event.stopPropagation()">' +
       '<div class="flex items-center justify-between px-6 py-4 border-b border-zinc-200">' +
         '<div>' +
           '<div class="text-ui-xs uppercase tracking-wider text-zinc-500">Compte</div>' +

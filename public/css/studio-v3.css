@@ -377,24 +377,31 @@
 }
 
 /* ---------- modal & creation system ---------- */
+/* Les modales partagent la charte de l'editeur : champs, bordures et fonds alignes. */
 .studio-v3-modal-frame input:not([type="color"]),
-.studio-v3-modal-frame textarea,
+.studio-v3-modal-frame textarea {
+  border-color: var(--v3-line) !important;
+  background-color: #ffffff !important;
+}
 .studio-v3-modal-frame input:focus,
-.studio-v3-modal-frame textarea:focus,
+.studio-v3-modal-frame textarea:focus {
+  border-color: #7a9487 !important;
+  box-shadow: 0 0 0 3px rgba(91,126,108,.09) !important;
+}
 .studio-v3-modal-frame .border-zinc-200,
-.studio-v3-modal-frame .border-zinc-200\/80,
+.studio-v3-modal-frame .border-zinc-200\/80 {
+  border-color: var(--v3-line) !important;
+}
 .studio-v3-modal-frame .bg-zinc-50,
 .studio-v3-modal-frame .bg-zinc-50\/80,
 .studio-v3-modal-frame .bg-zinc-50\/40,
-.studio-v3-modal-frame .bg-zinc-100,
-
-/* Wizard is a composition, not a generic popup form. */
-.studio-v3-wizard-content #wizard-form input,
-
-/* Share / command / media windows use horizontal information architecture. */
-
-/* Tabs read as navigation, not a row of boxed buttons. */
-.studio-v3-image-frame>div:nth-child(2),
+.studio-v3-modal-frame .bg-zinc-100 {
+  background-color: #f4f3ef !important;
+}
+/* Le wizard est une composition, pas un formulaire generique. */
+.studio-v3-wizard #wizard-form input {
+  background-color: transparent !important;
+}
 
 /* Hover-only section tools; normal editing belongs in the inspector. */
 

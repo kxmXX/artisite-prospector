@@ -30,7 +30,7 @@ export function renderShareModal(project, activeTab = "demo") {
 
   return `
     <div class="studio-system-modal fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in" onclick="if(event.target === this) window.app.closeShareModal()">
-      <div class="studio-v3-modal studio-v3-share w-full max-w-xl overflow-hidden transition-all flex flex-col max-h-[90vh]" onclick="event.stopPropagation()">
+      <div class="studio-v3-modal studio-v3-modal-frame studio-v3-share w-full max-w-xl overflow-hidden transition-all flex flex-col max-h-[90vh]" onclick="event.stopPropagation()">
         
         <!-- Header -->
         <div class="p-4 sm:p-5 border-b border-zinc-200/80 flex items-center justify-between bg-zinc-50/80">
