@@ -113,6 +113,10 @@ function decorateLayoutKeys(markup, project, section, isEditor = false) {
     output = output.replace(/<a\b([^>]*\shref=[^>]*)>/gi, (full, attrs) => (/onclick=/i.test(full) ? full : '<a' + attrs + ' onclick="event.preventDefault()">'));
   }
 
+  // Un moyen de contact non renseigné ne doit pas produire un lien mort : on
+  // renvoie vers le simulateur de devis plutôt qu'un « tel: » vide.
+  output = output.replace(/href="tel:"/g, 'href="#simulateur"');
+
   return output;
 }
 
