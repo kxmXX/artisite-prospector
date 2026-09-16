@@ -153,7 +153,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 - **Détecteur Impeccable** passé sur `index.html`, `app.css` et `studio-v3.css` : 12 signaux, dont 9 **intentionnels** — les huit « rebond » (l'auteur a explicitement voulu le preset « Rebond ») et le reflet infini du preset « Reflet ». Le brief gagne sur l'avertissement générique.
 - **Seul défaut mécanique réel** : la barre de progression animait `width`, une propriété de mise en page, à chaque image. Elle anime désormais `transform: scaleX(var(--campaign-progress))` (composition), à rendu identique ; la règle est alignée dans l'export autonome.
 - Tests : 2 nouveaux (`tests/progress_bar_perf.test.js`) ; **445/445**.
-- **PRODUCT.md / DESIGN.md non écrits, volontairement** : la compétence Impeccable impose un **entretien avec l'auteur** pour capturer la vérité produit et les décisions de design. Les inventer serait exactement le « slop » que cette passe combat. À faire à deux (`/impeccable init`).
+- **PRODUCT.md / DESIGN.md** : la compétence Impeccable impose un **entretien avec l'auteur** avant d'écrire la vérité produit ; il a eu lieu (voir ci-dessous).
+
+#### PRODUCT.md et DESIGN.md — la mémoire produit et le système visuel
+
+- **PRODUCT.md** : capturé **avec l'auteur**, pas inventé. Utilisateur principal confirmé : le **revendeur / agence** qui produit et présente des sites à des artisans et TPE du bâtiment ; travail visé : une démo crédible en quelques minutes, puis plusieurs sites à la suite. Contrainte confirmée : **pas d'éditeur sur téléphone** (desktop/tablette). Point de vérité important : **aucune preuve réelle n'existe encore** — pas d'avis vérifiés, pas de photos de chantier, pas d'identité de marque ; le travail futur ne doit pas les présenter comme des faits.
+- **DESIGN.md** : documente le système **existant** au format DESIGN.md (frontmatter de jetons normatifs + huit sections). Il sépare explicitement les deux mondes — le **chrome studio** (fond papier, encre #18201f, accent #d76a3b, contrôles à hauteur et rayon uniques) et le **site publié** (palettes de métier, polices par style, boutons à touche) — et fixe les règles à ne pas enfreindre (pas de verre, pas d'animation de mise en page, pas de valeur inventée).
+- Tests : 2 nouveaux (`tests/design_docs.test.js`) — ils vérifient la présence des documents, leur structure et que les jetons cités existent réellement dans `tokens.css`. **447/447**. La **passe anti-slop est close**.
 
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.59) — Lot 7 : la courbe d'animation devient réglable
 

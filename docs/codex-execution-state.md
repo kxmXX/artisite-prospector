@@ -1965,3 +1965,11 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Tests : tests/progress_bar_perf.test.js (2 cas) ; 445/445.
 - PRODUCT.md / DESIGN.md : non ecrits, volontairement — la competence impose un entretien avec l'auteur (init) ; les inventer serait du slop. A faire a deux.
 - Reste : bug destructif du centrage (jamais reproduit) ; Lot 6 (geste souris — validation utilisateur demandee) ; PRODUCT.md/DESIGN.md (entretien).
+
+## Journal — 17 septembre 2026 · 4.9.1 (suite 16) : PRODUCT.md et DESIGN.md
+
+- Entretien avec l'auteur effectue (deux salves de questions). Reponses confirmees : utilisateur principal = revendeur/agence ; travail = demo credible en quelques minutes pour un prospect + plusieurs sites clients a la suite ; hors perimetre confirme = pas d'editeur telephone ; preuves reelles = aucune pour l'instant, tout est de demonstration.
+- PRODUCT.md ecrit a partir de ces reponses uniquement (platform web, users, purpose, positioning, operating context, capabilities/constraints, evidence, principes, accessibilite). Aucune preuve inventee ; l'absence de temoignages/photos reelles est explicite.
+- DESIGN.md ecrit en scan du code : frontmatter de jetons normatifs (couleurs, typographie, rayons, espacements, composants) + les huit sections du format. Separe le chrome studio (fond papier, encre #18201f, accent #d76a3b, controles a hauteur/rayon uniques) et le site publie (palettes de metier, polices par style, boutons a touche). Documente les regles : pas de verre, pas d'animation de mise en page, catalogues comme seule source.
+- Tests : tests/design_docs.test.js (2 cas) ; 447/447. La passe anti-slop est close.
+- Reste : bug destructif du centrage (jamais reproduit) ; Lot 6 — glisser a la souris (l'auteur veut le tester en local ; le serveur tourne sur http://127.0.0.1:5173).

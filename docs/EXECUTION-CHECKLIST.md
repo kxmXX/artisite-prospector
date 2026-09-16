@@ -111,11 +111,13 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
       ombre) routée vers l'état choisi, « Effacer cet état » et « Revenir au style du thème ». 5b second
       temps soldé en `4.9.1` : l'**aperçu immédiat** d'un état existe (`elementStateDeclarations`, la même
       source que le CSS publié) — plus besoin de survoler réellement l'élément pour voir le résultat.
-- [ ] **Défauts visuels relevés à l'inspection** (`4.9.0-alpha.31` → `.34`) : lanceur d'assistant réduit à
-      une pastille compacte (il recouvrait la carte du hero) avec le bord épais retiré ; kickers numérotés
-      du tableau de bord supprimés ; tous les glyphes du chrome et du rendu remplacés par le système
-      d'icônes (statuts, sélection freeform, bouton de lecture, étapes de l'assistant). *Reste* :
-      unification du vocabulaire de boutons, vérification mobile.
+- [x] **Défauts visuels relevés à l'inspection** (`4.9.0-alpha.31` → `.34`, clos en `4.9.1`) : lanceur
+      d'assistant réduit à une pastille compacte (il recouvrait la carte du hero) avec le bord épais retiré ;
+      kickers numérotés du tableau de bord supprimés ; tous les glyphes du chrome et du rendu remplacés par le
+      système d'icônes (statuts, sélection freeform, bouton de lecture, étapes de l'assistant). Le vocabulaire
+      de boutons est unifié par les jetons de contrôle (`4.9.0-alpha.45`). La vérification « mobile » est
+      **hors périmètre** : l'éditeur n'est pas destiné au téléphone (décision de l'auteur) — le contrôle se
+      fait sur desktop et tablette. **Lot clos.**
 - [x] **Panneau de propriétés rendu accessible** (`4.9.0-alpha.37`) : à 1280 px c'était une surtoile masquée
       qu'aucun contrôle n'ouvrait. Bouton « Propriétés de la section » ajouté dans la barre du haut, avec
       `aria-controls`/`aria-expanded`. **Vérifié à l'écran** : réglages de section, 12 animations du catalogue,
@@ -169,7 +171,7 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
       section. Chaque section du panneau Structure se déplie pour montrer ses éléments, nommés par un module
       partagé avec le panneau de propriétés. Le gabarit mort `renderSectionAccordionContent` (837 lignes
       inertes) a été **supprimé** après réimplantation de ses capacités. **Aucune ligne morte ne subsiste.**
-- [ ] **Passe anti-slop (skill Impeccable)** : surfaces du navigateur thématisées en `4.9.0-alpha.30`
+- [x] **Passe anti-slop (skill Impeccable)** : surfaces du navigateur thématisées en `4.9.0-alpha.30`
       (sélection, curseur de saisie, barres de défilement, chiffres tabulaires, anneau de focus unique),
       portée bornée à `.studio-editor` ; **tous** les glyphes du chrome et du rendu remplacés par des icônes
       dessinées (`4.9.0-alpha.32` → `.34`) ; vocabulaire de boutons unifié par des jetons de contrôle
@@ -179,8 +181,11 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
       (les 8 « rebond » du catalogue d'animations — l'auteur a explicitement voulu « Rebond » — et le
       reflet infini du preset « Reflet ») ; le seul défaut mécanique réel, `transition: width` sur la
       barre de progression, est corrigé (`transform: scaleX`, composition au lieu de mise en page).
-      *Reste* : PRODUCT.md / DESIGN.md — la compétence Impeccable exige un **entretien avec l'auteur**
-      (`/impeccable init`), donc construction à faire à deux, pas à sa place.
+      **PRODUCT.md et DESIGN.md écrits** (`4.9.1`), à partir d'un **entretien avec l'auteur** : PRODUCT.md
+      capture l'utilisateur réel (revendeur/agence), le travail visé, les contraintes et l'absence de preuves
+      réelles ; DESIGN.md documente le système existant (jetons du chrome, monde du site publié, composants,
+      règles à ne pas enfreindre) au format DESIGN.md, avec les jetons normatifs en frontmatter. Deux tests
+      gardent leur présence et leur cohérence avec les jetons réels. **Lot clos.**
 - [x] **Lot 8 — Undo/Redo exhaustif** (`4.9.0-alpha.4`) : 11 commandes mutaient avant de prendre
       l'instantané (l'annulation ne restaurait rien) et 20 commandes n'avaient aucun historique ;
       toutes prennent désormais leur instantané **avant** la mutation, y compris les six
