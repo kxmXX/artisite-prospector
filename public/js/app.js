@@ -1258,6 +1258,19 @@ export class App {
   }
 
   /** Applique un réglage de mise en page à une section (annulable). */
+  /** Style graphique du comparateur avant/apres d'une section. */
+  setComparatorStyle(sectionId, style) {
+    const allowed = ["classique", "minimal", "fleches", "contraste"];
+    if (!state.currentProject || !allowed.includes(style)) return;
+    const updated = JSON.parse(JSON.stringify(state.currentProject));
+    const section = updated.sections.find(s => s.id === sectionId);
+    if (!section) return;
+    section.settings = section.settings || {};
+    section.settings.splitStyle = style;
+    state.updateProject(updated, true, "Style du comparateur");
+    this.refreshInspectorPanel();
+  }
+
   setSectionLayoutValue(sectionId, key, value) {
     if (!state.currentProject || !isValidSectionId(sectionId)) return;
     const updated = JSON.parse(JSON.stringify(state.currentProject));

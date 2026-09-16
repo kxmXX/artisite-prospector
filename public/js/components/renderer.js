@@ -1649,6 +1649,8 @@ function renderBeforeAfter(sec, project, options = {}) {
   const c = sec.content || {};
   const direction = c.direction || sec.settings?.direction || (sec.variant === "vertical" ? "vertical" : "horizontal");
   const initialSplit = Number(sec.settings?.initialSplit) || 50;
+  const COMPARATOR_STYLES = ["classique", "minimal", "fleches", "contraste"];
+  const splitStyle = COMPARATOR_STYLES.includes(sec.settings?.splitStyle) ? sec.settings.splitStyle : "classique";
   const isVertical = direction === "vertical";
 
   const directionToggleBtn = options.isEditor ? `
@@ -1707,6 +1709,7 @@ function renderBeforeAfter(sec, project, options = {}) {
 
         <div class="ba-container split-reveal-container shadow-2xl border-4 border-white" data-layout-node="before-after-comparator" data-layout-label="Comparateur Avant / Après"
              data-split-direction="${direction}"
+             data-split-style="${splitStyle}"
              data-split-pos="${initialSplit}"
              data-sec-id="${sec.id}"
              tabindex="0"

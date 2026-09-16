@@ -2792,6 +2792,15 @@ p[data-motion], div[data-motion], section[data-motion], h1[data-motion], h2[data
   height: 2px;
   transform: translateY(-50%);
 }
+/* Styles graphiques du comparateur avant/apres : l'auteur choisit l'ambiance. */
+.split-reveal-container[data-split-style="minimal"] .sr-percent-badge { display: none !important; }
+.split-reveal-container[data-split-style="minimal"] .sr-button { width: 28px; height: 28px; font-size: 0; border-width: 1px; box-shadow: 0 2px 8px rgba(0,0,0,.2); }
+.split-reveal-container[data-split-style="minimal"] .sr-line { width: 1px; box-shadow: none; }
+.split-reveal-container[data-split-style="fleches"] .sr-button { width: 52px; height: 52px; font-size: 20px; font-weight: 800; }
+.split-reveal-container[data-split-style="fleches"] .sr-line { width: 3px; }
+.split-reveal-container[data-split-style="contraste"] .sr-line { width: 4px; background: var(--primary, #527c22); box-shadow: none; }
+.split-reveal-container[data-split-style="contraste"] .sr-button { background: var(--primary, #527c22); color: #ffffff; border-color: #ffffff; }
+
 .sr-button {
   width: 42px;
   height: 42px;

@@ -143,6 +143,21 @@ function sectionGalleryHTML(section, sectionId) {
     </div>`;
 }
 
+/** Style graphique du comparateur avant/apres : l'auteur choisit l'ambiance. */
+function sectionComparatorHTML(section, sectionId) {
+  if (section?.type !== "beforeAfter") return "";
+  const current = section?.settings?.splitStyle || "classique";
+  const options = [["classique", "Classique"], ["minimal", "Minimal"], ["fleches", "Flèches"], ["contraste", "Contraste"]];
+  return `
+    <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-xl space-y-2">
+      <label class="text-ui-xs font-bold uppercase tracking-wider text-zinc-700">Style du comparateur</label>
+      <div class="flex flex-wrap gap-1">
+        ${options.map(([id, label]) => `<button type="button" class="motion-loop-btn ${current === id ? "is-active" : ""}" onclick="window.app.setComparatorStyle('${sectionId}', '${id}')">${label}</button>`).join("")}
+      </div>
+      <p class="text-ui-2xs text-zinc-500">Change la ligne et la poignée du curseur Avant / Après.</p>
+    </div>`;
+}
+
 /**
  * Boutons masques : le seul endroit pour les remettre.
  * Sans ce bloc, retirer un bouton etait definitif dans l'interface.
@@ -436,6 +451,7 @@ export function renderInspector(section, project, state) {
       ${sectionListsHTML(section, sectionId)}
       ${sectionContentSettingsHTML(section, sectionId)}
       ${sectionGalleryHTML(section, sectionId)}
+      ${sectionComparatorHTML(section, sectionId)}
       ${sectionButtonsHTML(section, sectionId)}
       ${sectionMapHTML(section, sectionId)}
 
