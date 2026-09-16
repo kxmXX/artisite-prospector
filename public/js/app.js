@@ -4207,6 +4207,37 @@ export class App {
     this.closeImageModal();
   }
 
+  /**
+   * Transforme la photo d'une carte service en comparateur avant/apres.
+   *
+   * La photo actuelle devient l'« apres » (elle reste en place), puis l'auteur
+   * choisit l'« avant ». Un second clic rend la carte a son image simple.
+   */
+  enableServiceComparison(sectionId, itemIndex) {
+    if (!state.currentProject) return;
+    const index = (itemIndex !== null && itemIndex !== undefined && itemIndex !== "null") ? Number(itemIndex) : 0;
+    const updated = JSON.parse(JSON.stringify(state.currentProject));
+    const sec = updated.sections.find(s => s.id === sectionId);
+    const services = sec && Array.isArray(sec.content?.services) ? sec.content.services : null;
+    if (!sec || !services || !services[index]) return;
+    const item = services[index];
+    if (item.beforeImage && item.afterImage) {
+      delete item.beforeImage;
+      delete item.afterImage;
+      if (item.type === "beforeAfter") delete item.type;
+      state.updateProject(updated, true, "Fin du comparateur avant/apres");
+      this.showToast("Carte service : image simple", "info");
+      return;
+    }
+    if (!item.image) { this.showToast("Choisissez d'abord une photo pour cette carte", "info"); return; }
+    item.afterImage = item.image;
+    item.beforeImage = item.image;
+    item.type = "beforeAfter";
+    state.updateProject(updated, true, "Comparateur avant/apres");
+    this.showToast("Photo actuelle = Après. Choisissez la photo Avant.", "info");
+    this.openImagePicker(sectionId, "services." + index + ".beforeImage");
+  }
+
   applyImageUpdate(sectionId, fieldPath, newUrl, itemIndex) {
     if (!state.currentProject) return;
     const sec = state.currentProject.sections.find(s => s.id === sectionId);

@@ -198,7 +198,8 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 
 - **Taille de texte partagée** : la barre flottante (`A-` / `A+`) rangeait la taille **par champ** (`fontSize_<champ>`) : agrandir un titre agrandissait donc tous les éléments qui portaient le même champ. Elle est désormais rangée **par clé de mise en page stable** (`elementFontSizes`, CSS `[data-layout-key]`), et « Revenir au style du thème » efface aussi la taille. Les curseurs « taille » **par champ** de l'inspecteur restent inchangés : eux visent explicitement un champ de la section.
 - **Badges avant/après** : les poignées de sélection (déplacer / tourner) recouvraient les badges AVANT/APRÈS. Les badges passent **en bas** de l'image, galerie comme services.
-- Tests : 4 nouveaux (`tests/element_font_size.test.js`) ; **467/467**.
+- **Découvrabilité avant/après** : l'option existait dans la liste des services de l'inspecteur, mais l'auteur la cherchait **sur l'image**. Un bouton **« Avant/après »** apparaît maintenant sur la photo d'une carte service : un clic garde la photo actuelle comme « Après » et ouvre le choix de l'« Avant » ; un second clic rend la carte à son image simple.
+- Tests : 5 nouveaux (`tests/element_font_size.test.js`, `tests/service_before_after.test.js` étendu) ; **468/468**.
 
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.59) — Lot 7 : la courbe d'animation devient réglable
 

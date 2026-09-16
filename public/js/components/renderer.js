@@ -311,6 +311,15 @@ const motionAttr = imgMotion && imgMotion !== "none" ? ` data-motion="${imgMotio
           ${getIcon("eye", "w-3.5 h-3.5 text-zinc-700")}
           <span>Remplacer</span>
         </button>
+        ${sec?.type === 'services' && fieldPath === 'image' ? `
+          <button type="button"
+                  onclick="event.stopPropagation(); window.app.enableServiceComparison('${sectionId}', ${indexParam})"
+                  class="btn-keycap btn-keycap-light px-2 py-1.5 text-zinc-900 rounded-lg text-xs font-medium shadow-xs flex items-center gap-1 transition-all"
+                  title="Transformer cette photo en comparateur avant/après (la photo actuelle devient l'Après, vous choisissez l'Avant)">
+            ${getIcon("sliders", "w-3.5 h-3.5 text-emerald-600")}
+            <span>Avant/après</span>
+          </button>
+        ` : ''}
         <div class="relative inline-block">
           <button type="button"
                   onclick="event.stopPropagation(); window.app.toggleImageMotionMenu('${sectionId}', '${fieldPath}', ${indexParam})"

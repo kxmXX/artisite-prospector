@@ -2023,3 +2023,11 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Badges avant/apres : les poignees de selection (deplacer/tourner) recouvraient les badges AVANT/APRES ; les badges passent en bas de l'image (galerie + services). bottom-3 ajoute aux utilitaires regeneres.
 - Tests : element_font_size (4 cas) ; 467/467.
 - Reste : Lot 6 — glisser a la souris (verdict de l'auteur) ; centrage (jamais reproduit) ; eventuels « problemes d'UX par endroits » a venir avec captures.
+
+## Journal — 17 septembre 2026 · 4.9.1 (suite 23) : option avant/apres sur l'image
+
+- Constat de parcours : l'option avant/apres vivait uniquement dans la liste Services de l'inspecteur, mais l'auteur la cherchait sur l'image elle-meme (« je vois pas de trucs »).
+- Ajout : bouton « Avant/apres » sur la photo d'une carte service (overlay editeur). Un clic garde la photo actuelle comme « Apres » et ouvre le choix de l'« Avant » ; un second clic rend la carte a son image simple. Methode enableServiceComparison(cote App).
+- Verifie : le rendu editeur contient le bouton et le libelle ; les tests couvrent l'aller-retour.
+- Tests : service_before_after etendu (5 cas) ; 468/468.
+- Reste : Lot 6 — glisser a la souris (verdict de l'auteur) ; centrage (jamais reproduit) ; captures UX a venir.

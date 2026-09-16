@@ -52,3 +52,13 @@ test('le rendu de service partage le comparateur de la galerie', () => {
   const app = read('public/js/app.js');
   assert.match(app, /prop === "beforeImage" \|\| prop === "afterImage"/, 'le chemin pointe doit poser le type');
 });
+test("l'option Avant/apres est visible sur l'image d'une carte service", () => {
+  const project = generateSite({ name: 'Overlay', tradeId: 'menuisier', city: 'Lyon' });
+  const html = renderWebsiteHTML(project, { isEditor: true });
+  assert.ok(html.includes('enableServiceComparison'), 'le bouton doit etre pose sur image');
+  assert.ok(html.includes('Avant/après'), 'le libelle doit etre lisible');
+  const app = read('public/js/app.js');
+  assert.match(app, /enableServiceComparison\(sectionId, itemIndex\)/);
+  assert.match(app, /item\.afterImage = item\.image/, 'la photo actuelle devient l Apres');
+  assert.match(app, /item\.beforeImage = item\.image/, 'la photo actuelle amorce l Avant');
+});
