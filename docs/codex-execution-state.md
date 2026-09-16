@@ -2038,3 +2038,13 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Correctif : capture de panel.scrollTop avant le re-rendu complet et restauration dans la rAF ; meme chose dans refreshInspectorPanel pour le rafraichissement du seul panneau.
 - Tests : tests/inspector_scroll.test.js (1 cas) ; 469/469.
 - Reste : Lot 6 — glisser a la souris (verdict de l'auteur) ; centrage (jamais reproduit) ; captures UX a venir.
+
+## Journal — 17 septembre 2026 · 4.9.1 (suite 25) : pop-ups, avant/apres permanent, cache
+
+- L'auteur a rendu deux captures et une charge utile : (1) il ne voyait toujours pas le bouton avant/apres ; (2) « 75 pop-ups en meme temps », le menu d'animation recouvre la barre de selection ; (3) il travaille sur trackpad ; (4) le derriere/premier plan, lui, fonctionne.
+- Cause majeure identifiee : le serveur local servait JS/CSS en max-age=3600, donc le navigateur gardait une heure de vieux code — l'auteur testait une interface perimee malgre les correctifs livres. En local, cacheControlHeader renvoie no-cache ; production inchangee (Vercel sert les fichiers).
+- Surcouches : le menu d'animation d'image devient une famille de controles (kind "image") ; open le met seul a l'ecran et masque la boite de selection (CSS data-active-editor-toolbar=image), close la retablit.
+- Avant/apres : carte permanente « Comparateur avant/apres » dans l'inspecteur des qu'une photo de service est selectionnee. La selection d'image n'a pas de data-image-field : la cle se retrouve en recalculant getUiCode(project.id, section.id, "services.N.image").
+- Tests : tests/editor_layers_and_cache.test.js (3 cas) ; 472/472.
+- Production toujours bloquee au commit b448545 (quota Vercel) : plusieurs commits d'avance sur main, dont tous ces correctifs. Le local (http://127.0.0.1:5173) est la seule surface a jour, et il recharge desormais tout seul.
+- Reste : verdict de l'auteur sur le glisser (trackpad) ; captures UX ; centrage (jamais reproduit).

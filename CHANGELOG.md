@@ -207,6 +207,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 - **Correctif** : la position du panneau est capturée puis restaurée, sur le **re-rendu complet** comme sur le **rafraîchissement du seul panneau**.
 - Tests : 1 nouveau (`tests/inspector_scroll.test.js`) ; **469/469**.
 
+#### Retours de l'auteur (suite 2) — pop-ups empilés, avant/après permanent, cache local
+
+- **La cause du « tu n'as rien corrigé »** : en local, le serveur servait JS et CSS avec `max-age=3600`. Le navigateur gardait donc **une heure de code périmé**, et l'auteur voyait l'ancienne interface malgré des correctifs livrés. En local, tout est désormais `no-cache` (revalidation systématique) ; en production, Vercel sert lui-même les fichiers statiques.
+- **Pop-ups empilés** : le menu d'animation d'une image s'ouvrait **par-dessus** la barre de sélection (label, poignées, barres d'action) — « 75 pop-ups en même temps ». C'est maintenant une famille de contrôles à part entière : ouvrir le menu efface la boîte de sélection, le refermer la rétablit.
+- **Bouton avant/après introuvable** : le bouton posé sur l'image n'apparaît qu'au survol, donc invisible pour l'auteur. Une carte **« Comparateur avant/après »** est maintenant permanente dans le panneau dès qu'une photo de service est sélectionnée, avec « Transformer en avant/après » / « Revenir à l'image simple ».
+- Tests : 3 nouveaux (`tests/editor_layers_and_cache.test.js`) ; **472/472**.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.59) — Lot 7 : la courbe d'animation devient réglable
 
 - Le catalogue portait une courbe par animation, mais l'auteur ne pouvait pas la changer. Trois courbes sont désormais proposées — **Douce** (départ vif, arrivée posée), **Rebond** (léger dépassement), **Régulière** — dans le repli « Réglages avancés » du panneau, à côté de la vitesse et du délai.
