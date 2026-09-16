@@ -1861,3 +1861,14 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Carte Google : facade a la demande. L'iframe garde sa source dans data-src ; Google Maps ne se charge qu'au clic. Test dedie.
 - Tests : 417/417. Commits pousses sur main.
 - Reste : slider (generaliser a toute photo + plusieurs styles), color picker, edition groupee, bug destructif du centrage, bouton d'appel direct, vue client = editeur + export 2d, drag-and-drop a aimants, retour (popstate).
+
+## Journal — 17 septembre 2026 · 4.9.1 (suite 3) : edition groupee, couleur, retour, comparateur
+
+- Edition groupee : bouton "Appliquer a tous les elements de la section" qui copie le style de l'element selectionne sur toutes les cartes (besoin explicite : regler toutes les cartes service d'un coup).
+- Selecteur de couleur : reperes HEX/RGB visibles + libelle "Harmonies proposees".
+- Retour : plus de doublon de destination (writeNavigationHistory) et une surcouche ouverte est fermee par le Retour au lieu de changer de page (state.setDrawer pose une entree d'historique, popstate ferme).
+- Comparatif de galerie : chaque entree avant/apres peut recevoir ses deux photos (openImagePicker avec photos.<i>.beforeImage/afterImage ; applyImageUpdate gere le chemin pointe).
+- Liens tel: vides supprimes (renvoi vers #simulateur).
+- Export autonome VERIFIE au navigateur : en-tete, heros, services, galerie garnie, avis, simulateur rendent correctement. Les manques venaient des contenus vides, restaures plus tot.
+- Tests : 420/420.
+- Reste : drag-and-drop a aimants, vue client = editeur (form factor), bug destructif du centrage (non reproduit), slider styles graphiques multiples, mediathèque alignee.

@@ -69,6 +69,16 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 - **Bouton d'appel direct** : l'en-tête affiche un bouton d'appel dès qu'un numéro existe, **y compris pour le paysagiste** (où il était absent) ; il n'apparaît plus quand aucun numéro n'est renseigné.
 - Tests : 2 nouveaux ; **417/417**.
 
+#### Édition groupée, repères de couleur, Retour fiable et comparateur complet
+
+- **Édition groupée** : un bouton « Appliquer à tous les éléments de la section » copie le style de l'élément sélectionné (taille, police, fond…) sur toutes les cartes d'une section — c'est ce qui manquait pour régler d'un coup toutes les cartes service.
+- **Sélecteur de couleur** : repères visibles HEX et RGB (avec exemples) et libellé « Harmonies proposées » — un débutant sait quoi taper.
+- **Bouton Retour** : il ne double plus les destinations identiques et, quand une surcouche est ouverte (compte, médiathèque, ajout de section…), il **ferme la surcouche** au lieu de changer de page ou d'onglet.
+- **Comparatif de galerie** : chaque entrée convertie en avant/après peut recevoir **ses deux photos** (« Photo avant » / « Photo après ») ; l'écriture crée bien une comparaison.
+- **Liens d'appel** : plus aucun `tel:` vide dans le rendu — un contact non renseigné renvoie vers le simulateur de devis.
+- **Export autonome vérifié** : généré puis **affiché au navigateur** (en-tête, héros, services, galerie garnie, avis, simulateur). Les manques constatés venaient des contenus vides, désormais restaurés.
+- Tests : 4 nouveaux ; **420/420**.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.59) — Lot 7 : la courbe d'animation devient réglable
 
 - Le catalogue portait une courbe par animation, mais l'auteur ne pouvait pas la changer. Trois courbes sont désormais proposées — **Douce** (départ vif, arrivée posée), **Rebond** (léger dépassement), **Régulière** — dans le repli « Réglages avancés » du panneau, à côté de la vitesse et du délai.
