@@ -3957,15 +3957,19 @@ export class App {
     const sec = state.currentProject.sections.find(s => s.id === sectionId);
     if (!sec || !sec.content) return;
 
-    // Comparatif avant/apres d'une entree de galerie : deux images distinctes.
-    const comparison = String(fieldPath).match(/^photos\.(\d+)\.(beforeImage|afterImage)$/);
-    if (comparison) {
-      const index = Number(comparison[1]);
-      const which = comparison[2];
-      const photos = Array.isArray(sec.content.photos) ? [...sec.content.photos] : [];
-      if (photos[index]) {
-        photos[index] = Object.assign({}, photos[index], { type: "beforeAfter", [which]: newUrl });
-        state.updateSectionContent(sectionId, "photos", photos);
+    // Chemin pointe d'une liste : « photos.2.url », « services.0.image »,
+    // « photos.1.beforeImage »… Le comparatif avant/apres pose aussi son type.
+    const dotted = String(fieldPath).match(/^([a-zA-Z0-9_]+)\.(\d+)\.([a-zA-Z0-9_]+)$/);
+    if (dotted) {
+      const listKey = dotted[1];
+      const index = Number(dotted[2]);
+      const prop = dotted[3];
+      const items = Array.isArray(sec.content[listKey]) ? [...sec.content[listKey]] : [];
+      if (items[index] && typeof items[index] === "object") {
+        const patch = { [prop]: newUrl };
+        if (prop === "beforeImage" || prop === "afterImage") patch.type = "beforeAfter";
+        items[index] = Object.assign({}, items[index], patch);
+        state.updateSectionContent(sectionId, listKey, items);
       }
       return;
     }
@@ -5544,6 +5548,83 @@ export class App {
     this._freeformReparentTarget = null;
   }
 
+  /** Index des emplacements image de la page : cle de mise en page -> champ editable. */
+  buildFreeformSlotIndex() {
+    const index = new Map();
+    if (!state.currentProject) return index;
+    for (const sectionEl of document.querySelectorAll(".editor-section-wrapper[data-section-id]")) {
+      const section = state.currentProject.sections.find(s => s.id === sectionEl.dataset.sectionId);
+      if (!section) continue;
+      for (const element of collectSectionElements(state.currentProject, section)) {
+        if (!element.key || !element.field || element.kind !== "image") continue;
+        index.set(element.key, { sectionId: section.id, field: element.field, kind: element.kind });
+      }
+    }
+    return index;
+  }
+
+  /** Emplacement image survole par la selection en cours, ou le plus proche. */
+  findFreeformDropSlot(rect, draggedKeys = []) {
+    if (!rect) return null;
+    const cx = (rect.left + rect.right) / 2;
+    const cy = (rect.top + rect.bottom) / 2;
+    const slots = this.buildFreeformSlotIndex();
+    if (!slots.size) return null;
+    let best = null;
+    let bestDistance = Infinity;
+    for (const element of document.querySelectorAll("#canvas-container [data-layout-key]")) {
+      const key = element.dataset.layoutKey;
+      const meta = key && slots.get(key);
+      if (!meta || draggedKeys.includes(key)) continue;
+      const box = element.getBoundingClientRect();
+      if (box.width < 8 || box.height < 8) continue;
+      if (cx >= box.left && cx <= box.right && cy >= box.top && cy <= box.bottom) {
+        return { key, element, sectionId: meta.sectionId, field: meta.field };
+      }
+      const dx = Math.max(box.left - cx, 0, cx - box.right);
+      const dy = Math.max(box.top - cy, 0, cy - box.bottom);
+      const distance = Math.hypot(dx, dy);
+      if (distance < bestDistance && distance <= 48) {
+        bestDistance = distance;
+        best = { key, element, sectionId: meta.sectionId, field: meta.field };
+      }
+    }
+    return best;
+  }
+
+  clearFreeformDropSlot() {
+    document.querySelectorAll("#canvas-container .is-freeform-drop-slot").forEach(element => element.classList.remove("is-freeform-drop-slot"));
+    this._freeformDropSlot = null;
+  }
+
+  setFreeformDropSlot(slot) {
+    const currentKey = this._freeformDropSlot && this._freeformDropSlot.key;
+    const nextKey = slot && slot.key;
+    if (currentKey === nextKey) { this._freeformDropSlot = slot || null; return; }
+    this.clearFreeformDropSlot();
+    if (slot && slot.element) {
+      slot.element.classList.add("is-freeform-drop-slot");
+      this._freeformDropSlot = slot;
+    }
+  }
+
+  /** Depose l'image glissee dans l'emplacement survole au lieu de la laisser flotter. */
+  commitFreeformDropSlot(entries, slot) {
+    if (!entries || !entries.length || !slot) return false;
+    const index = this.buildFreeformSlotIndex();
+    const sourceMeta = index.get(entries[0].key);
+    if (!sourceMeta) return false;
+    if (sourceMeta.sectionId === slot.sectionId && sourceMeta.field === slot.field) return false;
+    const element = entries[0].target;
+    const image = element.tagName === "IMG" ? element : element.querySelector("img");
+    const url = image && image.getAttribute("src");
+    if (!url) return false;
+    state.pushHistory("Attacher l'image a un emplacement");
+    this.applyImageUpdate(slot.sectionId, slot.field, url);
+    this.showToast("Image attachee a l'emplacement", "success");
+    return true;
+  }
+
   findFreeformReparentTarget(rect) {
     if (!rect) return null;
     const cx = (rect.left + rect.right) / 2;
@@ -5872,6 +5953,7 @@ export class App {
     const boundary = crossSectionMove ? (canvas.getBoundingClientRect() || sectionBoundary) : sectionBoundary;
     const snapContext = (action === "move" || action === "resize") && !crossSectionMove ? this.buildFreeformSnapContext(entries, boundary) : null;
     let pendingReparentTarget = null;
+    let pendingDropSlot = null;
     let liveUpdates = Object.fromEntries(entries.map(entry => [entry.key, { ...entry.base, x: Number(entry.base.x) || 0, y: Number(entry.base.y) || 0 }]));
     this._freeformOverlay?.classList.add("is-transforming");
     document.body.classList.add("freeform-transforming");
@@ -5921,6 +6003,11 @@ export class App {
           const currentSections = new Set(entries.map(entry => entry.target.closest(".editor-section-wrapper")?.dataset?.sectionId).filter(Boolean));
           pendingReparentTarget = candidate && !(currentSections.size === 1 && currentSections.has(candidate.dataset.sectionId)) ? candidate : null;
           this.setFreeformReparentTarget(pendingReparentTarget);
+        }
+        // Aimants : un emplacement image survole s'illumine et accueillera l'image.
+        if (action === "move") {
+          pendingDropSlot = this.findFreeformDropSlot(snappedRect, entries.map(entry => entry.key));
+          this.setFreeformDropSlot(pendingDropSlot);
         }
         this.showFreeformGuides(snapX, snapY, boundary);
         this.showFreeformSpacingGuides(spacingX, spacingY, snappedRect);
@@ -6065,7 +6152,13 @@ export class App {
       this.hideFreeformGuides();
       this.hideFreeformSpacingGuides();
       const reparentTarget = pendingReparentTarget;
+      const dropSlot = pendingDropSlot;
       this.clearFreeformReparentTarget();
+      this.clearFreeformDropSlot();
+      if (action === "move" && dropSlot && this.commitFreeformDropSlot(entries, dropSlot)) {
+        this.updateFreeformOverlay();
+        return;
+      }
       if (action === "move" && crossSectionMove && reparentTarget && this.commitFreeformReparent(entries, liveUpdates, reparentTarget)) {
         this._freeformCrossSectionMode = false;
         this.updateFreeformOverlay();

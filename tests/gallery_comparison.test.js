@@ -9,7 +9,7 @@ const read = (relative) => fs.readFileSync(path.join(root, relative), 'utf8');
 
 test('une entrée de galerie peut recevoir ses deux photos avant/après', () => {
   const app = read('public/js/app.js');
-  assert.match(app, /beforeImage\|afterImage/, "l'écriture doit viser avant ou après selon le champ");
+  assert.match(app, /prop === "beforeImage" \|\| prop === "afterImage"/, "l'écriture doit viser avant ou après selon le champ");
   const inspector = read('public/js/components/inspector.js');
   assert.match(inspector, /Photo avant/);
   assert.match(inspector, /Photo après/);
