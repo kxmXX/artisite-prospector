@@ -194,6 +194,12 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 - **Services → avant/après** (demande répétée) : chaque service reçoit deux boutons « Avant » / « Après » dans l'inspecteur. Dès que **les deux** photos existent, la carte rend le **même comparateur** que la galerie (curseur, badges AVANT/APRÈS) ; avec une seule, elle garde l'image simple. Même câblage éditeur/export.
 - Tests : 6 nouveaux (`tests/inspector_option_rows.test.js`, `tests/freeform_drop_coverage.test.js`, `tests/service_before_after.test.js`) ; **463/463**.
 
+#### Retours de l'auteur (suite) — taille de texte par élément, badges avant/après
+
+- **Taille de texte partagée** : la barre flottante (`A-` / `A+`) rangeait la taille **par champ** (`fontSize_<champ>`) : agrandir un titre agrandissait donc tous les éléments qui portaient le même champ. Elle est désormais rangée **par clé de mise en page stable** (`elementFontSizes`, CSS `[data-layout-key]`), et « Revenir au style du thème » efface aussi la taille. Les curseurs « taille » **par champ** de l'inspecteur restent inchangés : eux visent explicitement un champ de la section.
+- **Badges avant/après** : les poignées de sélection (déplacer / tourner) recouvraient les badges AVANT/APRÈS. Les badges passent **en bas** de l'image, galerie comme services.
+- Tests : 4 nouveaux (`tests/element_font_size.test.js`) ; **467/467**.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.59) — Lot 7 : la courbe d'animation devient réglable
 
 - Le catalogue portait une courbe par animation, mais l'auteur ne pouvait pas la changer. Trois courbes sont désormais proposées — **Douce** (départ vif, arrivée posée), **Rebond** (léger dépassement), **Régulière** — dans le repli « Réglages avancés » du panneau, à côté de la vitesse et du délai.

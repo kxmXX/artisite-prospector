@@ -22,7 +22,7 @@ import { ensureFontCatalog } from "./data/fonts.js";
 import { getUiCode } from "./data/uiIds.js";
 import { ELEMENT_STATES, ELEMENT_STATE_LABELS, setElementState, clearElementState, elementStateDeclarations } from "./engine/elementStates.js";
 import { setSectionLayout, isValidSectionId } from "./engine/sectionStyle.js";
-import { setElementStyle, clearElementStyle, getElementStyle } from "./engine/elementStyle.js";
+import { setElementStyle, clearElementStyle, getElementStyle, getElementFontSize, setElementFontSize } from "./engine/elementStyle.js";
 import { motionDirectionsFor, motionLoopAttribute, motionWhenAttribute } from "./data/motionPresets.js";
 import { getIcon } from "./components/icons.js";
 import { setElementTransform, clearElementTransform, enableElementTransform } from "./engine/elementTransform.js";
@@ -2376,16 +2376,15 @@ export class App {
   adjustActiveTextFontSize(delta) {
     if (!this._activeEditableEl) return;
     const el = this._activeEditableEl;
-    const secWrapper = el.closest(".editor-section-wrapper");
-    const secId = secWrapper?.getAttribute("data-section-id");
-    const field = el.getAttribute("data-editable");
-    if (secId && field) {
-      this.adjustFieldFontSize(secId, field, delta);
-    } else {
-      const currentSize = parseFloat(window.getComputedStyle(el).fontSize) || 16;
-      const newSize = Math.max(10, Math.min(64, currentSize + delta * 2));
-      el.style.fontSize = `${newSize}px`;
+    const layoutKey = el.getAttribute("data-layout-key");
+    if (layoutKey && state.currentProject) {
+      const next = Math.max(-10, Math.min(24, getElementFontSize(state.currentProject, layoutKey) + delta));
+      this.applyActiveTextFontSize(el, layoutKey, next, "Taille de texte");
+      return;
     }
+    const currentSize = parseFloat(window.getComputedStyle(el).fontSize) || 16;
+    const newSize = Math.max(10, Math.min(64, currentSize + delta * 2));
+    el.style.fontSize = `${newSize}px`;
   }
 
   adjustActiveTextFontSizeSlider(deltaVal) {
@@ -2395,27 +2394,32 @@ export class App {
 
     if (!this._activeEditableEl) return;
     const el = this._activeEditableEl;
-    const secWrapper = el.closest(".editor-section-wrapper");
-    const secId = secWrapper?.getAttribute("data-section-id");
-    const field = el.getAttribute("data-editable");
-
-    if (secId && field && state.currentProject) {
-      const sec = state.currentProject.sections.find(s => s.id === secId);
-      if (sec) {
-        sec.settings = sec.settings || {};
-        state.pushHistoryCoalesced("Taille de texte " + field);
-        sec.settings[`fontSize_${field}`] = delta;
-      }
-      el.style.fontSize = delta === 0 ? "" : `calc(1em + ${delta}px)`;
-      state.saveToStorage();
-    } else {
-      let baseSize = parseFloat(el.getAttribute("data-base-font-size"));
-      if (!baseSize) {
-        baseSize = parseFloat(window.getComputedStyle(el).fontSize) || 16;
-        el.setAttribute("data-base-font-size", String(baseSize));
-      }
-      el.style.fontSize = `${baseSize + delta}px`;
+    const layoutKey = el.getAttribute("data-layout-key");
+    if (layoutKey && state.currentProject) {
+      this.applyActiveTextFontSize(el, layoutKey, delta, "Taille de texte");
+      return;
     }
+    let baseSize = parseFloat(el.getAttribute("data-base-font-size"));
+    if (!baseSize) {
+      baseSize = parseFloat(window.getComputedStyle(el).fontSize) || 16;
+      el.setAttribute("data-base-font-size", String(baseSize));
+    }
+    el.style.fontSize = `${baseSize + delta}px`;
+  }
+
+  /**
+   * La taille de texte d'un element se range par cle de mise en page stable.
+   * Avant, elle etait rangee par champ (`fontSize_<champ>`) : agrandir un titre
+   * agrandissait tous les elements qui portaient le meme champ.
+   */
+  applyActiveTextFontSize(el, layoutKey, delta, label) {
+    const next = Math.max(-10, Math.min(24, Number(delta) || 0));
+    state.pushHistoryCoalesced(label);
+    state.currentProject = setElementFontSize(state.currentProject, layoutKey, next);
+    el.style.fontSize = next === 0 ? "" : `calc(1em + ${next}px)`;
+    state.saveToStorage();
+    this.updateUndoRedoUI();
+    this.showToast(`Taille du texte : ${next >= 0 ? "+" : ""}${next}px`, "info");
   }
 
   toggleActiveTextBold() {

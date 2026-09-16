@@ -3,7 +3,7 @@ import { HERO_STYLES } from "./heroStyles.js";
 import { elementStateCSS } from "../engine/elementStates.js";
 import { MOTION_PRESETS, MOTION_SPEEDS, MOTION_DELAYS, motionTimingCSS, motionDirectionsFor, motionDirectionCSS, motionLoopAttribute, motionRepeatRowHTML, motionWhenAttribute, motionTriggerRowHTML } from "../data/motionPresets.js";
 import { sectionLayoutAttributes, SECTION_LAYOUT_CSS } from "../engine/sectionStyle.js";
-import { elementStyleCSS } from "../engine/elementStyle.js";
+import { elementStyleCSS, elementFontSizeCSS } from "../engine/elementStyle.js";
 import { getTradeFallbackDataUrl } from "../data/imageFallbacks.js";
 import { getUiId, getSectionUiId, getUiCode } from "../data/uiIds.js";
 import { escapeHtml, sanitizeUrl, safeCssColor, safeCssLength, safeFontFamily } from "../utils/html.js";
@@ -487,6 +487,7 @@ export function renderWebsiteHTML(project, options = { isEditor: false, isStanda
       <style data-freeform-layout>${buildFreeformLayoutCSS(project)}</style>
       <style data-element-states>${elementStateCSS(project)}</style>
       <style data-element-style>${elementStyleCSS(project)}</style>
+      <style data-element-font-size>${elementFontSizeCSS(project)}</style>
       <style data-motion-timing>${motionTimingCSS()}</style>
       <style data-motion-direction>${motionDirectionCSS()}</style>
       ${sectionsHTML}
@@ -1830,8 +1831,8 @@ function renderServiceComparisonMedia(beforeSrc, afterSrc, secId, label) {
         <div class="sr-line"></div>
         <div class="ba-handle-button sr-button w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white shadow-md text-zinc-900 text-xs flex items-center justify-center font-bold"><span>&lsaquo; &rsaquo;</span></div>
       </div>
-      <div class="absolute top-3 left-3 z-20 pointer-events-none"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-black/65 backdrop-blur-md text-white border border-white/20 shadow-sm">AVANT</span></div>
-      <div class="absolute top-3 right-3 z-20 pointer-events-none"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-600/90 backdrop-blur-md text-white border border-white/20 shadow-sm">APRES</span></div>
+      <div class="absolute bottom-3 left-3 z-20 pointer-events-none"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-black/65 backdrop-blur-md text-white border border-white/20 shadow-sm">AVANT</span></div>
+      <div class="absolute bottom-3 right-3 z-20 pointer-events-none"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-600/90 backdrop-blur-md text-white border border-white/20 shadow-sm">APRES</span></div>
     </div>`;
 }
 
@@ -1876,12 +1877,12 @@ function renderGalleryCard(p, idx, sec, project, options, aspectClass) {
               </div>
             </div>
             <!-- Badges Avant / Après matching Sendpage Esprit Nature -->
-            <div class="absolute top-3 left-3 z-20 pointer-events-none">
+            <div class="absolute bottom-3 left-3 z-20 pointer-events-none">
               <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-black/65 backdrop-blur-md text-white border border-white/20 shadow-sm">
                 AVANT
               </span>
             </div>
-            <div class="absolute top-3 right-3 z-20 pointer-events-none">
+            <div class="absolute bottom-3 right-3 z-20 pointer-events-none">
               <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-600/90 backdrop-blur-md text-white border border-white/20 shadow-sm">
                 APRÈS
               </span>

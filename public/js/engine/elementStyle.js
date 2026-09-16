@@ -149,16 +149,27 @@ export function isKnownElementValue(property, valueId) {
 
 /** Retire un réglage. L'entrée disparaît quand il ne reste rien. Renvoie un nouveau projet. */
 export function clearElementStyle(project, layoutKey, property) {
-  if (!project || !project.elementStyles || !project.elementStyles[layoutKey]) return project;
-  const elementStyles = { ...project.elementStyles };
-  const forElement = { ...elementStyles[layoutKey] };
-  if (property === undefined) delete elementStyles[layoutKey];
-  else delete forElement[property];
-  if (property !== undefined) {
-    if (Object.keys(forElement).length) elementStyles[layoutKey] = forElement;
-    else delete elementStyles[layoutKey];
+  const hasStyles = Boolean(project && project.elementStyles && project.elementStyles[layoutKey]);
+  const hasFontSize = Boolean(project && project.elementFontSizes && project.elementFontSizes[layoutKey] !== undefined);
+  if (!project || (!hasStyles && !hasFontSize)) return project;
+  const next = { ...project };
+  if (property === undefined && hasFontSize) {
+    const elementFontSizes = { ...next.elementFontSizes };
+    delete elementFontSizes[layoutKey];
+    next.elementFontSizes = elementFontSizes;
   }
-  return { ...project, elementStyles };
+  if (hasStyles) {
+    const elementStyles = { ...next.elementStyles };
+    const forElement = { ...elementStyles[layoutKey] };
+    if (property === undefined) delete elementStyles[layoutKey];
+    else delete forElement[property];
+    if (property !== undefined) {
+      if (Object.keys(forElement).length) elementStyles[layoutKey] = forElement;
+      else delete elementStyles[layoutKey];
+    }
+    next.elementStyles = elementStyles;
+  }
+  return next;
 }
 
 /**
@@ -184,4 +195,40 @@ export function elementStyleCSS(project) {
     if (rules.length >= 400) break;
   }
   return rules.join("\n") + (rules.length ? "\n" : "");
+}
+/**
+ * Taille de texte propre a un element (decalage en px, negatif ou positif).
+ *
+ * La cle est la cle de mise en page stable de l'element, pas son champ texte :
+ * regler un titre ne doit jamais agrandir les autres elements qui partagent le
+ * meme champ (`fontSize_<champ>` le faisait).
+ */
+export function getElementFontSize(project, layoutKey) {
+  const sizes = project && project.elementFontSizes;
+  const value = sizes && SAFE_KEY.test(String(layoutKey || "")) ? Number(sizes[layoutKey]) : 0;
+  return Number.isFinite(value) ? Math.max(-10, Math.min(24, value)) : 0;
+}
+
+export function setElementFontSize(project, layoutKey, delta) {
+  if (!project || !SAFE_KEY.test(String(layoutKey || ""))) return project;
+  const value = Math.max(-10, Math.min(24, Number(delta) || 0));
+  const elementFontSizes = { ...(project.elementFontSizes || {}) };
+  if (value === 0) delete elementFontSizes[layoutKey];
+  else elementFontSizes[layoutKey] = value;
+  return { ...project, elementFontSizes };
+}
+
+export function elementFontSizeCSS(project) {
+  const sizes = project && project.elementFontSizes;
+  if (!sizes || typeof sizes !== "object") return "";
+  const rules = [];
+  for (const layoutKey of Object.keys(sizes)) {
+    if (!SAFE_KEY.test(layoutKey)) continue;
+    const delta = Number(sizes[layoutKey]);
+    if (!Number.isFinite(delta) || delta === 0) continue;
+    const clamped = Math.max(-10, Math.min(24, delta));
+    rules.push('[data-layout-key="' + layoutKey + '"] { font-size: calc(1em + ' + clamped + 'px) !important; }');
+    if (rules.length >= 400) break;
+  }
+  return rules.join("\n");
 }

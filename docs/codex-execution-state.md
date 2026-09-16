@@ -2016,3 +2016,10 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Tests : inspector_option_rows (2), freeform_drop_coverage (1), service_before_after (4) ; 463/463. Commit b448545 (inspecteur + aimantation).
 - Non traite encore : l'agrandissement d'un element qui grossit les autres (cause non reproduite — a preciser avec l'auteur : quels boutons, quel element) ; le surplus visuel du chrome sur les badges avant/apres ; les « problemes d'UX par endroits » sans capture precise.
 - Reste : Lot 6 — glisser a la souris (verdict de l'auteur) ; centrage (jamais reproduit) ; agrandissement partage (a preciser) ; chrome avant/apres.
+
+## Journal — 17 septembre 2026 · 4.9.1 (suite 22) : taille par element et badges
+
+- Taille de texte : la barre flottante A-/A+ rangeait la taille par champ (fontSize_<champ>), d'ou l'agrandissement de « quasiment tous les autres » elements portant le meme champ. Desormais rangee par cle de mise en page stable : elementFontSizes (nouveau), CSS elementFontSizeCSS injectee par le rendu, applyActiveTextFontSize cote barre, et clearElementStyle efface aussi la taille. Les curseurs « taille » par champ de l'inspecteur restent inchanges (ils visent un champ de la section).
+- Badges avant/apres : les poignees de selection (deplacer/tourner) recouvraient les badges AVANT/APRES ; les badges passent en bas de l'image (galerie + services). bottom-3 ajoute aux utilitaires regeneres.
+- Tests : element_font_size (4 cas) ; 467/467.
+- Reste : Lot 6 — glisser a la souris (verdict de l'auteur) ; centrage (jamais reproduit) ; eventuels « problemes d'UX par endroits » a venir avec captures.
