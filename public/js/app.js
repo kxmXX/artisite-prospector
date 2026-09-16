@@ -3957,6 +3957,19 @@ export class App {
     const sec = state.currentProject.sections.find(s => s.id === sectionId);
     if (!sec || !sec.content) return;
 
+    // Comparatif avant/apres d'une entree de galerie : deux images distinctes.
+    const comparison = String(fieldPath).match(/^photos\.(\d+)\.(beforeImage|afterImage)$/);
+    if (comparison) {
+      const index = Number(comparison[1]);
+      const which = comparison[2];
+      const photos = Array.isArray(sec.content.photos) ? [...sec.content.photos] : [];
+      if (photos[index]) {
+        photos[index] = Object.assign({}, photos[index], { type: "beforeAfter", [which]: newUrl });
+        state.updateSectionContent(sectionId, "photos", photos);
+      }
+      return;
+    }
+
     if (itemIndex !== null && itemIndex !== undefined && !fieldPath.includes(".")) {
       if (fieldPath === "photos") {
         const photos = Array.isArray(sec.content.photos) ? [...sec.content.photos] : [];

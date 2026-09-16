@@ -129,10 +129,16 @@ function sectionGalleryHTML(section, sectionId) {
                   onclick="window.app.setGalleryAspectRatio('${sectionId}', '${ratio.id}')">${ratio.label}</button>`).join("")}
       </div>
       ${photos.length ? `<div class="space-y-1">${photos.map((photo, index) => `
-        <div class="flex items-center justify-between gap-2 text-ui-xs text-zinc-600">
-          <span>#${index + 1} ${isBeforeAfter(photo) ? "Comparatif Avant/Après" : "Photo"}</span>
-          <button type="button" class="text-ui-2xs text-zinc-600 font-semibold border border-zinc-200 rounded-md px-1.5 py-0.5 bg-white"
-                  onclick="window.app.toggleGalleryItemType('${sectionId}', ${index})">${isBeforeAfter(photo) ? "En photo" : "En comparatif"}</button>
+        <div class="text-ui-xs text-zinc-600">
+          <div class="flex items-center justify-between gap-2">
+            <span>#${index + 1} ${isBeforeAfter(photo) ? "Comparatif Avant/Après" : "Photo"}</span>
+            <button type="button" class="text-ui-2xs text-zinc-600 font-semibold border border-zinc-200 rounded-md px-1.5 py-0.5 bg-white"
+                    onclick="window.app.toggleGalleryItemType('${sectionId}', ${index})">${isBeforeAfter(photo) ? "En photo" : "En comparatif"}</button>
+          </div>
+          ${isBeforeAfter(photo) ? `<div class="flex gap-1 mt-1">
+            <button type="button" class="flex-1 text-ui-2xs font-semibold border border-zinc-200 rounded-md px-1.5 py-0.5 bg-white" onclick="window.app.openImagePicker('${sectionId}', 'photos.${index}.beforeImage')">Photo avant</button>
+            <button type="button" class="flex-1 text-ui-2xs font-semibold border border-zinc-200 rounded-md px-1.5 py-0.5 bg-white" onclick="window.app.openImagePicker('${sectionId}', 'photos.${index}.afterImage')">Photo après</button>
+          </div>` : ''}
         </div>`).join("")}</div>` : ''}
     </div>`;
 }
