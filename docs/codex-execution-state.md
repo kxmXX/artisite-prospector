@@ -1949,3 +1949,11 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - La checklist portait encore « 830 lignes inertes » comme reste en deux endroits : corrige, Lot 3 et Lot 3b marques clos. Aucune ligne morte ne subsiste de ce gabarit (inspector.js fait 1109 lignes au total).
 - Aucun changement de code ; uniquement la checklist remise en accord avec l'etat reel.
 - Reste : bug destructif du centrage (jamais reproduit) ; Lot 6 (geste souris, boites de selection unifiees) ; Lot 5b (apercu d'etat, proprietes par etat) ; PRODUCT.md/DESIGN.md.
+
+## Journal — 17 septembre 2026 · 4.9.1 (suite 14) : apercu d'etat, lot 5 clos
+
+- Constat : les quatre etats etaient deja reglables sur toute la grille (espacement, rayon, police, opacite, fond, bordure, ombre) via la meme interface que le style principal ; la checklist 5b etait partiellement perimee. Le seul vrai manque : aucun apercu sans survol reel.
+- elementStateDeclarations extrait la fabrication des declarations d'un etat et elementStateCSS l'utilise : l'apercu et le CSS publie partagent exactement la meme source.
+- previewElementState applique ces declarations 2,5 s via une feuille temporaire et une classe is-state-previewed ; stopElementStatePreview retire tout ; aucune ecriture dans le projet.
+- Tests : tests/element_state_preview.test.js (3 cas) ; 443/443. Lot 5 clos dans la checklist.
+- Reste : bug destructif du centrage (jamais reproduit) ; Lot 6 (geste souris, boites de selection unifiees) ; PRODUCT.md/DESIGN.md.

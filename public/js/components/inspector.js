@@ -368,6 +368,9 @@ function elementStyleControlsHTML(project, layoutKey, activeState, sectionId) {
     (stateName === 'default' && sectionId
       ? '<button type="button" onclick="window.app.applyElementStyleToSection(\'' + sectionId + '\')" class="w-full py-1.5 rounded-md border border-zinc-300 bg-zinc-900 text-ui-2xs font-semibold text-white" title="Copier ces réglages sur tous les éléments de la section, par exemple toutes les cartes service">Appliquer à tous les éléments de la section</button>'
       : '') +
+    (stateName === 'default'
+      ? ''
+      : '<button type="button" onclick="window.app.previewElementState()" class="w-full py-1.5 rounded-md border border-zinc-300 bg-white text-ui-2xs font-semibold text-zinc-700" title="Voir ce que cet état donne sur l\'élément, sans avoir à le survoler">Aperçu de cet état</button>') +
     '<button type="button" onclick="' + reset + '" class="w-full py-1.5 rounded-md border border-zinc-200 bg-white text-ui-2xs font-semibold text-zinc-600">' +
       (stateName === 'default' ? 'Revenir au style du thème' : 'Effacer cet état') + '</button>' +
   '</div>';

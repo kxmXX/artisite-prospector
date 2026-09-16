@@ -103,17 +103,14 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
       captures à 1280 px, et je n'ai ni redimensionnement de fenêtre ni accès aux styles calculés).
       **Reste (4c)** : onglets par portée, divulgation progressive, `elementStyles[layoutKey]` pour les
       éléments, wording humain (fin du « 60fps », « preset », « responsive », « HEX/RGB », « WCAG AA »).
-- [~] **Lot 5 — États des éléments** (5a en `4.9.0-alpha.9`, 5b en `4.9.0-alpha.11` et
-      `alpha.12`) : modèle `elementStates[layoutKey]` (survol, focus, actif, désactivé), primitive
-      unique `elementStateCSS` injectée par le renderer et donc partagée par l'éditeur, l'aperçu et
-      l'export, liste blanche de propriétés et valeurs filtrées, plafond de 400 règles. Interface :
-      sélecteur « Principal · Survol · Focus · Actif · Désactivé » dans le menu couleur du texte,
-      réglages routés vers l'état choisi, retour au style principal en sortant de l'édition, et
-      pastille rappelant l'état actif hors du menu. 8 tests dédiés, **323/323**.
-      **Reste (5b, second temps)** : aucun aperçu immédiat d'un état sans survol réel ; le bouton
-      « Revenir au style principal » n'existe que par l'entrée « Principal » du menu ; seuls la
-      **couleur** est éditable par état — fond, bordure, ombre et opacité sont prévus par le modèle
-      (`ALLOWED_PROPERTIES`) mais aucun contrôle ne les expose.
+- [x] **Lot 5 — États des éléments** (5a `4.9.0-alpha.9`, 5b `4.9.0-alpha.11` → `.12`, clos en `4.9.1`) :
+      modèle `elementStates[layoutKey]` (survol, focus, actif, désactivé), primitive unique
+      `elementStateCSS` injectée par le renderer et donc partagée par l'éditeur, l'aperçu et l'export,
+      liste blanche de propriétés, plafond de 400 règles. Interface : sélecteur « Principal · Survol ·
+      Focus · Actif · Désactivé », **toute la grille** (espacement, rayon, police, opacité, fond, bordure,
+      ombre) routée vers l'état choisi, « Effacer cet état » et « Revenir au style du thème ». 5b second
+      temps soldé en `4.9.1` : l'**aperçu immédiat** d'un état existe (`elementStateDeclarations`, la même
+      source que le CSS publié) — plus besoin de survoler réellement l'élément pour voir le résultat.
 - [ ] **Défauts visuels relevés à l'inspection** (`4.9.0-alpha.31` → `.34`) : lanceur d'assistant réduit à
       une pastille compacte (il recouvrait la carte du hero) avec le bord épais retiré ; kickers numérotés
       du tableau de bord supprimés ; tous les glyphes du chrome et du rendu remplacés par le système

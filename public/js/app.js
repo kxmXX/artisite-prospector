@@ -20,7 +20,7 @@ import { getTradeById } from "./data/trades.js";
 import { getTradeFallbackDataUrl } from "./data/imageFallbacks.js";
 import { ensureFontCatalog } from "./data/fonts.js";
 import { getUiCode } from "./data/uiIds.js";
-import { ELEMENT_STATES, ELEMENT_STATE_LABELS, setElementState, clearElementState } from "./engine/elementStates.js";
+import { ELEMENT_STATES, ELEMENT_STATE_LABELS, setElementState, clearElementState, elementStateDeclarations } from "./engine/elementStates.js";
 import { setSectionLayout, isValidSectionId } from "./engine/sectionStyle.js";
 import { setElementStyle, clearElementStyle, getElementStyle } from "./engine/elementStyle.js";
 import { motionDirectionsFor, motionLoopAttribute, motionWhenAttribute } from "./data/motionPresets.js";
@@ -2648,6 +2648,39 @@ export class App {
     const next = setElementState(state.currentProject, layoutKey, stateName, property, value);
     if (next === state.currentProject) return;
     state.updateProject(next, true, "Réglage de l'état " + ELEMENT_STATE_LABELS[stateName]);
+  }
+
+  /**
+   * Montre à l'écran ce que l'état choisi donne sur l'élément, sans devoir
+   * réellement le survoler. L'aperçu est temporaire et ne touche pas au projet.
+   */
+  previewElementState() {
+    const layoutKey = state.selectedElementKey;
+    const stateName = state.elementStyleState;
+    if (!layoutKey || !ELEMENT_STATES.includes(stateName)) { this.showToast("Choisissez un état à prévisualiser", "info"); return; }
+    const body = elementStateDeclarations(state.currentProject, layoutKey, stateName);
+    if (!body) { this.showToast("Cet état n'a encore aucun réglage", "info"); return; }
+    const el = document.querySelector("#canvas-container [data-layout-key=\"" + layoutKey + "\"]") ||
+      document.querySelector(".editor-section-wrapper [data-layout-key=\"" + layoutKey + "\"]");
+    if (!el) return;
+    this.stopElementStatePreview();
+    const style = document.createElement("style");
+    style.setAttribute("data-state-preview", "");
+    style.textContent = '[data-layout-key="' + layoutKey + '"].is-state-previewed { ' + body + ' }';
+    document.head.appendChild(style);
+    el.classList.add("is-state-previewed");
+    this._statePreview = { style };
+    this._statePreviewTimer = setTimeout(() => this.stopElementStatePreview(), 2500);
+    this.showToast("Aperçu de l'état « " + ELEMENT_STATE_LABELS[stateName] + " »", "info");
+  }
+
+  stopElementStatePreview() {
+    if (this._statePreviewTimer) { clearTimeout(this._statePreviewTimer); this._statePreviewTimer = null; }
+    if (this._statePreview) {
+      this._statePreview.style.remove();
+      document.querySelectorAll(".is-state-previewed").forEach((node) => node.classList.remove("is-state-previewed"));
+      this._statePreview = null;
+    }
   }
 
   /** Efface l'état choisi sur l'élément sélectionné. */

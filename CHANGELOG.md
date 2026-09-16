@@ -142,6 +142,12 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 - **Runtime** : les deux runtimes — éditeur/aperçu (`initScrollObserver`) et export autonome (`initScrollReveal`) — honorent le déclencheur. « Au chargement » part à l'ouverture ; « au survol » et « au clic » **révèlent** l'élément puis **rejouent** l'animation à la demande, sans jamais cacher le contenu.
 - Tests : 4 nouveaux (`tests/motion_triggers.test.js`) ; **440/440**. Le **lot 7 est clos**.
 
+#### États des éléments — l'aperçu immédiat, et le lot 5 clos
+
+- **Constat** : les quatre états (survol, focus, actif, désactivé) étaient réglables — toute la grille, pas seulement la couleur — mais **rien ne montrait le résultat sans survoler réellement l'élément** au clavier ou à la souris. La checklist traînait encore ce reste, plus deux points déjà couverts (« revenir au style principal », propriétés autres que la couleur).
+- **Correctif** : `elementStateDeclarations` extrait la fabrication des déclarations d'un état, **la même source que le CSS publié**, et un bouton « Aperçu de cet état » l'applique 2,5 s sur l'élément sélectionné. L'aperçu est temporaire, n'écrit **pas** dans le projet et peut être arrêté.
+- Tests : 3 nouveaux (`tests/element_state_preview.test.js`) ; **443/443**. Le **lot 5 est clos**.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.59) — Lot 7 : la courbe d'animation devient réglable
 
 - Le catalogue portait une courbe par animation, mais l'auteur ne pouvait pas la changer. Trois courbes sont désormais proposées — **Douce** (départ vif, arrivée posée), **Rebond** (léger dépassement), **Régulière** — dans le repli « Réglages avancés » du panneau, à côté de la vitesse et du délai.

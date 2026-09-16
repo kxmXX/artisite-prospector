@@ -136,6 +136,24 @@ export function clearElementState(project, layoutKey, stateName) {
  * CSS des états. Une chaîne vide quand aucun état n'est défini, pour que les projets
  * existants ne reçoivent pas une feuille de style inutile.
  */
+/**
+ * Déclarations CSS d'un état précis.
+ *
+ * Sert au CSS publié et à l'aperçu dans l'éditeur : sans ce partage, l'aperçu
+ * pourrait montrer autre chose que ce qui sera joué.
+ */
+export function elementStateDeclarations(project, layoutKey, stateName) {
+  const forState = getElementState(project, layoutKey, stateName);
+  const declarations = [];
+  for (const property of Object.keys(forState)) {
+    const enumerated = declarationsFor(property, forState[property]);
+    if (enumerated) { for (const declaration of enumerated) declarations.push(declaration); continue; }
+    const declaration = sanitizeDeclaration(property, forState[property]);
+    if (declaration) declarations.push(declaration.property + ": " + declaration.value + ";");
+  }
+  return declarations.join(" ");
+}
+
 export function elementStateCSS(project) {
   const all = project && project.elementStates;
   if (!all || typeof all !== "object") return "";
@@ -145,19 +163,9 @@ export function elementStateCSS(project) {
     const forElement = all[layoutKey];
     if (!forElement || typeof forElement !== "object") continue;
     for (const stateName of ELEMENT_STATES) {
-      const forState = forElement[stateName];
-      if (!forState || typeof forState !== "object") continue;
-      const declarations = [];
-      for (const property of Object.keys(forState)) {
-        // Un réglage énuméré (padding, ombre...) prime ; sinon la déclaration libre
-        // reste acceptée si la liste blanche l'autorise (couleur, par exemple).
-        const enumerated = declarationsFor(property, forState[property]);
-        if (enumerated) { for (const declaration of enumerated) declarations.push(declaration); continue; }
-        const declaration = sanitizeDeclaration(property, forState[property]);
-        if (declaration) declarations.push(declaration.property + ": " + declaration.value + ";");
-      }
-      if (!declarations.length) continue;
-      rules.push('[data-layout-key="' + layoutKey + '"]' + STATE_SELECTORS[stateName] + " { " + declarations.join(" ") + " }");
+      const body = elementStateDeclarations(project, layoutKey, stateName);
+      if (!body) continue;
+      rules.push('[data-layout-key="' + layoutKey + '"]' + STATE_SELECTORS[stateName] + " { " + body + " }");
       if (rules.length >= MAX_RULES) break;
     }
     if (rules.length >= MAX_RULES) break;
