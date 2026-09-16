@@ -1841,3 +1841,15 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Tests : 409/409 ; utilitiesCss.js regenere (classe de statut IA).
 - IA : mise en sommeil (image), texte OK ; l'echec image est un 429 quota cote compte Google, hors code. Le repli complete desormais les modeles configures.
 - Reste : animations (demo 1-2x editeur, complete en client, direction), vue client = editeur + export 2d, contenu (6 avis, photos galerie), slider avant/apres, medias, editeur d'element (bug centrage, police, groupe, libelles, volet, retour), navigation (ancres hero, devis->appel), carte/horaires, drag-and-drop a aimants.
+
+## Journal — 17 septembre 2026 · 4.9.1 (suite) : contenu, animations, ancres, volet, police
+
+- Contenu : cause racine trouvee — TRADES (catalogue du generateur) vidait gallery/reviews/realisations/beforeAfter. Restaures depuis DEMO_TRADES ; avis completes a six par metier ; la ville affichee devient celle du projet. Faits client toujours vides (tests de politique alignes, pas supprimes). 410/410.
+- Animations : le catalogue dit "loop" mais le CSS ne connaissait que "infinite" -> la boucle ne bouclait pas. Les cinq identifiants sont geres ; en vue client la boucle tourne, en editeur elle est plafonnee a deux lectures. 411/411.
+- Navigation : les ancres existaient deja (#avis, #galerie, #simulateur) mais en vue client le clic etait neutralise sans defilement. Ajout de initAnchorScrolling/scrollToAnchor (preview uniquement) + scroll-margin-top. 413/413.
+- Volet Structure/Reglages : refermable sur desktop (etat persistant) ; le rail le rouvre.
+- Police par element : nouveau reglage enumere (theme, Satoshi, General Sans, Clash Display, Cabinet Grotesk, serif, mono), familles deja chargees.
+- Etats d'element : "survol / focus clavier / actif" expliques en clair pour un debutant.
+- IA image : en sommeil (429 quota cote compte Google). Le repli complete desormais les modeles configures et l'echec est visible dans la modale.
+- Deploiements Vercel : quota 100/jour atteint cote CLI ; l'auteur redeploie depuis le dashboard.
+- Reste : slider avant/apres (reparer + generaliser + styles), cartes/media, color picker, edition groupee, bug destructif du centrage, vue client = editeur + export 2d, drag-and-drop a aimants, carte paresseuse, horaires lies au jour, bouton d'appel direct, retour (popstate).

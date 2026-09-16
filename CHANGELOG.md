@@ -41,6 +41,26 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 - **Frontière maintenue** : les faits client restent vides et non inventés (téléphone, e-mail, adresse, horaires, certifications, badges, statistiques). Les tests de politique ont été **alignés sur ce nouveau contrat**, pas supprimés.
 - Tests : **410/410**.
 
+#### Animations — la boucle boucle enfin, et l'éditeur s'arrête
+
+- **Cause** : le catalogue nomme la répétition « loop », alors que le CSS ne connaissait que « infinite ». La boucle choisie ne bouclait donc **jamais** — d'où « j'ai mis une boucle, ça ne se lance pas ».
+- **Correctif** : les cinq identifiants (`once`, `twice`, `thrice`, `loop`, `infinite`) produisent la bonne répétition. En **vue client** (et à l'export), la boucle tourne exactement comme réglée.
+- **Demande de l'auteur** : dans l'éditeur, une animation joue **au plus deux fois** puis s'arrête — assez pour la voir, sans boucle infinie qui consomme des ressources et fait bugger le canevas.
+- Tests : 1 nouveau ; **411/411**.
+
+#### Navigation — les raccourcis font enfin le raccourci
+
+- Les liens du site (`#services`, `#about`, `#avis`, `#galerie`, `#faq`, `#simulateur`) existaient, et les sections portaient déjà ces ancres internes. Mais en **vue client** de l'éditeur, un clic était neutralisé sans jamais faire défiler : le raccourci ne servait à rien.
+- **Correctif** : en mode aperçu, `initAnchorScrolling` fait défiler le canevas vers l'ancre (fluide), avec `scroll-margin-top` pour ne pas passer sous l'en-tête collant. En mode conception, le clic continue de sélectionner, jamais de naviguer.
+- Test : 1 nouveau vérifie que chaque ancre citée par un `href` existe bien ; **413/413**.
+
+#### Éditeur — volet refermable, police par élément, états expliqués
+
+- **Volet Structure/Réglages** : il ne se fermait que sur mobile. Il se replie désormais aussi sur desktop (état conservé malgré les re-rendus), et le rail le rouvre.
+- **Police par élément** : nouveau réglage énuméré (police du thème, Satoshi, General Sans, Clash Display, Cabinet Grotesk, serif classique, monospace) — familles déjà chargées par le site et l'export, aucune valeur libre.
+- **États d'élément** : « survol », « focus clavier », « actif » sont maintenant expliqués en clair (infobulle + phrase), pour un débutant.
+- Tests : 2 nouveaux ; **415/415**.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.59) — Lot 7 : la courbe d'animation devient réglable
 
 - Le catalogue portait une courbe par animation, mais l'auteur ne pouvait pas la changer. Trois courbes sont désormais proposées — **Douce** (départ vif, arrivée posée), **Rebond** (léger dépassement), **Régulière** — dans le repli « Réglages avancés » du panneau, à côté de la vitesse et du délai.
