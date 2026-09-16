@@ -139,7 +139,7 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
       les boîtes de sélection unifiées, les gestes par appareil.
 - [ ] **Lot 6 — Positionnement** : flux par défaut, position libre en option, champs numériques
       X/Y/L/H/rotation, boîte de sélection réduite à un menu `⋯`, bornes clavier = bornes souris.
-- [ ] **Lot 7 — Mouvement unifié** : catalogue unique, déclencheur, durée, délai, courbe, direction,
+- [x] **Lot 7 — Mouvement unifié** : catalogue unique, déclencheur, durée, délai, courbe, direction,
       répétition explicite, tester/rejouer/arrêter/réinitialiser, runtime partagé à l'export.
       *Acquis 7a/7b/7c (`4.9.0-alpha.22` → `.28`)* : catalogue unique dans `public/js/data/motionPresets.js`,
       lu par l'inspecteur, le rendu (section, texte, image) et l'aperçu au survol ; les 12 entrées
@@ -152,8 +152,11 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
       traduit en `loop` à la lecture. L'outil **tester / arrêter / réinitialiser** couvre désormais les
       trois surfaces (`4.9.1`) : la section, le texte et l'image. Les animations sont **figées pendant un
       transform libre** (`4.9.1`) — tout le canevas, pas seulement la sélection — pour que les repères
-      d'aimantation mesurent des positions stables. *Reste* : exposer le **déclencheur** (`MOTION_TRIGGERS`
-      déclare apparition / chargement / survol / clic, mais seul « à l'apparition » est branché).
+      d'aimantation mesurent des positions stables. Le **déclencheur** est branché (`4.9.1`) : apparition
+      (défaut), chargement, survol et clic, sur les trois surfaces et dans les deux runtimes. Au passage,
+      les animations et styles de **texte** atteignent enfin le site publié : la décoration d'élément
+      n'était appelée qu'en mode éditeur, donc une animation choisie sur un titre ne partait jamais à
+      l'export. **Lot clos.**
 - [x] **Lot 4d — Divulgation progressive de l'inspecteur** (clos en `4.9.0-alpha.48`) : primitive partagée
       (`disclosure`, `<details>/<summary>` natifs, focus clavier, état retenu au nouveau rendu) appliquée au
       rythme de l'animation de section (`4.9.0-alpha.29`) puis aux réglages d'élément — espacement et angles

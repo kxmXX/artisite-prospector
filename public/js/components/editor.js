@@ -1,5 +1,5 @@
 import { getIcon } from "./icons.js";
-import { MOTION_PRESETS, MOTION_SPEEDS, MOTION_DELAYS, motionRepeatRowHTML } from "../data/motionPresets.js";
+import { MOTION_PRESETS, MOTION_SPEEDS, MOTION_DELAYS, motionRepeatRowHTML, motionTriggerRowHTML } from "../data/motionPresets.js";
 import { renderWebsiteHTML, renderStickyCallBar, collectSectionElements } from "./renderer.js";
 import { numberedLabels } from "../data/elementLabels.js";
 import { renderInspector } from "./inspector.js";
@@ -340,6 +340,10 @@ export function renderEditor(state) {
                   ${MOTION_PRESETS.map((motion) => `
                     <button type="button" data-motion-preview="${motion.id}" onclick="window.app.setActiveTextMotion('${motion.id}')" class="motion-chip ${motion.id === 'none' ? 'col-span-2 text-zinc-400' : ''}">${motion.label}</button>
                   `).join('')}
+                </div>
+                <div class="motion-trigger-row" data-text-when-row>
+                  <span class="motion-loop-label">Déclencheur</span>
+                  ${motionTriggerRowHTML("apparition", "data-text-when", (id) => "window.app.setActiveTextMotionTrigger('" + id + "')")}
                 </div>
                 <div class="motion-loop-row" data-text-loop-row>
                   <span class="motion-loop-label">Répétition</span>

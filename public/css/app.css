@@ -3701,6 +3701,9 @@ body:not(.client-preview-mode) #canvas-container [data-motion-loop="infinite"] {
 /* Trois actions d'aperçu (tester / arrêter / réinitialiser) tiennent sur une ligne. */
 .motion-actions { display: flex; align-items: center; gap: .3rem; margin-top: .5rem; }
 .motion-actions .motion-loop-btn { padding-inline: .25rem; }
+/* Quatre déclencheurs aux libellés longs : deux par ligne plutôt qu'une rangée qui déborde. */
+.motion-trigger-row { display: flex; flex-wrap: wrap; align-items: center; gap: .3rem; margin-top: .5rem; }
+.motion-trigger-row .motion-loop-btn { flex: 1 1 44%; padding-inline: .25rem; }
 .motion-loop-hint { margin-top: .35rem; font-size: .62rem; line-height: 1.35; color: #8a928e; }
 /* Hovering a preset plays it on the control itself, so the author sees the
    motion before committing it to content. */

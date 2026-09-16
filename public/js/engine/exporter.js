@@ -627,10 +627,30 @@ ${UTILITY_CSS}
       });
     })();
 
-    // 7. Scroll-Reveal 60fps Motion
+    // 7. Scroll-Reveal 60fps Motion — le déclencheur décide quand l'animation part.
     (function initScrollReveal() {
+      const els = document.querySelectorAll('[data-motion]:not([data-motion="none"])');
+      if (!els.length) return;
+      const replay = (el) => {
+        el.classList.remove('is-revealed');
+        void el.offsetWidth;
+        el.classList.add('is-revealed');
+      };
+      const revealAtLoad = [];
+      els.forEach(el => {
+        const when = el.getAttribute('data-motion-when') || 'apparition';
+        if (when === 'chargement') revealAtLoad.push(el);
+        else if (when === 'survol' || when === 'clic') {
+          // Le contenu reste lisible : on révèle, puis on rejoue à la demande.
+          el.classList.add('is-revealed');
+          el.addEventListener(when === 'survol' ? 'mouseenter' : 'click', () => replay(el));
+        }
+      });
+      if (revealAtLoad.length) {
+        requestAnimationFrame(() => revealAtLoad.forEach(el => el.classList.add('is-revealed')));
+      }
       if (!window.IntersectionObserver) {
-        document.querySelectorAll('[data-motion]:not([data-motion="none"])').forEach(el => el.classList.add('is-revealed'));
+        els.forEach(el => el.classList.add('is-revealed'));
         return;
       }
       const obs = new IntersectionObserver((entries) => {
@@ -640,7 +660,7 @@ ${UTILITY_CSS}
           }
         });
       }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
-      document.querySelectorAll('[data-motion]:not([data-motion="none"])').forEach(el => obs.observe(el));
+      els.forEach(el => obs.observe(el));
     })();
 
     // 8. Virtual Multi-Page Navigation Mode (Standalone)

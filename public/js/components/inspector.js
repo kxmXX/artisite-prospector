@@ -11,7 +11,7 @@ import { escapeHtml } from "../utils/html.js";
 import { SECTION_WIDTHS, SECTION_SPACING, SECTION_ALIGN, getSectionLayout } from "../engine/sectionStyle.js";
 import { ELEMENT_PADDING, ELEMENT_RADIUS, ELEMENT_FONT, ELEMENT_OPACITY, ELEMENT_BACKGROUND, ELEMENT_BORDER, ELEMENT_SHADOW, getElementStyle } from "../engine/elementStyle.js";
 import { ELEMENT_STATES, ELEMENT_STATE_LABELS, ELEMENT_STATE_DESCRIPTIONS, getElementState } from "../engine/elementStates.js";
-import { MOTION_PRESETS, MOTION_SPEEDS, MOTION_DELAYS, MOTION_EASINGS, motionDirectionsFor, motionRepeatRowHTML } from "../data/motionPresets.js";
+import { MOTION_PRESETS, MOTION_SPEEDS, MOTION_DELAYS, MOTION_EASINGS, motionDirectionsFor, motionRepeatRowHTML, motionTriggerRowHTML } from "../data/motionPresets.js";
 import { TRANSFORM_FIELDS, getElementTransform, hasElementTransform } from "../engine/elementTransform.js";
 import { collectSectionElements } from "./renderer.js";
 import { numberedLabels } from "../data/elementLabels.js";
@@ -492,7 +492,11 @@ export function renderInspector(section, project, state) {
           `).join('')}
         </div>
 
-        ${disclosure("section-motion-timing", "Réglages avancés : vitesse et délai", `
+        ${disclosure("section-motion-timing", "Réglages avancés : déclencheur, répétition, vitesse et délai", `
+        <div class="motion-trigger-row" data-section-when-row>
+          <span class="motion-loop-label">Déclencheur</span>
+          ${motionTriggerRowHTML(section.settings?.motionWhen || "apparition", "data-section-when", (id) => "window.app.setSectionMotionTrigger('" + sectionId + "', '" + id + "')")}
+        </div>
         <div class="motion-loop-row" data-section-loop-row>
           <span class="motion-loop-label">Répétition</span>
           ${motionRepeatRowHTML(section.settings?.motionLoop || "once", "data-section-loop", (id) => "window.app.setSectionMotionLoop('" + sectionId + "', '" + id + "')")}

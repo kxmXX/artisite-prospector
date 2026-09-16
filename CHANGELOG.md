@@ -134,6 +134,14 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 - **Correctif** : pendant `freeform-transforming` ou `freeform-rotating`, **toutes** les animations du canevas sont figées (`animation-play-state: paused`), pas seulement la sélection ; elles repartent au relâchement. La pause reste bornée au geste : aucune règle ne l'applique en dehors.
 - Tests : 1 nouveau (`tests/freeform_motion_suspension.test.js`) ; **436/436**.
 
+#### Animations — le déclencheur devient réglable, et le texte animé atteint le site publié
+
+- **Deux défauts** : le catalogue déclarait quatre déclencheurs (à l'apparition, au chargement, au survol, au clic) mais **seul « à l'apparition » était branché** ; et surtout `decorateEditableMarkup` n'était appelé **qu'en mode éditeur**, donc une animation choisie sur un titre (et ses styles d'auteur) **ne partait jamais** sur le site publié ni à l'export.
+- **Correctif de publication** : le rendu décore aussi le site public, **sans** les métadonnées d'édition (`data-ui-*`, index, badges) ; les animations et styles de texte sont enfin publiés.
+- **Déclencheur** : une rangée « Déclencheur » apparaît dans les trois menus (section, texte, image) et pose `data-motion-when`.
+- **Runtime** : les deux runtimes — éditeur/aperçu (`initScrollObserver`) et export autonome (`initScrollReveal`) — honorent le déclencheur. « Au chargement » part à l'ouverture ; « au survol » et « au clic » **révèlent** l'élément puis **rejouent** l'animation à la demande, sans jamais cacher le contenu.
+- Tests : 4 nouveaux (`tests/motion_triggers.test.js`) ; **440/440**. Le **lot 7 est clos**.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.59) — Lot 7 : la courbe d'animation devient réglable
 
 - Le catalogue portait une courbe par animation, mais l'auteur ne pouvait pas la changer. Trois courbes sont désormais proposées — **Douce** (départ vif, arrivée posée), **Rebond** (léger dépassement), **Régulière** — dans le repli « Réglages avancés » du panneau, à côté de la vitesse et du délai.

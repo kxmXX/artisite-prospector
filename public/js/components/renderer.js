@@ -1,7 +1,7 @@
 import { getIcon } from "./icons.js";
 import { HERO_STYLES } from "./heroStyles.js";
 import { elementStateCSS } from "../engine/elementStates.js";
-import { MOTION_PRESETS, MOTION_SPEEDS, MOTION_DELAYS, motionTimingCSS, motionDirectionsFor, motionDirectionCSS, motionLoopAttribute, motionRepeatRowHTML } from "../data/motionPresets.js";
+import { MOTION_PRESETS, MOTION_SPEEDS, MOTION_DELAYS, motionTimingCSS, motionDirectionsFor, motionDirectionCSS, motionLoopAttribute, motionRepeatRowHTML, motionWhenAttribute, motionTriggerRowHTML } from "../data/motionPresets.js";
 import { sectionLayoutAttributes, SECTION_LAYOUT_CSS } from "../engine/sectionStyle.js";
 import { elementStyleCSS } from "../engine/elementStyle.js";
 import { getTradeFallbackDataUrl } from "../data/imageFallbacks.js";
@@ -173,7 +173,7 @@ export function buildFreeformLayoutCSS(project) {
   ].filter(Boolean).join('\n');
 }
 
-function decorateEditableMarkup(markup, project, section) {
+function decorateEditableMarkup(markup, project, section, isEditor = false) {
   return markup.replace(/<([a-z][\w-]*)(\s[^>]*data-editable="([^"]+)"[^>]*)>/gi, (full, tag, attrs, fieldPath) => {
     const fontSizeDelta = section?.settings?.[`fontSize_${fieldPath}`] || 0;
     const isBold = section?.settings?.[`bold_${fieldPath}`];
@@ -195,15 +195,20 @@ function decorateEditableMarkup(markup, project, section) {
     const textLoop = motionLoopAttribute(section?.settings?.elementMotionLoops?.[fieldPath]);
     const textSpeed = section?.settings?.elementMotionSpeeds?.[fieldPath] && section.settings.elementMotionSpeeds[fieldPath] !== "normal" ? section.settings.elementMotionSpeeds[fieldPath] : "";
     const textDelay = section?.settings?.elementMotionDelays?.[fieldPath] && section.settings.elementMotionDelays[fieldPath] !== "aucun" ? section.settings.elementMotionDelays[fieldPath] : "";
+    const textWhen = motionWhenAttribute(section?.settings?.elementMotionWhens?.[fieldPath]);
     let motionAttrs = "";
     if (textMotion && textMotion !== "none") {
-motionAttrs = ` data-motion="${textMotion}"${textLoop ? ' data-motion-loop="' + textLoop + '"' : ''}${textSpeed ? ' data-motion-speed="' + textSpeed + '"' : ''}${textDelay ? ' data-motion-delay="' + textDelay + '"' : ''}`;
+motionAttrs = ` data-motion="${textMotion}"${textWhen ? ' data-motion-when="' + textWhen + '"' : ''}${textLoop ? ' data-motion-loop="' + textLoop + '"' : ''}${textSpeed ? ' data-motion-speed="' + textSpeed + '"' : ''}${textDelay ? ' data-motion-delay="' + textDelay + '"' : ''}`;
       if (textMotion === "pulse") {
         motionAttrs += ` data-btn-motion="pulse"`;
       }
     }
 
     const styleAttr = customStyles.length ? ` style="${customStyles.join(' ')}"` : "";
+
+    // Hors éditeur, le site publié reçoit les styles d'auteur et l'animation de
+    // l'élément, mais pas les métadonnées d'édition (data-ui-*, index, badges).
+    if (!isEditor) return `<${tag}${attrs}${motionAttrs}${styleAttr}>`;
 
     globalElementIndex++;
     const elementIndex = globalElementIndex;
@@ -279,7 +284,8 @@ export function renderEditableImage(url, { sectionId = "", fieldPath = "", targe
   const imgLoop = motionLoopAttribute(sec?.settings?.imageMotionLoops?.[imgKey]);
   const imgSpeed = sec?.settings?.imageMotionSpeeds?.[imgKey] && sec.settings.imageMotionSpeeds[imgKey] !== "normal" ? sec.settings.imageMotionSpeeds[imgKey] : "";
   const imgDelay = sec?.settings?.imageMotionDelays?.[imgKey] && sec.settings.imageMotionDelays[imgKey] !== "aucun" ? sec.settings.imageMotionDelays[imgKey] : "";
-const motionAttr = imgMotion && imgMotion !== "none" ? ` data-motion="${imgMotion}"${imgLoop ? ' data-motion-loop="' + imgLoop + '"' : ''}${imgSpeed ? ' data-motion-speed="' + imgSpeed + '"' : ''}${imgDelay ? ' data-motion-delay="' + imgDelay + '"' : ''}` : "";
+  const imgWhen = motionWhenAttribute(sec?.settings?.imageMotionWhens?.[imgKey]);
+const motionAttr = imgMotion && imgMotion !== "none" ? ` data-motion="${imgMotion}"${imgWhen ? ' data-motion-when="' + imgWhen + '"' : ''}${imgLoop ? ' data-motion-loop="' + imgLoop + '"' : ''}${imgSpeed ? ' data-motion-speed="' + imgSpeed + '"' : ''}${imgDelay ? ' data-motion-delay="' + imgDelay + '"' : ''}` : "";
   const motionClass = imgMotion && imgMotion !== "none" ? ` motion-preset-${imgMotion.replace('-in', '')}${imgMotion === 'pulse' ? ' btn-pulse-active' : ''}` : "";
 
   if (!isEditor) {
@@ -325,6 +331,10 @@ const motionAttr = imgMotion && imgMotion !== "none" ? ` data-motion="${imgMotio
                   ${mLabel}${((imgMotion || 'none') === mPreset && mPreset !== 'none') ? ' ✓' : ''}
                 </button>
               `).join('')}
+            </div>
+            <div class="motion-trigger-row" data-image-when-row>
+              <span class="motion-loop-label">Déclencheur</span>
+              ${motionTriggerRowHTML(imgWhen || "apparition", "data-image-when", (id) => "event.stopPropagation(); window.app.setImageMotionTrigger('" + sectionId + "', '" + fieldPath + "', " + indexParam + ", '" + id + "')")}
             </div>
             <div class="motion-loop-row" data-image-loop-row>
               <span class="motion-loop-label">Répétition</span>
@@ -586,7 +596,7 @@ function renderSection(sec, project, options) {
       innerHTML = `<div class="p-8 text-center text-gray-400">Section ${sec.type}</div>`;
   }
 
-  if (isEditor) innerHTML = decorateEditableMarkup(innerHTML, project, sec);
+  innerHTML = decorateEditableMarkup(innerHTML, project, sec, isEditor);
   innerHTML = decorateLayoutKeys(innerHTML, project, sec, isEditor);
 
   const globalBg = String(project.branding?.bgColor || "").toLowerCase();
@@ -599,6 +609,7 @@ function renderSection(sec, project, options) {
   const motionSpeed = sec.settings?.motionSpeed && sec.settings.motionSpeed !== "normal" ? sec.settings.motionSpeed : "";
   const motionDelay = sec.settings?.motionDelay && sec.settings.motionDelay !== "aucun" ? sec.settings.motionDelay : "";
   const motionEasing = sec.settings?.motionEasing && sec.settings.motionEasing !== "douce" ? sec.settings.motionEasing : "";
+  const motionWhen = motionWhenAttribute(sec.settings?.motionWhen);
   const motionDirection = motionDirectionsFor(motionPreset).some((direction) => direction.id === sec.settings?.motionDirection)
     ? sec.settings.motionDirection
     : "";
@@ -608,7 +619,7 @@ function renderSection(sec, project, options) {
 
   const sectionLayout = sectionLayoutAttributes(sec);
   if (!isEditor) {
-    return `<section id="${sec.type}" class="site-section ${bgTheme} ${isHidden ? 'hidden' : ''}" style="--section-bg: ${themeColor}; ${customBackground}${sectionLayout.style}" data-section-id="${sec.id}" data-section-type="${sec.type}" data-section-bg="${sectionTheme}" data-has-custom-bg="${customBackground ? 'true' : 'false'}" data-scroll-fx="zoom"${motionLoop ? ' data-motion-loop="' + motionLoop + '"' : ''} data-ui-id="${getSectionUiId(sec)}" data-ui-type="section"${sectionLayout.attributes}${motionPreset ? ` data-motion="${motionPreset}"` : ''}${motionPreset && motionDirection ? ` data-motion-direction="${motionDirection}"` : ''}>${innerHTML}</section>`;
+    return `<section id="${sec.type}" class="site-section ${bgTheme} ${isHidden ? 'hidden' : ''}" style="--section-bg: ${themeColor}; ${customBackground}${sectionLayout.style}" data-section-id="${sec.id}" data-section-type="${sec.type}" data-section-bg="${sectionTheme}" data-has-custom-bg="${customBackground ? 'true' : 'false'}" data-scroll-fx="zoom"${motionLoop ? ' data-motion-loop="' + motionLoop + '"' : ''} data-ui-id="${getSectionUiId(sec)}" data-ui-type="section"${sectionLayout.attributes}${motionPreset ? ` data-motion="${motionPreset}"` : ''}${motionPreset && motionWhen ? ` data-motion-when="${motionWhen}"` : ''}${motionPreset && motionDirection ? ` data-motion-direction="${motionDirection}"` : ''}>${innerHTML}</section>`;
   }
 
   // Editor Wrapper with Controls
@@ -659,6 +670,7 @@ function renderSection(sec, project, options) {
          data-section-bg="${sectionTheme}"
          data-has-custom-bg="${hasCustomBg ? 'true' : 'false'}"
           ${motionPreset ? `data-motion="${motionPreset}"` : ''}
+          ${motionPreset && motionWhen ? `data-motion-when="${motionWhen}"` : ''}
           ${motionPreset && motionDirection ? `data-motion-direction="${motionDirection}"` : ''}
           ${motionPreset && motionSpeed ? `data-motion-speed="${motionSpeed}"` : ''}
           ${motionPreset && motionDelay ? `data-motion-delay="${motionDelay}"` : ''}

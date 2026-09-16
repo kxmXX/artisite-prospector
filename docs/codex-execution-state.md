@@ -1934,3 +1934,11 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Correctif CSS (studio-v3.css) : pendant freeform-transforming OU freeform-rotating, toutes les animations du canevas sont figees (animation-play-state: paused) ; elles reprennent au relachement. La pause reste bornee au geste.
 - Tests : tests/freeform_motion_suspension.test.js (1 cas) ; 436/436.
 - Reste : exposer le declencheur (MOTION_TRIGGERS : apparition / chargement / survol / clic ; seul « a l'apparition » est branche) ; bug destructif du centrage (jamais reproduit) ; PRODUCT.md/DESIGN.md.
+
+## Journal — 17 septembre 2026 · 4.9.1 (suite 12) : declencheur branche, lot 7 clos
+
+- Deux defauts : MOTION_TRIGGERS (apparition / chargement / survol / clic) n'etait pas branche, et decorateEditableMarkup n'etait appele qu'en mode editeur — donc les animations de texte et leurs styles d'auteur ne partaient jamais sur le site publie ni a l'export.
+- Correctif de publication : la decoration d'element tourne aussi en mode public, sans les metadonnees d'edition (data-ui-*, index, badges). Verifie : 981 data-ui- en editeur contre 30 en public (ceux du balisage de base).
+- Declencheur : rangee partagee dans les trois menus ; data-motion-when pose sur l'element ; les deux runtimes (initScrollObserver et initScrollReveal) honorent chargement (revele a l'ouverture), survol et clic (revele puis rejoue, sans cacher le contenu).
+- Tests : tests/motion_triggers.test.js (4 cas) ; 440/440. Lot 7 clos dans la checklist (catalogue, declencheur, duree, delai, courbe, direction, repetition, tester/arreter/reinitialiser, runtime partage).
+- Reste : bug destructif du centrage (jamais reproduit) ; Lot 6 (geste souris, boites de selection unifiees) ; Lot 3b (830 lignes inertes) ; Lot 5b (apercu d'etat, proprietes par etat) ; PRODUCT.md/DESIGN.md.

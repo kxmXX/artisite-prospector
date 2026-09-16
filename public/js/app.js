@@ -23,7 +23,7 @@ import { getUiCode } from "./data/uiIds.js";
 import { ELEMENT_STATES, ELEMENT_STATE_LABELS, setElementState, clearElementState } from "./engine/elementStates.js";
 import { setSectionLayout, isValidSectionId } from "./engine/sectionStyle.js";
 import { setElementStyle, clearElementStyle, getElementStyle } from "./engine/elementStyle.js";
-import { motionDirectionsFor, motionLoopAttribute } from "./data/motionPresets.js";
+import { motionDirectionsFor, motionLoopAttribute, motionWhenAttribute } from "./data/motionPresets.js";
 import { getIcon } from "./components/icons.js";
 import { setElementTransform, clearElementTransform, enableElementTransform } from "./engine/elementTransform.js";
 import { parseClientDemoPin, verifyClientDemoPin } from "./utils/clientDemoPin.js";
@@ -3450,6 +3450,7 @@ export class App {
     delete sec.settings.motionSpeed;
     delete sec.settings.motionDelay;
     delete sec.settings.motionDirection;
+    delete sec.settings.motionWhen;
     state.updateProject(updated, true);
     this.stopSectionMotion(sectionId);
     this.refreshInspectorPanel();
@@ -3521,6 +3522,88 @@ export class App {
     }
     if (preset && preset !== "none") this.previewSectionMotion(sectionId, preset);
     this.showToast("Direction de l'animation enregistrée", "info");
+  }
+
+  /** Declencheur de l'animation de section : apparition (defaut), chargement, survol, clic. */
+  setSectionMotionTrigger(sectionId, triggerId) {
+    if (!state.currentProject) return;
+    const when = motionWhenAttribute(triggerId);
+    const updated = JSON.parse(JSON.stringify(state.currentProject));
+    const sec = updated.sections.find(s => s.id === sectionId);
+    if (!sec) return;
+    sec.settings = sec.settings || {};
+    if (when) sec.settings.motionWhen = when;
+    else delete sec.settings.motionWhen;
+    state.updateProject(updated, true, "Declencheur de l'animation");
+
+    const secEl = document.getElementById("section-" + sectionId) || document.querySelector(".editor-section-wrapper[data-section-id=\"" + sectionId + "\"]");
+    if (secEl) {
+      if (when) secEl.setAttribute("data-motion-when", when);
+      else secEl.removeAttribute("data-motion-when");
+    }
+    const preset = sec.settings.motionPreset || sec.motionPreset;
+    if (preset && preset !== "none") this.previewSectionMotion(sectionId, preset);
+    this.showToast("Déclencheur de l'animation enregistré", "info");
+  }
+
+  /** Declencheur de l'animation du texte en cours d'edition. */
+  setActiveTextMotionTrigger(triggerId) {
+    const el = this._activeEditableEl;
+    if (!el) return;
+    const when = motionWhenAttribute(triggerId);
+    const field = el.getAttribute("data-editable") || "text";
+    const secId = el.closest(".editor-section-wrapper")?.getAttribute("data-section-id");
+    if (secId && state.currentProject) {
+      const updated = JSON.parse(JSON.stringify(state.currentProject));
+      const sec = updated.sections.find(s => s.id === secId);
+      if (sec) {
+        sec.settings = sec.settings || {};
+        sec.settings.elementMotionWhens = sec.settings.elementMotionWhens || {};
+        if (when) sec.settings.elementMotionWhens[field] = when;
+        else delete sec.settings.elementMotionWhens[field];
+        state.updateProject(updated, true);
+      }
+    }
+    if (when) el.setAttribute("data-motion-when", when);
+    else el.removeAttribute("data-motion-when");
+    this.syncMotionLoopButtons("#ftb-anim-menu", "data-text-when", when || "apparition");
+    this.showToast("Déclencheur enregistré", "info");
+  }
+
+  /** Declencheur de l'animation d'une image. */
+  setImageMotionTrigger(secId, fieldPath, itemIndex, triggerId) {
+    const idx = (itemIndex !== null && itemIndex !== undefined && itemIndex !== "null") ? itemIndex : 0;
+    const when = motionWhenAttribute(triggerId);
+    if (!state.currentProject) return;
+    const updated = JSON.parse(JSON.stringify(state.currentProject));
+    const sec = updated.sections.find(s => s.id === secId);
+    if (!sec) return;
+    sec.settings = sec.settings || {};
+    sec.settings.imageMotionWhens = sec.settings.imageMotionWhens || {};
+    const key = fieldPath + "_" + idx;
+    if (when) sec.settings.imageMotionWhens[key] = when;
+    else delete sec.settings.imageMotionWhens[key];
+    state.updateProject(updated, true);
+    const imgEl = this._findImageElement(secId, fieldPath, idx);
+    if (imgEl) {
+      if (when) imgEl.setAttribute("data-motion-when", when);
+      else imgEl.removeAttribute("data-motion-when");
+    }
+    this.syncMotionLoopButtons("#img-motion-menu-" + secId + "-" + String(fieldPath || "").replace(/\./g, "-") + "-" + idx, "data-image-when", when || "apparition");
+    this.showToast("Déclencheur enregistré", "info");
+  }
+
+  getFieldMotionTrigger(el) {
+    const field = el?.getAttribute?.("data-editable");
+    const secId = el?.closest?.(".editor-section-wrapper")?.getAttribute("data-section-id");
+    const sec = state.currentProject?.sections.find(s => s.id === secId);
+    return motionWhenAttribute(sec?.settings?.elementMotionWhens?.[field]) || "apparition";
+  }
+
+  getImageMotionTrigger(secId, fieldPath, itemIndex) {
+    const idx = (itemIndex !== null && itemIndex !== undefined && itemIndex !== "null") ? itemIndex : 0;
+    const key = fieldPath + "_" + idx;
+    return motionWhenAttribute(state.currentProject?.sections.find(s => s.id === secId)?.settings?.imageMotionWhens?.[key]) || "apparition";
   }
 
   getFieldMotionLoop(el) {
@@ -3781,6 +3864,7 @@ export class App {
     const settings = state.currentProject?.sections.find(s => s.id === secId)?.settings || {};
     this.syncMotionLoopButtons("#ftb-anim-menu", "data-text-speed", settings.elementMotionSpeeds?.[field] || "normal");
     this.syncMotionLoopButtons("#ftb-anim-menu", "data-text-delay", settings.elementMotionDelays?.[field] || "aucun");
+    this.syncMotionLoopButtons("#ftb-anim-menu", "data-text-when", this.getFieldMotionTrigger(this._activeEditableEl));
     if (menu) menu.classList.toggle("hidden");
   }
 
@@ -3864,6 +3948,7 @@ export class App {
     if (sec.settings?.elementMotionLoops) delete sec.settings.elementMotionLoops[field];
     if (sec.settings?.elementMotionSpeeds) delete sec.settings.elementMotionSpeeds[field];
     if (sec.settings?.elementMotionDelays) delete sec.settings.elementMotionDelays[field];
+    if (sec.settings?.elementMotionWhens) delete sec.settings.elementMotionWhens[field];
     state.updateProject(updated, true);
     this.showToast("Animation du texte reinitialisee", "info");
   }
@@ -3898,7 +3983,7 @@ export class App {
     const updated = JSON.parse(JSON.stringify(state.currentProject));
     const sec = updated.sections.find(s => s.id === secId);
     if (!sec) return;
-    for (const bucket of ["imageMotions", "imageMotionLoops", "imageMotionSpeeds", "imageMotionDelays"]) {
+    for (const bucket of ["imageMotions", "imageMotionLoops", "imageMotionSpeeds", "imageMotionDelays", "imageMotionWhens"]) {
       if (sec.settings?.[bucket]) delete sec.settings[bucket][key];
     }
     state.updateProject(updated, true);
@@ -4322,6 +4407,23 @@ export class App {
 
     const scrollContainer = document.getElementById("editor-main-canvas") || document.querySelector("main.overflow-y-auto") || document.querySelector("main") || null;
 
+    // Le déclencheur décide quand l'animation part. « Apparition » garde le
+    // réveil au défilement ; les autres sont posés tout de suite puis rejoués.
+    const revealAtLoad = [];
+    motionElements.forEach(el => {
+      const hasMotion = el.matches("[data-motion]:not([data-motion='none'])");
+      const when = hasMotion ? (el.getAttribute("data-motion-when") || "apparition") : "apparition";
+      if (when === "chargement") revealAtLoad.push(el);
+      else if (when === "survol" || when === "clic") {
+        // Le contenu reste lisible : on révèle, puis on rejoue à la demande.
+        el.classList.add("is-revealed");
+        this.bindMotionReplay(el, when);
+      }
+    });
+    if (revealAtLoad.length) {
+      requestAnimationFrame(() => revealAtLoad.forEach(el => el.classList.add("is-revealed")));
+    }
+
     if (typeof IntersectionObserver === "undefined") {
       motionElements.forEach(el => {
         el.classList.add("is-revealed");
@@ -4374,6 +4476,29 @@ export class App {
       }, { passive: true });
       this._mainScrollBound = true;
     }
+  }
+
+  /**
+   * Rejoue l'animation d'un élément à la demande (déclencheurs « au survol » et
+   * « au clic »). Idempotent : un même élément ne cumule pas les écouteurs, et
+   * changer de déclencheur retire l'ancien.
+   */
+  bindMotionReplay(el, when) {
+    if (!el || el.dataset.motionReplayBound === when) return;
+    if (typeof el._motionReplayCleanup === "function") el._motionReplayCleanup();
+    const replay = () => {
+      el.classList.remove("is-revealed");
+      void el.offsetWidth;
+      el.classList.add("is-revealed");
+    };
+    const type = when === "survol" ? "mouseenter" : "click";
+    el.addEventListener(type, replay);
+    el.dataset.motionReplayBound = when;
+    el._motionReplayCleanup = () => {
+      el.removeEventListener(type, replay);
+      delete el._motionReplayCleanup;
+      delete el.dataset.motionReplayBound;
+    };
   }
 
   updateTypography(headingFont, bodyFont) {

@@ -19,7 +19,7 @@ test('les reglages secondaires sont replies par defaut', () => {
   assert.ok(html.includes('data-disclosure="section-motion-timing"'), 'le bloc avance doit exister');
   assert.match(html, /<details class="ui-disclosure" data-disclosure="section-motion-timing"(?! open)/,
     'le bloc doit etre replie par defaut');
-  assert.ok(html.includes('Réglages avancés : vitesse et délai'), 'l intitule doit etre lisible');
+  assert.ok(html.includes('Réglages avancés : déclencheur, répétition, vitesse et délai'), 'l intitule doit etre lisible et annoncer tout ce qu il contient');
 });
 
 test('l essentiel reste visible sans deplier', () => {

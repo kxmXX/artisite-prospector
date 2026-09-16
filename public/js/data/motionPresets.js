@@ -258,3 +258,34 @@ export function motionDirectionCSS() {
   }
   return lines.join("\n");
 }
+
+const TRIGGER_BY_ID = new Map(MOTION_TRIGGERS.map((trigger) => [trigger.id, trigger]));
+
+/** Déclencheur choisi, avec repli sûr sur « à l'apparition ». */
+export function getMotionTrigger(id) {
+  return TRIGGER_BY_ID.get(String(id || "")) || TRIGGER_BY_ID.get("apparition");
+}
+
+export function motionTriggerIds() {
+  return MOTION_TRIGGERS.map((trigger) => trigger.id);
+}
+
+/** Valeur de `data-motion-when` : vide pour le déclencheur par défaut. */
+export function motionWhenAttribute(value) {
+  const id = String(value || "");
+  return TRIGGER_BY_ID.has(id) && id !== "apparition" ? id : "";
+}
+
+/**
+ * Rangée « Déclencheur » partagée par les trois surfaces d'animation — section,
+ * élément, image — pour qu'elles proposent exactement les mêmes choix.
+ * `onclickFor(id)` renvoie l'action propre à chaque surface.
+ */
+export function motionTriggerRowHTML(currentId, dataAttr, onclickFor) {
+  const current = getMotionTrigger(currentId).id;
+  return MOTION_TRIGGERS.map((trigger) => {
+    const active = trigger.id === current ? " is-active" : "";
+    return '<button type="button" ' + dataAttr + '="' + trigger.id + '" class="motion-loop-btn' + active +
+      '" title="' + trigger.description + '" onclick="' + onclickFor(trigger.id) + '">' + trigger.label + "</button>";
+  }).join("");
+}
