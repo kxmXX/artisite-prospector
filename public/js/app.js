@@ -13,7 +13,7 @@ import { renderInspector } from "./components/inspector.js";
 import { renderWebsiteHTML, generateLocalBusinessSchema, collectSectionElements } from "./components/renderer.js";
 import { generateSite, createSectionData } from "./engine/generator.js";
 import { processCopilotPrompt, applyCopilotOperations, resolveProjectUiTarget } from "./engine/copilot.js";
-import { adaptFreeformLayoutToViewport, FREEFORM_SNAP_THRESHOLD, marqueeContainsRectCenter, marqueeRectFromPoints, rectAxisLines, resolveEdgeAutoScroll, resolveEqualSpacingSnap, resolveFreeformSnap } from "./engine/freeform.js";
+import { adaptFreeformLayoutToViewport, FREEFORM_SNAP_THRESHOLD, FREEFORM_DROP_COVERAGE, marqueeContainsRectCenter, marqueeRectFromPoints, rectAxisLines, resolveEdgeAutoScroll, resolveEqualSpacingSnap, resolveFreeformSnap } from "./engine/freeform.js";
 import { downloadHTML, downloadJSON, generateProductionPackage, downloadProductionPackage } from "./engine/exporter.js";
 import { getStylePresetById } from "./data/styles.js";
 import { getTradeById } from "./data/trades.js";
@@ -5857,26 +5857,24 @@ export class App {
   /** Emplacement image survole par la selection en cours, ou le plus proche. */
   findFreeformDropSlot(rect, draggedKeys = []) {
     if (!rect) return null;
-    const cx = (rect.left + rect.right) / 2;
-    const cy = (rect.top + rect.bottom) / 2;
     const slots = this.buildFreeformSlotIndex();
     if (!slots.size) return null;
+    const area = Math.max(0, rect.right - rect.left) * Math.max(0, rect.bottom - rect.top);
+    if (!area) return null;
     let best = null;
-    let bestDistance = Infinity;
+    let bestCoverage = 0;
     for (const element of document.querySelectorAll("#canvas-container [data-layout-key]")) {
       const key = element.dataset.layoutKey;
       const meta = key && slots.get(key);
       if (!meta || draggedKeys.includes(key)) continue;
       const box = element.getBoundingClientRect();
       if (box.width < 8 || box.height < 8) continue;
-      if (cx >= box.left && cx <= box.right && cy >= box.top && cy <= box.bottom) {
-        return { key, element, sectionId: meta.sectionId, field: meta.field };
-      }
-      const dx = Math.max(box.left - cx, 0, cx - box.right);
-      const dy = Math.max(box.top - cy, 0, cy - box.bottom);
-      const distance = Math.hypot(dx, dy);
-      if (distance < bestDistance && distance <= 48) {
-        bestDistance = distance;
+      const overlapWidth = Math.min(rect.right, box.right) - Math.max(rect.left, box.left);
+      const overlapHeight = Math.min(rect.bottom, box.bottom) - Math.max(rect.top, box.top);
+      if (overlapWidth <= 0 || overlapHeight <= 0) continue;
+      const coverage = (overlapWidth * overlapHeight) / area;
+      if (coverage >= FREEFORM_DROP_COVERAGE && coverage > bestCoverage) {
+        bestCoverage = coverage;
         best = { key, element, sectionId: meta.sectionId, field: meta.field };
       }
     }

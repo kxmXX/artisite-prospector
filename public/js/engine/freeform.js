@@ -1,5 +1,12 @@
 export const FREEFORM_SNAP_THRESHOLD = 6;
 
+/**
+ * Recouvrement minimal (part de la surface déplacée) pour qu'un dépôt magnétique
+ * soit accepté. Un simple effleurement ne doit pas attacher l'image : il faut
+ * vraiment la poser sur l'emplacement.
+ */
+export const FREEFORM_DROP_COVERAGE = 0.6;
+
 export function resolveFreeformSnap(start, size, lines = [], threshold = FREEFORM_SNAP_THRESHOLD) {
   const safeStart = Number(start);
   const safeSize = Number(size);

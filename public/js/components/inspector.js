@@ -330,7 +330,7 @@ function elementStyleControlsHTML(project, layoutKey, activeState, sectionId) {
   const command = stateName === 'default' ? 'setSelectedElementStyle' : 'setSelectedElementStateValue';
   const isActive = (property, id) => Object.prototype.hasOwnProperty.call(values, property) && values[property] === id;
 
-  const stateRow = '<div class="flex flex-wrap gap-1">' + [['default', 'Principal']]
+  const stateRow = '<div class="motion-option-row">' + [['default', 'Principal']]
     .concat(ELEMENT_STATES.map(function (name) { return [name, ELEMENT_STATE_LABELS[name]]; }))
     .map(function (pair) {
       const cls = 'motion-loop-btn' + (stateName === pair[0] ? ' is-active' : '');
@@ -338,7 +338,7 @@ function elementStyleControlsHTML(project, layoutKey, activeState, sectionId) {
       return '<button type="button" class="' + cls + '" title="' + title + '" onclick="window.app.setElementStyleState(\'' + pair[0] + '\')">' + pair[1] + '</button>';
     }).join('') + '</div>';
 
-  const row = (property, scale) => '<div class="flex flex-wrap gap-1">' + Object.keys(scale).map(function (id) {
+  const row = (property, scale) => '<div class="motion-option-row">' + Object.keys(scale).map(function (id) {
     const cls = 'motion-loop-btn' + (isActive(property, id) ? ' is-active' : '');
     return '<button type="button" class="' + cls +
       '" onclick="window.app.' + command + '(\'' + property + '\', \'' + id + '\')">' +
