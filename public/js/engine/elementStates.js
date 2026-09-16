@@ -24,6 +24,14 @@ export const ELEMENT_STATE_LABELS = {
   disabled: "Désactivé"
 };
 
+// Phrase en clair pour chaque état : « focus » et « actif » ne parlent pas a un debutant.
+export const ELEMENT_STATE_DESCRIPTIONS = {
+  hover: "Quand la souris passe au-dessus de l'element.",
+  focus: "Quand l'element est atteint au clavier (touche Tabulation).",
+  active: "Pendant le clic, avant de relacher le bouton.",
+  disabled: "Quand l'action n'est pas disponible pour le visiteur."
+};
+
 // focus est traduit en :focus-visible : le produit n'a qu'une politique de focus,
 // visible au clavier uniquement (voir public/css/tokens.css).
 const STATE_SELECTORS = {

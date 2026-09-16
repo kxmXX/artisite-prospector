@@ -10,7 +10,7 @@ import {
 import { escapeHtml } from "../utils/html.js";
 import { SECTION_WIDTHS, SECTION_SPACING, SECTION_ALIGN, getSectionLayout } from "../engine/sectionStyle.js";
 import { ELEMENT_PADDING, ELEMENT_RADIUS, ELEMENT_FONT, ELEMENT_OPACITY, ELEMENT_BACKGROUND, ELEMENT_BORDER, ELEMENT_SHADOW, getElementStyle } from "../engine/elementStyle.js";
-import { ELEMENT_STATES, ELEMENT_STATE_LABELS, getElementState } from "../engine/elementStates.js";
+import { ELEMENT_STATES, ELEMENT_STATE_LABELS, ELEMENT_STATE_DESCRIPTIONS, getElementState } from "../engine/elementStates.js";
 import { MOTION_PRESETS, MOTION_SPEEDS, MOTION_DELAYS, MOTION_EASINGS } from "../data/motionPresets.js";
 import { TRANSFORM_FIELDS, getElementTransform, hasElementTransform } from "../engine/elementTransform.js";
 import { collectSectionElements } from "./renderer.js";
@@ -313,7 +313,8 @@ function elementStyleControlsHTML(project, layoutKey, activeState) {
     .concat(ELEMENT_STATES.map(function (name) { return [name, ELEMENT_STATE_LABELS[name]]; }))
     .map(function (pair) {
       const cls = 'motion-loop-btn' + (stateName === pair[0] ? ' is-active' : '');
-      return '<button type="button" class="' + cls + '" onclick="window.app.setElementStyleState(\'' + pair[0] + '\')">' + pair[1] + '</button>';
+      const title = pair[0] === 'default' ? "Le style normal de l'element." : (ELEMENT_STATE_DESCRIPTIONS[pair[0]] || '');
+      return '<button type="button" class="' + cls + '" title="' + title + '" onclick="window.app.setElementStyleState(\'' + pair[0] + '\')">' + pair[1] + '</button>';
     }).join('') + '</div>';
 
   const row = (property, scale) => '<div class="flex flex-wrap gap-1">' + Object.keys(scale).map(function (id) {
@@ -339,6 +340,7 @@ function elementStyleControlsHTML(project, layoutKey, activeState) {
     '<label class="block text-ui-xs font-medium text-zinc-500 uppercase tracking-wider">Élément sélectionné</label>' +
     '<div class="text-ui-2xs font-mono text-zinc-400">' + escapeHtml(layoutKey) + '</div>' +
     stateRow +
+    '<p class="text-ui-2xs text-zinc-500">Chaque état est une variante : survol = souris dessus, focus clavier = tabulation, actif = pendant le clic.</p>' +
     (stateName === 'default' ? '' : '<p class="text-ui-2xs text-zinc-500">Les réglages suivants ne s\'appliquent qu\'à l\'état « ' + ELEMENT_STATE_LABELS[stateName] + ' ».</p>') +
     essentialRows +
     disclosure('element-advanced', 'R\u00e9glages avanc\u00e9s : opacit\u00e9, fond, bordure, ombre', advancedRows) +
