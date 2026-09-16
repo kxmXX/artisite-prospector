@@ -225,7 +225,7 @@ ${UTILITY_CSS}
     .campaign-card { display: grid; grid-template-columns: 1fr; gap: 1.5rem; background: #ffffff; border-radius: 1rem; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); border: 1px solid rgba(0,0,0,0.08); overflow: hidden; padding: 1.5rem; }
     @media (min-width: 768px) { .campaign-card { grid-template-columns: 4fr 6fr; padding: 2rem; align-items: center; } }
     .campaign-progress-bar { height: 10px; width: 100%; background-color: #e4e4e7; border-radius: 9999px; overflow: hidden; position: relative; }
-    .campaign-progress-fill { height: 100%; background: linear-gradient(90deg, #10b981, #059669); border-radius: 9999px; }
+    .campaign-progress-fill { height: 100%; width: 100%; background: linear-gradient(90deg, #10b981, #059669); border-radius: 9999px; transform: scaleX(var(--campaign-progress, 0)); transform-origin: left center; }
     .campaign-pill-selector { display: flex; flex-wrap: wrap; gap: 0.5rem; }
     .campaign-pill-option { padding: 0.4rem 0.85rem; border-radius: 9999px; border: 1px solid #d4d4d8; font-size: 0.8125rem; font-weight: 600; cursor: pointer; background: #f4f4f5; color: #27272a; }
     .campaign-pill-option.is-active { background: #18181b; color: #ffffff; border-color: #18181b; }

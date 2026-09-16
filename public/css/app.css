@@ -2914,9 +2914,14 @@ p[data-motion], div[data-motion], section[data-motion], h1[data-motion], h2[data
 }
 .campaign-progress-fill {
   height: 100%;
+  width: 100%;
   background: linear-gradient(90deg, #10b981, #059669);
   border-radius: 9999px;
-  transition: width 800ms cubic-bezier(0.16, 1, 0.3, 1);
+  /* La barre anime transform (composition) et non width (mise en page) : même
+     rendu, sans recalcul de mise en page à chaque image. */
+  transform: scaleX(var(--campaign-progress, 0));
+  transform-origin: left center;
+  transition: transform 800ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 .campaign-pill-selector {
   display: flex;

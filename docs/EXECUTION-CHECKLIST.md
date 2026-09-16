@@ -174,7 +174,13 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
       portée bornée à `.studio-editor` ; **tous** les glyphes du chrome et du rendu remplacés par des icônes
       dessinées (`4.9.0-alpha.32` → `.34`) ; vocabulaire de boutons unifié par des jetons de contrôle
       (`4.9.0-alpha.45`), à rendu identique ; verre décoratif retiré du chrome, surfaces opaques
-      (`4.9.0-alpha.46`), voiles de modale et site publié conservés. *Reste* : PRODUCT.md / DESIGN.md.
+      (`4.9.0-alpha.46`), voiles de modale et site publié conservés. **Détecteur mécanique Impeccable passé**
+      sur `index.html`, `app.css` et `studio-v3.css` (`4.9.1`) : 12 signaux, dont 9 **intentionnels**
+      (les 8 « rebond » du catalogue d'animations — l'auteur a explicitement voulu « Rebond » — et le
+      reflet infini du preset « Reflet ») ; le seul défaut mécanique réel, `transition: width` sur la
+      barre de progression, est corrigé (`transform: scaleX`, composition au lieu de mise en page).
+      *Reste* : PRODUCT.md / DESIGN.md — la compétence Impeccable exige un **entretien avec l'auteur**
+      (`/impeccable init`), donc construction à faire à deux, pas à sa place.
 - [x] **Lot 8 — Undo/Redo exhaustif** (`4.9.0-alpha.4`) : 11 commandes mutaient avant de prendre
       l'instantané (l'annulation ne restaurait rien) et 20 commandes n'avaient aucun historique ;
       toutes prennent désormais leur instantané **avant** la mutation, y compris les six

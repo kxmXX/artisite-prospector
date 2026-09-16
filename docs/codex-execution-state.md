@@ -1957,3 +1957,11 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - previewElementState applique ces declarations 2,5 s via une feuille temporaire et une classe is-state-previewed ; stopElementStatePreview retire tout ; aucune ecriture dans le projet.
 - Tests : tests/element_state_preview.test.js (3 cas) ; 443/443. Lot 5 clos dans la checklist.
 - Reste : bug destructif du centrage (jamais reproduit) ; Lot 6 (geste souris, boites de selection unifiees) ; PRODUCT.md/DESIGN.md.
+
+## Journal — 17 septembre 2026 · 4.9.1 (suite 15) : detecteur anti-slop et barre de progression
+
+- Detecteur Impeccable passe sur index.html, app.css et studio-v3.css : 12 signaux. 9 sont intentionnels (8 rebond-easing : le preset « Rebond » est un choix explicite de l'auteur ; 1 marquee : le reflet infini du preset « Reflet »). Le brief gagne sur l'avertissement generique.
+- Seul defaut mecanique reel : .campaign-progress-fill animait width (mise en page) ; passe a transform: scaleX(var(--campaign-progress)) avec transform-origin: left, a rendu identique. Regle alignee dans l'export autonome (exporter.js) et progression fournie par variable dans le rendu.
+- Tests : tests/progress_bar_perf.test.js (2 cas) ; 445/445.
+- PRODUCT.md / DESIGN.md : non ecrits, volontairement — la competence impose un entretien avec l'auteur (init) ; les inventer serait du slop. A faire a deux.
+- Reste : bug destructif du centrage (jamais reproduit) ; Lot 6 (geste souris — validation utilisateur demandee) ; PRODUCT.md/DESIGN.md (entretien).

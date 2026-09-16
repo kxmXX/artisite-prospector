@@ -148,6 +148,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 - **Correctif** : `elementStateDeclarations` extrait la fabrication des déclarations d'un état, **la même source que le CSS publié**, et un bouton « Aperçu de cet état » l'applique 2,5 s sur l'élément sélectionné. L'aperçu est temporaire, n'écrit **pas** dans le projet et peut être arrêté.
 - Tests : 3 nouveaux (`tests/element_state_preview.test.js`) ; **443/443**. Le **lot 5 est clos**.
 
+#### Passe anti-slop — détecteur mécanique et barre de progression
+
+- **Détecteur Impeccable** passé sur `index.html`, `app.css` et `studio-v3.css` : 12 signaux, dont 9 **intentionnels** — les huit « rebond » (l'auteur a explicitement voulu le preset « Rebond ») et le reflet infini du preset « Reflet ». Le brief gagne sur l'avertissement générique.
+- **Seul défaut mécanique réel** : la barre de progression animait `width`, une propriété de mise en page, à chaque image. Elle anime désormais `transform: scaleX(var(--campaign-progress))` (composition), à rendu identique ; la règle est alignée dans l'export autonome.
+- Tests : 2 nouveaux (`tests/progress_bar_perf.test.js`) ; **445/445**.
+- **PRODUCT.md / DESIGN.md non écrits, volontairement** : la compétence Impeccable impose un **entretien avec l'auteur** pour capturer la vérité produit et les décisions de design. Les inventer serait exactement le « slop » que cette passe combat. À faire à deux (`/impeccable init`).
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.59) — Lot 7 : la courbe d'animation devient réglable
 
 - Le catalogue portait une courbe par animation, mais l'auteur ne pouvait pas la changer. Trois courbes sont désormais proposées — **Douce** (départ vif, arrivée posée), **Rebond** (léger dépassement), **Régulière** — dans le repli « Réglages avancés » du panneau, à côté de la vitesse et du délai.

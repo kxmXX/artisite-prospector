@@ -2734,7 +2734,7 @@ function renderCustomBlock(sec, project, options = {}) {
                   <span class="text-emerald-700 font-extrabold">${current} / ${target} chantiers confirmés (${progressPct}%)</span>
                 </div>
                 <div class="campaign-progress-bar">
-                  <div class="campaign-progress-fill" style="width: ${progressPct}%;"></div>
+                  <div class="campaign-progress-fill" style="--campaign-progress: ${Math.max(0, Math.min(100, Number(progressPct) || 0)) / 100};"></div>
                 </div>
               </div>
 
