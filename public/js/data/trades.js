@@ -98,8 +98,8 @@ export const DEMO_TRADES = [
     "beforeAfter": {
       "title": "Transformation spectaculaire de vos extérieurs",
       "subtitle": "Faites glisser le curseur pour visualiser la métamorphose avant et après notre intervention",
-      "beforeImage": "images/gallery-4-ba-pool.jpg",
-      "afterImage": "images/gallery-4-ba-pool.jpg",
+      "beforeImage": "images/service-defrichage.jpg",
+      "afterImage": "images/hero-garden.jpg",
       "beforeLabel": "Terrain en friche avant travaux",
       "afterLabel": "Jardin paysager livré & engazonné",
       "projectCity": "Secteur local",
@@ -146,7 +146,7 @@ export const DEMO_TRADES = [
       },
       {
         "type": "beforeAfter",
-        "beforeImage": "images/gallery-4-ba-pool.jpg",
+        "beforeImage": "images/service-defrichage.jpg",
         "afterImage": "images/gallery-4-ba-pool.jpg",
         "url": "images/gallery-4-ba-pool.jpg",
         "title": "Piscine & Engazonnement",
@@ -159,7 +159,7 @@ export const DEMO_TRADES = [
       },
       {
         "type": "beforeAfter",
-        "beforeImage": "images/gallery-6-ba-path.jpg",
+        "beforeImage": "images/service-defrichage.jpg",
         "afterImage": "images/gallery-6-ba-path.jpg",
         "url": "images/gallery-6-ba-path.jpg",
         "title": "Allée & Défrichage",
