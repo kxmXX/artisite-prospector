@@ -2006,3 +2006,13 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Tests : tests/header_tablet_layout.test.js (2 cas) ; 456/456.
 - Production a jour : 27e87aa deploye (le quota Vercel s'est libere).
 - Reste : Lot 6 — glisser a la souris (test local de l'auteur) ; bug destructif du centrage (jamais reproduit, contrat verrouille par test).
+
+## Journal — 17 septembre 2026 · 4.9.1 (suite 21) : retours de l'auteur
+
+- L'auteur a teste et rendu un retour precis : (1) il ne comprenait pas la consigne du test de glisser ; (2) le drag and drop libre est « brutal » — il depose au moindre effleurement ; (3) il veut transformer la photo d'un service en comparateur avant/apres (demande deja faite) ; (4) l'interface avant/apres est « buggee » visuellement ; (5) agrandir un element grossit « quasiment tous les autres » ; (6) des problemes d'UX par endroits.
+- Inspecteur (capture fournie) : rangees d'etats et d'options en grille qui se replie (motion-option-row) ; les libelles longs (polices, « Focus clavier ») ne se chevauchent plus. Verifie a l'ecran : plus de collision.
+- Aimantation : FREEFORM_DROP_COVERAGE = 0.6 ; findFreeformDropSlot exige un recouvrement reel, l'ancien seuil de proximite de 48 px est supprime.
+- Services avant/apres : boutons Avant/Apres par service dans l'inspecteur ; le rendu reutilise exactement le comparateur de la galerie (memes classes, donc meme cablage editeur/export) des que les deux photos existent.
+- Tests : inspector_option_rows (2), freeform_drop_coverage (1), service_before_after (4) ; 463/463. Commit b448545 (inspecteur + aimantation).
+- Non traite encore : l'agrandissement d'un element qui grossit les autres (cause non reproduite — a preciser avec l'auteur : quels boutons, quel element) ; le surplus visuel du chrome sur les badges avant/apres ; les « problemes d'UX par endroits » sans capture precise.
+- Reste : Lot 6 — glisser a la souris (verdict de l'auteur) ; centrage (jamais reproduit) ; agrandissement partage (a preciser) ; chrome avant/apres.

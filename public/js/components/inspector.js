@@ -255,7 +255,13 @@ function sectionListsHTML(section, sectionId) {
           ${items.map((item, index) => `
             <div class="flex items-center justify-between gap-2 text-ui-xs text-zinc-600">
               <span class="truncate">${escapeHtml(itemLabel(item, index))}</span>
-              <button type="button" class="text-ui-2xs text-red-600 font-semibold whitespace-nowrap" title="Retirer cette entrée" onclick="window.app.removeListEntry('${sectionId}', '${key}', ${index})">Retirer</button>
+              <span class="flex items-center gap-1 whitespace-nowrap">
+                ${key === 'services' && item && typeof item === 'object' ? `
+                  <button type="button" class="text-ui-2xs font-semibold border border-zinc-200 rounded-md px-1.5 py-0.5 bg-white hover:border-zinc-400" title="Photo avant : avec la photo après, la carte devient un comparateur" onclick="window.app.openImagePicker('${sectionId}', 'services.${index}.beforeImage')">Avant</button>
+                  <button type="button" class="text-ui-2xs font-semibold border border-zinc-200 rounded-md px-1.5 py-0.5 bg-white hover:border-zinc-400" title="Photo après : avec la photo avant, la carte devient un comparateur" onclick="window.app.openImagePicker('${sectionId}', 'services.${index}.afterImage')">Après</button>
+                ` : ''}
+                <button type="button" class="text-ui-2xs text-red-600 font-semibold" title="Retirer cette entrée" onclick="window.app.removeListEntry('${sectionId}', '${key}', ${index})">Retirer</button>
+              </span>
             </div>`).join("")}
         </div>`;
       }).join("")}

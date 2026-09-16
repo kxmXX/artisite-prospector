@@ -1494,7 +1494,7 @@ function renderServices(sec, project, options = {}) {
             ${(c.services || []).map((srv, idx) => `
               <div class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all border border-black/5 flex flex-col group" data-layout-node="service-card-${idx}" data-layout-label="Carte service ${idx + 1}">
                 <div class="aspect-[16/9] overflow-hidden relative bg-slate-100" data-layout-node="service-media-${idx}" data-layout-label="Média service ${idx + 1}">
-                  ${renderEditableImage(srv.image, { sectionId: sec.id, fieldPath: 'image', targetFieldPath: `services.${idx}.image`, itemIndex: idx, alt: srv.title, className: 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-500', options })}
+                  ${renderServiceMedia(srv, idx, sec, options, 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-500')}
                   <span class="absolute top-4 right-4 z-10 bg-black/75 backdrop-blur text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider" data-editable="services.${idx}.tag">
                     ${srv.tag}
                   </span>
@@ -1544,7 +1544,7 @@ function renderServices(sec, project, options = {}) {
                 <div class="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center ${isEven ? 'lg:flex-row-reverse' : ''}" data-layout-node="service-card-${idx}" data-layout-label="Bloc service ${idx + 1}">
                   <div class="lg:col-span-6 ${isEven ? 'lg:order-2' : 'lg:order-1'}" data-layout-node="service-media-${idx}" data-layout-label="Média service ${idx + 1}">
                     <div class="aspect-[16/10] rounded-3xl overflow-hidden shadow-xl border-2 border-black/5 bg-slate-100">
-                      ${renderEditableImage(srv.image, { sectionId: sec.id, fieldPath: 'image', targetFieldPath: `services.${idx}.image`, itemIndex: idx, alt: srv.title, className: 'w-full h-full object-cover', options })}
+                      ${renderServiceMedia(srv, idx, sec, options, 'w-full h-full object-cover')}
                     </div>
                   </div>
                   <div class="lg:col-span-6 ${isEven ? 'lg:order-1' : 'lg:order-2'} space-y-4" data-layout-node="service-copy-${idx}" data-layout-label="Contenu service ${idx + 1}">
@@ -1629,7 +1629,7 @@ function renderServices(sec, project, options = {}) {
           ${(c.services || []).map((srv, idx) => `
             <div class="bg-white dark:bg-zinc-900 rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-zinc-800 flex flex-col group transform hover:-translate-y-1" data-layout-node="service-card-${idx}" data-layout-label="Carte service ${idx + 1}">
               <div class="aspect-[16/10] overflow-hidden relative bg-slate-100" data-layout-node="service-media-${idx}" data-layout-label="Média service ${idx + 1}">
-                ${renderEditableImage(srv.image, { sectionId: sec.id, fieldPath: 'image', targetFieldPath: `services.${idx}.image`, itemIndex: idx, alt: srv.title, className: 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-500', options })}
+                ${renderServiceMedia(srv, idx, sec, options, 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-500')}
                 ${(!isPaysagiste && srv.tag) ? `
                   <span class="absolute top-3 right-3 z-10 bg-black/70 backdrop-blur text-white text-[11px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider" data-editable="services.${idx}.tag">
                     ${srv.tag}
@@ -1809,6 +1809,38 @@ function renderRealisations(sec, project, options = {}) {
       </div>
     </div>
   `;
+}
+
+/**
+ * Media d'une carte service : comparateur avant/apres des que les deux photos
+ * sont fournies, sinon l'image simple. Memes classes que la galerie, donc meme
+ * cablage dans l'editeur et a l'export.
+ */
+function renderServiceComparisonMedia(beforeSrc, afterSrc, secId, label) {
+  return `
+    <div class="ba-container split-reveal-container ba-card w-full h-full"
+         data-split-direction="horizontal" data-split-pos="50" data-sec-id="${secId}"
+         tabindex="0" role="slider" aria-label="Comparateur Avant Apres ${label || ''}"
+         aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">
+      <img src="${afterSrc}" alt="Apres intervention" class="ba-img-after sr-img-after" loading="lazy">
+      <div class="ba-img-before-wrapper sr-clipper" style="width: 50%;">
+        <img src="${beforeSrc}" alt="Avant travaux" class="ba-img-before sr-img-before" loading="lazy">
+      </div>
+      <div class="ba-handle sr-handle" style="left: 50%; top: 0; bottom: 0;">
+        <div class="sr-line"></div>
+        <div class="ba-handle-button sr-button w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white shadow-md text-zinc-900 text-xs flex items-center justify-center font-bold"><span>&lsaquo; &rsaquo;</span></div>
+      </div>
+      <div class="absolute top-3 left-3 z-20 pointer-events-none"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-black/65 backdrop-blur-md text-white border border-white/20 shadow-sm">AVANT</span></div>
+      <div class="absolute top-3 right-3 z-20 pointer-events-none"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-600/90 backdrop-blur-md text-white border border-white/20 shadow-sm">APRES</span></div>
+    </div>`;
+}
+
+/** Image d'un service : comparateur si les deux photos existent, sinon image simple. */
+function renderServiceMedia(srv, idx, sec, options, className) {
+  if (srv && srv.beforeImage && srv.afterImage) {
+    return renderServiceComparisonMedia(srv.beforeImage, srv.afterImage, sec.id, srv.title);
+  }
+  return renderEditableImage(srv.image, { sectionId: sec.id, fieldPath: 'image', targetFieldPath: `services.${idx}.image`, itemIndex: idx, alt: srv.title, className, options });
 }
 
 // Helper to render individual gallery card (Standard Photo or Before/After Interactive Comparison)

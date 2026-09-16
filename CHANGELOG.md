@@ -187,6 +187,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 - **Vérifié à l'écran** : capture tablette avant/après ; l'en-tête tient sur une ligne.
 - Tests : 2 nouveaux (`tests/header_tablet_layout.test.js`) ; **456/456**.
 
+#### Retours de l'auteur — inspecteur, aimantation, services avant/après
+
+- **Inspecteur (capture de l'auteur)** : les rangées d'états et d'options (polices, « Focus clavier ») étaient un flex d'une seule ligne : les libellés longs se **chevauchaient**. Elles passent en **grille qui se replie** (`motion-option-row`, colonnes ≥ 78 px, texte repliable) — plus aucun recouvrement.
+- **Aimantation** : la dépose magnétique « droppait » au moindre effleurement (seuil de 48 px). Elle exige désormais que l'élément déplacé **recouvre au moins 60 %** de la cible (`FREEFORM_DROP_COVERAGE`) ; le simple voisinage ne suffit plus.
+- **Services → avant/après** (demande répétée) : chaque service reçoit deux boutons « Avant » / « Après » dans l'inspecteur. Dès que **les deux** photos existent, la carte rend le **même comparateur** que la galerie (curseur, badges AVANT/APRÈS) ; avec une seule, elle garde l'image simple. Même câblage éditeur/export.
+- Tests : 6 nouveaux (`tests/inspector_option_rows.test.js`, `tests/freeform_drop_coverage.test.js`, `tests/service_before_after.test.js`) ; **463/463**.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.59) — Lot 7 : la courbe d'animation devient réglable
 
 - Le catalogue portait une courbe par animation, mais l'auteur ne pouvait pas la changer. Trois courbes sont désormais proposées — **Douce** (départ vif, arrivée posée), **Rebond** (léger dépassement), **Régulière** — dans le repli « Réglages avancés » du panneau, à côté de la vitesse et du délai.
