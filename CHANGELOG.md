@@ -86,6 +86,12 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 - L'écriture d'image accepte désormais un **chemin pointé de liste** (`services.0.image`, `photos.2.url`, `photos.1.beforeImage`) : c'est ce qui permet d'écrire au bon endroit, et cela couvre aussi les deux photos du comparatif.
 - Tests : 1 nouveau ; **421/421**.
 
+#### Comparateur — quatre styles graphiques au choix
+
+- Le curseur Avant / Après propose désormais **Classique**, **Minimal** (ligne fine, pastille discrète), **Flèches** (poignée large, flèches lisibles) et **Contraste** (ligne et poignée à la couleur du thème).
+- Contrôle dans l'inspecteur de la section Avant/Après ; le rendu pose `data-split-style` et le CSS fait le reste.
+- Tests : 1 nouveau ; **422/422**.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.59) — Lot 7 : la courbe d'animation devient réglable
 
 - Le catalogue portait une courbe par animation, mais l'auteur ne pouvait pas la changer. Trois courbes sont désormais proposées — **Douce** (départ vif, arrivée posée), **Rebond** (léger dépassement), **Régulière** — dans le repli « Réglages avancés » du panneau, à côté de la vitesse et du délai.

@@ -1880,3 +1880,9 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - applyImageUpdate gere desormais les chemins pointes generiques (services.0.image, photos.2.url, photos.1.beforeImage) : c'est la brique qui rend l'attachement possible, et elle couvre aussi les deux photos du comparatif.
 - Tests : 421/421.
 - Reste : vue client = editeur (form factor : le canevas de l'editeur est plus etroit a cause des panneaux), bug destructif du centrage (non reproduit), styles graphiques multiples du slider, mediathèque alignee sur l'editeur.
+
+## Journal — 17 septembre 2026 · 4.9.1 (suite 5) : styles du comparateur
+
+- Quatre styles graphiques du comparateur avant/apres : classique, minimal, fleches, contraste. Le rendu pose data-split-style sur le conteneur ; le CSS fait le reste ; controle dans l'inspecteur de la section Avant/Apres (setComparatorStyle).
+- Tests : 422/422.
+- Reste : vue client = editeur (form factor : canevas plus etroit a cause des panneaux ; browser_evaluate est desactive, mesure impossible par script), bug destructif du centrage (jamais reproduit), mediathèque alignee sur l'editeur.
