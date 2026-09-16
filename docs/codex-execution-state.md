@@ -1894,3 +1894,10 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Test dedie : 424/424.
 - Verification : captures editeur puis vue client (le rendu reste identique, a la largeur pres des panneaux, desormais compensee).
 - Reste : bug destructif du centrage (jamais reproduit), mediathèque a aligner sur l'editeur.
+
+## Journal — 17 septembre 2026 · 4.9.1 (suite 7) : modales alignees sur la charte
+
+- Cause : la regle CSS .studio-v3-modal-frame (theme des modales) etait corrompue — liste de selecteurs sans bloc de declarations. Elle n'etait de plus jamais appliquee (aucune modale ne portait la classe).
+- Correctif : regle reecrite (champs/bordures/fonds alignes sur les jetons studio) et classe appliquee aux sept modales (mediatheque, closer, auth, palette de commandes, partage, wizard, ajout de section). Le contour de focus est conserve.
+- Tests : 425/425.
+- Reste : bug destructif du centrage (jamais reproduit ; contrat verrouille par test).

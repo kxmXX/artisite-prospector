@@ -98,6 +98,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 - **Correctif** : en aperçu, le canevas desktop conserve **exactement la largeur de contenu qu'il a dans l'éditeur**, centré — `calc(100vw - 726px)` au-delà de 1280, `calc(100vw - 388px)` en dessous, d'après les vraies largeurs du chrome (rail 66/62 + volet Structure 286/270 + propriétés 318). Le rendu éditeur et le rendu client sont désormais identiques.
 - Tests : 1 nouveau ; **424/424**.
 
+#### Médias et modales — la charte est de nouveau appliquée
+
+- **Cause trouvée** : la règle CSS `.studio-v3-modal-frame`, censée aligner les modales sur la charte de l'éditeur, était **corrompue** — une longue liste de sélecteurs suivie d'aucun bloc de déclarations. Résultat : la médiathèque (et six autres fenêtres) gardait ses fonds et bordures d'origine, d'où l'impression de « design totalement différent ».
+- **Correctif** : la règle est réécrite (champs, bordures et fonds alignés sur les jetons studio) et la classe est **réellement appliquée aux sept modales** : médiathèque, assistant closer, compte, palette de commandes, partage, wizard et ajout de section.
+- Le contour de focus est conservé (pas de `outline: none`), conformément au contrat d'accessibilité.
+- Tests : 1 nouveau ; **425/425**.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.59) — Lot 7 : la courbe d'animation devient réglable
 
 - Le catalogue portait une courbe par animation, mais l'auteur ne pouvait pas la changer. Trois courbes sont désormais proposées — **Douce** (départ vif, arrivée posée), **Rebond** (léger dépassement), **Régulière** — dans le repli « Réglages avancés » du panneau, à côté de la vitesse et du délai.
