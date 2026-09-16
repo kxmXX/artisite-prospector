@@ -585,12 +585,16 @@ function renderSettingsAccordions(project, state = {}) {
                       </button>
                     </div>
                   </div>
-                  <input id="color-text-${key}" class="color-hex-input" value="${color}" inputmode="text" maxlength="7"
+                  <div class="text-ui-2xs text-zinc-400">Code HEX ou valeurs RGB — vous pouvez aussi les taper à la main.</div>
+                  <input id="color-text-${key}" class="color-hex-input" value="${color}" inputmode="text" maxlength="7" placeholder="#527c22"
+                         title="Code couleur HEX, par exemple #527c22"
                          oninput="window.app.updateColorFromText('${key}', this.value)"
                          onchange="window.app.commitColorFromText('${key}', this.value)" aria-label="Valeur HEX ${label}">
-                  <input class="color-rgb-input" value="${hexToRgbText(color)}" inputmode="decimal"
+                  <input class="color-rgb-input" value="${hexToRgbText(color)}" inputmode="decimal" placeholder="82, 124, 34"
+                         title="Valeurs RGB, par exemple 82, 124, 34"
                          oninput="window.app.updateColorFromRgb('${key}', this.value)"
                          onchange="window.app.commitColorFromRgb('${key}', this.value)" aria-label="Valeur RGB ${label}">
+                  <div class="text-ui-2xs font-semibold text-zinc-400 uppercase tracking-wide mt-1">Harmonies proposées</div>
                   <div class="color-harmony-row" aria-label="Harmonies de couleur">
                     <button type="button" style="--harmony-color: ${harmony[0]}" onclick="window.app.applyHarmonyColor('${key}', '${harmony[0]}')" title="Couleur actuelle"></button>
                     <button type="button" style="--harmony-color: ${harmony[1]}" onclick="window.app.applyHarmonyColor('${key}', '${harmony[1]}')" title="Couleur complémentaire"></button>
