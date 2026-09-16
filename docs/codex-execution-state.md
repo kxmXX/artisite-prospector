@@ -1853,3 +1853,11 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - IA image : en sommeil (429 quota cote compte Google). Le repli complete desormais les modeles configures et l'echec est visible dans la modale.
 - Deploiements Vercel : quota 100/jour atteint cote CLI ; l'auteur redeploie depuis le dashboard.
 - Reste : slider avant/apres (reparer + generaliser + styles), cartes/media, color picker, edition groupee, bug destructif du centrage, vue client = editeur + export 2d, drag-and-drop a aimants, carte paresseuse, horaires lies au jour, bouton d'appel direct, retour (popstate).
+
+## Journal — 17 septembre 2026 · 4.9.1 (suite 2) : comparateur, horaires, carte
+
+- Comparateur avant/apres : les paires du paysagiste avaient la meme image des deux cotes. Paires distinctes + test de non-regression.
+- Horaires : le jour courant est mis en avant (fond teinte, pastille "Aujourd'hui", aria-current="date").
+- Carte Google : facade a la demande. L'iframe garde sa source dans data-src ; Google Maps ne se charge qu'au clic. Test dedie.
+- Tests : 417/417. Commits pousses sur main.
+- Reste : slider (generaliser a toute photo + plusieurs styles), color picker, edition groupee, bug destructif du centrage, bouton d'appel direct, vue client = editeur + export 2d, drag-and-drop a aimants, retour (popstate).

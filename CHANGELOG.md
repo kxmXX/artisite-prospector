@@ -61,6 +61,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 - **États d'élément** : « survol », « focus clavier », « actif » sont maintenant expliqués en clair (infobulle + phrase), pour un débutant.
 - Tests : 2 nouveaux ; **415/415**.
 
+#### Comparateur Avant/Après, horaires et carte
+
+- **Comparateur** : les paires avant/après du paysagiste utilisaient **deux fois la même image** — le curseur n'avait donc rien à révéler. Les paires de démonstration ont maintenant deux visuels distincts (test de non-régression ajouté).
+- **Horaires liés au jour** : le jour courant est mis en avant (fond teinté + pastille « Aujourd'hui » et `aria-current="date"`), calculé à l'affichage dans le fuseau du visiteur.
+- **Carte Google** : elle ne charge plus au chargement de la page. Une façade locale (« Afficher la carte interactive ») pose `data-src` et ne déclenche Google Maps qu'au clic — plus de blocage ni de lenteur, l'itinéraire reste disponible.
+- Tests : 2 nouveaux ; **417/417**.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.59) — Lot 7 : la courbe d'animation devient réglable
 
 - Le catalogue portait une courbe par animation, mais l'auteur ne pouvait pas la changer. Trois courbes sont désormais proposées — **Douce** (départ vif, arrivée posée), **Rebond** (léger dépassement), **Régulière** — dans le repli « Réglages avancés » du panneau, à côté de la vitesse et du délai.
