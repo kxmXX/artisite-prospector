@@ -83,15 +83,14 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
       media queries du site répondent à la fenêtre, pas au canvas. Correction prévue au lot
       responsive via des requêtes de conteneur sur le canvas — **non appliquée à ce stade**;
       la vitrine publique, elle, est correcte (vérifiée pleine largeur).
-- [~] **Lot 3 — Sélection et hiérarchie** (3a livré en `4.9.0-alpha.7`) : Échap suit un escalier
-      unique (édition en ligne, modale, élément, barres), une sélection dont la boîte est masquée ne
-      répond plus aux flèches, et la barre d'étape affiche `Section ▸ Élément`. 4 tests dédiés.
-      **Reste (3b)** : l'état de sélection reste porté par deux variables historiques
-      (`_freeformSelectedKey`/`selectedSectionId`) au lieu d'une source unique ; pas d'arbre des
-      éléments dans le panneau Structure ; les 830 lignes inertes de `renderSectionAccordionContent`
-      sont toujours présentes et **plusieurs de leurs capacités ne sont atteignables nulle part
-      ailleurs** (boucle d'animation de section, motifs d'inspiration, assombrissement du hero) :
-      les réimplanter avant de supprimer le template, pas l'inverse.
+- [x] **Lot 3 — Sélection et hiérarchie** (3a `4.9.0-alpha.7`, 3b `4.9.0-alpha.49` → `.57`) : Échap
+      suit un escalier unique (édition en ligne, modale, élément, barres), une sélection dont la boîte est
+      masquée ne répond plus aux flèches, et la barre d'étape affiche `Section ▸ Élément`. `4.9.0-alpha.49`
+      → `.50` : `state.selectedElementKey` est la source unique via `setElementSelection` (quatre chemins
+      y passent) et chaque section du panneau Structure se déplie pour montrer ses éléments. `4.9.0-alpha.57` :
+      le gabarit mort `renderSectionAccordionContent` (837 lignes) est **supprimé**, après réimplantation de
+      ses capacités — boucle d'animation de section, motifs d'inspiration, assombrissement du hero, listes
+      éditables — désormais portées par l'inspecteur. **Lot clos.**
 - [~] **Lot 4 — Inspecteur contextuel** (4a et 4b livrés en `4.9.0-alpha.14` à `alpha.16`) :
       modèle de mise en page de section (largeur pleine/contenu/étroite, respiration
       compacte/normale/aérée, alignement), **conditionné** pour ne rien changer aux vitrines existantes,
@@ -167,12 +166,12 @@ devient le lot 9. L'audit SEO réel et les faux avis Google restent exclus.
       requête média et non d'un état, d'où un panneau bloqué sur la section précédente. Elle est désormais
       portée par `state.inspectorPanelOpen` ; **vérifié à l'écran** — le panneau affiche bien la section
       choisie. Conséquence assumée : il ne s'ouvre plus tout seul sous 1280 px, l'auteur l'ouvre par le bouton.
-- [ ] **Lot 3b — Sélection unique et arbre des éléments** (`4.9.0-alpha.49` → `.50`) : `setElementSelection`
-      est le seul point d'écriture de la sélection d'élément (quatre chemins y passent), et deux
-      désynchronisations sont corrigées — nettoyage de la sélection libre, changement de section. Chaque
-      section du panneau Structure se déplie pour montrer ses éléments, nommés par un module partagé avec le
-      panneau de propriétés. *Reste* : le remplacement des 830 lignes inertes de
-      `renderSectionAccordionContent`.
+- [x] **Lot 3b — Sélection unique et arbre des éléments** (`4.9.0-alpha.49` → `.50`, clos en `.57`) :
+      `setElementSelection` est le seul point d'écriture de la sélection d'élément (quatre chemins y
+      passent), et deux désynchronisations sont corrigées — nettoyage de la sélection libre, changement de
+      section. Chaque section du panneau Structure se déplie pour montrer ses éléments, nommés par un module
+      partagé avec le panneau de propriétés. Le gabarit mort `renderSectionAccordionContent` (837 lignes
+      inertes) a été **supprimé** après réimplantation de ses capacités. **Aucune ligne morte ne subsiste.**
 - [ ] **Passe anti-slop (skill Impeccable)** : surfaces du navigateur thématisées en `4.9.0-alpha.30`
       (sélection, curseur de saisie, barres de défilement, chiffres tabulaires, anneau de focus unique),
       portée bornée à `.studio-editor` ; **tous** les glyphes du chrome et du rendu remplacés par des icônes

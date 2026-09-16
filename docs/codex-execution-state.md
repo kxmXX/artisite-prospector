@@ -1942,3 +1942,10 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Declencheur : rangee partagee dans les trois menus ; data-motion-when pose sur l'element ; les deux runtimes (initScrollObserver et initScrollReveal) honorent chargement (revele a l'ouverture), survol et clic (revele puis rejoue, sans cacher le contenu).
 - Tests : tests/motion_triggers.test.js (4 cas) ; 440/440. Lot 7 clos dans la checklist (catalogue, declencheur, duree, delai, courbe, direction, repetition, tester/arreter/reinitialiser, runtime partage).
 - Reste : bug destructif du centrage (jamais reproduit) ; Lot 6 (geste souris, boites de selection unifiees) ; Lot 3b (830 lignes inertes) ; Lot 5b (apercu d'etat, proprietes par etat) ; PRODUCT.md/DESIGN.md.
+
+## Journal — 17 septembre 2026 · 4.9.1 (suite 13) : reconciliation de la checklist
+
+- Verifie dans le code : renderSectionAccordionContent n'existe plus (supprime en 4.9.0-alpha.57) et ses capacites vivent dans l'inspecteur — setSectionMotionLoop, INSPIRATION_PATTERNS/applyInspirationPattern, setHeroOverlayDarkening, listes ajouter/retirer. state.selectedElementKey est la source unique via setElementSelection.
+- La checklist portait encore « 830 lignes inertes » comme reste en deux endroits : corrige, Lot 3 et Lot 3b marques clos. Aucune ligne morte ne subsiste de ce gabarit (inspector.js fait 1109 lignes au total).
+- Aucun changement de code ; uniquement la checklist remise en accord avec l'etat reel.
+- Reste : bug destructif du centrage (jamais reproduit) ; Lot 6 (geste souris, boites de selection unifiees) ; Lot 5b (apercu d'etat, proprietes par etat) ; PRODUCT.md/DESIGN.md.
