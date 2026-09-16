@@ -8,6 +8,7 @@ import { getTradeFallbackDataUrl } from "../data/imageFallbacks.js";
 import { getUiId, getSectionUiId, getUiCode } from "../data/uiIds.js";
 import { escapeHtml, sanitizeUrl, safeCssColor, safeCssLength, safeFontFamily } from "../utils/html.js";
 
+
 function usesReferenceVitrineTemplate(project) {
   if (project?.templateId) return project.templateId === "esprit-reference";
   return project?.business?.tradeId === "paysagiste";

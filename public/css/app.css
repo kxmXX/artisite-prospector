@@ -3659,12 +3659,29 @@ img[data-motion="pulse"],
   animation-duration: calc(1.8s * var(--anim-duration-multiplier, 1.0)) !important;
 }
 
-/* Explicit loop control: an entrance preset runs once unless the author asks for more. */
+/* Répétition : une entrée joue une fois, sauf demande contraire. Les deux
+   identifiants historiques (loop et infinite) sont acceptés — le catalogue dit
+   « loop » alors que le menu d'image disait « infinite », donc la boucle ne
+   bouclait pas. */
+[data-motion-loop="once"] { animation-iteration-count: 1 !important; }
 [data-motion-loop="twice"] { animation-iteration-count: 2 !important; }
+[data-motion-loop="thrice"] { animation-iteration-count: 3 !important; }
+[data-motion-loop="loop"] { animation-iteration-count: infinite !important; }
 [data-motion-loop="infinite"] { animation-iteration-count: infinite !important; }
+
+/* Dans l'éditeur, une animation joue au plus deux fois : assez pour la voir, sans
+   boucle infinie qui consomme des ressources et fait bugger le canevas. La vue
+   client (client-preview-mode) et l'export gardent le réglage exact. */
+body:not(.client-preview-mode) #canvas-container [data-motion-loop="thrice"] { animation-iteration-count: 2 !important; }
+body:not(.client-preview-mode) #canvas-container [data-motion-loop="loop"],
+body:not(.client-preview-mode) #canvas-container [data-motion-loop="infinite"] { animation-iteration-count: 2 !important; }
+
 @media (prefers-reduced-motion: reduce) {
   [data-motion-loop] { animation-iteration-count: 1 !important; }
 }
+
+/* Les ancres du site ne doivent pas se cacher sous l'en-tete collant. */
+.site-section, .editor-section-wrapper { scroll-margin-top: 84px; }
 
 /* Loop selector shared by the section, text and image motion menus. */
 .motion-loop-row { display: flex; align-items: center; gap: .3rem; margin-top: .5rem; }

@@ -6377,6 +6377,35 @@ export class App {
     window.addEventListener("pointercancel", onArmUp);
   }
 
+  /**
+   * Vue client (preview) : les liens d'ancre du site font le raccourci. En mode
+   * conception, un clic ne doit jamais naviguer : il sélectionne l'élément.
+   */
+  initAnchorScrolling() {
+    const canvas = document.getElementById("canvas-container");
+    if (!canvas || canvas === this._anchorBoundCanvas) return;
+    this._anchorBoundCanvas = canvas;
+    canvas.addEventListener("click", (event) => {
+      if (state.editorMode !== "preview") return;
+      const link = event.target.closest('a[href^="#"]');
+      if (!link) return;
+      const href = link.getAttribute("href");
+      if (!href || href === "#") return;
+      event.preventDefault();
+      this.scrollToAnchor(href);
+    });
+  }
+
+  scrollToAnchor(href) {
+    const id = String(href || "").replace(/^#/, "");
+    if (!id) return;
+    const canvas = document.getElementById("canvas-container");
+    const escaped = typeof window !== "undefined" && window.CSS && CSS.escape ? CSS.escape(id) : id;
+    const target = (canvas && canvas.querySelector("#" + escaped)) || document.getElementById(id);
+    if (!target || typeof target.scrollIntoView !== "function") return;
+    target.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
   initFreeformEditing() {
     const canvas = document.getElementById("canvas-container");
     if (!canvas || state.editorMode === "preview") {
@@ -6562,6 +6591,7 @@ export class App {
     });
 
     this.initFreeformEditing();
+    this.initAnchorScrolling();
 
     // Sidebar Section Reordering via HTML5 Drag & Drop
     document.querySelectorAll(".section-card-grip[draggable='true']").forEach(grip => {
