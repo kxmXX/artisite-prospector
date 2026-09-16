@@ -92,6 +92,12 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 - Contrôle dans l'inspecteur de la section Avant/Après ; le rendu pose `data-split-style` et le CSS fait le reste.
 - Tests : 1 nouveau ; **422/422**.
 
+#### Parité éditeur / vue client — le rendu ne se réorganise plus
+
+- **Cause** : en aperçu, le rail et les panneaux sont retirés. Le canevas récupérait donc 670 px (ou 332 px sous 1280) de largeur en plus, et le site se réorganisait — l'auteur modifiait un rendu qu'il ne retrouvait pas côté client.
+- **Correctif** : en aperçu, le canevas desktop conserve **exactement la largeur de contenu qu'il a dans l'éditeur**, centré — `calc(100vw - 726px)` au-delà de 1280, `calc(100vw - 388px)` en dessous, d'après les vraies largeurs du chrome (rail 66/62 + volet Structure 286/270 + propriétés 318). Le rendu éditeur et le rendu client sont désormais identiques.
+- Tests : 1 nouveau ; **424/424**.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.59) — Lot 7 : la courbe d'animation devient réglable
 
 - Le catalogue portait une courbe par animation, mais l'auteur ne pouvait pas la changer. Trois courbes sont désormais proposées — **Douce** (départ vif, arrivée posée), **Rebond** (léger dépassement), **Régulière** — dans le repli « Réglages avancés » du panneau, à côté de la vitesse et du délai.

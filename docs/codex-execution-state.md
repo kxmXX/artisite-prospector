@@ -1886,3 +1886,11 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - Quatre styles graphiques du comparateur avant/apres : classique, minimal, fleches, contraste. Le rendu pose data-split-style sur le conteneur ; le CSS fait le reste ; controle dans l'inspecteur de la section Avant/Apres (setComparatorStyle).
 - Tests : 422/422.
 - Reste : vue client = editeur (form factor : canevas plus etroit a cause des panneaux ; browser_evaluate est desactive, mesure impossible par script), bug destructif du centrage (jamais reproduit), mediathèque alignee sur l'editeur.
+
+## Journal — 17 septembre 2026 · 4.9.1 (suite 6) : parite editeur / vue client
+
+- Cause : en apercu, rail et panneaux retires -> le canevas recuperait 670px (ou 332px sous 1280) et le site se reorganisait.
+- Correctif CSS : en client-preview-mode, le canevas desktop garde exactement la largeur de contenu de l'editeur, centre (calc(100vw - 726px) > 1280 ; calc(100vw - 388px) entre 901 et 1280), d'apres les largeurs reelles du chrome (rail 66/62 + volet 286/270 + proprietes 318).
+- Test dedie : 424/424.
+- Verification : captures editeur puis vue client (le rendu reste identique, a la largeur pres des panneaux, desormais compensee).
+- Reste : bug destructif du centrage (jamais reproduit), mediathèque a aligner sur l'editeur.
