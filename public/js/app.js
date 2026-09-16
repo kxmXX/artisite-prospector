@@ -10,7 +10,7 @@ import { fetchSession, signIn, signUp, signOut, pullProjects, pushProject, impor
 import { renderAddSectionModal } from "./components/addSectionModal.js";
 import { renderImageModal } from "./components/imageModal.js";
 import { renderInspector } from "./components/inspector.js";
-import { renderWebsiteHTML, generateLocalBusinessSchema } from "./components/renderer.js";
+import { renderWebsiteHTML, generateLocalBusinessSchema, collectSectionElements } from "./components/renderer.js";
 import { generateSite, createSectionData } from "./engine/generator.js";
 import { processCopilotPrompt, applyCopilotOperations, resolveProjectUiTarget } from "./engine/copilot.js";
 import { adaptFreeformLayoutToViewport, FREEFORM_SNAP_THRESHOLD, marqueeContainsRectCenter, marqueeRectFromPoints, rectAxisLines, resolveEdgeAutoScroll, resolveEqualSpacingSnap, resolveFreeformSnap } from "./engine/freeform.js";
@@ -22,7 +22,7 @@ import { ensureFontCatalog } from "./data/fonts.js";
 import { getUiCode } from "./data/uiIds.js";
 import { ELEMENT_STATES, ELEMENT_STATE_LABELS, setElementState, clearElementState } from "./engine/elementStates.js";
 import { setSectionLayout, isValidSectionId } from "./engine/sectionStyle.js";
-import { setElementStyle, clearElementStyle } from "./engine/elementStyle.js";
+import { setElementStyle, clearElementStyle, getElementStyle } from "./engine/elementStyle.js";
 import { getIcon } from "./components/icons.js";
 import { setElementTransform, clearElementTransform, enableElementTransform } from "./engine/elementTransform.js";
 import { parseClientDemoPin, verifyClientDemoPin } from "./utils/clientDemoPin.js";
@@ -2589,6 +2589,28 @@ export class App {
     const next = setElementStyle(state.currentProject, layoutKey, property, value);
     if (next === state.currentProject) return;
     state.updateProject(next, true, "Style de l'élément");
+  }
+
+  /**
+   * Édition groupée : copie le style de l'élément sélectionné sur tous les autres
+   * éléments de la même section. C'est ce qui manquait pour régler d'un coup toutes
+   * les cartes service plutôt qu'une par une.
+   */
+  applyElementStyleToSection(sectionId) {
+    const layoutKey = state.selectedElementKey;
+    if (!state.currentProject || !layoutKey) return;
+    const section = state.currentProject.sections.find(s => s.id === sectionId);
+    if (!section) return;
+    const style = getElementStyle(state.currentProject, layoutKey);
+    const keys = collectSectionElements(state.currentProject, section)
+      .map(element => element.key)
+      .filter(key => key && key !== layoutKey);
+    if (!keys.length) { this.showToast("Aucun autre élément dans cette section", "info"); return; }
+    const elementStyles = Object.assign({}, state.currentProject.elementStyles || {});
+    for (const key of keys) elementStyles[key] = Object.assign({}, style);
+    state.updateProject(Object.assign({}, state.currentProject, { elementStyles }), true, "Style appliqué aux éléments de la section");
+    this.refreshInspectorPanel();
+    this.showToast(keys.length + (keys.length > 1 ? " éléments mis à jour" : " élément mis à jour"), "success");
   }
 
   /** Choisit l'état auquel s'appliquent les réglages d'élément de l'inspecteur. */

@@ -298,7 +298,7 @@ function elementTransformControlsHTML(project, layoutKey, viewport) {
   `;
 }
 
-function elementStyleControlsHTML(project, layoutKey, activeState) {
+function elementStyleControlsHTML(project, layoutKey, activeState, sectionId) {
   const stateName = ELEMENT_STATES.includes(activeState) ? activeState : 'default';
   // Les réglages et leurs valeurs vivent dans deux magasins selon l'état choisi :
   // le style de base de l'élément, ou les écarts de l'état. Une seule grille pilote
@@ -344,6 +344,9 @@ function elementStyleControlsHTML(project, layoutKey, activeState) {
     (stateName === 'default' ? '' : '<p class="text-ui-2xs text-zinc-500">Les réglages suivants ne s\'appliquent qu\'à l\'état « ' + ELEMENT_STATE_LABELS[stateName] + ' ».</p>') +
     essentialRows +
     disclosure('element-advanced', 'R\u00e9glages avanc\u00e9s : opacit\u00e9, fond, bordure, ombre', advancedRows) +
+    (stateName === 'default' && sectionId
+      ? '<button type="button" onclick="window.app.applyElementStyleToSection(\'' + sectionId + '\')" class="w-full py-1.5 rounded-md border border-zinc-300 bg-zinc-900 text-ui-2xs font-semibold text-white" title="Copier ces réglages sur tous les éléments de la section, par exemple toutes les cartes service">Appliquer à tous les éléments de la section</button>'
+      : '') +
     '<button type="button" onclick="' + reset + '" class="w-full py-1.5 rounded-md border border-zinc-200 bg-white text-ui-2xs font-semibold text-zinc-600">' +
       (stateName === 'default' ? 'Revenir au style du thème' : 'Effacer cet état') + '</button>' +
   '</div>';
@@ -421,7 +424,7 @@ export function renderInspector(section, project, state) {
       <!-- Section Variant Switcher -->
       ${sectionLayoutControlsHTML(section, sectionId)}
 
-      ${state.selectedElementKey ? elementStyleControlsHTML(project, state.selectedElementKey, state.elementStyleState) : ''}
+      ${state.selectedElementKey ? elementStyleControlsHTML(project, state.selectedElementKey, state.elementStyleState, sectionId) : ''}
       ${state.selectedElementKey ? elementTransformControlsHTML(project, state.selectedElementKey, state.viewport) : ''}
       ${sectionElementsHTML(section, project, state.selectedElementKey)}
       ${sectionListsHTML(section, sectionId)}
