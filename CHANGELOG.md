@@ -66,6 +66,7 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 - **Comparateur** : les paires avant/après du paysagiste utilisaient **deux fois la même image** — le curseur n'avait donc rien à révéler. Les paires de démonstration ont maintenant deux visuels distincts (test de non-régression ajouté).
 - **Horaires liés au jour** : le jour courant est mis en avant (fond teinté + pastille « Aujourd'hui » et `aria-current="date"`), calculé à l'affichage dans le fuseau du visiteur.
 - **Carte Google** : elle ne charge plus au chargement de la page. Une façade locale (« Afficher la carte interactive ») pose `data-src` et ne déclenche Google Maps qu'au clic — plus de blocage ni de lenteur, l'itinéraire reste disponible.
+- **Bouton d'appel direct** : l'en-tête affiche un bouton d'appel dès qu'un numéro existe, **y compris pour le paysagiste** (où il était absent) ; il n'apparaît plus quand aucun numéro n'est renseigné.
 - Tests : 2 nouveaux ; **417/417**.
 
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.59) — Lot 7 : la courbe d'animation devient réglable
