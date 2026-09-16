@@ -118,7 +118,9 @@ test('le menu texte rendu par l editeur lit le catalogue et offre vitesse et del
   const html = renderEditor(state);
   assert.ok(html.includes('id="ftb-anim-menu"'), 'le menu texte doit exister');
   assert.ok(html.includes('Apparition en fondu'), 'le menu texte doit afficher les noms du catalogue');
-  assert.equal(html.split('setActiveTextMotion(').length - 1, 12, 'le menu rendu doit generer les 12 entrees du catalogue, pas une liste locale');
+  // On cible l'appel avec son argument : `resetActiveTextMotion()` contient la
+  // sous-chaîne `setActiveTextMotion(` et ne doit pas être compté.
+  assert.equal(html.split("window.app.setActiveTextMotion('").length - 1, 12, 'le menu rendu doit generer les 12 entrees du catalogue, pas une liste locale');
   assert.ok(html.includes('data-text-speed="normal"') && html.includes('data-text-speed="lente"'), 'la vitesse doit etre offerte');
   assert.ok(html.includes('data-text-delay="aucun"') && html.includes('data-text-delay="net"'), 'le delai doit etre offert');
 });

@@ -121,6 +121,13 @@ et ce projet adhère à la numérotation [Semantic Versioning](https://semver.or
 - **Migration à la lecture** : `normalizeMotionRepeatId` traduit l'ancien `infinite` en `loop` ; un projet déjà enregistré continue de boucler et le bon bouton s'allume, sans réécriture de données.
 - Tests : `tests/motion_loop.test.js` étendu (6 cas) ; **431/431**.
 
+#### Animations — tester, arrêter, réinitialiser sur les trois surfaces
+
+- **Constat** : seule la section proposait les trois actions. Les animations de **texte** et d'**image** n'avaient qu'un aperçu au survol : aucun moyen de rejouer, d'arrêter une animation gênante, ni d'effacer un réglage devenu inutile.
+- **Actions** : les menus texte et image reçoivent une rangée « Tester / Arrêter / Réinitialiser », comme l'inspecteur de section. « Tester » rejoue avec la répétition enregistrée ; « Arrêter » coupe l'animation en cours **sans** toucher au réglage ; « Réinitialiser » efface preset, répétition, vitesse et délai pour cette cible précise.
+- Un helper `_findImageElement` remplace les quatre sélecteurs d'image dupliqués, pour que les trois actions visent bien la même image.
+- Tests : 4 nouveaux (`tests/motion_actions.test.js`) ; **435/435**.
+
 ### Maturation produit — 17 septembre 2026 (4.9.0-alpha.59) — Lot 7 : la courbe d'animation devient réglable
 
 - Le catalogue portait une courbe par animation, mais l'auteur ne pouvait pas la changer. Trois courbes sont désormais proposées — **Douce** (départ vif, arrivée posée), **Rebond** (léger dépassement), **Régulière** — dans le repli « Réglages avancés » du panneau, à côté de la vitesse et du délai.

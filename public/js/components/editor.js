@@ -357,6 +357,11 @@ export function renderEditor(state) {
                     <button type="button" data-text-delay="${delay.id}" class="motion-loop-btn ${delay.id === 'aucun' ? 'is-active' : ''}" title="${delay.description}" onclick="window.app.setActiveTextMotionDelay('${delay.id}')">${delay.label}</button>
                   `).join('')}
                 </div>
+                <div class="motion-actions" data-text-actions>
+                  <button type="button" class="motion-loop-btn" title="Rejouer l'animation de ce texte" onclick="window.app.playActiveTextMotion()">Tester</button>
+                  <button type="button" class="motion-loop-btn" title="Arrêter l'animation en cours" onclick="window.app.stopActiveTextMotion()">Arrêter</button>
+                  <button type="button" class="motion-loop-btn" title="Revenir à aucun réglage d'animation" onclick="window.app.resetActiveTextMotion()">Réinitialiser</button>
+                </div>
                 <div class="motion-preview-hint">Survolez une animation pour la voir jouer.</div>
               </div>
             </div>

@@ -3818,6 +3818,93 @@ export class App {
     this.showToast(`Animation texte : ${preset === 'none' ? 'Aucune' : preset}`, "info");
   }
 
+  /** Element image d'apres sa section, son champ et son index. */
+  _findImageElement(secId, fieldPath, itemIndex) {
+    const idx = (itemIndex !== null && itemIndex !== undefined && itemIndex !== "null") ? itemIndex : 0;
+    const secEl = document.getElementById("section-" + secId) || document.querySelector(".editor-section-wrapper[data-section-id=\"" + secId + "\"]");
+    return secEl?.querySelector("[data-image-field=\"" + fieldPath + "\"][data-image-index=\"" + idx + "\"]") || secEl?.querySelector("img") || null;
+  }
+
+  /** Rejoue l'animation du texte en cours d'edition. */
+  playActiveTextMotion() {
+    const el = this._activeEditableEl;
+    if (!el) return;
+    const field = el.getAttribute("data-editable") || "text";
+    const secId = el.closest(".editor-section-wrapper")?.getAttribute("data-section-id");
+    const sec = state.currentProject?.sections.find(s => s.id === secId);
+    const motion = sec?.settings?.elementMotions?.[field];
+    if (!motion || motion === "none") { this.showToast("Choisissez d'abord une animation pour ce texte", "info"); return; }
+    const live = (secId && field)
+      ? document.querySelector(".editor-section-wrapper[data-section-id=\"" + secId + "\"] [data-editable=\"" + field + "\"]")
+      : el;
+    this.previewElementMotion(live || el, motion, motionLoopAttribute(sec?.settings?.elementMotionLoops?.[field]));
+  }
+
+  /** Arrete l'animation du texte sans toucher au reglage enregistre. */
+  stopActiveTextMotion() {
+    const el = this._activeEditableEl;
+    if (!el) return;
+    el.classList.remove("is-revealed", "motion-preview", "btn-pulse-active");
+    this.showToast("Animation arretee", "info");
+  }
+
+  /** Efface le reglage d'animation du texte en cours d'edition. */
+  resetActiveTextMotion() {
+    const el = this._activeEditableEl;
+    if (!el) return;
+    const field = el.getAttribute("data-editable") || "text";
+    const secId = el.closest(".editor-section-wrapper")?.getAttribute("data-section-id");
+    el.classList.remove("is-revealed", "motion-preview", "btn-pulse-active");
+    if (!secId || !state.currentProject) return;
+    state.pushHistory("Reinitialisation de l'animation du texte");
+    const updated = JSON.parse(JSON.stringify(state.currentProject));
+    const sec = updated.sections.find(s => s.id === secId);
+    if (!sec) return;
+    if (sec.settings?.elementMotions) delete sec.settings.elementMotions[field];
+    if (sec.settings?.elementMotionLoops) delete sec.settings.elementMotionLoops[field];
+    if (sec.settings?.elementMotionSpeeds) delete sec.settings.elementMotionSpeeds[field];
+    if (sec.settings?.elementMotionDelays) delete sec.settings.elementMotionDelays[field];
+    state.updateProject(updated, true);
+    this.showToast("Animation du texte reinitialisee", "info");
+  }
+
+  /** Rejoue l'animation d'une image. */
+  playImageMotion(secId, fieldPath, itemIndex) {
+    const idx = (itemIndex !== null && itemIndex !== undefined && itemIndex !== "null") ? itemIndex : 0;
+    const key = fieldPath + "_" + idx;
+    const sec = state.currentProject?.sections.find(s => s.id === secId);
+    const motion = sec?.settings?.imageMotions?.[key];
+    if (!motion || motion === "none") { this.showToast("Choisissez d'abord une animation pour cette image", "info"); return; }
+    const imgEl = this._findImageElement(secId, fieldPath, idx);
+    if (imgEl) this.previewElementMotion(imgEl, motion, motionLoopAttribute(sec?.settings?.imageMotionLoops?.[key]));
+  }
+
+  /** Arrete l'animation d'une image sans toucher au reglage enregistre. */
+  stopImageMotion(secId, fieldPath, itemIndex) {
+    const imgEl = this._findImageElement(secId, fieldPath, itemIndex);
+    if (!imgEl) return;
+    imgEl.classList.remove("is-revealed", "motion-preview", "btn-pulse-active");
+    this.showToast("Animation arretee", "info");
+  }
+
+  /** Efface le reglage d'animation d'une image. */
+  resetImageMotion(secId, fieldPath, itemIndex) {
+    const idx = (itemIndex !== null && itemIndex !== undefined && itemIndex !== "null") ? itemIndex : 0;
+    const key = fieldPath + "_" + idx;
+    const imgEl = this._findImageElement(secId, fieldPath, idx);
+    if (imgEl) imgEl.classList.remove("is-revealed", "motion-preview", "btn-pulse-active");
+    if (!state.currentProject) return;
+    state.pushHistory("Reinitialisation de l'animation de l'image");
+    const updated = JSON.parse(JSON.stringify(state.currentProject));
+    const sec = updated.sections.find(s => s.id === secId);
+    if (!sec) return;
+    for (const bucket of ["imageMotions", "imageMotionLoops", "imageMotionSpeeds", "imageMotionDelays"]) {
+      if (sec.settings?.[bucket]) delete sec.settings[bucket][key];
+    }
+    state.updateProject(updated, true);
+    this.showToast("Animation de l'image reinitialisee", "info");
+  }
+
   previewElementMotion(el, preset, loop) {
     if (!el) return;
     const motion = preset === "none" ? "" : preset;

@@ -1919,3 +1919,11 @@ tentative de ce tour s'est heurtée à une limite d'échappement de l'outil et n
 - normalizeMotionRepeatId traduit l'ancien infinite en loop a la lecture : un projet existant boucle toujours et le bon bouton s'allume, sans migration de donnees. Le CSS garde la regle infinite pour les pages deja enregistrees.
 - Tests : tests/motion_loop.test.js etendu (6 cas) ; 431/431.
 - Reste : bug destructif du centrage (jamais reproduit) ; outil tester/rejouer/arreter/reinitialiser ; motions pendant un transform libre ; PRODUCT.md/DESIGN.md.
+
+## Journal — 17 septembre 2026 · 4.9.1 (suite 10) : tester / arreter / reinitialiser partout
+
+- Cause : seule la section proposait les trois actions ; les animations de texte et d'image n'avaient qu'un apercu au survol, sans rejouer, arreter ni effacer un reglage.
+- Les menus texte (barre flottante) et image recoivent une rangee Tester / Arreter / Reinitialiser, comme l'inspecteur de section. Tester rejoue avec la repetition enregistree ; Arreter coupe l'animation sans toucher au reglage ; Reinitialiser efface preset, repetition, vitesse et delai pour la cible visee.
+- Helper _findImageElement : les trois actions image visent la meme image (remplace quatre selecteurs dupliques).
+- Tests : tests/motion_actions.test.js (4 cas) ; 435/435.
+- Reste : bug destructif du centrage (jamais reproduit) ; motions pendant un transform libre ; PRODUCT.md/DESIGN.md.

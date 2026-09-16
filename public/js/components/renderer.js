@@ -342,6 +342,11 @@ const motionAttr = imgMotion && imgMotion !== "none" ? ` data-motion="${imgMotio
                 <button type="button" data-image-delay="${delay.id}" class="motion-loop-btn ${delay.id === (sec?.settings?.imageMotionDelays?.[imgKey] || 'aucun') ? 'is-active' : ''}" title="${delay.description}" onclick="event.stopPropagation(); window.app.setImageMotionDelay('${sectionId}', '${fieldPath}', ${indexParam}, '${delay.id}')">${delay.label}</button>
               `).join('')}
             </div>
+            <div class="motion-actions" data-image-actions>
+              <button type="button" class="motion-loop-btn" title="Rejouer l'animation de cette image" onclick="event.stopPropagation(); window.app.playImageMotion('${sectionId}', '${fieldPath}', ${indexParam})">Tester</button>
+              <button type="button" class="motion-loop-btn" title="Arrêter l'animation en cours" onclick="event.stopPropagation(); window.app.stopImageMotion('${sectionId}', '${fieldPath}', ${indexParam})">Arrêter</button>
+              <button type="button" class="motion-loop-btn" title="Revenir à aucun réglage d'animation" onclick="event.stopPropagation(); window.app.resetImageMotion('${sectionId}', '${fieldPath}', ${indexParam})">Réinitialiser</button>
+            </div>
             <div class="motion-preview-hint">Survolez un style pour le voir jouer.</div>
           </div>
         </div>
